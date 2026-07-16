@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="primary">#D52662</color>
+    <color name="secondary">#FCCFA1</color>
+    <color name="hint_color">#4A4A4A</color>
+    <color name="orange">#FF9F43</color>
+
+    <color name="toast_bg_upload">#DDEEFF</color>          <!-- light blue pill background   -->
+    <color name="toast_icon_bg_upload">#DDEEFF</color>     <!-- icon box background (same)   -->
+    <color name="toast_icon_tint_upload">#1E4D8C</color>   <!-- dark blue icon tint           -->
+    <color name="toast_text_upload">#1E4D8C</color>        <!-- dark blue text                -->
+    <color name="toast_border_upload">#1E4D8C</color>      <!-- dark blue border              -->
+    <color name="toast_bg_success">#C8F5D8</color>         <!-- mint green pill background    -->
+    <color name="toast_icon_bg_success">#C8F5D8</color>    <!-- icon box background (same)    -->
+    <color name="toast_icon_tint_success">#1A7A34</color>  <!-- dark green icon tint          -->
+    <color name="toast_text_success">#1A7A34</color>       <!-- dark green text               -->
+    <color name="toast_border_success">#1A7A34</color>     <!-- dark green border             -->
+    <color name="toast_bg_edit">#F5EDA0</color>            <!-- pale yellow pill background   -->
+    <color name="toast_icon_bg_edit">#F5EDA0</color>       <!-- icon box background (same)    -->
+    <color name="toast_icon_tint_edit">#7A6A00</color>     <!-- olive/dark-yellow icon tint   -->
+    <color name="toast_text_edit">#7A6A00</color>          <!-- olive text                    -->
+    <color name="toast_border_edit">#7A6A00</color>        <!-- olive border                  -->
+    <color name="toast_bg_delete">#FFD6D6</color>          <!-- light pink pill background    -->
+    <color name="toast_icon_bg_delete">#FFD6D6</color>     <!-- icon box background (same)    -->
+    <color name="toast_icon_tint_delete">#CC0000</color>   <!-- red icon tint                 -->
+    <color name="toast_text_delete">#CC0000</color>        <!-- red text                      -->
+    <color name="toast_border_delete">#CC0000</color>      <!-- red border                    -->
+    <color name="toast_bg_warning">#FFD9A1</color>         <!-- warm orange pill background   -->
+    <color name="toast_icon_bg_warning">#F5C57A</color>    <!-- icon box background (same)    -->
+    <color name="toast_icon_tint_warning">#A06000</color>  <!-- dark amber icon tint          -->
+    <color name="toast_text_warning">#A06000</color>       <!-- dark amber text               -->
+    <color name="toast_border_warning">#A06000</color>     <!-- dark amber border             -->
+    <color name="toast_bg_expired">#EAEAEA</color>
+    <color name="toast_icon_bg_expired">#EAEAEA</color>
+    <color name="toast_icon_tint_expired">#5C5C5C</color>
+    <color name="toast_text_expired">#5C5C5C</color>
+    <color name="toast_border_expired">#5C5C5C</color>
+
+
+    <!-- LiquidGlass Effect -->
+    <color name="stroke_color">#66FFFFFF</color>           <!-- semi-transparent white border -->
+    <color name="filter_bg">#99FFFFFF</color>              <!-- pill/filter button pressed bg -->
+</resources>

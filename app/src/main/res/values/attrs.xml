@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Custom theme colour attributes for PayTouch Consumer.
+        Always reference these via ?attr/colorXxx in XML layouts and drawables.
+        Do NOT reference @color/ raw values directly for semantic UI colours.
+
+        Both values/themes.xml (light) and values-night/themes.xml (dark) currently
+        resolve to identical values — dark-mode palette to be added later.
+    -->
+
+    <attr name="colorSecondary"       format="color" />
+
+    <!-- ── Text ─────────────────────────────────────────────────── -->
+    <attr name="colorTextBody"       format="color" /> <!-- primary body / title text -->
+    <attr name="colorTextSubtitle"   format="color" /> <!-- secondary labels, subtitles -->
+    <attr name="colorTextHint"       format="color" /> <!-- EditText placeholder text -->
+    <attr name="colorTextOnBrand"    format="color" /> <!-- text / icons on brand-colour bg -->
+
+    <!-- ── Icons ─────────────────────────────────────────────────── -->
+    <attr name="colorIconDefault"    format="color" /> <!-- default icon tint -->
+    <attr name="colorIconSubtle"     format="color" /> <!-- muted / inactive icon tint -->
+
+    <!-- ── Surfaces ──────────────────────────────────────────────── -->
+    <attr name="colorToolbarBg"      format="color" /> <!-- toolbar / app-bar background -->
+    <attr name="colorBrandSubtle"    format="color" /> <!-- very light brand tint for highlights -->
+
+    <!-- ── Status ────────────────────────────────────────────────── -->
+    <attr name="colorStatusSuccess"  format="color" />
+    <attr name="colorStatusError"    format="color" />
+    <attr name="colorStatusWarning"  format="color" />
+
+    <!-- ── Stroke / Dividers ─────────────────────────────────────── -->
+    <attr name="colorStroke"         format="color" /> <!-- input / card borders -->
+    <attr name="colorDivider"        format="color" /> <!-- horizontal list dividers -->
+
+    <!-- ── Bottom Sheet ──────────────────────────────────────────── -->
+    <attr name="colorSheetScrim"     format="color" /> <!-- dim overlay behind open sheet -->
+    <attr name="colorSheetDragBar"   format="color" /> <!-- drag-handle pill colour -->
+
+</resources>

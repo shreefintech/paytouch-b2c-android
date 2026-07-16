@@ -1,0 +1,52 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--
+        Dark theme — currently mirrors the light theme exactly.
+        When dark-mode is implemented, replace the colour values below with
+        dark-palette equivalents. The ?attr/colorXxx system is already in place;
+        only these item values need to change.
+    -->
+<!--    <style name="Base.Theme.PaytouchConsumer" parent="Theme.Material3.Light.NoActionBar">
+
+        &lt;!&ndash; ── System / Window ──────────────────────────────────────────── &ndash;&gt;
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/secondary</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:textColorHint">@color/color_text_hint</item>
+
+        &lt;!&ndash; ── Material3 colour overrides ───────────────────────────────── &ndash;&gt;
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnBackground">@color/black</item>
+        <item name="colorSurface">@color/color_surface</item>
+        <item name="colorSurfaceVariant">@color/color_surface_variant</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorError">@color/color_error</item>
+        <item name="colorOutline">@color/color_stroke</item>
+
+        &lt;!&ndash; ── Custom theme attrs (see res/values/attrs.xml) ────────────── &ndash;&gt;
+        &lt;!&ndash; Text &ndash;&gt;
+        <item name="colorTextBody">@color/black</item>
+        <item name="colorTextSubtitle">@color/hint_color</item>
+        <item name="colorTextHint">@color/color_text_hint</item>
+        <item name="colorTextOnBrand">@color/white</item>
+        &lt;!&ndash; Icons &ndash;&gt;
+        <item name="colorIconDefault">@color/hint_color</item>
+        <item name="colorIconSubtle">@color/color_text_hint</item>
+        &lt;!&ndash; Surfaces &ndash;&gt;
+        <item name="colorToolbarBg">@color/white</item>
+        <item name="colorBrandSubtle">@color/color_brand_subtle</item>
+        &lt;!&ndash; Status &ndash;&gt;
+        <item name="colorStatusSuccess">@color/color_success</item>
+        <item name="colorStatusError">@color/color_error</item>
+        <item name="colorStatusWarning">@color/color_warning</item>
+        &lt;!&ndash; Stroke / Dividers &ndash;&gt;
+        <item name="colorStroke">@color/color_stroke</item>
+        <item name="colorDivider">@color/color_divider</item>
+        &lt;!&ndash; Bottom Sheet &ndash;&gt;
+        <item name="colorSheetScrim">@color/sheet_view_bg</item>
+        <item name="colorSheetDragBar">@color/btm_sheet_bar</item>
+
+    </style>-->
+</resources>

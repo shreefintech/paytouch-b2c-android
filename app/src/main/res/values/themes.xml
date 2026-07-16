@@ -1,0 +1,93 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.PaytouchConsumer" parent="Theme.Material3.Light.NoActionBar">
+
+        <!-- ── System / Window ──────────────────────────────────────────── -->
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:textColorHint">@color/hint_color</item>
+
+
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorPrimary">@color/primary</item>
+        <!-- Text -->
+        <item name="colorTextBody">@color/black</item>
+        <item name="colorTextSubtitle">@color/hint_color</item>
+        <item name="colorTextHint">@color/hint_color</item>
+        <item name="colorTextOnBrand">@color/primary</item>
+        <!-- Icons -->
+        <item name="colorIconDefault">@color/hint_color</item>
+        <item name="colorIconSubtle">@color/hint_color</item>
+        <!-- Surfaces -->
+        <item name="colorToolbarBg">@color/white</item>
+
+    </style>
+
+    <style name="Theme.PaytouchConsumer" parent="Base.Theme.PaytouchConsumer" />
+    <declare-styleable name="BlurView">
+        <attr name="blurOverlayColor" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="GlassFrameLayout">
+
+        <!-- Corner radius of the glass surface (default 24dp) -->
+        <attr name="glass_cornerRadius" format="dimension" />
+
+        <!-- Gaussian blur radius applied to the captured backdrop (default 12dp) -->
+        <attr name="glass_blurRadius" format="dimension" />
+
+        <!-- Enable vibrancy (color-boost) on the blurred backdrop (default true) -->
+        <attr name="glass_vibrancy" format="boolean" />
+
+        <!-- Lens refraction: vertical warp height (0dp = disabled) -->
+        <attr name="glass_lensRefractionHeight" format="dimension" />
+
+        <!-- Lens refraction: lateral refraction amount (0dp = disabled) -->
+        <attr name="glass_lensRefractionAmount" format="dimension" />
+
+        <!-- Enable chromatic aberration on the lens effect (default false) -->
+        <attr name="glass_chromaticAberration" format="boolean" />
+
+        <!-- Semi-transparent color tint drawn over the glass surface
+             e.g. #33FFFFFF for a frosted white look.
+             Omit or set to @null / transparent for no tint. -->
+        <attr name="glass_tintColor" format="color" />
+
+        <!-- Saturation multiplier for the backdrop (1.0 = unchanged) -->
+        <attr name="glass_saturation" format="float" />
+
+        <!-- Brightness multiplier for the backdrop (1.0 = unchanged) -->
+        <attr name="glass_brightness" format="float" />
+
+    </declare-styleable>
+
+    <declare-styleable name="OutlineTextView">
+        <attr name="stroke_color" format="color" />
+        <attr name="stroke_width" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="LiquidGlassButton">
+        <attr name="normalTint"        format="color" />
+        <attr name="pressedTint"       format="reference" />
+        <attr name="glassCornerRadius" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="LiquidGlassCardView">
+        <attr name="lgCornerRadius" format="float" />
+        <attr name="lgBlur" format="float" />
+    </declare-styleable>
+
+    <declare-styleable name="BackBtn">
+        <attr name="normalSrc" format="reference"/>
+        <attr name="pressedSrc" format="reference"/>
+    </declare-styleable>
+
+    <style name="CircleCard">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+</resources>

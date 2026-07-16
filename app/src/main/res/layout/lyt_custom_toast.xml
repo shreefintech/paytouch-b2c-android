@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    layout_custom_toast.xml
+    Place in: res/layout/layout_custom_toast.xml
+
+    Uses CardView for pill shape + border — no drawable background needed.
+    Icon drawables you import from Figma:
+      @drawable/ic_toast_upload
+      @drawable/ic_toast_success
+      @drawable/ic_toast_edit
+      @drawable/ic_toast_delete
+      @drawable/ic_toast_warning
+      @drawable/ic_toast_expired
+-->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toastRoot"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="6dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/toast_border_upload"
+    app:cardBackgroundColor="@color/toast_bg_upload">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="@dimen/margin_small"
+        android:paddingHorizontal="@dimen/margin_medium">
+
+        <!-- Icon container (inner rounded card) -->
+        <FrameLayout
+            android:id="@+id/toastIconContainer"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/toast_icon_bg_upload">
+
+            <ImageView
+                android:id="@+id/toastIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_toast_upload"
+                android:scaleType="fitCenter" />
+
+        </FrameLayout>
+
+        <!-- Message -->
+        <TextView
+            android:id="@+id/toastMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:textSize="@dimen/text_size_12"
+            android:textColor="@color/toast_text_upload"
+            android:maxLines="3"
+            tools:text="this is custom toast"
+            android:ellipsize="end"
+            android:fontFamily="@font/proza_libre_medium" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

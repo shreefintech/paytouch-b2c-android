@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Page Margins -->
+    <dimen name="page_margin_horizontal">20dp</dimen>
+    <dimen name="page_margin_vertical">20dp</dimen>
+    <dimen name="screen_padding">20dp</dimen>
+
+    <!-- Common Margins -->
+    <dimen name="margin_tiny">2dp</dimen>
+    <dimen name="margin_extra_small">5dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_small_medium">10dp</dimen>
+    <dimen name="margin_medium">12dp</dimen>
+    <dimen name="margin_large">16dp</dimen>
+    <dimen name="margin_extra_large">20dp</dimen>
+    <dimen name="margin_xlarge">25dp</dimen>
+    <dimen name="margin_xxlarge">30dp</dimen>
+
+    <!-- Text Sizes -->
+    <dimen name="text_size_8">8sp</dimen>
+    <dimen name="text_size_9">9sp</dimen>
+    <dimen name="text_size_10">10sp</dimen>
+    <dimen name="text_size_11">11sp</dimen>
+    <dimen name="text_size_12">12sp</dimen>
+    <dimen name="text_size_13">13sp</dimen>
+    <dimen name="text_size_14">14sp</dimen>
+    <dimen name="text_size_16">16sp</dimen>
+    <dimen name="text_size_17">17sp</dimen>
+    <dimen name="text_size_18">18sp</dimen>
+    <dimen name="text_size_19">19sp</dimen>
+    <dimen name="text_size_20">20sp</dimen>
+    <dimen name="text_size_22">22sp</dimen>
+    <dimen name="text_size_23">23sp</dimen>
+    <dimen name="text_size_25">25sp</dimen>
+
+
+    <!-- Common Heights -->
+    <dimen name="button_height">45dp</dimen>
+    <dimen name="input_height">50dp</dimen>
+    <dimen name="toolbar_height">70dp</dimen>
+
+    <!-- Common Width -->
+    <dimen name="dialog_button_width">100dp</dimen>
+
+    <!-- Corner Radius -->
+    <dimen name="card_corner_radius">10dp</dimen>
+    <dimen name="button_corner_radius">15dp</dimen>
+    <dimen name="dialog_corner_radius">20dp</dimen>
+    <dimen name="input_corner_radius">10dp</dimen>
+
+    <!-- Icon Sizes -->
+    <dimen name="icon_small">20dp</dimen>
+    <dimen name="icon_medium">25dp</dimen>
+    <dimen name="icon_large">30dp</dimen>
+    <dimen name="icon_xlarge">40dp</dimen>
+
+    <!-- Avatar / Profile -->
+    <dimen name="profile_image_size">50dp</dimen>
+
+    <!-- Stroke -->
+    <dimen name="default_stroke_width">1dp</dimen>
+
+    <!-- Elevation -->
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="input_elevation">10dp</dimen>
+
+    <!-- Blur -->
+    <dimen name="default_blur_radius">10dp</dimen>
+    <dimen name="strong_blur_radius">50dp</dimen>
+
+
+    <!-- Default Component Spacing -->
+    <dimen name="item_spacing">10dp</dimen>
+    <dimen name="section_spacing">20dp</dimen>
+    <dimen name="content_spacing">16dp</dimen>
+
+    <dimen name="back_btn_size">33dp</dimen>
+    <dimen name="toast_radius">20dp</dimen>
+    <dimen name="toast_blure">50dp</dimen>
+
+    <!-- LiquidGlass Effect -->
+    <dimen name="glass_frem_radius">30dp</dimen>
+    <dimen name="glass_frem_blur">10dp</dimen>
+    <dimen name="mpin_box_radius">15dp</dimen>
+    <dimen name="mpin_box_blure">10dp</dimen>
+    <dimen name="mpin_box_stroke">5dp</dimen>
+    <dimen name="filter_btn_radius">60dp</dimen>
+    <dimen name="filter_btn_blure">10dp</dimen>
+</resources>

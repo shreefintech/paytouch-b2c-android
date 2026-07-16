@@ -1,0 +1,29 @@
+# Android Studio
+.idea/
+*.iml
+
+# Gradle
+.gradle/
+
+# Local machine settings
+local.properties
+
+# Build outputs
+build/
+*/build/
+app/release/
+
+# Native build
+.externalNativeBuild/
+.cxx/
+
+# Android Studio captures
+captures/
+
+# macOS
+.DS_Store
+
+#cUrl file
+app/src/main/java/com/shreefintech/dashboard/retrofit/CurlInterceptor.kt
+
+design/
