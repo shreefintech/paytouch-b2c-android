@@ -1,0 +1,23 @@
+#!/bin/sh
+
+echo "Running pre-push checks..."
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+# Block direct push to main
+if [ "$branch" = "main" ]; then
+    echo "❌ Direct push to MAIN branch is not allowed."
+    exit 1
+fi
+
+# Check for Android debug logs
+if git grep -nE 'Log\.[deivw]\s*\(|Utility\.printLog\s*\(' -- '*.kt' '*.java'
+then
+    echo ""
+    echo "❌ Push blocked: Debug logs found."
+    echo "Please remove Log.d(), Log.e(), Log.i(), Log.v(), Log.w() or Utility.printLog() calls."
+    exit 1
+fi
+
+echo "✅ Push allowed for branch: $branch"
+exit 0

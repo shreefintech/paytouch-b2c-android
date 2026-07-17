@@ -23,6 +23,11 @@ object Constant {
     const val KEY_LOGIN_MOBILE         = "MOBILE_LOGIN"
     const val KEY_LOGIN_TYPE_PASSWORD  = "LOGIN_TYPE_PASSWORD"
 
+    // Auth flow type extras
+    const val EXTRA_FLOW_TYPE       = "FLOW_TYPE"
+    const val FLOW_RESET_PASSWORD   = "RESET_PASSWORD"
+    const val FLOW_RESET_MPIN       = "RESET_MPIN"
+
     // Intent extra keys
     const val EXTRA_TRANSACTION_ID   = "TRANSACTION_ID"
     const val EXTRA_AMOUNT           = "AMOUNT"

@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="showProgress"
+            type="androidx.databinding.ObservableBoolean" />
+
+        <import type="android.view.View" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg">
+
+        <!-- ── Wallet illustration (top-right) ── -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivWalletIllustration"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:scaleType="fitEnd"
+            android:src="@drawable/img_wallet_recolored"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- ── PayTouch logo ── -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:scaleType="fitStart"
+            android:src="@drawable/img_paytouch"
+            app:layout_constraintEnd_toStartOf="@id/ivWalletIllustration"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.55" />
+
+        <!-- ── Welcome! ── -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvWelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_extra_large"
+            android:ellipsize="end"
+            android:fontFamily="@font/proza_libre_bold"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text="@string/welcome_create_account"
+            android:textColor="?attr/colorTextOnBrand"
+            android:textSize="@dimen/text_size_22"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivLogo" />
+
+        <!-- ── Subtitle ── -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:layout_marginEnd="@dimen/margin_extra_small"
+            android:ellipsize="end"
+            android:fontFamily="@font/proza_libre_medium"
+            android:includeFontPadding="false"
+            android:maxLines="3"
+            android:text="@string/create_account_subtitle"
+            android:textColor="?attr/colorTextOnBrand"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintEnd_toStartOf="@id/ivWalletIllustration"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
+
+        <!-- ── Glass card (fills remaining screen height) ── -->
+        <FrameLayout
+            android:id="@+id/flCard"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/margin_xxlarge"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:clipToOutline="true"
+            android:outlineProvider="background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/page_margin_horizontal">
+
+                    <!-- Mobile Number label -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/label_mobile_number"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <!-- Mobile input -->
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etMobile"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/input_height"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:background="@drawable/bg_input_field"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:hint="@string/hint_mobile"
+                        android:includeFontPadding="false"
+                        android:inputType="phone"
+                        android:maxLength="10"
+                        android:maxLines="1"
+                        android:paddingHorizontal="@dimen/margin_small"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:textColorHint="?attr/colorTextHint"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <!-- Email Address label -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_large"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/label_email_address"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <!-- Email input -->
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/input_height"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:background="@drawable/bg_input_field"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:hint="@string/hint_email"
+                        android:includeFontPadding="false"
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1"
+                        android:paddingHorizontal="@dimen/margin_small"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:textColorHint="?attr/colorTextHint"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <!-- Referral Code label row -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_large"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/label_referral_code"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_tiny"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:includeFontPadding="false"
+                            android:text="@string/label_optional"
+                            android:textColor="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_11" />
+
+                    </LinearLayout>
+
+                    <!-- Referral Code input -->
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etReferralCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/input_height"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:background="@drawable/bg_input_field"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:hint="@string/hint_referral_code"
+                        android:includeFontPadding="false"
+                        android:inputType="textNoSuggestions"
+                        android:maxLines="1"
+                        android:paddingHorizontal="@dimen/margin_small"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:textColorHint="?attr/colorTextHint"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <!-- Password label -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_large"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/label_password"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <!-- Password input with eye toggle -->
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/input_height"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:background="@drawable/bg_input_field">
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hint_password"
+                            android:includeFontPadding="false"
+                            android:inputType="textPassword"
+                            android:maxLines="1"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivPasswordToggle"
+                            android:layout_width="@dimen/icon_small"
+                            android:layout_height="@dimen/icon_small"
+                            android:layout_gravity="center_vertical|end"
+                            android:layout_marginEnd="@dimen/margin_large"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClickListener="@{onClickListener}"
+                            android:src="@drawable/ic_eye_off"
+                            android:tint="@color/black" />
+
+                    </FrameLayout>
+
+                    <!-- Confirm Password label -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_large"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/label_confirm_password"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <!-- Confirm Password input with eye toggle -->
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/input_height"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:background="@drawable/bg_input_field">
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etConfirmPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hint_confirm_password"
+                            android:includeFontPadding="false"
+                            android:inputType="textPassword"
+                            android:maxLines="1"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivConfirmPasswordToggle"
+                            android:layout_width="@dimen/icon_small"
+                            android:layout_height="@dimen/icon_small"
+                            android:layout_gravity="center_vertical|end"
+                            android:layout_marginEnd="@dimen/margin_large"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClickListener="@{onClickListener}"
+                            android:src="@drawable/ic_eye_off"
+                            android:tint="@color/black" />
+
+                    </FrameLayout>
+
+                    <!-- Terms & Conditions row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/cbTerms"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="?attr/colorPrimary"
+                            android:minHeight="0dp"
+                            android:minWidth="0dp" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvTerms"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_small"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:includeFontPadding="false"
+                            android:text="@string/label_terms_conditions"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_12" />
+
+                    </LinearLayout>
+
+                    <!-- Create Account button -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/button_height"
+                        android:layout_marginTop="@dimen/margin_extra_large"
+                        android:layout_marginBottom="@dimen/margin_small"
+                        app:cardBackgroundColor="?attr/colorPrimary"
+                        app:cardCornerRadius="@dimen/button_corner_radius"
+                        app:cardElevation="@dimen/card_elevation">
+
+                        <LinearLayout
+                            android:id="@+id/llCreateAccount"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?selectableItemBackground"
+                            android:gravity="center"
+                            android:onClickListener="@{onClickListener}"
+                            android:orientation="horizontal"
+                            android:visibility="@{showProgress ? View.INVISIBLE : View.VISIBLE}">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="@dimen/icon_medium"
+                                android:layout_height="@dimen/icon_medium"
+                                android:layout_marginEnd="@dimen/margin_small_medium"
+                                android:src="@drawable/ic_create_account" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/create_account"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <ProgressBar
+                            android:id="@+id/progressBar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginVertical="@dimen/margin_small"
+                            android:indeterminateTint="@color/white"
+                            android:visibility="@{showProgress ? View.VISIBLE : View.GONE}"
+                            tools:visibility="gone" />
+
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Back to sign In Page -->
+                    <LinearLayout
+                        android:id="@+id/tvBackToSignIn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:layout_marginBottom="@dimen/margin_small"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:onClickListener="@{onClickListener}"
+                        android:orientation="horizontal">
+
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/icon_small"
+                            android:layout_height="@dimen/icon_small"
+                            android:src="@drawable/ic_signin"
+                            android:tint="@color/black"/>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_small"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:includeFontPadding="false"
+                            android:maxLines="1"
+                            android:text="@string/back_to_sign_in"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
