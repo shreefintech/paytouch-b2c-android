@@ -493,7 +493,7 @@
                             android:fontFamily="@font/proza_libre_medium"
                             android:includeFontPadding="false"
                             android:maxLines="1"
-                            android:text="@string/back_to_sign_in"
+                            android:text="@string/backToSignIn"
                             android:textColor="@color/black"
                             android:textSize="@dimen/text_size_13" />
 

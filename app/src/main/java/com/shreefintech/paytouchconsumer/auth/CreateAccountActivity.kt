@@ -90,8 +90,8 @@ class CreateAccountActivity : BaseActivity() {
     }
 
     private fun setupTermsText() {
-        val fullText = getString(R.string.label_terms_conditions)
-        val linkText = getString(R.string.terms_link_text)
+        val fullText = getString(R.string.labelTermsConditions)
+        val linkText = getString(R.string.termsLinkText)
         val spannable = SpannableString(fullText)
         val linkStart = fullText.indexOf(linkText)
         if (linkStart < 0) return

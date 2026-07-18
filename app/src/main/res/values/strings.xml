@@ -12,7 +12,7 @@
     <string name="hint_mpin">Enter 4-digit MPIN</string>
     <string name="label_save_credentials">Save Credentials</string>
     <string name="forgot_password">Forgot Password?</string>
-    <string name="forgot_mpin">Forgot MPIN?</string>
+    <string name="forgotMpin">Forgot MPIN?</string>
     <string name="sign_in">Sign In</string>
     <string name="no_account">Don\'t Have an account?</string>
     <string name="create_account">Create Account</string>
@@ -26,18 +26,18 @@
     <string name="msgMpinInvalid">MPIN must be exactly 4 digits</string>
 
     <!-- Create Account screen -->
-    <string name="welcome_create_account">Welcome!</string>
-    <string name="create_account_subtitle">Enter your Details To get started</string>
-    <string name="label_email_address">Email Address</string>
-    <string name="hint_email">Enter your email address</string>
-    <string name="label_referral_code">Referral Code</string>
-    <string name="label_optional">(Optional)</string>
-    <string name="hint_referral_code">Enter your referral code</string>
-    <string name="label_confirm_password">Confirm Password</string>
-    <string name="hint_confirm_password">Re - Enter your Password</string>
-    <string name="label_terms_conditions">I agree to the platform fee terms &amp; conditions.</string>
-    <string name="terms_link_text">terms &amp; conditions.</string>
-    <string name="back_to_sign_in">Back to sign in Page</string>
+    <string name="welcomeCreateAccount">Welcome!</string>
+    <string name="createAccountSubtitle">Enter your Details To get started</string>
+    <string name="labelEmailAddress">Email Address</string>
+    <string name="hintEmail">Enter your email address</string>
+    <string name="labelReferralCode">Referral Code</string>
+    <string name="labelOptional">(Optional)</string>
+    <string name="hintReferralCode">Enter your referral code</string>
+    <string name="labelConfirmPassword">Confirm Password</string>
+    <string name="hintConfirmPassword">Re - Enter your Password</string>
+    <string name="labelTermsConditions">I agree to the platform fee terms &amp; conditions.</string>
+    <string name="termsLinkText">terms &amp; conditions.</string>
+    <string name="backToSignIn">Back to sign in Page</string>
 
     <!-- OTP Verification screen -->
     <string name="titleOtpVerification">OTP Verification!</string>

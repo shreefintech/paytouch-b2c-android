@@ -59,7 +59,7 @@
             android:fontFamily="@font/proza_libre_bold"
             android:includeFontPadding="false"
             android:maxLines="1"
-            android:text="@string/welcome_create_account"
+            android:text="@string/welcomeCreateAccount"
             android:textColor="?attr/colorTextOnBrand"
             android:textSize="@dimen/text_size_22"
             app:layout_constraintStart_toStartOf="parent"
@@ -77,7 +77,7 @@
             android:fontFamily="@font/proza_libre_medium"
             android:includeFontPadding="false"
             android:maxLines="3"
-            android:text="@string/create_account_subtitle"
+            android:text="@string/createAccountSubtitle"
             android:textColor="?attr/colorTextOnBrand"
             android:textSize="@dimen/text_size_14"
             app:layout_constraintEnd_toStartOf="@id/ivWalletIllustration"
@@ -149,7 +149,7 @@
                         android:ellipsize="end"
                         android:fontFamily="@font/proza_libre_semi_bold"
                         android:includeFontPadding="false"
-                        android:text="@string/label_email_address"
+                        android:text="@string/labelEmailAddress"
                         android:textColor="@color/primary"
                         android:textSize="@dimen/text_size_13" />
 
@@ -162,7 +162,7 @@
                         android:background="@drawable/bg_input_field"
                         android:ellipsize="end"
                         android:fontFamily="@font/proza_libre_medium"
-                        android:hint="@string/hint_email"
+                        android:hint="@string/hintEmail"
                         android:includeFontPadding="false"
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
@@ -186,7 +186,7 @@
                             android:ellipsize="end"
                             android:fontFamily="@font/proza_libre_semi_bold"
                             android:includeFontPadding="false"
-                            android:text="@string/label_referral_code"
+                            android:text="@string/labelReferralCode"
                             android:textColor="@color/primary"
                             android:textSize="@dimen/text_size_13" />
 
@@ -196,7 +196,7 @@
                             android:layout_marginStart="@dimen/margin_tiny"
                             android:fontFamily="@font/proza_libre_medium"
                             android:includeFontPadding="false"
-                            android:text="@string/label_optional"
+                            android:text="@string/labelOptional"
                             android:textColor="?attr/colorTextHint"
                             android:textSize="@dimen/text_size_11" />
 
@@ -211,7 +211,7 @@
                         android:background="@drawable/bg_input_field"
                         android:ellipsize="end"
                         android:fontFamily="@font/proza_libre_medium"
-                        android:hint="@string/hint_referral_code"
+                        android:hint="@string/hintReferralCode"
                         android:includeFontPadding="false"
                         android:inputType="textNoSuggestions"
                         android:maxLines="1"
@@ -279,7 +279,7 @@
                         android:ellipsize="end"
                         android:fontFamily="@font/proza_libre_semi_bold"
                         android:includeFontPadding="false"
-                        android:text="@string/label_confirm_password"
+                        android:text="@string/labelConfirmPassword"
                         android:textColor="@color/primary"
                         android:textSize="@dimen/text_size_13" />
 
@@ -297,7 +297,7 @@
                             android:background="@android:color/transparent"
                             android:ellipsize="end"
                             android:fontFamily="@font/proza_libre_medium"
-                            android:hint="@string/hint_confirm_password"
+                            android:hint="@string/hintConfirmPassword"
                             android:includeFontPadding="false"
                             android:inputType="textPassword"
                             android:maxLines="1"
@@ -345,7 +345,7 @@
                             android:layout_weight="1"
                             android:fontFamily="@font/proza_libre_medium"
                             android:includeFontPadding="false"
-                            android:text="@string/label_terms_conditions"
+                            android:text="@string/labelTermsConditions"
                             android:textColor="@color/black"
                             android:textSize="@dimen/text_size_12" />
 
@@ -431,7 +431,7 @@
                             android:fontFamily="@font/proza_libre_medium"
                             android:includeFontPadding="false"
                             android:maxLines="1"
-                            android:text="@string/back_to_sign_in"
+                            android:text="@string/backToSignIn"
                             android:textColor="@color/black"
                             android:textSize="@dimen/text_size_13" />
 

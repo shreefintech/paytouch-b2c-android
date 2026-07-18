@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.utill.Utility
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,6 +43,8 @@ class CreateAccountViewModel(application: Application) : AndroidViewModel(applic
                 //     }
                 // }
                 withContext(Dispatchers.Main) { onSuccess() }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) { onError(e.message ?: "Something went wrong") }
             }

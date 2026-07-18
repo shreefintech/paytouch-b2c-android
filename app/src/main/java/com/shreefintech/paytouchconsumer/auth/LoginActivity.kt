@@ -126,7 +126,7 @@ class LoginActivity : BaseActivity() {
                 binding.tvBtnMpin.setTextColor(ContextCompat.getColor(this, R.color.white))
                 binding.tvCredentialLabel.text  = getString(R.string.label_mpin)
                 binding.etCredential.hint       = getString(R.string.hint_mpin)
-                binding.tvForgotPassword.text   = getString(R.string.forgot_mpin)
+                binding.tvForgotPassword.text   = getString(R.string.forgotMpin)
                 binding.etCredential.inputType  =
                     InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
                 binding.ivPasswordToggle.gone()
