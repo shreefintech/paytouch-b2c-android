@@ -43,4 +43,9 @@
     <!-- LiquidGlass Effect -->
     <color name="stroke_color">#66FFFFFF</color>           <!-- semi-transparent white border -->
     <color name="filter_bg">#99FFFFFF</color>              <!-- pill/filter button pressed bg -->
+
+    <!-- Document upload cards -->
+    <color name="upload_btn_color">#33D52662</color>       <!-- upload button pressed glass tint -->
+    <color name="form_wizard_success">#1A7A34</color>      <!-- edit icon tint -->
+    <color name="form_wizard_reject">#CC0000</color>       <!-- delete icon tint -->
 </resources>

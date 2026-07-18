@@ -1,0 +1,1024 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="showProgress"
+            type="androidx.databinding.ObservableBoolean" />
+
+        <import type="android.view.View" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg">
+
+        <!-- ── Toolbar ── -->
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <!-- ── Glass card (fills remaining screen height) ── -->
+        <FrameLayout
+            android:id="@+id/flCard"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:clipToOutline="true"
+            android:outlineProvider="background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Create Virtual Account header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin_large">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/titleCreateVirtualAccount"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_18" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_tiny"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:includeFontPadding="false"
+                            android:text="@string/subtitleCreateVirtualAccount"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_12" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/primary" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/page_margin_horizontal">
+
+                        <!-- Personal Information -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelPersonalInformation"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_16" />
+
+                        <!-- Full Name label -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelFullName"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etFullName"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/input_height"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:background="@drawable/bg_input_field"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintFullName"
+                            android:includeFontPadding="false"
+                            android:inputType="textPersonName|textCapWords"
+                            android:maxLength="50"
+                            android:maxLines="1"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- Mobile Number label -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/label_mobile_number"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etMobile"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/input_height"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:background="@drawable/bg_input_field"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hint_mobile"
+                            android:includeFontPadding="false"
+                            android:inputType="phone"
+                            android:maxLength="10"
+                            android:maxLines="1"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- State / City / District row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal">
+
+                            <FrameLayout
+                                android:id="@+id/flStateAnchor"
+                                android:layout_width="0dp"
+                                android:layout_height="@dimen/input_height"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_input_field"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClickListener="@{onClickListener}">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvState"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center_vertical"
+                                    android:hint="@string/hintSelectState"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/icon_large"
+                                    android:singleLine="true"
+                                    android:textColor="@color/black"
+                                    android:textColorHint="?attr/colorTextHint"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivStateArrow"
+                                    android:layout_width="@dimen/icon_small"
+                                    android:layout_height="@dimen/icon_small"
+                                    android:layout_gravity="center_vertical|end"
+                                    android:layout_marginEnd="@dimen/margin_small"
+                                    android:src="@drawable/ic_down_arrow" />
+
+                            </FrameLayout>
+
+                            <FrameLayout
+                                android:id="@+id/flCityAnchor"
+                                android:layout_width="0dp"
+                                android:layout_height="@dimen/input_height"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_input_field"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClickListener="@{onClickListener}">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvCity"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center_vertical"
+                                    android:hint="@string/hintSelectCity"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/icon_large"
+                                    android:singleLine="true"
+                                    android:textColor="@color/black"
+                                    android:textColorHint="?attr/colorTextHint"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivCityArrow"
+                                    android:layout_width="@dimen/icon_small"
+                                    android:layout_height="@dimen/icon_small"
+                                    android:layout_gravity="center_vertical|end"
+                                    android:layout_marginEnd="@dimen/margin_small"
+                                    android:src="@drawable/ic_down_arrow" />
+
+                            </FrameLayout>
+
+                            <FrameLayout
+                                android:id="@+id/flDistrictAnchor"
+                                android:layout_width="0dp"
+                                android:layout_height="@dimen/input_height"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_input_field"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClickListener="@{onClickListener}">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvDistrict"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center_vertical"
+                                    android:hint="@string/hintSelectDistrict"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/icon_large"
+                                    android:singleLine="true"
+                                    android:textColor="@color/black"
+                                    android:textColorHint="?attr/colorTextHint"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivDistrictArrow"
+                                    android:layout_width="@dimen/icon_small"
+                                    android:layout_height="@dimen/icon_small"
+                                    android:layout_gravity="center_vertical|end"
+                                    android:layout_marginEnd="@dimen/margin_small"
+                                    android:src="@drawable/ic_down_arrow" />
+
+                            </FrameLayout>
+
+                        </LinearLayout>
+
+                        <!-- Pan Card Number label -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelPanCardNumber"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etPan"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/input_height"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:background="@drawable/bg_input_field"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintPanCardNumber"
+                            android:includeFontPadding="false"
+                            android:inputType="textCapCharacters|textNoSuggestions"
+                            android:maxLength="10"
+                            android:maxLines="1"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- Aadhar Card Number label -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelAadharCardNumber"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etAadhar"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/input_height"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:background="@drawable/bg_input_field"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintAadharCardNumber"
+                            android:includeFontPadding="false"
+                            android:inputType="number"
+                            android:maxLength="12"
+                            android:maxLines="1"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- Bank Details -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_xlarge"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelBankDetails"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_16" />
+
+                        <!-- IFSC Code label -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelIfscCode"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etIfsc"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/input_height"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:background="@drawable/bg_input_field"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintIfscCode"
+                            android:includeFontPadding="false"
+                            android:inputType="textCapCharacters|textNoSuggestions"
+                            android:maxLength="11"
+                            android:maxLines="1"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- Bank Account Number label -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelBankAccountNumber"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etBankAccount"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/input_height"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:background="@drawable/bg_input_field"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintBankAccountNumber"
+                            android:includeFontPadding="false"
+                            android:inputType="number"
+                            android:maxLength="18"
+                            android:maxLines="1"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- VPA label -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelVpa"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etVpa"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/input_height"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:background="@drawable/bg_input_field"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintVpa"
+                            android:includeFontPadding="false"
+                            android:inputType="textNoSuggestions"
+                            android:maxLength="100"
+                            android:maxLines="1"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- Branch Name label -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelBranchName"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etBranchName"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/input_height"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:background="@drawable/bg_input_field"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintBranchName"
+                            android:includeFontPadding="false"
+                            android:inputType="textCapWords"
+                            android:maxLength="50"
+                            android:maxLines="1"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- Upload Aadhar Card (Front) -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvProofLbl1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_xlarge"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelAadharFront"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvProof1"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            app:cardBackgroundColor="@android:color/transparent"
+                            app:cardCornerRadius="@dimen/normal_card_radius"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/primary"
+                            app:strokeWidth="1dp">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <ProgressBar
+                                    android:id="@+id/prgPreview1"
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    tools:visibility="gone" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivPreview1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleType="centerCrop"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <com.shreefintech.paytouchconsumer.widget.LiquidGlassButton
+                                    android:id="@+id/flUpload1"
+                                    android:layout_width="@dimen/btn_height"
+                                    android:layout_height="@dimen/btn_height"
+                                    android:onClickListener="@{onClickListener}"
+                                    app:glassCornerRadius="@dimen/submit_btn_radius"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:normalTint="@android:color/transparent"
+                                    app:pressedTint="@color/upload_btn_color">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivUpload1"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:padding="@dimen/margin_medium"
+                                        android:src="@drawable/ic_upload"
+                                        android:tint="@color/primary" />
+
+                                </com.shreefintech.paytouchconsumer.widget.LiquidGlassButton>
+
+                                <FrameLayout
+                                    android:id="@+id/flEdit1"
+                                    android:layout_width="@dimen/upload_edit_size"
+                                    android:layout_height="@dimen/upload_edit_size"
+                                    android:layout_margin="@dimen/margin_medium"
+                                    android:visibility="gone"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivEditProof1"
+                                        android:layout_width="@dimen/upload_edit_size"
+                                        android:layout_height="@dimen/upload_edit_size"
+                                        android:background="?selectableItemBackgroundBorderless"
+                                        android:onClickListener="@{onClickListener}"
+                                        android:padding="2dp"
+                                        android:src="@drawable/ic_edit_placeholder"
+                                        android:tint="@color/form_wizard_success" />
+
+                                </FrameLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/flDelete1"
+                                    android:layout_width="@dimen/upload_edit_size"
+                                    android:layout_height="@dimen/upload_edit_size"
+                                    android:layout_margin="@dimen/margin_medium"
+                                    android:visibility="gone"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@id/flEdit1">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivDeleteProof1"
+                                        android:layout_width="@dimen/upload_edit_size"
+                                        android:layout_height="@dimen/upload_edit_size"
+                                        android:background="?selectableItemBackgroundBorderless"
+                                        android:onClickListener="@{onClickListener}"
+                                        android:padding="2dp"
+                                        android:src="@drawable/ic_cross"
+                                        android:tint="@color/form_wizard_reject" />
+
+                                </FrameLayout>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Upload Aadhar Card (Back) -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvProofLbl2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_xlarge"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelAadharBack"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvProof2"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            app:cardBackgroundColor="@android:color/transparent"
+                            app:cardCornerRadius="@dimen/normal_card_radius"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/primary"
+                            app:strokeWidth="1dp">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <ProgressBar
+                                    android:id="@+id/prgPreview2"
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    tools:visibility="gone" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivPreview2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleType="centerCrop"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <com.shreefintech.paytouchconsumer.widget.LiquidGlassButton
+                                    android:id="@+id/flUpload2"
+                                    android:layout_width="@dimen/btn_height"
+                                    android:layout_height="@dimen/btn_height"
+                                    android:onClickListener="@{onClickListener}"
+                                    app:glassCornerRadius="@dimen/submit_btn_radius"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:normalTint="@android:color/transparent"
+                                    app:pressedTint="@color/upload_btn_color">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivUpload2"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:padding="@dimen/margin_medium"
+                                        android:src="@drawable/ic_upload"
+                                        android:tint="@color/primary" />
+
+                                </com.shreefintech.paytouchconsumer.widget.LiquidGlassButton>
+
+                                <FrameLayout
+                                    android:id="@+id/flEdit2"
+                                    android:layout_width="@dimen/upload_edit_size"
+                                    android:layout_height="@dimen/upload_edit_size"
+                                    android:layout_margin="@dimen/margin_medium"
+                                    android:visibility="gone"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivEditProof2"
+                                        android:layout_width="@dimen/upload_edit_size"
+                                        android:layout_height="@dimen/upload_edit_size"
+                                        android:background="?selectableItemBackgroundBorderless"
+                                        android:onClickListener="@{onClickListener}"
+                                        android:padding="2dp"
+                                        android:src="@drawable/ic_edit_placeholder"
+                                        android:tint="@color/form_wizard_success" />
+
+                                </FrameLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/flDelete2"
+                                    android:layout_width="@dimen/upload_edit_size"
+                                    android:layout_height="@dimen/upload_edit_size"
+                                    android:layout_margin="@dimen/margin_medium"
+                                    android:visibility="gone"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@id/flEdit2">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivDeleteProof2"
+                                        android:layout_width="@dimen/upload_edit_size"
+                                        android:layout_height="@dimen/upload_edit_size"
+                                        android:background="?selectableItemBackgroundBorderless"
+                                        android:onClickListener="@{onClickListener}"
+                                        android:padding="2dp"
+                                        android:src="@drawable/ic_cross"
+                                        android:tint="@color/form_wizard_reject" />
+
+                                </FrameLayout>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Upload PAN Card -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvProofLbl3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_xlarge"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelPanUpload"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvProof3"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            app:cardBackgroundColor="@android:color/transparent"
+                            app:cardCornerRadius="@dimen/normal_card_radius"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/primary"
+                            app:strokeWidth="1dp">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <ProgressBar
+                                    android:id="@+id/prgPreview3"
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    tools:visibility="gone" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivPreview3"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleType="centerCrop"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <com.shreefintech.paytouchconsumer.widget.LiquidGlassButton
+                                    android:id="@+id/flUpload3"
+                                    android:layout_width="@dimen/btn_height"
+                                    android:layout_height="@dimen/btn_height"
+                                    android:onClickListener="@{onClickListener}"
+                                    app:glassCornerRadius="@dimen/submit_btn_radius"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:normalTint="@android:color/transparent"
+                                    app:pressedTint="@color/upload_btn_color">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivUpload3"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:padding="@dimen/margin_medium"
+                                        android:src="@drawable/ic_upload"
+                                        android:tint="@color/primary" />
+
+                                </com.shreefintech.paytouchconsumer.widget.LiquidGlassButton>
+
+                                <FrameLayout
+                                    android:id="@+id/flEdit3"
+                                    android:layout_width="@dimen/upload_edit_size"
+                                    android:layout_height="@dimen/upload_edit_size"
+                                    android:layout_margin="@dimen/margin_medium"
+                                    android:visibility="gone"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivEditProof3"
+                                        android:layout_width="@dimen/upload_edit_size"
+                                        android:layout_height="@dimen/upload_edit_size"
+                                        android:background="?selectableItemBackgroundBorderless"
+                                        android:onClickListener="@{onClickListener}"
+                                        android:padding="2dp"
+                                        android:src="@drawable/ic_edit_placeholder"
+                                        android:tint="@color/form_wizard_success" />
+
+                                </FrameLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/flDelete3"
+                                    android:layout_width="@dimen/upload_edit_size"
+                                    android:layout_height="@dimen/upload_edit_size"
+                                    android:layout_margin="@dimen/margin_medium"
+                                    android:visibility="gone"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@id/flEdit3">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivDeleteProof3"
+                                        android:layout_width="@dimen/upload_edit_size"
+                                        android:layout_height="@dimen/upload_edit_size"
+                                        android:background="?selectableItemBackgroundBorderless"
+                                        android:onClickListener="@{onClickListener}"
+                                        android:padding="2dp"
+                                        android:src="@drawable/ic_cross"
+                                        android:tint="@color/form_wizard_reject" />
+
+                                </FrameLayout>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Proof -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvProofLbl4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_xlarge"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelProof"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvProof4"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            app:cardBackgroundColor="@android:color/transparent"
+                            app:cardCornerRadius="@dimen/normal_card_radius"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/primary"
+                            app:strokeWidth="1dp">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <ProgressBar
+                                    android:id="@+id/prgPreview4"
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    tools:visibility="gone" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivPreview4"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleType="centerCrop"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <com.shreefintech.paytouchconsumer.widget.LiquidGlassButton
+                                    android:id="@+id/flUpload4"
+                                    android:layout_width="@dimen/btn_height"
+                                    android:layout_height="@dimen/btn_height"
+                                    android:onClickListener="@{onClickListener}"
+                                    app:glassCornerRadius="@dimen/submit_btn_radius"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:normalTint="@android:color/transparent"
+                                    app:pressedTint="@color/upload_btn_color">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivUpload4"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:padding="@dimen/margin_medium"
+                                        android:src="@drawable/ic_upload"
+                                        android:tint="@color/primary" />
+
+                                </com.shreefintech.paytouchconsumer.widget.LiquidGlassButton>
+
+                                <FrameLayout
+                                    android:id="@+id/flEdit4"
+                                    android:layout_width="@dimen/upload_edit_size"
+                                    android:layout_height="@dimen/upload_edit_size"
+                                    android:layout_margin="@dimen/margin_medium"
+                                    android:visibility="gone"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivEditProof4"
+                                        android:layout_width="@dimen/upload_edit_size"
+                                        android:layout_height="@dimen/upload_edit_size"
+                                        android:background="?selectableItemBackgroundBorderless"
+                                        android:onClickListener="@{onClickListener}"
+                                        android:padding="2dp"
+                                        android:src="@drawable/ic_edit_placeholder"
+                                        android:tint="@color/form_wizard_success" />
+
+                                </FrameLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/flDelete4"
+                                    android:layout_width="@dimen/upload_edit_size"
+                                    android:layout_height="@dimen/upload_edit_size"
+                                    android:layout_margin="@dimen/margin_medium"
+                                    android:visibility="gone"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@id/flEdit4">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivDeleteProof4"
+                                        android:layout_width="@dimen/upload_edit_size"
+                                        android:layout_height="@dimen/upload_edit_size"
+                                        android:background="?selectableItemBackgroundBorderless"
+                                        android:onClickListener="@{onClickListener}"
+                                        android:padding="2dp"
+                                        android:src="@drawable/ic_cross"
+                                        android:tint="@color/form_wizard_reject" />
+
+                                </FrameLayout>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Create Virtual Account button -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/button_height"
+                            android:layout_marginTop="@dimen/margin_extra_large"
+                            android:layout_marginBottom="@dimen/margin_small"
+                            app:cardBackgroundColor="?attr/colorPrimary"
+                            app:cardCornerRadius="@dimen/button_corner_radius"
+                            app:cardElevation="@dimen/card_elevation">
+
+                            <LinearLayout
+                                android:id="@+id/llCreateVirtualAccount"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:foreground="?selectableItemBackground"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="horizontal"
+                                android:visibility="@{showProgress ? View.INVISIBLE : View.VISIBLE}">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/icon_medium"
+                                    android:layout_height="@dimen/icon_medium"
+                                    android:layout_marginEnd="@dimen/margin_small_medium"
+                                    android:src="@drawable/ic_wallet"
+                                    android:tint="@color/white" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/btnCreateVirtualAccount"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/text_size_16"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
+
+                            <ProgressBar
+                                android:id="@+id/progressBar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginVertical="@dimen/margin_small"
+                                android:indeterminateTint="@color/white"
+                                android:visibility="@{showProgress ? View.VISIBLE : View.GONE}"
+                                tools:visibility="gone" />
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

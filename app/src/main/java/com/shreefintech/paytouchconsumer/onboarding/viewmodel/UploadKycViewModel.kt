@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.auth
+package com.shreefintech.paytouchconsumer.onboarding.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -9,10 +9,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ResetMpinViewModel(application: Application) : AndroidViewModel(application) {
+class UploadKycViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun changeMpin(
-        newMpin: String,
+    fun submitKyc(
+        mobile: String,
+        memberName: String,
+        birthdate: String,
+        age: Int,
+        address: String,
+        city: String,
+        email: String,
+        panNumber: String,
+        aadharNumber: String,
+        gstNumber: String,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -24,9 +33,20 @@ class ResetMpinViewModel(application: Application) : AndroidViewModel(applicatio
         onLoading()
         viewModelScope.launch {
             try {
-                // TODO(PAYTOUCH-487): wire change-MPIN API call
-                // val body = JsonObject().apply { addProperty("mpin", newMpin) }
-                // val response = ApiClient.apiService.changeMpin(body)
+                // TODO(PAYTOUCH-KYC): wire upload-KYC API call
+                // val body = JsonObject().apply {
+                //     addProperty("mobile", mobile)
+                //     addProperty("member_name", memberName)
+                //     addProperty("birthdate", birthdate)
+                //     addProperty("age", age)
+                //     addProperty("address", address)
+                //     addProperty("city", city)
+                //     addProperty("email", email)
+                //     addProperty("pan_number", panNumber)
+                //     addProperty("aadhar_number", aadharNumber)
+                //     addProperty("gst_number", gstNumber)
+                // }
+                // val response = ApiClient.apiService.uploadKyc(body)
                 // withContext(Dispatchers.Main) {
                 //     if (response.isSuccessful && response.body()?.success == true) {
                 //         onSuccess()

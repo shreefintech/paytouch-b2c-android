@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.auth.viewmodel.CreateAccountViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityCreateAccountBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil

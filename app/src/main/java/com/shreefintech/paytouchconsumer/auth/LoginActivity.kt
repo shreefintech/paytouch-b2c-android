@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.auth
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
@@ -14,6 +15,8 @@ import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.auth.viewmodel.LoginViewModel
+import com.shreefintech.paytouchconsumer.onboarding.UploadKycActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoginBinding
 import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -225,7 +228,8 @@ class LoginActivity : BaseActivity() {
                 binding.llSignIn -> {
                     if (Utility.stopClick()) return@OnClickListener
 
-                    onNext()
+                    /*onNext()*/
+                    startActivity(Intent(mActivity, UploadKycActivity::class.java))
                 }
                 binding.tvForgotPassword -> {
                     if (Utility.stopClick()) return@OnClickListener
