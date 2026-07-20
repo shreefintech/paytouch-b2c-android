@@ -545,8 +545,8 @@ Keeps the user logged in across app restarts. Handles forced logout on session e
 ## 18. Internet Connectivity Check
 
 ### Rules
-- `Constant.isNetworkAvailable(context)` must be called before every API request
-- If no internet: show user message, do not make API call
+- `Utility.isInternetAvailable(context)` must be called before every API request
+- If no internet: show user message via `ToastUtil`, do not make API call
 - Uses Android `ConnectivityManager` to check active network
 
 ---

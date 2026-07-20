@@ -1,7 +1,7 @@
-package com.shreefintech.paytouchconsumer.auth.viewmodel
+package com.shreefintech.paytouchconsumer.auth
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.content.Context
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -10,37 +10,29 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ResetMpinViewModel(application: Application) : AndroidViewModel(application) {
+class ResetMpinViewModel : ViewModel() {
 
     fun changeMpin(
+        context: Context,
         newMpin: String,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        if (!Utility.isInternetAvailable(getApplication())) {
-            onError(getApplication<Application>().getString(R.string.msgNoInternet))
+        if (!Utility.isInternetAvailable(context)) {
+            onError(context.getString(R.string.msgNoInternet))
             return
         }
         onLoading()
         viewModelScope.launch {
             try {
                 // TODO(PAYTOUCH-487): wire change-MPIN API call
-                // val body = JsonObject().apply { addProperty("mpin", newMpin) }
-                // val response = ApiClient.apiService.changeMpin(body)
-                // withContext(Dispatchers.Main) {
-                //     if (response.isSuccessful && response.body()?.success == true) {
-                //         onSuccess()
-                //     } else {
-                //         onError(ApiHelper.parseErrorMessage(response))
-                //     }
-                // }
                 withContext(Dispatchers.Main) { onSuccess() }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    onError(e.message ?: getApplication<Application>().getString(R.string.msgSomethingWentWrong))
+                    onError(e.message ?: context.getString(R.string.errGeneric))
                 }
             }
         }

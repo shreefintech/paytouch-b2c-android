@@ -21,7 +21,9 @@
     <string name="msgMobileEmpty">Please enter your mobile number</string>
     <string name="msgMobileInvalid">Enter a valid 10-digit mobile number</string>
     <string name="msgPasswordEmpty">Please enter your password</string>
-    <string name="msgPasswordShort">Password must be at least 6 characters</string>
+    <string name="msgPasswordShort">Password must be at least 8 characters</string>
+    <string name="msgNoInternet">No internet connection</string>
+    <string name="errGeneric">Something went wrong</string>
     <string name="msgMpinEmpty">Please enter your MPIN</string>
     <string name="msgMpinInvalid">MPIN must be exactly 4 digits</string>
 

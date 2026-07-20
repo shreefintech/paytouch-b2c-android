@@ -19,7 +19,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.auth.viewmodel.CreateAccountViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityCreateAccountBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -149,6 +148,11 @@ class CreateAccountActivity : BaseActivity() {
                 getString(R.string.msgPasswordEmpty)
             }
 
+            password.length < 8 -> {
+                binding.etPassword.requestFocus()
+                getString(R.string.msgPasswordShort)
+            }
+
             confirmPassword.isEmpty() -> {
                 binding.etConfirmPassword.requestFocus()
                 getString(R.string.msgConfirmPasswordEmpty)
@@ -177,6 +181,7 @@ class CreateAccountActivity : BaseActivity() {
         val referralCode = binding.etReferralCode.text?.toString()?.trim() ?: ""
         val password     = binding.etPassword.text?.toString()             ?: ""
         viewModel.register(
+            context      = mActivity,
             mobile       = mobile,
             email        = email,
             referralCode = referralCode,

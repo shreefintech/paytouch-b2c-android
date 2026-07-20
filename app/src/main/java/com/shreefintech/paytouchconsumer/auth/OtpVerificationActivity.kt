@@ -164,8 +164,9 @@ class OtpVerificationActivity : BaseActivity() {
     private fun onSubmitOtp() {
         if (!validate()) return
         viewModel.verifyOtp(
-            otp      = collectOtp(),
-            flowType = flowType,
+            context   = mActivity,
+            otp       = collectOtp(),
+            flowType  = flowType,
             onLoading = { showProgress.set(true) },
             onSuccess = {
                 showProgress.set(false)
@@ -177,6 +178,7 @@ class OtpVerificationActivity : BaseActivity() {
 
     private fun onResendOtp() {
         viewModel.resendOtp(
+            context   = mActivity,
             flowType  = flowType,
             onLoading = { showProgress.set(true) },
             onSuccess = { showProgress.set(false); startResendTimer() },
