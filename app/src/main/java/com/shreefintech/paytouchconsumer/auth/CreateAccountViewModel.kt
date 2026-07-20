@@ -1,17 +1,19 @@
 package com.shreefintech.paytouchconsumer.auth
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.content.Context
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CreateAccountViewModel(application: Application) : AndroidViewModel(application) {
+class CreateAccountViewModel : ViewModel() {
 
     fun register(
+        context: Context,
         mobile: String,
         email: String,
         referralCode: String,
@@ -20,33 +22,21 @@ class CreateAccountViewModel(application: Application) : AndroidViewModel(applic
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        if (!Utility.isInternetAvailable(getApplication())) {
-            onError("No internet connection")
+        if (!Utility.isInternetAvailable(context)) {
+            onError(context.getString(R.string.msgNoInternet))
             return
         }
         onLoading()
         viewModelScope.launch {
             try {
                 // TODO(PAYTOUCH-487): wire create-account API call
-                // val body = JsonObject().apply {
-                //     addProperty("mobile", mobile)
-                //     addProperty("email", email)
-                //     addProperty("password", password)
-                //     if (referralCode.isNotEmpty()) addProperty("referral_code", referralCode)
-                // }
-                // val response = ApiClient.apiService.register(body)
-                // withContext(Dispatchers.Main) {
-                //     if (response.isSuccessful && response.body()?.success == true) {
-                //         onSuccess()
-                //     } else {
-                //         onError(ApiHelper.parseErrorMessage(response))
-                //     }
-                // }
                 withContext(Dispatchers.Main) { onSuccess() }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) { onError(e.message ?: "Something went wrong") }
+                withContext(Dispatchers.Main) {
+                    onError(e.message ?: context.getString(R.string.errGeneric))
+                }
             }
         }
     }

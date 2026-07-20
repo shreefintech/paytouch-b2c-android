@@ -155,6 +155,7 @@ class ResetMpinActivity : BaseActivity() {
             listOf(binding.etNewMpin1, binding.etNewMpin2, binding.etNewMpin3, binding.etNewMpin4)
         )
         viewModel.changeMpin(
+            context   = mActivity,
             newMpin   = newMpin,
             onLoading = { showProgress.set(true) },
             onSuccess = { showProgress.set(false); navigateToLogin() },

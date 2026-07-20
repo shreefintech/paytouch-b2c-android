@@ -1,44 +1,39 @@
 package com.shreefintech.paytouchconsumer.auth
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.content.Context
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ResetPasswordViewModel(application: Application) : AndroidViewModel(application) {
+class ResetPasswordViewModel : ViewModel() {
 
     fun changePassword(
+        context: Context,
         newPassword: String,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        if (!Utility.isInternetAvailable(getApplication())) {
-            onError("No internet connection")
+        if (!Utility.isInternetAvailable(context)) {
+            onError(context.getString(R.string.msgNoInternet))
             return
         }
         onLoading()
         viewModelScope.launch {
             try {
                 // TODO(PAYTOUCH-487): wire change-password API call
-                // val body = JsonObject().apply { addProperty("password", newPassword) }
-                // val response = ApiClient.apiService.changePassword(body)
-                // withContext(Dispatchers.Main) {
-                //     if (response.isSuccessful && response.body()?.success == true) {
-                //         onSuccess()
-                //     } else {
-                //         onError(ApiHelper.parseErrorMessage(response))
-                //     }
-                // }
                 withContext(Dispatchers.Main) { onSuccess() }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) { onError(e.message ?: "Something went wrong") }
+                withContext(Dispatchers.Main) {
+                    onError(e.message ?: context.getString(R.string.errGeneric))
+                }
             }
         }
     }

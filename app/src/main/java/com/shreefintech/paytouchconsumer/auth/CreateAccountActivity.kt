@@ -148,7 +148,7 @@ class CreateAccountActivity : BaseActivity() {
                 getString(R.string.msgPasswordEmpty)
             }
 
-            password.length < 6 -> {
+            password.length < 8 -> {
                 binding.etPassword.requestFocus()
                 getString(R.string.msgPasswordShort)
             }
@@ -181,6 +181,7 @@ class CreateAccountActivity : BaseActivity() {
         val referralCode = binding.etReferralCode.text?.toString()?.trim() ?: ""
         val password     = binding.etPassword.text?.toString()             ?: ""
         viewModel.register(
+            context      = mActivity,
             mobile       = mobile,
             email        = email,
             referralCode = referralCode,

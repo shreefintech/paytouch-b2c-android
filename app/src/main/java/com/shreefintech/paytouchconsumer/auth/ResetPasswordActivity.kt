@@ -113,6 +113,7 @@ class ResetPasswordActivity : BaseActivity() {
         if (!validate()) return
         val newPassword = binding.etNewPassword.text?.toString() ?: ""
         viewModel.changePassword(
+            context     = mActivity,
             newPassword = newPassword,
             onLoading   = { showProgress.set(true) },
             onSuccess   = { showProgress.set(false); navigateToLogin() },
