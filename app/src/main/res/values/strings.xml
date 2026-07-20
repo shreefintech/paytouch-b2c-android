@@ -120,9 +120,7 @@
     <string name="msgGstInvalid">Please enter a valid GST number</string>
     <string name="kycSubmitSuccess">KYC details submitted successfully</string>
 
-    <!-- Common error messages -->
-    <string name="msgNoInternet">No internet connection</string>
-    <string name="msgSomethingWentWrong">Something went wrong</string>
+    <!-- Common error messages — msgNoInternet and errGeneric are declared above; no duplicates here -->
 
     <string name="msfOnlyPdfJpgJpegAllowed">Only PDF, JPG, JPEG allowed.</string>
     <string name="msgFileExceeds2mbLimit">File exceeds 2MB limit.</string>

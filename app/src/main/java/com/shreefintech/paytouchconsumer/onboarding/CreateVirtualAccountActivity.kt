@@ -370,6 +370,23 @@ class CreateVirtualAccountActivity : BaseActivity() {
         // TODO(PAYTOUCH-514): re-enable validate() once virtual account API is wired
 //        if (!validate()) return
 
+        val aadharFrontUri = uploadUris[0] ?: run {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelAadharFront)))
+            return
+        }
+        val aadharBackUri = uploadUris[1] ?: run {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelAadharBack)))
+            return
+        }
+        val panUri = uploadUris[2] ?: run {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelPanUpload)))
+            return
+        }
+        val proofUri = uploadUris[3] ?: run {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelProof)))
+            return
+        }
+
         viewModel.submitVirtualAccount(
             fullName       = binding.etFullName.text?.toString()?.trim()    ?: "",
             mobile         = binding.etMobile.text?.toString()?.trim()      ?: "",
@@ -382,10 +399,10 @@ class CreateVirtualAccountActivity : BaseActivity() {
             bankAccount    = binding.etBankAccount.text?.toString()?.trim() ?: "",
             vpa            = binding.etVpa.text?.toString()?.trim()         ?: "",
             branchName     = binding.etBranchName.text?.toString()?.trim() ?: "",
-            aadharFrontUri = uploadUris[0] ?: return,
-            aadharBackUri  = uploadUris[1] ?: return,
-            panUri         = uploadUris[2] ?: return,
-            proofUri       = uploadUris[3] ?: return,
+            aadharFrontUri = aadharFrontUri,
+            aadharBackUri  = aadharBackUri,
+            panUri         = panUri,
+            proofUri       = proofUri,
             onLoading      = { showProgress.set(true) },
             onSuccess      = {
                 showProgress.set(false)

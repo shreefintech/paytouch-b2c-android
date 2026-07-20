@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.auth
+package com.shreefintech.paytouchconsumer.auth.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

@@ -60,7 +60,7 @@ class UploadKycViewModel(application: Application) : AndroidViewModel(applicatio
                 throw e
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    onError(e.message ?: getApplication<Application>().getString(R.string.msgSomethingWentWrong))
+                    onError(e.message ?: getApplication<Application>().getString(R.string.errGeneric))
                 }
             }
         }

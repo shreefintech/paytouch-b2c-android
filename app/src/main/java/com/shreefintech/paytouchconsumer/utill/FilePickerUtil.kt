@@ -140,7 +140,10 @@ class FilePickerUtil {
             return
         }
 
-        val fileSizeBytes = getFileSize(uri)
+        val fileSizeBytes = getFileSize(uri) ?: run {
+            onError?.invoke(FilePickerError.UnableToReadFile)
+            return
+        }
         if (fileSizeBytes > MAX_FILE_SIZE_BYTES) {
             onError?.invoke(FilePickerError.FileTooLarge)
             return
@@ -166,7 +169,7 @@ class FilePickerUtil {
 
     // ─── Get file size ────────────────────────────────────────────────────────
 
-    private fun getFileSize(uri: Uri): Long {
+    private fun getFileSize(uri: Uri): Long? {
         var size = 0L
         if (uri.scheme == "content") {
             context.contentResolver.query(uri, null, null, null, null)?.use {
@@ -179,7 +182,9 @@ class FilePickerUtil {
         if (size == 0L) {
             try {
                 context.contentResolver.openFileDescriptor(uri, "r")?.use { size = it.statSize }
-            } catch (e: Exception) { e.printStackTrace() }
+            } catch (e: Exception) {
+                return null
+            }
         }
         return size
     }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.utill.Utility
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,9 +32,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 // API call wired here once the endpoint is ready
                 withContext(Dispatchers.Main) { onSuccess() }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    onError(e.message ?: getApplication<Application>().getString(R.string.msgSomethingWentWrong))
+                    onError(e.message ?: getApplication<Application>().getString(R.string.errGeneric))
                 }
             }
         }
@@ -48,7 +51,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         return when (mode) {
             LoginMode.PASSWORD -> when {
                 credential.isBlank() -> app.getString(R.string.msgPasswordEmpty)
-                credential.length < 6 -> app.getString(R.string.msgPasswordShort)
+                credential.length < 8 -> app.getString(R.string.msgPasswordShort)
                 else -> null
             }
             LoginMode.MPIN -> when {
