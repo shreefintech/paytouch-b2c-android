@@ -367,6 +367,7 @@ class CreateVirtualAccountActivity : BaseActivity() {
     }
 
     private fun onSubmit() {
+        // TODO(PAYTOUCH-514): re-enable validate() once virtual account API is wired
 //        if (!validate()) return
 
         viewModel.submitVirtualAccount(

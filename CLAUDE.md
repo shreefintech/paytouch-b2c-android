@@ -2,6 +2,8 @@
 
 PayTouch Dashboard is a **fintech Android app** (Kotlin) for managing KYC compliance and virtual banking accounts. It serves two user roles: **Admin** (reviews KYC, manages members/schemes/virtual accounts) and **Client** (uploads KYC documents). Built by Shreefintech.
 
+> **Current state:** This project is in the **UI implementation phase**. API wiring is pending — all network calls are currently stubbed with `TODO(PAYTOUCH-xxx):` comments. Validations and business logic will be finalized once APIs are connected. Do not treat missing API calls or relaxed validations as bugs.
+
 > Full developer rules: `DEVELOPER_GUIDELINES.md` | Business logic: `docs/business_logic.md` | Dos & Don'ts for AI: `docs/dos_and_donts.md`
 
 ---
@@ -52,19 +54,17 @@ Always prioritize optimized, maintainable, and production-ready code. Generate s
 ## Package Structure (top-level)
 
 ```
-com.shreefintech.dashboard/
-├── admin/          # Admin-role screens (KYC review, members, schemes, virtual accounts)
-├── auth/           # Login, OTP, password/MPIN flows
-├── client/kyc/     # Client KYC upload flows
-├── enums/          # Project-wide enums (Role, NextStep, EntityType, MemberStatus)
+com.shreefintech.paytouchconsumer/
+├── auth/           # Login, OTP, password/MPIN flows, create-account
+├── onboarding/     # Client onboarding flows (KYC upload, Virtual Account creation)
+├── enums/          # Project-wide enums (LoginMode, etc.)
 ├── fcm/            # Firebase push notification service
 ├── glass/          # LiquidGlassEffect custom blur UI
 ├── retrofit/       # All networking (ApiService, ApiClient, ApiHelper, models)
 ├── utill/          # Shared utilities — NOTE: spelling "utill" is intentional, never rename
 ├── viewmodel/      # Cross-feature ViewModels (SessionViewModel)
-├── widget/         # Reusable custom views (BackBtn, CustomDropdown, sidebar)
+├── widget/         # Reusable custom views (LiquidGlassButton, CustomDropdown, etc.)
 ├── BaseActivity.kt
-├── DashboardActivity.kt
 └── SplashActivity.kt
 ```
 

@@ -232,12 +232,7 @@ class UploadKycActivity : BaseActivity() {
                 getString(R.string.msgAadharInvalid)
             }
 
-            gst.isEmpty() -> {
-                binding.etGst.requestFocus()
-                getString(R.string.msgGstEmpty)
-            }
-
-            !GST_REGEX.matches(gst) -> {
+            gst.isNotEmpty() && !GST_REGEX.matches(gst) -> {
                 binding.etGst.requestFocus()
                 getString(R.string.msgGstInvalid)
             }
@@ -289,6 +284,7 @@ class UploadKycActivity : BaseActivity() {
 
                 binding.llSubmit -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // TODO(PAYTOUCH-514): replace with onSubmitKyc() once KYC API is wired
 //                    onSubmitKyc()
                     startActivity(Intent(mActivity, CreateVirtualAccountActivity::class.java))
                     finish()

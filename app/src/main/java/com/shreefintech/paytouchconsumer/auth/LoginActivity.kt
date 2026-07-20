@@ -228,6 +228,7 @@ class LoginActivity : BaseActivity() {
                 binding.llSignIn -> {
                     if (Utility.stopClick()) return@OnClickListener
 
+                    // TODO(PAYTOUCH-514): replace with onNext() once login API is wired
                     /*onNext()*/
                     startActivity(Intent(mActivity, UploadKycActivity::class.java))
                 }

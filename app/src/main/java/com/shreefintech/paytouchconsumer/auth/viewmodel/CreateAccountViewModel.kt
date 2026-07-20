@@ -3,6 +3,7 @@ package com.shreefintech.paytouchconsumer.auth.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,7 @@ class CreateAccountViewModel(application: Application) : AndroidViewModel(applic
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
-            onError("No internet connection")
+            onError(getApplication<Application>().getString(R.string.msgNoInternet))
             return
         }
         onLoading()
@@ -46,7 +47,9 @@ class CreateAccountViewModel(application: Application) : AndroidViewModel(applic
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) { onError(e.message ?: "Something went wrong") }
+                withContext(Dispatchers.Main) {
+                    onError(e.message ?: getApplication<Application>().getString(R.string.msgSomethingWentWrong))
+                }
             }
         }
     }

@@ -10,7 +10,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import com.shreefintech.paytouchconsumer.R
 
 /**
@@ -61,7 +60,6 @@ class FilePickerUtil {
 
     private var context: Context
     private var activity: Activity? = null
-    private var fragment: Fragment? = null
 
     private val fileLauncher: ActivityResultLauncher<String>
     private val permissionLauncher: ActivityResultLauncher<Array<String>>
@@ -82,8 +80,6 @@ class FilePickerUtil {
             handlePermissionResult(permissions)
         }
     }
-
-
 
     // ─── Open picker ──────────────────────────────────────────────────────────
 
@@ -107,7 +103,7 @@ class FilePickerUtil {
 
 
     private fun shouldShowRationale(): Boolean {
-        val act = activity ?: (fragment?.requireActivity()) ?: return false
+        val act = activity ?: return false
         return requiredPermissions().any {
             ActivityCompat.shouldShowRequestPermissionRationale(act, it)
         }

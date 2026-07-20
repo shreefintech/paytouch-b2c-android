@@ -149,11 +149,6 @@ class CreateAccountActivity : BaseActivity() {
                 getString(R.string.msgPasswordEmpty)
             }
 
-            password.length < 6 -> {
-                binding.etPassword.requestFocus()
-                getString(R.string.msgPasswordShort)
-            }
-
             confirmPassword.isEmpty() -> {
                 binding.etConfirmPassword.requestFocus()
                 getString(R.string.msgConfirmPasswordEmpty)

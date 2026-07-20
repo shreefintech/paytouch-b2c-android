@@ -3,6 +3,7 @@ package com.shreefintech.paytouchconsumer.auth.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         val error = validate(mobile, credential, mode)
         if (error != null) { onError(error); return }
         if (!Utility.isInternetAvailable(getApplication())) {
-            onError("No internet connection")
+            onError(getApplication<Application>().getString(R.string.msgNoInternet))
             return
         }
         onLoading()
@@ -31,25 +32,28 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 // API call wired here once the endpoint is ready
                 withContext(Dispatchers.Main) { onSuccess() }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) { onError(e.message ?: "Something went wrong") }
+                withContext(Dispatchers.Main) {
+                    onError(e.message ?: getApplication<Application>().getString(R.string.msgSomethingWentWrong))
+                }
             }
         }
     }
 
     private fun validate(mobile: String, credential: String, mode: LoginMode): String? {
-        if (mobile.isBlank()) return "Please enter your mobile number"
+        val app = getApplication<Application>()
+        if (mobile.isBlank()) return app.getString(R.string.msgMobileEmpty)
         if (mobile.length != 10 || !mobile.matches(Regex("[6-9][0-9]{9}"))) {
-            return "Enter a valid 10-digit mobile number"
+            return app.getString(R.string.msgMobileInvalid)
         }
         return when (mode) {
             LoginMode.PASSWORD -> when {
-                credential.isBlank() -> "Please enter your password"
-                credential.length < 6 -> "Password must be at least 6 characters"
+                credential.isBlank() -> app.getString(R.string.msgPasswordEmpty)
+                credential.length < 6 -> app.getString(R.string.msgPasswordShort)
                 else -> null
             }
             LoginMode.MPIN -> when {
-                credential.isBlank() -> "Please enter your MPIN"
-                !credential.matches(Regex("[0-9]{4}")) -> "MPIN must be exactly 4 digits"
+                credential.isBlank() -> app.getString(R.string.msgMpinEmpty)
+                !credential.matches(Regex("[0-9]{4}")) -> app.getString(R.string.msgMpinInvalid)
                 else -> null
             }
         }
