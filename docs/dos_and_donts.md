@@ -9,7 +9,7 @@ Every rule here is derived from a specific pattern (good or bad) found in the ex
 ### Architecture
 
 **DO use a single `ApiClient` object as the only Retrofit source.**
-The existing code correctly uses singleton Retrofit instances. The new project must have exactly ONE `ApiClient` class that all ViewModels talk to via a Repository. No Activity should create its own Retrofit instance.
+The new project must have exactly ONE `ApiClient` class. ViewModels call `ApiClient.apiService` directly for standard API calls — no Activity should create its own Retrofit instance.
 
 **DO use a single `SharedPreferenceHelper` class as the ONLY SharedPreferences access point.**
 The existing code has at least three separate SharedPreferences stores with overlapping keys. The new project must funnel every read and write through one class. No Activity or ViewModel should call `getSharedPreferences()` directly.
@@ -88,7 +88,15 @@ Never call `notifyDataSetChanged()` for a single item change. This is a performa
 ### Architecture
 
 **DON'T put network calls in Activities or Fragments.**
-The biggest structural problem in the existing codebase. Activities call Retrofit directly, handle callbacks directly, and update UI directly. All network calls must go in a Repository, called from a ViewModel, with results posted to LiveData/StateFlow.
+The biggest structural problem in the existing codebase. All network calls must go in a ViewModel — never directly in an Activity or Fragment. The ViewModel calls `ApiClient.apiService` directly and surfaces results via `onLoading`/`onSuccess`/`onError` callbacks.
+
+**Repository, LiveData, and StateFlow are NOT required for standard one-shot API calls.** Use them only when:
+- Data must outlive the screen (shared across multiple destinations)
+- Data is heavy and needs caching or pagination
+- Data represents a continuous stream of updates (WebSocket, polling)
+- Multiple screens need to observe the same data simultaneously
+
+For all other cases — a simple request/response API call — ViewModel callbacks are the correct and preferred pattern.
 
 **DON'T store a static mutable field for a token or any shared state.**
 `Constant.TOKEN` is a public static field that gets overwritten by the Shreefintech token fetch. This is a race condition and a global state anti-pattern. Use a Repository singleton or SharedPreferenceHelper to pass tokens safely.
@@ -105,8 +113,8 @@ The existing app has `ApiClient`, `ApiClientPayTouch`, `ApiClientAdmin`, and `Pa
 **DON'T put business logic (fee calculation, validation, status routing) in Adapters or Activities.**
 Fee calculation and routing logic are scattered across Activity code in the existing app. The new project must put all domain logic in a ViewModel or use-case class, keeping Activities as pure UI responders.
 
-**DON'T create Activity references or Context references inside ViewModels.**
-ViewModels must not hold references to Activities, Fragments, or Context (except `ApplicationContext` via `AndroidViewModel`). Holding Activity context in a ViewModel causes memory leaks.
+**DON'T store Activity or Context references as fields inside ViewModels.**
+ViewModels must not hold Activity, Fragment, or Context as a class-level field — this causes memory leaks. Passing `Context` as a function parameter for one-time use (e.g., `context.getString(...)` or `Utility.isInternetAvailable(context)`) is acceptable and is the project's standard pattern. Never store the parameter beyond the function call.
 
 **DON'T use `SessionManager.java` (the legacy class) — use only `SharedPreferenceHelper`.**
 The existing code has both `SessionManager.java` (legacy, ~169 lines) and `SharePrefManager.java` (modern). They overlap. The new project has only one.

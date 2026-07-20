@@ -1,0 +1,40 @@
+package com.shreefintech.paytouchconsumer.auth
+
+import android.content.Context
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.utill.Utility
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+class ResetMpinViewModel : ViewModel() {
+
+    fun changeMpin(
+        context: Context,
+        newMpin: String,
+        onLoading: () -> Unit,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(context)) {
+            onError(context.getString(R.string.msgNoInternet))
+            return
+        }
+        onLoading()
+        viewModelScope.launch {
+            try {
+                // TODO(PAYTOUCH-487): wire change-MPIN API call
+                withContext(Dispatchers.Main) { onSuccess() }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    onError(e.message ?: context.getString(R.string.errGeneric))
+                }
+            }
+        }
+    }
+}

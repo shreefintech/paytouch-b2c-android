@@ -12,6 +12,7 @@
     <string name="hint_mpin">Enter 4-digit MPIN</string>
     <string name="label_save_credentials">Save Credentials</string>
     <string name="forgot_password">Forgot Password?</string>
+    <string name="forgotMpin">Forgot MPIN?</string>
     <string name="sign_in">Sign In</string>
     <string name="no_account">Don\'t Have an account?</string>
     <string name="create_account">Create Account</string>
@@ -20,7 +21,67 @@
     <string name="msgMobileEmpty">Please enter your mobile number</string>
     <string name="msgMobileInvalid">Enter a valid 10-digit mobile number</string>
     <string name="msgPasswordEmpty">Please enter your password</string>
-    <string name="msgPasswordShort">Password must be at least 6 characters</string>
+    <string name="msgPasswordShort">Password must be at least 8 characters</string>
+    <string name="msgNoInternet">No internet connection</string>
+    <string name="errGeneric">Something went wrong</string>
     <string name="msgMpinEmpty">Please enter your MPIN</string>
     <string name="msgMpinInvalid">MPIN must be exactly 4 digits</string>
+
+    <!-- Create Account screen -->
+    <string name="welcomeCreateAccount">Welcome!</string>
+    <string name="createAccountSubtitle">Enter your Details To get started</string>
+    <string name="labelEmailAddress">Email Address</string>
+    <string name="hintEmail">Enter your email address</string>
+    <string name="labelReferralCode">Referral Code</string>
+    <string name="labelOptional">(Optional)</string>
+    <string name="hintReferralCode">Enter your referral code</string>
+    <string name="labelConfirmPassword">Confirm Password</string>
+    <string name="hintConfirmPassword">Re - Enter your Password</string>
+    <string name="labelTermsConditions">I agree to the platform fee terms &amp; conditions.</string>
+    <string name="termsLinkText">terms &amp; conditions.</string>
+    <string name="backToSignIn">Back to sign in Page</string>
+
+    <!-- OTP Verification screen -->
+    <string name="titleOtpVerification">OTP Verification!</string>
+    <string name="subtitleOtpVerification">Enter the code sent to your registered number to continue</string>
+    <string name="msgOtpDidntReceive">Didn\'t receive it? Check your SMS or tap resend below</string>
+    <string name="btnSubmitOtp">Submit OTP</string>
+    <string name="resendOtpTimer">Resend OTP -%s</string>
+    <string name="resendOtp">Resend OTP</string>
+    <string name="msgOtpEmpty">Please enter the OTP</string>
+    <string name="msgOtpIncomplete">Please enter complete 6-digit OTP</string>
+
+    <!-- Reset Password screen -->
+    <string name="titleResetPassword">Reset Password</string>
+    <string name="subtitleResetPassword">Update your password to keep your account secure</string>
+    <string name="msgPasswordRules">Password must be at least 8 characters and include one uppercase letter, one number, and one special character</string>
+    <string name="labelNewPassword">New password</string>
+    <string name="hintNewPassword">Enter New Password</string>
+    <string name="hintConfirmNewPassword">Re-enter New Password</string>
+    <string name="btnChangePassword">Change Password</string>
+    <string name="msgNewPasswordEmpty">Please enter your new password</string>
+    <string name="msgNewPasswordShort">Password must be at least 8 characters</string>
+    <string name="msgPasswordWeak">Password must include uppercase, number, and special character</string>
+    <string name="msgConfirmNewPasswordEmpty">Please confirm your new password</string>
+
+    <!-- Reset MPIN screen -->
+    <string name="titleResetMpin">Reset MPIN</string>
+    <string name="subtitleResetMpin">Set a new MPIN to keep your account secure</string>
+    <string name="msgMpinRules">MPIN must be a 4-digit number and shouldn\'t match your birth year or repeat the same digit</string>
+    <string name="labelNewMpin">New MPIN</string>
+    <string name="labelConfirmMpin">Confirm MPIN</string>
+    <string name="btnChangeMpin">Change MPIN</string>
+    <string name="msgNewMpinEmpty">Please enter your new MPIN</string>
+    <string name="msgNewMpinIncomplete">New MPIN must be exactly 4 digits</string>
+    <string name="msgNewMpinRepeated">MPIN cannot have all same digits</string>
+    <string name="msgConfirmMpinEmpty">Please confirm your MPIN</string>
+    <string name="msgConfirmMpinIncomplete">Confirm MPIN must be exactly 4 digits</string>
+    <string name="msgMpinMismatch">MPINs do not match</string>
+
+    <!-- Create Account validation messages -->
+    <string name="msgEmailEmpty">Please enter your email address</string>
+    <string name="msgEmailInvalid">Please enter a valid email address</string>
+    <string name="msgConfirmPasswordEmpty">Please confirm your password</string>
+    <string name="msgPasswordMismatch">Passwords do not match</string>
+    <string name="msgTermsNotAccepted">Please accept the terms &amp; conditions to continue</string>
 </resources>

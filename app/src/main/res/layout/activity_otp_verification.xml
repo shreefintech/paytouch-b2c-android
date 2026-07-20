@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="showProgress"
+            type="androidx.databinding.ObservableBoolean" />
+
+        <import type="android.view.View" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg">
+
+        <!-- ── Wallet illustration (top-right) ── -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivWalletIllustration"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:scaleType="fitEnd"
+            android:src="@drawable/img_wallet_recolored"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- ── PayTouch logo ── -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:scaleType="fitStart"
+            android:src="@drawable/img_paytouch"
+            app:layout_constraintEnd_toStartOf="@id/ivWalletIllustration"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.55" />
+
+        <!-- ── OTP Verification! ── -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_extra_large"
+            android:ellipsize="end"
+            android:fontFamily="@font/proza_libre_bold"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text="@string/titleOtpVerification"
+            android:textColor="?attr/colorTextOnBrand"
+            android:textSize="@dimen/text_size_22"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivLogo" />
+
+        <!-- ── Subtitle ── -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:layout_marginEnd="@dimen/margin_extra_small"
+            android:ellipsize="end"
+            android:fontFamily="@font/proza_libre_medium"
+            android:includeFontPadding="false"
+            android:maxLines="3"
+            android:text="@string/subtitleOtpVerification"
+            android:textColor="?attr/colorTextOnBrand"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintEnd_toStartOf="@id/ivWalletIllustration"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+        <!-- ── Glass card ── -->
+        <FrameLayout
+            android:id="@+id/flCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_xxlarge"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:clipToOutline="true"
+            android:outlineProvider="background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/page_margin_horizontal">
+
+                    <!-- Resend hint -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin_xxlarge"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:maxLines="2"
+                        android:text="@string/msgOtpDidntReceive"
+                        android:textColor="?attr/colorTextHint"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <!-- OTP boxes row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etOtp1"
+                            android:layout_width="38dp"
+                            android:layout_height="50dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_otp_box"
+                            android:cursorVisible="false"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="center"
+                            android:imeOptions="actionNext"
+                            android:includeFontPadding="false"
+                            android:inputType="number"
+                            android:maxLength="1"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_20" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etOtp2"
+                            android:layout_width="38dp"
+                            android:layout_height="50dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_otp_box"
+                            android:cursorVisible="false"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="center"
+                            android:imeOptions="actionNext"
+                            android:includeFontPadding="false"
+                            android:inputType="number"
+                            android:maxLength="1"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_20" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etOtp3"
+                            android:layout_width="38dp"
+                            android:layout_height="50dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_otp_box"
+                            android:cursorVisible="false"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="center"
+                            android:imeOptions="actionNext"
+                            android:includeFontPadding="false"
+                            android:inputType="number"
+                            android:maxLength="1"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_20" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etOtp4"
+                            android:layout_width="38dp"
+                            android:layout_height="50dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_otp_box"
+                            android:cursorVisible="false"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="center"
+                            android:imeOptions="actionNext"
+                            android:includeFontPadding="false"
+                            android:inputType="number"
+                            android:maxLength="1"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_20" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etOtp5"
+                            android:layout_width="38dp"
+                            android:layout_height="50dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_otp_box"
+                            android:cursorVisible="false"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="center"
+                            android:imeOptions="actionNext"
+                            android:includeFontPadding="false"
+                            android:inputType="number"
+                            android:maxLength="1"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_20" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etOtp6"
+                            android:layout_width="38dp"
+                            android:layout_height="50dp"
+                            android:background="@drawable/bg_otp_box"
+                            android:cursorVisible="false"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="center"
+                            android:imeOptions="actionDone"
+                            android:includeFontPadding="false"
+                            android:inputType="number"
+                            android:maxLength="1"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_20" />
+
+                    </LinearLayout>
+
+                    <!-- Submit OTP button -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/button_height"
+                        android:layout_marginTop="@dimen/margin_xxlarge"
+                        android:layout_marginBottom="@dimen/margin_small"
+                        app:cardBackgroundColor="?attr/colorPrimary"
+                        app:cardCornerRadius="@dimen/button_corner_radius"
+                        app:cardElevation="@dimen/card_elevation">
+
+                        <LinearLayout
+                            android:id="@+id/llSubmitOtp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?selectableItemBackground"
+                            android:gravity="center"
+                            android:onClickListener="@{onClickListener}"
+                            android:orientation="horizontal"
+                            android:visibility="@{showProgress ? View.INVISIBLE : View.VISIBLE}">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/btnSubmitOtp"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <ProgressBar
+                            android:id="@+id/progressBar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginVertical="@dimen/margin_small"
+                            android:indeterminateTint="@color/white"
+                            android:visibility="@{showProgress ? View.VISIBLE : View.GONE}"
+                            tools:visibility="gone" />
+
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Resend OTP timer -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvResendOtp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:clickable="false"
+                        android:ellipsize="end"
+                        android:focusable="true"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:onClickListener="@{onClickListener}"
+                        android:text="@string/resendOtpTimer"
+                        android:textColor="?attr/colorTextHint"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <!-- Back to sign In Page -->
+                    <LinearLayout
+                        android:id="@+id/tvBackToSignIn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:layout_marginBottom="@dimen/margin_small"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:onClickListener="@{onClickListener}"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/icon_small"
+                            android:layout_height="@dimen/icon_small"
+                            android:src="@drawable/ic_signin"
+                            android:tint="@color/black"/>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_small"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:includeFontPadding="false"
+                            android:maxLines="1"
+                            android:text="@string/backToSignIn"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

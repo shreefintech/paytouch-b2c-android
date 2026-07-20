@@ -112,9 +112,10 @@ class LoginActivity : BaseActivity() {
                 binding.tvBtnMpin.setBackgroundResource(R.drawable.bg_toggle_unselected)
                 binding.tvBtnPassword.setTextColor(ContextCompat.getColor(this, R.color.white))
                 binding.tvBtnMpin.setTextColor(getThemeColor(com.bumptech.glide.R.attr.colorPrimary))
-                binding.tvCredentialLabel.text = getString(R.string.label_password)
-                binding.etCredential.hint      = getString(R.string.hint_password)
-                binding.etCredential.inputType =
+                binding.tvCredentialLabel.text  = getString(R.string.label_password)
+                binding.etCredential.hint       = getString(R.string.hint_password)
+                binding.tvForgotPassword.text   = getString(R.string.forgot_password)
+                binding.etCredential.inputType  =
                     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 binding.ivPasswordToggle.visible()
             }
@@ -123,9 +124,10 @@ class LoginActivity : BaseActivity() {
                 binding.tvBtnMpin.setBackgroundResource(R.drawable.bg_toggle_selected)
                 binding.tvBtnPassword.setTextColor(getThemeColor(com.bumptech.glide.R.attr.colorPrimary))
                 binding.tvBtnMpin.setTextColor(ContextCompat.getColor(this, R.color.white))
-                binding.tvCredentialLabel.text = getString(R.string.label_mpin)
-                binding.etCredential.hint      = getString(R.string.hint_mpin)
-                binding.etCredential.inputType =
+                binding.tvCredentialLabel.text  = getString(R.string.label_mpin)
+                binding.etCredential.hint       = getString(R.string.hint_mpin)
+                binding.tvForgotPassword.text   = getString(R.string.forgotMpin)
+                binding.etCredential.inputType  =
                     InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
                 binding.ivPasswordToggle.gone()
             }
@@ -227,9 +229,16 @@ class LoginActivity : BaseActivity() {
                 }
                 binding.tvForgotPassword -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    val flowType = if (currentMode == LoginMode.MPIN) {
+                        Constant.FLOW_RESET_MPIN
+                    } else {
+                        Constant.FLOW_RESET_PASSWORD
+                    }
+                    startActivity(OtpVerificationActivity.newIntent(mActivity, flowType))
                 }
                 binding.llCreateAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    startActivity(android.content.Intent(mActivity, CreateAccountActivity::class.java))
                 }
                 binding.ivPasswordToggle -> {
                     togglePasswordVisibility()
