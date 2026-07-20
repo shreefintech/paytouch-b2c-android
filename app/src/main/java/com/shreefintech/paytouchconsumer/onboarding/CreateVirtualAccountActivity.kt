@@ -135,26 +135,17 @@ class CreateVirtualAccountActivity : BaseActivity() {
     }
 
     private fun setupInputFilters() {
-        val emojiFilter = Utility.EmojiExcludeFilter()
-        val digitFilter = InputFilter { source, start, end, _, _, _ ->
-            val sub = source.subSequence(start, end)
-            if (sub.all { it.isDigit() }) null else sub.filter { it.isDigit() }
-        }
-        val alphaSpaceFilter = InputFilter { source, start, end, _, _, _ ->
-            val sub = source.subSequence(start, end)
-            if (sub.all { it.isLetter() || it.isWhitespace() }) null
-            else sub.filter { it.isLetter() || it.isWhitespace() }
-        }
+        val emojiFilter     = Utility.EmojiExcludeFilter()
         val upperCaseFilter = InputFilter { source, start, end, _, _, _ ->
             source.subSequence(start, end).toString().uppercase()
         }
 
-        binding.etFullName.filters    = arrayOf(InputFilter.LengthFilter(50), alphaSpaceFilter, emojiFilter)
-        binding.etMobile.filters      = arrayOf(InputFilter.LengthFilter(10), digitFilter, emojiFilter)
+        binding.etFullName.filters    = arrayOf(InputFilter.LengthFilter(50), Utility.alphaSpaceFilter(), emojiFilter)
+        binding.etMobile.filters      = arrayOf(InputFilter.LengthFilter(10), Utility.digitFilter(), emojiFilter)
         binding.etPan.filters         = arrayOf(InputFilter.LengthFilter(10), upperCaseFilter, emojiFilter)
-        binding.etAadhar.filters      = arrayOf(InputFilter.LengthFilter(12), digitFilter, emojiFilter)
+        binding.etAadhar.filters      = arrayOf(InputFilter.LengthFilter(12), Utility.digitFilter(), emojiFilter)
         binding.etIfsc.filters        = arrayOf(InputFilter.LengthFilter(11), upperCaseFilter, emojiFilter)
-        binding.etBankAccount.filters = arrayOf(InputFilter.LengthFilter(18), digitFilter, emojiFilter)
+        binding.etBankAccount.filters = arrayOf(InputFilter.LengthFilter(18), Utility.digitFilter(), emojiFilter)
         binding.etVpa.filters         = arrayOf(InputFilter.LengthFilter(100), emojiFilter)
         binding.etBranchName.filters  = arrayOf(InputFilter.LengthFilter(50), emojiFilter)
     }
@@ -265,105 +256,63 @@ class CreateVirtualAccountActivity : BaseActivity() {
 
     private fun validate(): Boolean {
         Utility.hideKeyboard(binding.clRoot)
-        val fullName    = binding.etFullName.text?.toString()?.trim()    ?: ""
-        val mobile      = binding.etMobile.text?.toString()?.trim()      ?: ""
-        val pan         = binding.etPan.text?.toString()?.trim()         ?: ""
-        val aadhar      = binding.etAadhar.text?.toString()?.trim()      ?: ""
+        val msg = validatePersonalInfo()
+            ?: validateIdentityDocs()
+            ?: validateBankDetails()
+            ?: validateDocuments()
+        if (msg != null) { ToastUtil.showDelete(mActivity, msg); return false }
+        return true
+    }
+
+    private fun validatePersonalInfo(): String? {
+        val fullName = binding.etFullName.text?.toString()?.trim() ?: ""
+        val mobile   = binding.etMobile.text?.toString()?.trim()   ?: ""
+        return when {
+            fullName.isEmpty()  -> { binding.etFullName.requestFocus(); getString(R.string.msgFullNameEmpty) }
+            mobile.isEmpty()    -> { binding.etMobile.requestFocus(); getString(R.string.msgMobileEmpty) }
+            mobile.length != 10 -> { binding.etMobile.requestFocus(); getString(R.string.msgMobileInvalid) }
+            selectedState.isNullOrEmpty()    -> getString(R.string.msgStateEmpty)
+            selectedCity.isNullOrEmpty()     -> getString(R.string.msgCityEmpty)
+            selectedDistrict.isNullOrEmpty() -> getString(R.string.msgDistrictEmpty)
+            else -> null
+        }
+    }
+
+    private fun validateIdentityDocs(): String? {
+        val pan    = binding.etPan.text?.toString()?.trim()    ?: ""
+        val aadhar = binding.etAadhar.text?.toString()?.trim() ?: ""
+        return when {
+            pan.isEmpty()           -> { binding.etPan.requestFocus(); getString(R.string.msgPanEmpty) }
+            !PAN_REGEX.matches(pan) -> { binding.etPan.requestFocus(); getString(R.string.msgPanInvalid) }
+            aadhar.isEmpty()        -> { binding.etAadhar.requestFocus(); getString(R.string.msgAadharEmpty) }
+            aadhar.length != 12     -> { binding.etAadhar.requestFocus(); getString(R.string.msgAadharInvalid) }
+            else -> null
+        }
+    }
+
+    private fun validateBankDetails(): String? {
         val ifsc        = binding.etIfsc.text?.toString()?.trim()        ?: ""
         val bankAccount = binding.etBankAccount.text?.toString()?.trim() ?: ""
         val vpa         = binding.etVpa.text?.toString()?.trim()         ?: ""
-        val branchName  = binding.etBranchName.text?.toString()?.trim() ?: ""
-
-        val msg = when {
-            fullName.isEmpty() -> {
-                binding.etFullName.requestFocus()
-                getString(R.string.msgFullNameEmpty)
-            }
-
-            mobile.isEmpty() -> {
-                binding.etMobile.requestFocus()
-                getString(R.string.msgMobileEmpty)
-            }
-
-            mobile.length != 10 -> {
-                binding.etMobile.requestFocus()
-                getString(R.string.msgMobileInvalid)
-            }
-
-            selectedState.isNullOrEmpty() -> getString(R.string.msgStateEmpty)
-
-            selectedCity.isNullOrEmpty() -> getString(R.string.msgCityEmpty)
-
-            selectedDistrict.isNullOrEmpty() -> getString(R.string.msgDistrictEmpty)
-
-            pan.isEmpty() -> {
-                binding.etPan.requestFocus()
-                getString(R.string.msgPanEmpty)
-            }
-
-            !PAN_REGEX.matches(pan) -> {
-                binding.etPan.requestFocus()
-                getString(R.string.msgPanInvalid)
-            }
-
-            aadhar.isEmpty() -> {
-                binding.etAadhar.requestFocus()
-                getString(R.string.msgAadharEmpty)
-            }
-
-            aadhar.length != 12 -> {
-                binding.etAadhar.requestFocus()
-                getString(R.string.msgAadharInvalid)
-            }
-
-            ifsc.isEmpty() -> {
-                binding.etIfsc.requestFocus()
-                getString(R.string.msgIfscEmpty)
-            }
-
-            !IFSC_REGEX.matches(ifsc) -> {
-                binding.etIfsc.requestFocus()
-                getString(R.string.msgIfscInvalid)
-            }
-
-            bankAccount.isEmpty() -> {
-                binding.etBankAccount.requestFocus()
-                getString(R.string.msgBankAccountEmpty)
-            }
-
-            bankAccount.length !in 9..18 -> {
-                binding.etBankAccount.requestFocus()
-                getString(R.string.msgBankAccountInvalid)
-            }
-
-            vpa.isEmpty() -> {
-                binding.etVpa.requestFocus()
-                getString(R.string.msgVpaEmpty)
-            }
-
-            !VPA_REGEX.matches(vpa) -> {
-                binding.etVpa.requestFocus()
-                getString(R.string.msgVpaInvalid)
-            }
-
-            branchName.isEmpty() -> {
-                binding.etBranchName.requestFocus()
-                getString(R.string.msgBranchNameEmpty)
-            }
-
-            uploadUris[0] == null -> getString(R.string.msgDocumentRequired, getString(R.string.labelAadharFront))
-            uploadUris[1] == null -> getString(R.string.msgDocumentRequired, getString(R.string.labelAadharBack))
-            uploadUris[2] == null -> getString(R.string.msgDocumentRequired, getString(R.string.labelPanUpload))
-            uploadUris[3] == null -> getString(R.string.msgDocumentRequired, getString(R.string.labelProof))
-
+        val branchName  = binding.etBranchName.text?.toString()?.trim()  ?: ""
+        return when {
+            ifsc.isEmpty()             -> { binding.etIfsc.requestFocus(); getString(R.string.msgIfscEmpty) }
+            !IFSC_REGEX.matches(ifsc)  -> { binding.etIfsc.requestFocus(); getString(R.string.msgIfscInvalid) }
+            bankAccount.isEmpty()      -> { binding.etBankAccount.requestFocus(); getString(R.string.msgBankAccountEmpty) }
+            bankAccount.length !in 9..18 -> { binding.etBankAccount.requestFocus(); getString(R.string.msgBankAccountInvalid) }
+            vpa.isEmpty()              -> { binding.etVpa.requestFocus(); getString(R.string.msgVpaEmpty) }
+            !VPA_REGEX.matches(vpa)    -> { binding.etVpa.requestFocus(); getString(R.string.msgVpaInvalid) }
+            branchName.isEmpty()       -> { binding.etBranchName.requestFocus(); getString(R.string.msgBranchNameEmpty) }
             else -> null
         }
+    }
 
-        if (msg != null) {
-            ToastUtil.showDelete(mActivity, msg)
-            return false
-        }
-        return true
+    private fun validateDocuments(): String? = when {
+        uploadUris[0] == null -> getString(R.string.msgDocumentRequired, getString(R.string.labelAadharFront))
+        uploadUris[1] == null -> getString(R.string.msgDocumentRequired, getString(R.string.labelAadharBack))
+        uploadUris[2] == null -> getString(R.string.msgDocumentRequired, getString(R.string.labelPanUpload))
+        uploadUris[3] == null -> getString(R.string.msgDocumentRequired, getString(R.string.labelProof))
+        else -> null
     }
 
     private fun onSubmit() {
@@ -406,7 +355,7 @@ class CreateVirtualAccountActivity : BaseActivity() {
             onLoading      = { showProgress.set(true) },
             onSuccess      = {
                 showProgress.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.vaSubmitSuccess))
+                ToastUtil.showSuccess(mActivity, getString(R.string.msgVaSubmitSuccess))
                 finish()
             },
             onError        = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }

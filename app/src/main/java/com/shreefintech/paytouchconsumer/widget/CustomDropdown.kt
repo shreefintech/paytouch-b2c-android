@@ -49,7 +49,7 @@ object CustomDropdown {
             divider = "#1A000000".toColorInt().toDrawable()
             dividerHeight = 1
             clipToOutline = true
-            background = ContextCompat.getDrawable(activity, R.drawable.popup_rounded_bg)
+            background = ContextCompat.getDrawable(activity, R.drawable.bg_popup_rounded)
         }
 
         val screenHeight = activity.resources.displayMetrics.heightPixels

@@ -12,7 +12,7 @@
     <string name="hint_mpin">Enter 4-digit MPIN</string>
     <string name="label_save_credentials">Save Credentials</string>
     <string name="forgot_password">Forgot Password?</string>
-    <string name="forgotMpin">Forgot MPIN?</string>
+    <string name="labelForgotMpin">Forgot MPIN?</string>
     <string name="sign_in">Sign In</string>
     <string name="no_account">Don\'t Have an account?</string>
     <string name="create_account">Create Account</string>
@@ -46,8 +46,8 @@
     <string name="subtitleOtpVerification">Enter the code sent to your registered number to continue</string>
     <string name="msgOtpDidntReceive">Didn\'t receive it? Check your SMS or tap resend below</string>
     <string name="btnSubmitOtp">Submit OTP</string>
-    <string name="resendOtpTimer">Resend OTP -%s</string>
-    <string name="resendOtp">Resend OTP</string>
+    <string name="msgResendOtpTimer">Resend OTP -%s</string>
+    <string name="btnResendOtp">Resend OTP</string>
     <string name="msgOtpEmpty">Please enter the OTP</string>
     <string name="msgOtpIncomplete">Please enter complete 6-digit OTP</string>
 
@@ -118,15 +118,13 @@
     <string name="msgAadharInvalid">Aadhar number must be exactly 12 digits</string>
     <string name="msgGstEmpty">Please enter your GST number</string>
     <string name="msgGstInvalid">Please enter a valid GST number</string>
-    <string name="kycSubmitSuccess">KYC details submitted successfully</string>
+    <string name="msgKycSubmitSuccess">KYC details submitted successfully</string>
 
     <!-- Common error messages — msgNoInternet and errGeneric are declared above; no duplicates here -->
 
-    <string name="msfOnlyPdfJpgJpegAllowed">Only PDF, JPG, JPEG allowed.</string>
+    <string name="msgOnlyPdfJpgJpegAllowed">Only PDF, JPG, JPEG allowed.</string>
     <string name="msgFileExceeds2mbLimit">File exceeds 2MB limit.</string>
     <string name="msgUnableToReadFileTryAgain">Unable to read file. Try again.</string>
-    <string name="msgStoragePermissionDeniedPleaseAllow">Storage permission denied. Please allow and try again.</string>
-    <string name="msgPermissionPermanentlyDenied">Permission permanently denied. Please enable from Settings.</string>
 
     <!-- Create Virtual Account screen -->
     <string name="titleCreateVirtualAccount">Create Virtual Account</string>
@@ -161,6 +159,7 @@
     <string name="labelPanUpload">Upload PAN Card</string>
     <string name="labelProof">Proof</string>
     <string name="msgDocumentRequired">Please upload: %s</string>
-    <string name="vaSubmitSuccess">Virtual account request submitted successfully</string>
+    <string name="msgVaSubmitSuccess">Virtual account request submitted successfully</string>
+    <string name="msgAccountCreatedSuccessfully">Account created successfully</string>
     <string name="btnSubmit">Submit</string>
 </resources>

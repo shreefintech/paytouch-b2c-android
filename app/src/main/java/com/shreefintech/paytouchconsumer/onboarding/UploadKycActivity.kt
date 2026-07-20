@@ -93,26 +93,17 @@ class UploadKycActivity : BaseActivity() {
     }
 
     private fun setupInputFilters() {
-        val emojiFilter = Utility.EmojiExcludeFilter()
-        val digitFilter = InputFilter { source, start, end, _, _, _ ->
-            val sub = source.subSequence(start, end)
-            if (sub.all { it.isDigit() }) null else sub.filter { it.isDigit() }
-        }
-        val alphaSpaceFilter = InputFilter { source, start, end, _, _, _ ->
-            val sub = source.subSequence(start, end)
-            if (sub.all { it.isLetter() || it.isWhitespace() }) null
-            else sub.filter { it.isLetter() || it.isWhitespace() }
-        }
-        val upperCaseFilter = InputFilter { source, start, end, _, _, _ ->
+        val emojiFilter      = Utility.EmojiExcludeFilter()
+        val upperCaseFilter  = InputFilter { source, start, end, _, _, _ ->
             source.subSequence(start, end).toString().uppercase()
         }
 
-        binding.etMobile.filters     = arrayOf(InputFilter.LengthFilter(10), digitFilter, emojiFilter)
-        binding.etMemberName.filters = arrayOf(InputFilter.LengthFilter(50), alphaSpaceFilter, emojiFilter)
+        binding.etMobile.filters     = arrayOf(InputFilter.LengthFilter(10), Utility.digitFilter(), emojiFilter)
+        binding.etMemberName.filters = arrayOf(InputFilter.LengthFilter(50), Utility.alphaSpaceFilter(), emojiFilter)
         binding.etAddress.filters    = arrayOf(InputFilter.LengthFilter(200), emojiFilter)
         binding.etEmail.filters      = arrayOf(InputFilter.LengthFilter(100), emojiFilter)
         binding.etPan.filters        = arrayOf(InputFilter.LengthFilter(10), upperCaseFilter, emojiFilter)
-        binding.etAadhar.filters     = arrayOf(InputFilter.LengthFilter(12), digitFilter, emojiFilter)
+        binding.etAadhar.filters     = arrayOf(InputFilter.LengthFilter(12), Utility.digitFilter(), emojiFilter)
         binding.etGst.filters        = arrayOf(InputFilter.LengthFilter(15), upperCaseFilter, emojiFilter)
     }
 
@@ -161,90 +152,54 @@ class UploadKycActivity : BaseActivity() {
 
     private fun validate(): Boolean {
         Utility.hideKeyboard(binding.clRoot)
+        val msg = validatePersonalInfo() ?: validateContactAndLocation() ?: validateIdentityDocs()
+        if (msg != null) { ToastUtil.showDelete(mActivity, msg); return false }
+        return true
+    }
+
+    private fun validatePersonalInfo(): String? {
         val mobile     = binding.etMobile.text?.toString()?.trim()     ?: ""
         val memberName = binding.etMemberName.text?.toString()?.trim() ?: ""
-        val address    = binding.etAddress.text?.toString()?.trim()    ?: ""
-        val email      = binding.etEmail.text?.toString()?.trim()      ?: ""
-        val pan        = binding.etPan.text?.toString()?.trim()        ?: ""
-        val aadhar     = binding.etAadhar.text?.toString()?.trim()     ?: ""
-        val gst        = binding.etGst.text?.toString()?.trim()        ?: ""
         val age        = binding.etAge.text?.toString()?.trim()?.toIntOrNull()
-
-        val msg = when {
-            mobile.isEmpty() -> {
-                binding.etMobile.requestFocus()
-                getString(R.string.msgMobileEmpty)
-            }
-
-            mobile.length != 10 -> {
-                binding.etMobile.requestFocus()
-                getString(R.string.msgMobileInvalid)
-            }
-
-            memberName.isEmpty() -> {
-                binding.etMemberName.requestFocus()
-                getString(R.string.msgMemberNameEmpty)
-            }
-
-            birthCalendar == null -> getString(R.string.msgBirthdateEmpty)
-
-            age == null || age < MIN_AGE_YEARS -> getString(R.string.msgAgeInvalid)
-
-            address.isEmpty() -> {
-                binding.etAddress.requestFocus()
-                getString(R.string.msgHomeAddressEmpty)
-            }
-
-            address.length < 5 -> {
-                binding.etAddress.requestFocus()
-                getString(R.string.msgHomeAddressShort)
-            }
-
-            selectedCity.isNullOrEmpty() -> getString(R.string.msgCityEmpty)
-
-            email.isEmpty() -> {
-                binding.etEmail.requestFocus()
-                getString(R.string.msgEmailEmpty)
-            }
-
-            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
-                binding.etEmail.requestFocus()
-                getString(R.string.msgEmailInvalid)
-            }
-
-            pan.isEmpty() -> {
-                binding.etPan.requestFocus()
-                getString(R.string.msgPanEmpty)
-            }
-
-            !PAN_REGEX.matches(pan) -> {
-                binding.etPan.requestFocus()
-                getString(R.string.msgPanInvalid)
-            }
-
-            aadhar.isEmpty() -> {
-                binding.etAadhar.requestFocus()
-                getString(R.string.msgAadharEmpty)
-            }
-
-            aadhar.length != 12 -> {
-                binding.etAadhar.requestFocus()
-                getString(R.string.msgAadharInvalid)
-            }
-
-            gst.isNotEmpty() && !GST_REGEX.matches(gst) -> {
-                binding.etGst.requestFocus()
-                getString(R.string.msgGstInvalid)
-            }
-
+        return when {
+            mobile.isEmpty()     -> { binding.etMobile.requestFocus(); getString(R.string.msgMobileEmpty) }
+            mobile.length != 10  -> { binding.etMobile.requestFocus(); getString(R.string.msgMobileInvalid) }
+            memberName.isEmpty() -> { binding.etMemberName.requestFocus(); getString(R.string.msgMemberNameEmpty) }
+            birthCalendar == null                  -> getString(R.string.msgBirthdateEmpty)
+            age == null || age < MIN_AGE_YEARS     -> getString(R.string.msgAgeInvalid)
             else -> null
         }
+    }
 
-        if (msg != null) {
-            ToastUtil.showDelete(mActivity, msg)
-            return false
+    private fun validateContactAndLocation(): String? {
+        val address = binding.etAddress.text?.toString()?.trim() ?: ""
+        val email   = binding.etEmail.text?.toString()?.trim()   ?: ""
+        return when {
+            address.isEmpty()   -> { binding.etAddress.requestFocus(); getString(R.string.msgHomeAddressEmpty) }
+            address.length < 5  -> { binding.etAddress.requestFocus(); getString(R.string.msgHomeAddressShort) }
+            selectedCity.isNullOrEmpty() -> getString(R.string.msgCityEmpty)
+            email.isEmpty()     -> { binding.etEmail.requestFocus(); getString(R.string.msgEmailEmpty) }
+            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
+                binding.etEmail.requestFocus(); getString(R.string.msgEmailInvalid)
+            }
+            else -> null
         }
-        return true
+    }
+
+    private fun validateIdentityDocs(): String? {
+        val pan    = binding.etPan.text?.toString()?.trim()    ?: ""
+        val aadhar = binding.etAadhar.text?.toString()?.trim() ?: ""
+        val gst    = binding.etGst.text?.toString()?.trim()    ?: ""
+        return when {
+            pan.isEmpty()           -> { binding.etPan.requestFocus(); getString(R.string.msgPanEmpty) }
+            !PAN_REGEX.matches(pan) -> { binding.etPan.requestFocus(); getString(R.string.msgPanInvalid) }
+            aadhar.isEmpty()        -> { binding.etAadhar.requestFocus(); getString(R.string.msgAadharEmpty) }
+            aadhar.length != 12     -> { binding.etAadhar.requestFocus(); getString(R.string.msgAadharInvalid) }
+            gst.isNotEmpty() && !GST_REGEX.matches(gst) -> {
+                binding.etGst.requestFocus(); getString(R.string.msgGstInvalid)
+            }
+            else -> null
+        }
     }
 
     private fun onSubmitKyc() {
@@ -265,7 +220,7 @@ class UploadKycActivity : BaseActivity() {
             onLoading     = { showProgress.set(true) },
             onSuccess     = {
                 showProgress.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.kycSubmitSuccess))
+                ToastUtil.showSuccess(mActivity, getString(R.string.msgKycSubmitSuccess))
                 resultCode = 1
                 startActivity(Intent(mActivity, CreateVirtualAccountActivity::class.java))
                 finish()

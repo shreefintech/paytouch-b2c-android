@@ -66,6 +66,17 @@ object Utility {
         }
     }
 
+    fun digitFilter() = InputFilter { source, start, end, _, _, _ ->
+        val sub = source.subSequence(start, end)
+        if (sub.all { it.isDigit() }) null else sub.filter { it.isDigit() }
+    }
+
+    fun alphaSpaceFilter() = InputFilter { source, start, end, _, _, _ ->
+        val sub = source.subSequence(start, end)
+        if (sub.all { it.isLetter() || it.isWhitespace() }) null
+        else sub.filter { it.isLetter() || it.isWhitespace() }
+    }
+
 
     var tapFlag = true
     var LAST_CLICK_TIME: Long = 0

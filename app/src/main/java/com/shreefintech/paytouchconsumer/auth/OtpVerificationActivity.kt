@@ -129,14 +129,14 @@ class OtpVerificationActivity : BaseActivity() {
                 val min = millisUntilFinished / 60_000
                 val sec = (millisUntilFinished % 60_000) / 1_000
                 binding.tvResendOtp.text = getString(
-                    R.string.resendOtpTimer,
+                    R.string.msgResendOtpTimer,
                     String.format("%02d:%02d", min, sec)
                 )
             }
             override fun onFinish() {
                 isResendEnabled = true
                 binding.tvResendOtp.isClickable = true
-                binding.tvResendOtp.text = getString(R.string.resendOtp)
+                binding.tvResendOtp.text = getString(R.string.btnResendOtp)
                 binding.tvResendOtp.setTextColor(ContextCompat.getColor(mActivity, R.color.primary))
             }
         }.start()

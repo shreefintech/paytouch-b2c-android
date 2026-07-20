@@ -1,22 +1,18 @@
 package com.shreefintech.paytouchconsumer.utill
 
-import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.provider.OpenableColumns
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import com.shreefintech.paytouchconsumer.R
 
 /**
  * FilePickerUtil — Pick & validate PDF/JPG/JPEG files (max 2MB)
  *
- * STEP 1 — Register launchers in onCreate / onViewCreated (before fragment/activity starts)
- *   filePickerUtil = FilePickerUtil(this)           // Activity
+ * STEP 1 — Register launchers in onCreate (before activity starts)
+ *   filePickerUtil = FilePickerUtil(this)
  *
  * STEP 2 — Set callbacks
  *   filePickerUtil.onSuccess = { file -> binding.tvFileName.text = file.fileName }
@@ -24,8 +20,11 @@ import com.shreefintech.paytouchconsumer.R
  *
  * STEP 3 — Open picker
  *   binding.btnPick.setOnClickListener { filePickerUtil.openPicker() }
+ *
+ * Note: GetContent does not require explicit storage permissions — the system picker
+ * grants URI read access automatically upon selection.
  */
-class FilePickerUtil {
+class FilePickerUtil(activity: AppCompatActivity) {
 
     // ─── Models ───────────────────────────────────────────────────────────────
 
@@ -40,8 +39,6 @@ class FilePickerUtil {
         object InvalidExtension : FilePickerError()
         object FileTooLarge : FilePickerError()
         object UnableToReadFile : FilePickerError()
-        object PermissionDenied : FilePickerError()
-        object PermissionPermanentlyDenied : FilePickerError()
     }
 
     // ─── Config ───────────────────────────────────────────────────────────────
@@ -58,72 +55,17 @@ class FilePickerUtil {
 
     // ─── Internals ────────────────────────────────────────────────────────────
 
-    private var context: Context
-    private var activity: Activity? = null
+    private val context: Context = activity
 
-    private val fileLauncher: ActivityResultLauncher<String>
-    private val permissionLauncher: ActivityResultLauncher<Array<String>>
-
-    // ─── Constructors ─────────────────────────────────────────────────────────
-
-    constructor(activity: AppCompatActivity) {
-        this.context = activity
-        this.activity = activity
-
-        fileLauncher = activity.registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private val fileLauncher: ActivityResultLauncher<String> =
+        activity.registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let { validate(it) }
         }
-
-        permissionLauncher = activity.registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            handlePermissionResult(permissions)
-        }
-    }
 
     // ─── Open picker ──────────────────────────────────────────────────────────
 
     fun openPicker() {
         fileLauncher.launch("*/*")
-    }
-
-    // ─── Permission helpers ───────────────────────────────────────────────────
-
-    private fun requiredPermissions(): Array<String> {
-        return when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
-                Manifest.permission.READ_MEDIA_IMAGES
-            )
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> arrayOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-            else -> emptyArray()
-        }
-    }
-
-
-    private fun shouldShowRationale(): Boolean {
-        val act = activity ?: return false
-        return requiredPermissions().any {
-            ActivityCompat.shouldShowRequestPermissionRationale(act, it)
-        }
-    }
-
-    private fun handlePermissionResult(permissions: Map<String, Boolean>) {
-        when {
-            permissions.values.all { it } -> {
-                // All granted — open picker
-                fileLauncher.launch("*/*")
-            }
-            shouldShowRationale() -> {
-                // Denied but can ask again
-                onError?.invoke(FilePickerError.PermissionDenied)
-            }
-            else -> {
-                // Permanently denied
-                onError?.invoke(FilePickerError.PermissionPermanentlyDenied)
-            }
-        }
     }
 
     // ─── Validate file ────────────────────────────────────────────────────────
@@ -192,11 +134,8 @@ class FilePickerUtil {
     // ─── Error messages ───────────────────────────────────────────────────────
 
     fun getErrorMessage(error: FilePickerError): String = when (error) {
-        is FilePickerError.InvalidExtension -> context.getString(R.string.msfOnlyPdfJpgJpegAllowed)
-        is FilePickerError.FileTooLarge -> context.getString(R.string.msgFileExceeds2mbLimit)
-        is FilePickerError.UnableToReadFile -> context.getString(R.string.msgUnableToReadFileTryAgain)
-        is FilePickerError.PermissionDenied -> context.getString(R.string.msgStoragePermissionDeniedPleaseAllow)
-        is FilePickerError.PermissionPermanentlyDenied -> context.getString(R.string.msgPermissionPermanentlyDenied)
+        is FilePickerError.InvalidExtension  -> context.getString(R.string.msgOnlyPdfJpgJpegAllowed)
+        is FilePickerError.FileTooLarge      -> context.getString(R.string.msgFileExceeds2mbLimit)
+        is FilePickerError.UnableToReadFile  -> context.getString(R.string.msgUnableToReadFileTryAgain)
     }
-
 }
