@@ -10,6 +10,8 @@ import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
+import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -32,7 +34,7 @@ class ElectricityActivity : BaseActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(
                 systemBars.left,
                 systemBars.top,
@@ -43,11 +45,11 @@ class ElectricityActivity : BaseActivity() {
         }
 
         LiquidGlassEffect.attach(
-            targetView   = binding.flCard,
-            rootView     = binding.clRoot as ViewGroup,
+            targetView = binding.flCard,
+            rootView = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion   = 0f,
-            blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
+            distortion = 0f,
+            blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
         binding.onClickListener = onClickListener()
@@ -57,11 +59,11 @@ class ElectricityActivity : BaseActivity() {
     private fun showCompanyDropdown() {
         Utility.hideKeyboard(binding.clRoot)
         CustomDropdown.showDropdown(
-            activity   = mActivity,
+            activity = mActivity,
             anchorView = binding.flCompanyAnchor,
-            arrowView  = binding.ivCompanyArrow,
-            textView   = binding.tvCompany,
-            items      = operatorList
+            arrowView = binding.ivCompanyArrow,
+            textView = binding.tvCompany,
+            items = operatorList
         ) { selected, _ ->
             selectedOperator = selected
             binding.tvCompany.setTextColor(0xFF000000.toInt())
@@ -70,7 +72,7 @@ class ElectricityActivity : BaseActivity() {
 
     private fun onProceedToPay() {
         val consumerNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
-        val amount         = binding.etAmount.text?.toString()?.trim()         ?: ""
+        val amount = binding.etAmount.text?.toString()?.trim() ?: ""
 
         if (consumerNumber.isEmpty()) {
             binding.etConsumerNumber.requestFocus()
@@ -96,18 +98,20 @@ class ElectricityActivity : BaseActivity() {
     private fun onReset() {
         binding.etConsumerNumber.setText("")
         binding.etAmount.setText("")
-        binding.tvPlatformFee.text    = getString(R.string.hintPlatformFee)
-        binding.tvTotalPayable.text   = getString(R.string.hintTotalPayable)
-        binding.tvCompany.text        = getString(R.string.hintSelectCompany)
+        binding.tvPlatformFee.text = getString(R.string.hintPlatformFee)
+        binding.tvTotalPayable.text = getString(R.string.hintTotalPayable)
+        binding.tvCompany.text = getString(R.string.hintSelectCompany)
         binding.tvCompany.setTextColor(0x80000000.toInt())
-        binding.cbTerms.isChecked     = false
-        selectedOperator              = null
+        binding.cbTerms.isChecked = false
+        selectedOperator = null
         Utility.hideKeyboard(binding.clRoot)
     }
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() { finish() }
+            override fun handleOnBackPressed() {
+                finish()
+            }
         })
     }
 
@@ -118,35 +122,55 @@ class ElectricityActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
+
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, ElectricityReportActivity::class.java))
+                    startActivity(Intent(mActivity, TransactionReportActivity::class.java))
                 }
+
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, ElectricityStatusActivity::class.java))
                 }
+
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, ElectricitySmsReceiptActivity::class.java))
+                    // TODO(PAYTOUCH-546): Pass real transaction data once API is wired
+                    SmsReceiptActivity.start(
+                        context = mActivity,
+                        mobile = "9876543210",
+                        txnId = "BC88213045",
+                        amount = "₹149.00",
+                        status = "Success",
+                        username = "Ravi Kumar",
+                        date = "18-07-2026, 09:15 am",
+                        platformFee = "₹3.00",
+                        refId = "TXN10235",
+                        accountNo = "30723111936",
+                        companyName = "Paschim Gujarat Vij Company Ltd"
+                    )
                 }
+
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
                     showCompanyDropdown()
                 }
+
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onProceedToPay()
                 }
+
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onReset()
                 }
+
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, ElectricityReportActivity::class.java))
+                    startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
                 }
             }
         }
     }
+
 }
