@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg"
+        tools:context=".electricity.ElectricityActivity">
+
+        <!-- Toolbar -->
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <!-- Title row: "Electricity Bill" + BharatConnect logo -->
+        <LinearLayout
+            android:id="@+id/llTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:text="@string/titleElectricityBill"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_20" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/img_bharat_connect" />
+        </LinearLayout>
+
+        <!-- Tab bar card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvTabs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_small_medium"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorPrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llTitle">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Tab: PayBill (always active on this screen) -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_toggle_selected"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/margin_small"
+                    android:paddingBottom="@dimen/margin_small"
+                    android:paddingStart="@dimen/margin_extra_small"
+                    android:paddingEnd="@dimen/margin_extra_small">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_paybill"
+                        android:tint="@color/white" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/tabPayBill"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_10" />
+                </LinearLayout>
+
+                <!-- Tab: Report -->
+                <LinearLayout
+                    android:id="@+id/llTabReport"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:onClickListener="@{onClickListener}"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/margin_small"
+                    android:paddingBottom="@dimen/margin_small"
+                    android:paddingStart="@dimen/margin_extra_small"
+                    android:paddingEnd="@dimen/margin_extra_small">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_download"
+                        android:tint="@color/primary" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/tabReport"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10" />
+                </LinearLayout>
+
+                <!-- Tab: Status -->
+                <LinearLayout
+                    android:id="@+id/llTabStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:onClickListener="@{onClickListener}"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/margin_small"
+                    android:paddingBottom="@dimen/margin_small"
+                    android:paddingStart="@dimen/margin_extra_small"
+                    android:paddingEnd="@dimen/margin_extra_small">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_clock"
+                        android:tint="@color/primary" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/tabStatus"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10" />
+                </LinearLayout>
+
+                <!-- Tab: SMS Receipt -->
+                <LinearLayout
+                    android:id="@+id/llTabSmsReceipt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:onClickListener="@{onClickListener}"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/margin_small"
+                    android:paddingBottom="@dimen/margin_small"
+                    android:paddingStart="@dimen/margin_extra_small"
+                    android:paddingEnd="@dimen/margin_extra_small">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_share"
+                        android:tint="@color/primary" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/tabSmsReceipt"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvTabs">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/margin_extra_large">
+
+                <!-- Recent Transactions row — pinned to bottom -->
+                <LinearLayout
+                    android:id="@+id/llRecentTransactions"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/page_margin_horizontal"
+                    android:layout_marginEnd="@dimen/page_margin_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:background="@drawable/bg_white_rounded"
+                    android:gravity="center_vertical"
+                    android:onClickListener="@{onClickListener}"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/margin_large"
+                    app:layout_constraintTop_toBottomOf="@id/flCard"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/proza_libre_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/titleRecentTransactions"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_14" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_right_arrow"
+                        android:tint="@color/primary" />
+                </LinearLayout>
+
+                <!-- Glass form card — fills space between tab bar and recent transactions -->
+                <FrameLayout
+                    android:id="@+id/flCard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/page_margin_horizontal"
+                    android:layout_marginEnd="@dimen/page_margin_horizontal"
+                    android:layout_marginBottom="@dimen/margin_small_medium"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin_large">
+
+                        <!-- Category | Company row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <!-- Category (static) -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelCategory"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:background="@drawable/bg_form_field"
+                                    android:padding="@dimen/margin_small_medium">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryElectricityBill"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </FrameLayout>
+                            </LinearLayout>
+
+                            <!-- Company (dropdown) -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelCompany"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <FrameLayout
+                                    android:id="@+id/flCompanyAnchor"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:background="@drawable/bg_form_field"
+                                    android:onClickListener="@{onClickListener}"
+                                    android:padding="@dimen/margin_small_medium">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvCompany"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/hintSelectCompany"
+                                            android:textColor="#80000000"
+                                            android:textSize="@dimen/text_size_12" />
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:id="@+id/ivCompanyArrow"
+                                            android:layout_width="14dp"
+                                            android:layout_height="14dp"
+                                            android:src="@drawable/ic_down_arrow"
+                                            android:tint="@color/primary" />
+                                    </LinearLayout>
+                                </FrameLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Consumer Number -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelConsumerNumber"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etConsumerNumber"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/bg_form_field"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintConsumerNumber"
+                            android:inputType="text"
+                            android:padding="@dimen/margin_small_medium"
+                            android:textColor="@color/black"
+                            android:textColorHint="#80000000"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- Amount -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelAmount"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etAmount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/bg_form_field"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintAmount"
+                            android:inputType="numberDecimal"
+                            android:padding="@dimen/margin_small_medium"
+                            android:textColor="@color/black"
+                            android:textColorHint="#80000000"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- Platform Fee | Total Payable -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelPlatformFee"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:background="@drawable/bg_form_field"
+                                    android:padding="@dimen/margin_small_medium">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvPlatformFee"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/hintPlatformFee"
+                                        android:textColor="#80000000"
+                                        android:textSize="@dimen/text_size_12" />
+                                </FrameLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelTotalPayable"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:background="@drawable/bg_form_field"
+                                    android:padding="@dimen/margin_small_medium">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvTotalPayable"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/hintTotalPayable"
+                                        android:textColor="#80000000"
+                                        android:textSize="@dimen/text_size_12" />
+                                </FrameLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Terms checkbox row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.checkbox.MaterialCheckBox
+                                android:id="@+id/cbTerms"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:maxLines="1"
+                                app:buttonIconTint="@color/white"
+                                android:buttonTint="?attr/colorPrimary"
+                                android:padding="0dp" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvTerms"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:includeFontPadding="false"
+                                android:text="@string/msgTermsAgreement"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/text_size_12" />
+                        </LinearLayout>
+
+                        <!-- Action buttons -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:orientation="horizontal">
+
+                            <!-- Proceed to pay -->
+                            <LinearLayout
+                                android:id="@+id/llProceed"
+                                android:layout_width="0dp"
+                                android:layout_height="@dimen/btn_height"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:background="@drawable/bg_reset_btn"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_procced_to_pay" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/btnProceedToPay"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="@dimen/text_size_12" />
+                            </LinearLayout>
+
+                            <!-- Reset -->
+                            <LinearLayout
+                                android:id="@+id/llReset"
+                                android:layout_width="0dp"
+                                android:layout_height="@dimen/btn_height"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_toggle_selected"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_refresh"
+                                    android:tint="@color/white" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/btnReset"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/text_size_12" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </FrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
