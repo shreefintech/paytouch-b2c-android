@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.auth
+package com.shreefintech.paytouchconsumer.auth.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -10,14 +10,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CreateAccountViewModel : ViewModel() {
+class ResetPasswordViewModel : ViewModel() {
 
-    fun register(
+    fun changePassword(
         context: Context,
-        mobile: String,
-        email: String,
-        referralCode: String,
-        password: String,
+        newPassword: String,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -29,7 +26,7 @@ class CreateAccountViewModel : ViewModel() {
         onLoading()
         viewModelScope.launch {
             try {
-                // TODO(PAYTOUCH-487): wire create-account API call
+                // TODO(PAYTOUCH-487): wire change-password API call
                 withContext(Dispatchers.Main) { onSuccess() }
             } catch (e: CancellationException) {
                 throw e

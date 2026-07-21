@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.auth.viewmodel.CreateAccountViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityCreateAccountBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -75,17 +76,10 @@ class CreateAccountActivity : BaseActivity() {
 
     private fun setupInputFilters() {
         val emojiFilter = Utility.EmojiExcludeFilter()
-        binding.etMobile.filters = arrayOf(
-            InputFilter.LengthFilter(10),
-            InputFilter { source, start, end, _, _, _ ->
-                val sub = source.subSequence(start, end)
-                if (sub.all { it.isDigit() }) null else sub.filter { it.isDigit() }
-            },
-            emojiFilter
-        )
-        binding.etEmail.filters = arrayOf(InputFilter.LengthFilter(100), emojiFilter)
-        binding.etReferralCode.filters = arrayOf(InputFilter.LengthFilter(50), emojiFilter)
-        binding.etPassword.filters = arrayOf(InputFilter.LengthFilter(20), emojiFilter)
+        binding.etMobile.filters          = arrayOf(InputFilter.LengthFilter(10), Utility.digitFilter(), emojiFilter)
+        binding.etEmail.filters           = arrayOf(InputFilter.LengthFilter(100), emojiFilter)
+        binding.etReferralCode.filters    = arrayOf(InputFilter.LengthFilter(50), emojiFilter)
+        binding.etPassword.filters        = arrayOf(InputFilter.LengthFilter(20), emojiFilter)
         binding.etConfirmPassword.filters = arrayOf(InputFilter.LengthFilter(20), emojiFilter)
     }
 
@@ -187,7 +181,11 @@ class CreateAccountActivity : BaseActivity() {
             referralCode = referralCode,
             password     = password,
             onLoading    = { showProgress.set(true) },
-            onSuccess    = { showProgress.set(false) },
+            onSuccess    = {
+                showProgress.set(false)
+                ToastUtil.showSuccess(mActivity, getString(R.string.msgAccountCreatedSuccessfully))
+                // TODO(PAYTOUCH-487): navigate to OtpVerificationActivity once register API is wired
+            },
             onError      = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
         )
     }

@@ -291,7 +291,7 @@
                         android:includeFontPadding="false"
                         android:maxLines="1"
                         android:onClickListener="@{onClickListener}"
-                        android:text="@string/resendOtpTimer"
+                        android:text="@string/msgResendOtpTimer"
                         android:textColor="?attr/colorTextHint"
                         android:textSize="@dimen/text_size_13" />
 

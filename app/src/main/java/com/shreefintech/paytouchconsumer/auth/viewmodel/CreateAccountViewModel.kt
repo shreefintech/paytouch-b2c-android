@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.auth
+package com.shreefintech.paytouchconsumer.auth.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -10,11 +10,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ResetMpinViewModel : ViewModel() {
+class CreateAccountViewModel : ViewModel() {
 
-    fun changeMpin(
+    fun register(
         context: Context,
-        newMpin: String,
+        mobile: String,
+        email: String,
+        referralCode: String,
+        password: String,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -26,7 +29,7 @@ class ResetMpinViewModel : ViewModel() {
         onLoading()
         viewModelScope.launch {
             try {
-                // TODO(PAYTOUCH-487): wire change-MPIN API call
+                // TODO(PAYTOUCH-487): wire create-account API call
                 withContext(Dispatchers.Main) { onSuccess() }
             } catch (e: CancellationException) {
                 throw e
