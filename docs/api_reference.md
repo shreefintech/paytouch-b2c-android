@@ -1,6 +1,6 @@
 # PayTouch Consumer — API Reference
 
-All endpoints grouped by domain area. The new project must use the PayTouch Main API (`https://www.paytouch.in/`) as the canonical source. Legacy endpoints are documented for completeness but should be audited and removed where replaced.
+> **Current phase:** UI implementation. APIs are not yet wired. This document is the authoritative reference for field names, endpoint paths, and response structures. Use it when wiring up any API call — do not invent field names or paths.
 
 ---
 
@@ -8,117 +8,116 @@ All endpoints grouped by domain area. The new project must use the PayTouch Main
 
 | Client Name | Base URL | Purpose |
 |---|---|---|
-| Main API | `https://www.paytouch.in/` | All core features |
+| Main API | `https://www.paytouch.in/` | All core features (auth, KYC, payments, wallet) |
 | VPS Admin | `https://admin.paytouch.in/` | Parallel user/transaction tracking |
-| Legacy | `https://dashboard.shreefintechsolutions.com/api/mobikwik/` | Old MobiKwik endpoint (audit for removal) |
-| QR Payment | `https://tablet-frying-shy.ngrok-free.dev/` | Dynamic QR (REPLACE with stable URL) |
+| Legacy | `https://dashboard.shreefintechsolutions.com/api/mobikwik/` | Old MobiKwik endpoint — audit before using |
+| QR Payment | *(stable URL TBD — current dev URL is a ngrok tunnel, must be replaced before release)* | Dynamic QR payment |
 
-## Authentication Headers
+## Authentication Header
 All Main API and VPS Admin requests require:
 ```
 Authorization: Bearer {token}
 ```
-Token is obtained from login/register response and stored in SharedPreferences.
+Token is obtained from the login/register response and stored in SharedPreferences via `SharedPreferenceHelper`.
+
+## Standard Response Wrapper
+All endpoints return:
+```json
+{
+  "success": true,
+  "message": "Human-readable result",
+  "data": { /* endpoint-specific payload */ }
+}
+```
+HTTP status codes:
+- `200` — Success
+- `401` — Unauthorized → forced logout
+- `422` — Validation error
+- `500` — Server error
 
 ---
 
 ## AUTHENTICATION & USER MANAGEMENT
 
 ### POST `api/login`
-**Purpose:** Authenticate user with mobile + password or MPIN.
-**Called from:** LoginActivity
+**Called from:** `LoginActivity`
 
-**Request Body:**
+**Request:**
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | mobile | String | Yes | 10-digit mobile number |
-| password | String | Conditional | Required for password login mode |
-| mpin | String | Conditional | Required for MPIN login mode |
+| password | String | Conditional | Password login mode |
+| mpin | String | Conditional | MPIN login mode |
 
 **Response:**
 | Field | Type | Notes |
 |---|---|---|
-| token | String | Bearer token for subsequent requests |
+| token | String | Bearer token |
 | token_type | String | Always "Bearer" |
-| user.id | Int | User ID |
-| user.mobile | String | Registered mobile |
-| user.email | String | Registered email |
-| user.wallet_balance | Decimal | Current wallet balance |
-| user.requires_kyc | Boolean | True → route to KYC screen |
-| user.requires_mpin | Boolean | True → route to MPIN creation |
-| user.requires_virtual_account | Boolean | True → route to Virtual Account |
+| user.id | Int | |
+| user.mobile | String | |
+| user.email | String | |
+| user.wallet_balance | Decimal | |
+| user.requires_kyc | Boolean | true → route to KYC |
+| user.requires_mpin | Boolean | true → route to MPIN creation |
+| user.requires_virtual_account | Boolean | true → route to Virtual Account |
 
 ---
 
 ### POST `api/register`
-**Purpose:** Create a new user account.
-**Called from:** CreateAccountActivity
+**Called from:** `CreateAccountActivity`
 
-**Request Body:**
+**Request:**
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | name | String | Yes | Full name |
-| mobile | String | Yes | 10-digit mobile |
-| email | String | Yes | Valid email format |
-| password | String | Yes | Min 8 characters |
-| password_confirmation | String | Yes | Must match password |
-| referral_code | String | No | Optional referral code |
+| mobile | String | Yes | 10-digit |
+| email | String | Yes | Valid email |
+| password | String | Yes | Min 8 chars |
+| password_confirmation | String | Yes | Must match |
+| referral_code | String | No | Optional |
 
-**Response:** Same structure as login response.
+**Response:** Same structure as login.
 
 ---
 
 ### GET `api/user`
-**Purpose:** Fetch current authenticated user's profile and onboarding flags.
-**Called from:** SplashActivity (session check), DashboardCategoryActivity
+**Called from:** Splash screen (session check), Home screen
 
-**Response:**
-| Field | Type | Notes |
-|---|---|---|
-| id | Int | User ID |
-| mobile | String | |
-| email | String | |
-| wallet_balance | Decimal | |
-| requires_kyc | Boolean | |
-| requires_mpin | Boolean | |
-| requires_virtual_account | Boolean | |
+**Response:** `{ id, mobile, email, wallet_balance, requires_kyc, requires_mpin, requires_virtual_account }`
 
 ---
 
 ### POST `api/logout`
-**Purpose:** Invalidate the server-side session.
-**Called from:** DashboardCategoryActivity (menu → logout)
+**Called from:** Home screen (logout action)
 
-**Request:** No body required (token in header is sufficient).
-**Response:** `{ success: true, message: String }`
+**Request:** No body (token in header).
+**Response:** `{ success: Boolean, message: String }`
 
 ---
 
 ## KYC
 
 ### GET `api/kyc/account-info`
-**Purpose:** Fetch existing KYC data (if any) to pre-fill the KYC form.
-**Called from:** KYCActivity (on load)
+**Called from:** `UploadKycActivity` (on load, to pre-fill)
 
-**Response:** All KYC fields listed below, possibly null if not yet submitted.
+**Response:** All KYC fields; may be null if not yet submitted.
 
 ---
 
 ### POST `api/kyc/submit`
-**Purpose:** Submit KYC identity information.
-**Called from:** KYCActivity (on submit)
+**Called from:** `UploadKycActivity` (on submit)
 
-**Request Body:**
 | Field | Type | Required | Validation |
 |---|---|---|---|
 | mobile_no | String | Yes | 10 digits |
 | member_name | String | Yes | |
-| birth_date | String | Yes | Date format (from date picker) |
-| age | Int | Yes | Auto-calculated from DOB |
+| birth_date | String | Yes | From date picker |
+| age | Int | Yes | Auto-calculated |
 | home_address | String | Yes | |
 | city_name | String | Yes | |
 | email | String | Yes | Valid email |
-| pan_card_no | String | Yes | Regex: `[A-Z]{5}[0-9]{4}[A-Z]{1}` |
+| pan_card_no | String | Yes | `[A-Z]{5}[0-9]{4}[A-Z]{1}` |
 | aadhaar_no | String | Yes | Exactly 12 digits |
 | gst_no | String | No | GST format if provided |
 
@@ -129,122 +128,87 @@ Token is obtained from login/register response and stored in SharedPreferences.
 ## MPIN
 
 ### POST `api/mpin/create`
-**Purpose:** Create a new 4-digit MPIN during onboarding.
-**Called from:** MpinActivity
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| mpin | String | Yes | Exactly 4 digits |
-| mpin_confirmation | String | Yes | Must match mpin |
-
-**Response:** `{ success: Boolean, message: String }`
+| Field | Type | Required |
+|---|---|---|
+| mpin | String | Yes — 4 digits |
+| mpin_confirmation | String | Yes — must match |
 
 ---
 
 ### POST `api/mpin/verify`
-**Purpose:** Verify MPIN during MPIN-mode login.
-**Called from:** LoginActivity (MPIN mode)
-
 | Field | Type | Required |
 |---|---|---|
 | mpin | String | Yes |
-
-**Response:** `{ success: Boolean, message: String }`
 
 ---
 
 ### POST `api/mpin/send-otp`
-**Purpose:** Send OTP to registered mobile to begin MPIN reset.
-**Called from:** MPIN reset flow
-
-**Request:** Mobile number or no body (uses token to identify user).
-**Response:** `{ success: Boolean, message: String }`
+**Request:** No body required (user identified by Bearer token).
 
 ---
 
 ### POST `api/mpin/verify-otp`
-**Purpose:** Verify OTP for MPIN reset.
-
 | Field | Type | Required |
 |---|---|---|
 | otp | String | Yes |
 
-**Response:** `{ success: Boolean, message: String }`
-
 ---
 
 ### POST `api/mpin/reset`
-**Purpose:** Set new MPIN after OTP verified.
-
 | Field | Type | Required |
 |---|---|---|
 | mpin | String | Yes |
 | mpin_confirmation | String | Yes |
-
-**Response:** `{ success: Boolean, message: String }`
 
 ---
 
 ## PASSWORD MANAGEMENT
 
 ### POST `api/password/send-otp`
-**Purpose:** Send OTP for password reset.
-**Called from:** Forgot Password flow
-
 | Field | Type | Required |
 |---|---|---|
 | mobile | String | Yes |
 
-**Response:** `{ success: Boolean, message: String }`
-
 ---
 
 ### POST `api/password/verify-otp`
-**Purpose:** Verify OTP for password reset.
-
 | Field | Type | Required |
 |---|---|---|
 | otp | String | Yes |
 
-**Response:** `{ success: Boolean, message: String }`
-
 ---
 
 ### POST `api/password/reset`
-**Purpose:** Set new password after OTP verified.
-
 | Field | Type | Required |
 |---|---|---|
-| password | String | Yes | Min 8 chars |
-| password_confirmation | String | Yes | Must match |
-
-**Response:** `{ success: Boolean, message: String }`
+| password | String | Yes — min 8 chars |
+| password_confirmation | String | Yes — must match |
 
 ---
 
 ## VIRTUAL ACCOUNT
 
 ### POST `api/virtual-account/create`
-**Purpose:** Submit banking details and KYC documents to create a virtual account. This completes onboarding.
-**Called from:** VirtualAccountActivity
+**Called from:** `CreateVirtualAccountActivity`
 **Content-Type:** `multipart/form-data`
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| name | String | Yes | |
-| mobile | String | Yes | |
-| city | String | Yes | |
-| state | String | Yes | From Indian states list |
-| aadhaar | String | Yes | |
-| pan | String | Yes | |
-| bank_acc | String | Yes | Bank account number |
-| ifsc | String | Yes | IFSC code |
-| upi | String | Yes | UPI ID |
-| branch | String | Yes | Bank branch name |
-| aadhaar_front | File | Yes | Image file |
-| aadhaar_back | File | Yes | Image file |
-| pan_image | File | Yes | Image file |
-| bank_proof | File | Yes | Image file |
+| Field | Type | Required |
+|---|---|---|
+| name | String | Yes |
+| mobile | String | Yes |
+| city | String | Yes |
+| state | String | Yes |
+| district | String | Yes |
+| aadhaar | String | Yes |
+| pan | String | Yes |
+| bank_acc | String | Yes |
+| ifsc | String | Yes |
+| upi | String | Yes |
+| branch | String | Yes |
+| aadhaar_front | File | Yes |
+| aadhaar_back | File | Yes |
+| pan_image | File | Yes |
+| bank_proof | File | Yes |
 
 **Response:** `{ success: Boolean, message: String, data: {} }`
 
@@ -253,9 +217,6 @@ Token is obtained from login/register response and stored in SharedPreferences.
 ## WALLET & TRANSACTIONS
 
 ### GET `api/wallet/balance`
-**Purpose:** Fetch current wallet balance.
-**Called from:** Dashboard, before payments
-
 **Response:**
 | Field | Type |
 |---|---|
@@ -265,24 +226,16 @@ Token is obtained from login/register response and stored in SharedPreferences.
 ---
 
 ### GET `api/transactions`
-**Purpose:** Get unified paginated transaction history.
-**Called from:** Transaction history screens
-
-**Query Params:**
-| Param | Type | Notes |
-|---|---|---|
-| page | Int | Pagination page number |
-| category | String | Optional filter |
+**Query Params:** `page` (Int), `category` (String, optional)
 
 **Response:** Paginated list of transaction objects.
 
 ---
 
-## TOKEN
+## HOME / DASHBOARD TOKEN
 
 ### GET `api/shreefintech-token`
-**Purpose:** Fetch a dynamic token used for certain payment operations. Fetched on every dashboard load.
-**Called from:** DashboardCategoryActivity
+**Called from:** `HomeActivity` (on load)
 
 **Response:**
 | Field | Type |
@@ -295,29 +248,18 @@ Token is obtained from login/register response and stored in SharedPreferences.
 ## HDFC SMART GATEWAY
 
 ### POST `api/hdfc/orders`
-**Purpose:** Create a new payment order on the HDFC gateway.
-**Called from:** Payment confirmation screens
-
 | Field | Type | Required |
 |---|---|---|
 | amount | Decimal | Yes |
-| transaction_id | String | Yes | PYTCH-format locally-generated ID |
-| category | String | Yes | Bill category |
-| consumer_number | String | Yes | |
+| transaction_id | String | Yes — PYTCH-format |
+| category | String | Yes |
+| consumer_number | String | Yes |
 
-**Response:**
-| Field | Type |
-|---|---|
-| success | Boolean |
-| data.order_id | String |
+**Response:** `{ success: Boolean, data.order_id: String }`
 
 ---
 
 ### GET `api/hdfc/orders/{order_id}/status`
-**Purpose:** Poll for the completion status of an HDFC order.
-**Called from:** Payment status screens
-
-**Path Param:** `order_id` — returned from create order call
 **Response:** `{ success: Boolean, status: String, message: String }`
 
 ---
@@ -325,17 +267,9 @@ Token is obtained from login/register response and stored in SharedPreferences.
 ## ELECTRICITY BILL PAYMENT
 
 ### GET/POST `api/electricity/operators`
-**Purpose:** Get list of available electricity operators.
-**Called from:** Electricity PayBill screen (operator dropdown)
-
 **Response:** `{ success: Boolean, data: [{ id, name, code }] }`
 
----
-
 ### POST `api/electricity/fetch-bill`
-**Purpose:** Fetch outstanding electricity bill for a consumer number.
-**Called from:** Electricity PayBill screen (after operator + consumer number entered)
-
 | Field | Type | Required |
 |---|---|---|
 | operator | String | Yes |
@@ -344,154 +278,82 @@ Token is obtained from login/register response and stored in SharedPreferences.
 **Response:**
 | Field | Type |
 |---|---|
-| success | Boolean |
 | data.outstanding_amount | Decimal |
 | data.due_date | String |
 | data.consumer_name | String |
-| data.bill_details | Object (varies by operator) |
-
----
 
 ### POST `api/electricity/process-payment`
-**Purpose:** Process electricity bill payment.
-**Called from:** Electricity PayBill screen (after user confirms)
-
 | Field | Type | Required |
 |---|---|---|
 | operator | String | Yes |
 | consumer_number | String | Yes |
 | amount | Decimal | Yes |
-| transaction_id | String | Yes | PYTCH-format ID |
-
-**Response:** `{ success: Boolean, message: String, data.transaction_id: String }`
-
----
+| transaction_id | String | Yes — PYTCH-format |
 
 ### POST `api/electricity/verify`
-**Purpose:** Verify payment result after processing.
-
-| Field | Type | Required |
-|---|---|---|
-| transaction_id | String | Yes |
-
-**Response:** `{ success: Boolean, status: String, message: String }`
-
----
+| Field | Type |
+|---|---|
+| transaction_id | String |
 
 ### POST `api/electricity/transaction-status`
-**Purpose:** Check the status of a specific electricity transaction by ID.
-**Called from:** Transaction Status screen
-
-| Field | Type | Required |
-|---|---|---|
-| transaction_id | String | Yes |
-
-**Response:** `{ success: Boolean, status: String (Success/Failed/Processing), message: String }`
-
----
+| Field | Type |
+|---|---|
+| transaction_id | String |
 
 ### GET `api/electricity/payment-reports`
-**Purpose:** Get paginated electricity payment reports (filtered).
-**Called from:** Transaction Report screen
-
 **Query Params:** `page`, `consumer_number`, `status`, `from_date`, `to_date`
 
----
-
 ### GET `api/electricity/latest-payment`
-**Purpose:** Get the most recent electricity payment.
-
----
-
 ### GET `api/electricity/payment-history`
-**Purpose:** Get full electricity payment history.
 
 ---
 
 ## GAS BILL PAYMENT
 *Same endpoint pattern as Electricity — replace `electricity` with `gas` in all paths.*
 
-| Endpoint | Same as Electricity? |
-|---|---|
-| `api/gas/operators` | Yes |
-| `api/gas/fetch-bill` | Yes |
-| `api/gas/process-payment` | Yes |
-| `api/gas/verify` | Yes |
-| `api/gas/transaction-status` | Yes |
-| `api/gas/payment-reports` | Yes |
-| `api/gas/latest-payment` | Yes |
-| `api/gas/payment-history` | Yes |
-
 ---
 
 ## MOBILE PREPAID RECHARGE
 
 ### GET `api/prepaid/operators`
-**Purpose:** Get list of prepaid mobile operators.
-
----
 
 ### POST `api/prepaid/recharge`
-**Purpose:** Process direct mobile recharge.
-**Note:** No fetch-bill step — user enters amount directly.
-
-| Field | Type | Required |
-|---|---|---|
-| operator | String | Yes |
-| mobile | String | Yes | The mobile number to recharge |
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| operator | String | Yes | |
+| mobile | String | Yes | Mobile number to recharge |
 | circle | String | Yes | Telecom circle/zone |
-| amount | Decimal | Yes |
+| amount | Decimal | Yes | |
 | plan | String | No | Optional plan code |
-| transaction_id | String | Yes |
-
----
+| transaction_id | String | Yes | PYTCH-format |
 
 ### POST `api/prepaid/transaction-status`
 ### GET `api/prepaid/payment-reports`
 ### GET `api/prepaid/latest-payment`
 ### GET `api/prepaid/recent-transactions`
-*Same structure as electricity equivalents.*
 
 ---
 
 ## MOBILE POSTPAID BILL PAYMENT
-*Same pattern as electricity (fetch-bill → process-payment → verify → status). Replace `electricity` with `postpaid`.*
-
-| Endpoint |
-|---|
-| `api/postpaid/fetch-bill` |
-| `api/postpaid/process-payment` |
-| `api/postpaid/verify` |
-| `api/postpaid/transaction-status` |
-| `api/postpaid/payment-reports` |
+*Same pattern as Electricity — replace `electricity` with `postpaid`.*
 
 ---
 
 ## DTH RECHARGE
 
 ### GET `api/dth/operators`
+
 ### GET `api/dth/plans`
-**Purpose:** Get available recharge plans for a selected operator.
-
-| Query Param | Type | Required |
-|---|---|---|
-| operator | String | Yes |
-
-**Response:** `{ success: Boolean, data: [{ id, name, amount, validity, description }] }`
-
----
+**Query Param:** `operator` (String, required)
+**Response:** `{ data: [{ id, name, amount, validity, description }] }`
 
 ### POST `api/dth/process-direct`
-**Purpose:** Process DTH recharge directly (no fetch-bill step).
-
 | Field | Type | Required |
 |---|---|---|
 | operator | String | Yes |
-| consumer_number | String | Yes | DTH subscriber ID |
+| consumer_number | String | Yes |
 | amount | Decimal | Yes |
 | transaction_id | String | Yes |
-
----
 
 ### POST `api/dth/transaction-status`
 ### GET `api/dth/payment-report`
@@ -501,49 +363,28 @@ Token is obtained from login/register response and stored in SharedPreferences.
 ---
 
 ## CABLE TV BILL PAYMENT
-
-### GET `api/cable/operators`
-### POST `api/cable/fetch-bill`
-### POST `api/cable/process-direct`
-### POST `api/cable/transaction-status`
-### GET `api/cable/payment-report`
-### GET `api/cable/sms-receipt`
+*Endpoints: `api/cable/operators`, `api/cable/fetch-bill`, `api/cable/process-direct`, `api/cable/transaction-status`, `api/cable/payment-report`, `api/cable/sms-receipt`*
 
 ---
 
 ## BROADBAND BILL PAYMENT
-
-### GET `api/broadband/operators`
-### POST `api/broadband/fetch-bill`
-### POST `api/broadband/process-direct`
-### POST `api/broadband/transaction-status`
-### GET `api/broadband/payment-report`
-### GET `api/broadband/sms-receipt`
-### GET `api/broadband/recent`
+*Endpoints: `api/broadband/operators`, `api/broadband/fetch-bill`, `api/broadband/process-direct`, `api/broadband/transaction-status`, `api/broadband/payment-report`, `api/broadband/sms-receipt`, `api/broadband/recent`*
 
 ---
 
 ## FASTAG RECHARGE
 
 ### POST `api/fastag/fetch-bill`
-**Purpose:** Look up FASTag account by vehicle/consumer number.
-
 | Field | Type | Required |
 |---|---|---|
-| consumer_number | String | Yes | Vehicle registration or FASTag ID |
-
----
+| consumer_number | String | Yes — vehicle registration or FASTag ID |
 
 ### POST `api/fastag/process-recharge`
-**Purpose:** Top up the FASTag account.
-
 | Field | Type | Required |
 |---|---|---|
 | consumer_number | String | Yes |
 | amount | Decimal | Yes |
 | transaction_id | String | Yes |
-
----
 
 ### POST `api/fastag/transaction-status`
 ### GET `api/fastag/transaction-report`
@@ -554,63 +395,28 @@ Token is obtained from login/register response and stored in SharedPreferences.
 ## LOAN REPAYMENT
 
 ### GET `api/loan/operators`
-**Purpose:** Get list of loan providers/lenders.
-
----
-
 ### POST `api/loan/fetch-bill`
-**Purpose:** Fetch outstanding loan EMI details.
-
-| Field | Type | Required |
-|---|---|---|
-| operator | String | Yes |
-| consumer_number | String | Yes | Loan account number |
-
----
+| Field | Type |
+|---|---|
+| operator | String |
+| consumer_number | String — loan account number |
 
 ### POST `api/loan/process-payment`
-### POST `api/loan/utility-payment-status-search`
-**Purpose:** Search for a loan payment by consumer number (alternative status check).
-
 ### GET `api/loan/payment-report`
 ### GET `api/loan/latest-payment`
-### GET `api/loan/payment-history`
 
 ---
 
 ## MUNICIPAL TAX PAYMENT
-
-### GET `api/municipal/operators`
-### POST `api/municipal/fetch-bill`
-### POST `api/municipal/process-payment`
-### GET `api/municipal/payment-report`
-### POST `api/municipal/transaction-status`
-### GET `api/municipal/latest-payment`
-### GET `api/municipal/recent-transactions`
-
----
-
-## WATER BILL PAYMENT
-
-### GET `api/water/operator-list`
-**Purpose:** Get list of water utility operators.
-*Note: Only one endpoint is defined for Water in the current codebase. The payment flow may route through the legacy API.*
+*Endpoints: `api/municipal/operators`, `api/municipal/fetch-bill`, `api/municipal/process-payment`, `api/municipal/payment-report`, `api/municipal/transaction-status`, `api/municipal/latest-payment`, `api/municipal/recent-transactions`*
 
 ---
 
 ## VPS ADMIN BACKEND (`https://admin.paytouch.in/`)
 
-### POST `users.php`
-**Purpose:** Register or update a user on the VPS backend.
-**Called from:** After login/register on main API.
-
-### GET `users.php`
-**Purpose:** Fetch VPS-side user profile.
-**Called from:** DashboardCategoryActivity (profile sync).
-
-### POST `transactions.php`
-**Purpose:** Log a transaction to the VPS backend.
-**Called from:** After every payment attempt.
+### POST `users.php` — Register/update user
+### GET `users.php` — Fetch user profile
+### POST `transactions.php` — Log a transaction
 
 | Field | Type | Required |
 |---|---|---|
@@ -622,67 +428,45 @@ Token is obtained from login/register response and stored in SharedPreferences.
 | consumer_number | String | Yes |
 | provider_name | String | Yes |
 
-### GET `transactions.php`
-**Purpose:** Fetch VPS-side transaction history.
+### GET `transactions.php` — Fetch transaction history
+### GET `balance.php` — Fetch VPS-side wallet balance
 
-### GET `balance.php`
-**Purpose:** Fetch VPS-side wallet balance.
+> VPS calls are non-blocking. Log failures; do not surface them to the user.
 
 ---
 
 ## LEGACY API (`https://dashboard.shreefintechsolutions.com/api/mobikwik/`)
 
-> **WARNING:** These endpoints are from the old MobiKwik integration. Audit each one before using in the new project. Some may be replaced by the main PayTouch API.
+> **Audit required before use.** These endpoints are from the old MobiKwik integration. Determine which are still active and which are replaced by the main PayTouch API before wiring any of them.
 
 | Method | Path | Purpose |
 |---|---|---|
-| POST | `operators` | Get operator list (legacy) |
-| POST | `circles` | Get telecom circle list |
-| POST | `view-bill` | Fetch bill (legacy) |
-| POST | `payment` | Process payment (legacy) |
-| POST | `status` | Check payment status (legacy) |
-| POST | `plans/{operatorId}/{circleId}` | Get prepaid plans (legacy) |
-| POST | `balance` | Check balance (legacy) |
+| POST | `operators` | Get operator list |
+| POST | `circles` | Get telecom circles |
+| POST | `view-bill` | Fetch bill |
+| POST | `payment` | Process payment |
+| POST | `status` | Check payment status |
+| POST | `plans/{operatorId}/{circleId}` | Get prepaid plans |
+| POST | `balance` | Check balance |
 
 ---
 
-## DYNAMIC QR PAYMENT (ngrok — REPLACE URL)
+## DYNAMIC QR PAYMENT
 
-### POST `(ngrok base URL)/`
-**Purpose:** Generate a QR code for UPI payment.
-**WARNING:** Base URL is `https://tablet-frying-shy.ngrok-free.dev/` — a development tunnel. Must be replaced with a stable production URL before shipping.
+> **WARNING:** Base URL is currently a ngrok development tunnel. Must be replaced with a stable production URL before release.
 
-**Request:**
+### POST `{qr-base-url}/`
+
 | Field | Type | Required |
 |---|---|---|
 | amount | Decimal | Yes |
-| transaction_id | String | Yes |
-| token | String | Yes | Shreefintech token from `api/shreefintech-token` |
+| transaction_id | String | Yes — PYTCH-format |
+| token | String | Yes — from `api/shreefintech-token` |
 
 **Response:**
 | Field | Type |
 |---|---|
 | success | Boolean |
-| message | String |
-| data.qr_url | String | URL to QR image |
-| data.amount | Decimal | |
-| data.order_id | String | |
-
----
-
-## STANDARD RESPONSE WRAPPER
-
-All endpoints return a common wrapper:
-```json
-{
-  "success": true,
-  "message": "Human-readable result message",
-  "data": { /* endpoint-specific payload */ }
-}
-```
-
-**Error responses** follow the same structure with `success: false` and an error message. HTTP status codes used:
-- `200` — Success
-- `401` — Unauthorized (token expired/invalid → forced logout)
-- `422` — Validation error (field errors in response body)
-- `500` — Server error
+| data.qr_url | String — URL to QR image |
+| data.amount | Decimal |
+| data.order_id | String |

@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg"
+        tools:context=".HomeActivity">
+
+        <!-- Toolbar -->
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <!-- White categories card -->
+        <FrameLayout
+            android:id="@+id/flCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/margin_large"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="@dimen/dialog_corner_radius"
+            app:cardElevation="4dp"
+            android:clipToOutline="true"
+            android:outlineProvider="background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/margin_medium"
+                android:orientation="vertical">
+
+                <!-- Scrollable category grid -->
+                <androidx.core.widget.NestedScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/margin_medium"
+                        android:paddingBottom="@dimen/margin_medium">
+
+                        <!-- Section title -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:layout_marginBottom="@dimen/margin_small"
+                            android:fontFamily="@font/proza_libre_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/titleCategories"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_18" />
+
+                        <!-- Row 1: Electricity | Gas | Prepaid -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:id="@+id/llElectricity"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:background="@drawable/bg_category_item"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="vertical"
+                                android:paddingTop="@dimen/margin_medium"
+                                android:paddingBottom="@dimen/margin_medium"
+                                android:paddingStart="@dimen/margin_small"
+                                android:paddingEnd="@dimen/margin_small">
+
+
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/category_icon_size"
+                                    android:layout_height="@dimen/category_icon_size"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_electricity"/>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/categoryElectricity"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_11" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/llGas"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:background="@drawable/bg_category_item"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="vertical"
+                                android:paddingTop="@dimen/margin_medium"
+                                android:paddingBottom="@dimen/margin_medium"
+                                android:paddingStart="@dimen/margin_small"
+                                android:paddingEnd="@dimen/margin_small">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/category_icon_size"
+                                    android:layout_height="@dimen/category_icon_size"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_gas"/>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/categoryGas"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_11" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/llPrepaid"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:background="@drawable/bg_category_item"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="vertical"
+                                android:paddingTop="@dimen/margin_medium"
+                                android:paddingBottom="@dimen/margin_medium"
+                                android:paddingStart="@dimen/margin_small"
+                                android:paddingEnd="@dimen/margin_small">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/category_icon_size"
+                                    android:layout_height="@dimen/category_icon_size"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_prepaid"/>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/categoryPrepaid"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_11" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <!-- Row 2: TV Cable | DTH | Fastag -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_extra_large"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:id="@+id/llTvCable"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:background="@drawable/bg_category_item"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="vertical"
+                                android:paddingTop="@dimen/margin_medium"
+                                android:paddingBottom="@dimen/margin_medium"
+                                android:paddingStart="@dimen/margin_small"
+                                android:paddingEnd="@dimen/margin_small">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/category_icon_size"
+                                    android:layout_height="@dimen/category_icon_size"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_tv"/>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/categoryTvCable"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_11" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/llDth"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:background="@drawable/bg_category_item"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="vertical"
+                                android:paddingTop="@dimen/margin_medium"
+                                android:paddingBottom="@dimen/margin_medium"
+                                android:paddingStart="@dimen/margin_small"
+                                android:paddingEnd="@dimen/margin_small">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/category_icon_size"
+                                    android:layout_height="@dimen/category_icon_size"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_broadband"/>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/categoryDth"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_11" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/llFastag"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:background="@drawable/bg_category_item"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="vertical"
+                                android:paddingTop="@dimen/margin_medium"
+                                android:paddingBottom="@dimen/margin_medium"
+                                android:paddingStart="@dimen/margin_small"
+                                android:paddingEnd="@dimen/margin_small">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/category_icon_size"
+                                    android:layout_height="@dimen/category_icon_size"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_fastag"/>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/categoryFastag"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_11" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <!-- Row 3: TV Cable | My Account | TV Cable -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_extra_large"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:id="@+id/llLoan"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:background="@drawable/bg_category_item"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="vertical"
+                                android:paddingTop="@dimen/margin_medium"
+                                android:paddingBottom="@dimen/margin_medium"
+                                android:paddingStart="@dimen/margin_small"
+                                android:paddingEnd="@dimen/margin_small">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/category_icon_size"
+                                    android:layout_height="@dimen/category_icon_size"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_loan"/>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/categoryLoan"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_11" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/llMyAccount"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:background="@drawable/bg_category_item"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="vertical"
+                                android:paddingTop="@dimen/margin_medium"
+                                android:paddingBottom="@dimen/margin_medium"
+                                android:paddingStart="@dimen/margin_small"
+                                android:paddingEnd="@dimen/margin_small">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/category_icon_size"
+                                    android:layout_height="@dimen/category_icon_size"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_profile" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/categoryMyAccount"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_11" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/llTax"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:background="@drawable/bg_category_item"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="vertical"
+                                android:paddingTop="@dimen/margin_medium"
+                                android:paddingBottom="@dimen/margin_medium"
+                                android:paddingStart="@dimen/margin_small"
+                                android:paddingEnd="@dimen/margin_small">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="@dimen/category_icon_size"
+                                    android:layout_height="@dimen/category_icon_size"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_tax" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/categoryTax"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_11" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </androidx.core.widget.NestedScrollView>
+
+                <!-- Load Wallet — pinned at bottom -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvLoadWallet"
+                    android:layout_width="match_parent"
+                    android:layout_height="72dp"
+                    android:layout_marginStart="@dimen/margin_large"
+                    android:layout_marginEnd="@dimen/margin_large"
+                    android:layout_marginTop="@dimen/margin_small_medium"
+                    android:layout_marginBottom="@dimen/margin_large"
+                    android:onClickListener="@{onClickListener}"
+                    app:cardBackgroundColor="@color/primary"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipChildren="true">
+
+                        <!-- Decorative wallet illustration clipped on right -->
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivWalletDecor"
+                            android:layout_width="188dp"
+                            android:layout_height="60dp"
+                            android:layout_marginEnd="-10dp"
+                            android:alpha="0.5"
+                            android:src="@drawable/img_wallet_bg"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_bias="1.0" />
+
+                        <!-- Icon + Label on left -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_large"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:src="@drawable/ic_wallet"
+                                android:tint="@color/white" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_small_medium"
+                                android:fontFamily="@font/proza_libre_bold"
+                                android:includeFontPadding="false"
+                                android:text="@string/btnLoadWallet"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/text_size_16" />
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
