@@ -49,4 +49,5 @@
     <color name="form_wizard_success">#1A7A34</color>      <!-- edit icon tint -->
     <color name="form_wizard_reject">#CC0000</color>           <!-- delete icon tint -->
     <color name="recent_transaction_bg">#CCFFFFFF</color>      <!-- recent transactions card bg -->
+    <color name="dropdown_hint_color">#80000000</color>         <!-- unselected dropdown placeholder text -->
 </resources>
