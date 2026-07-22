@@ -1,10 +1,10 @@
 package com.shreefintech.paytouchconsumer.electricity
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
@@ -64,7 +64,7 @@ class ElectricityActivity : BaseActivity() {
             items      = operatorList
         ) { selected, _ ->
             selectedOperator = selected
-            binding.tvCompany.setTextColor(0xFF000000.toInt())
+            binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
         }
     }
 
@@ -99,7 +99,7 @@ class ElectricityActivity : BaseActivity() {
         binding.tvPlatformFee.text    = getString(R.string.hintPlatformFee)
         binding.tvTotalPayable.text   = getString(R.string.hintTotalPayable)
         binding.tvCompany.text        = getString(R.string.hintSelectCompany)
-        binding.tvCompany.setTextColor(0x80000000.toInt())
+        binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.dropdown_hint_color))
         binding.cbTerms.isChecked     = false
         selectedOperator              = null
         Utility.hideKeyboard(binding.clRoot)
@@ -118,18 +118,7 @@ class ElectricityActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
-                binding.llTabReport -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, ElectricityReportActivity::class.java))
-                }
-                binding.llTabStatus -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, ElectricityStatusActivity::class.java))
-                }
-                binding.llTabSmsReceipt -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, ElectricitySmsReceiptActivity::class.java))
-                }
+
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
                     showCompanyDropdown()
@@ -141,10 +130,6 @@ class ElectricityActivity : BaseActivity() {
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onReset()
-                }
-                binding.llRecentTransactions -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, ElectricityReportActivity::class.java))
                 }
             }
         }
