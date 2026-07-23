@@ -202,4 +202,77 @@
     <string name="btnLoadWallet">Load Wallet</string>
     <string name="categoryLoan">Loan</string>
     <string name="categoryTax">Tax</string>
+
+    <!-- Transaction Report screen -->
+    <string name="titleTransactionReport">Transaction Report</string>
+    <string name="hintSearchTransaction">Search mobile no. or Transaction ID</string>
+    <string name="msgNoTransactionsFound">No transactions found</string>
+    <string name="textFromDate">From Date</string>
+    <string name="dateHint">yyyy-mm-dd</string>
+    <string name="textToDate">To Date</string>
+    <string name="textUserId">User Id</string>
+    <string name="textMobileNumber">Mobile Number</string>
+    <string name="hintEnterMobileNumber">Enter Mobile Number</string>
+    <string name="hintEnterUserId">Enter User Id</string>
+    <string name="textStatus">Status</string>
+    <string name="hintStatus">Select Status</string>
+    <string name="textApply">Apply</string>
+    <string name="textReset">Reset</string>
+    <string name="titleFilterTransactions">Filter Transactions</string>
+    <string name="btnClearAll">Clear All</string>
+    <string name="labelFilterByStatus">By Status</string>
+    <string name="statusAll">All</string>
+    <string name="statusSuccess">Success</string>
+    <string name="statusFailed">Failed</string>
+    <string name="statusPending">Pending</string>
+    <string name="btnApplyFilter">Apply Filter</string>
+
+    <!-- Transaction Detail screen -->
+    <string name="titleTransactionStatus">Transaction Status</string>
+    <string name="labelMobileNo">Mobile No.</string>
+    <string name="labelUsername">Username :</string>
+    <string name="labelPayment">Payment</string>
+    <string name="labelDate">Date</string>
+    <string name="labelIdSection">ID</string>
+    <string name="labelTransactionId">Transaction ID</string>
+    <string name="labelReferenceId">Reference ID</string>
+    <string name="labelUserIdDetail">User ID</string>
+
+    <!-- SMS Receipt screen -->
+    <string name="tabReceipt">Receipt</string>
+    <string name="tabDisplay">Display</string>
+    <string name="tabSmsDisplay">SMS Display</string>
+    <string name="labelConsumerNo">Consumer No</string>
+    <string name="labelCustomerName">Customer Name</string>
+    <string name="labelCompanyName">Company Name</string>
+    <string name="labelTransactionDate">Transaction Date</string>
+    <string name="labelAmountPaid">Amount Paid</string>
+    <string name="labelPaytouchTxnId">Paytouch Transaction ID</string>
+    <string name="labelBConnectTxnId">B-connect Txn ID</string>
+    <string name="labelCcf">CCF</string>
+    <string name="labelStatus">Status</string>
+    <string name="titleElectricityPaymentConfirmation">Electricity Payment Confirmation</string>
+    <string name="labelPaytouchSmsNotification">Paytouch SMS Notification</string>
+    <string name="labelBConnectTxnColon">B-Connect Txn ID:</string>
+    <string name="labelDateColon">Date:</string>
+    <string name="labelPaytouchSignature">-Paytouch</string>
+    <string name="msgThankYouForUsing">Thank you for using</string>
+    <string name="labelShreefintech">Shree Fintech Solutions Private Limited</string>
+    <string name="btnDownload">Download</string>
+    <string name="btnShare">Share</string>
+    <string name="btnOpen">Open</string>
+    <string name="titleShareReceipt">Share Receipt</string>
+    <string name="msgReceiptDownloaded">Receipt saved to gallery</string>
+    <string name="msgReceiptDownloadFailed">Failed to save receipt</string>
+    <string name="msgReceiptShareFailed">Failed to share receipt</string>
+    <string name="msgStoragePermissionRequired">Storage permission required to save receipt</string>
+    <string name="msgSmsBody">Dear Customer, Your electricity bill payment of %1$s for Consumer %2$s has been successfully processed</string>
+
+    <string name="labelDetailDate">Date - %s</string>
+    <string name="labelDetailAmount">Amount - %s</string>
+    <string name="labelDetailAccountNumber">Account Number - %s</string>
+    <string name="labelDetailReference">Reference - %s</string>
+    <string name="labelMobileNoFmt">Mobile No. %s</string>
+    <string name="labelUsernameFmt">Username : %s</string>
+
 </resources>

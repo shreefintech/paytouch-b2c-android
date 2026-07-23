@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/margin_small_medium"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="@dimen/normal_card_radius"
+    app:cardElevation="0dp"
+    app:strokeColor="?attr/colorPrimary"
+    app:strokeWidth="1.5dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/margin_small_medium">
+
+        <!-- ── Header (always visible, tap to expand/collapse) ── -->
+        <LinearLayout
+            android:id="@+id/llHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- Category icon circle (hidden when expanded) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvCategoryIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="?attr/colorPrimary"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivCategoryIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:tint="@color/white"
+                    tools:src="@drawable/ic_electricity" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Title area (category name / account name + date) -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_small_medium"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Category name — visible when COLLAPSED -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCategoryName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_14"
+                    tools:text="Electricity Bill" />
+
+                <!-- Date — visible when COLLAPSED -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCollapsedDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/proza_libre_regular"
+                    android:includeFontPadding="false"
+                    android:textColor="#80000000"
+                    android:textSize="@dimen/text_size_12"
+                    tools:text="25 Apr 2026" />
+
+
+            </LinearLayout>
+
+            <!-- Chevron: rotated 180° when expanded -->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivChevron"
+                android:layout_width="@dimen/icon_small"
+                android:layout_height="@dimen/icon_small"
+                android:src="@drawable/ic_down_arrow"
+                android:tint="@color/primary" />
+        </LinearLayout>
+
+        <!-- ── Expanded content (GONE when collapsed) ── -->
+        <LinearLayout
+            android:id="@+id/llExpandedContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <!-- Dashed separator (requires software layer for dash rendering) -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/margin_small_medium"
+                android:layout_marginBottom="@dimen/margin_small"
+                android:background="@drawable/bg_dashed_line"
+                android:layerType="software" />
+
+            <!-- Detail rows -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDetailDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_extra_small"
+                android:fontFamily="@font/proza_libre_regular"
+                android:includeFontPadding="false"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_13"
+                tools:text="Date - 25 Apr 2026" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDetailAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_extra_small"
+                android:fontFamily="@font/proza_libre_regular"
+                android:includeFontPadding="false"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_13"
+                tools:text="Amount - ₹1,724" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDetailAccountNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_extra_small"
+                android:fontFamily="@font/proza_libre_regular"
+                android:includeFontPadding="false"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_13"
+                tools:text="Account Number - 30723111936" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDetailReference"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_extra_small"
+                android:fontFamily="@font/proza_libre_regular"
+                android:includeFontPadding="false"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_13"
+                tools:text="Reference - PYTCH250426195020166" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

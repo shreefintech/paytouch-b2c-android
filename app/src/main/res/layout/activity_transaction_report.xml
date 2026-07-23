@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Main content -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clRoot"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/img_screen_bg"
+            tools:context=".electricity.transactions.TransactionReportActivity">
+
+            <!-- Toolbar -->
+            <include
+                android:id="@+id/lytToolbar"
+                layout="@layout/lyt_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/toolbar_height"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:onClickListener="@{onClickListener}" />
+
+            <!-- Title row: "Transaction Report" + BharatConnect logo -->
+            <LinearLayout
+                android:id="@+id/llTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/page_margin_horizontal"
+                android:layout_marginEnd="@dimen/page_margin_horizontal"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/titleTransactionReport"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_20" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/img_bharat_connect" />
+            </LinearLayout>
+
+            <!-- Search row: search bar + filter button -->
+            <LinearLayout
+                android:id="@+id/llSearchRow"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/btn_height"
+                android:layout_marginStart="@dimen/page_margin_horizontal"
+                android:layout_marginEnd="@dimen/page_margin_horizontal"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/llTitle">
+
+                <!-- Search bar: MaterialCardView with primary stroke -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="@dimen/button_corner_radius"
+                    app:cardElevation="0dp"
+                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeWidth="1.5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToOutline="true"
+                        android:orientation="horizontal"
+                        android:outlineProvider="background">
+
+                        <!-- Primary icon section -->
+                        <FrameLayout
+                            android:layout_width="@dimen/btn_height"
+                            android:layout_height="match_parent"
+                            android:background="@color/primary">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_search"
+                                android:tint="@color/white" />
+                        </FrameLayout>
+
+                        <!-- Search EditText -->
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etSearch"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintSearchTransaction"
+                            android:imeOptions="actionSearch"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/margin_small_medium"
+                            android:paddingEnd="@dimen/margin_small_medium"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="#80000000"
+                            android:textSize="@dimen/text_size_13" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Filter button -->
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/flFilter"
+                    android:layout_width="@dimen/btn_height"
+                    android:layout_height="@dimen/btn_height"
+                    android:background="?selectableItemBackground"
+                    android:layout_gravity="center"
+                    android:onClick="@{onClickListener}"
+                    android:src="@drawable/ic_filter" />
+
+            </LinearLayout>
+
+            <!-- Glass card — fills remaining space -->
+            <FrameLayout
+                android:id="@+id/flCard"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="@dimen/page_margin_horizontal"
+                android:layout_marginEnd="@dimen/page_margin_horizontal"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginBottom="@dimen/page_margin_vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/llSearchRow">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTransactions"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:overScrollMode="never"
+                    android:paddingVertical="@dimen/margin_large"
+                    android:paddingHorizontal="@dimen/margin_small_medium"
+                    android:scrollbars="none"
+                    tools:listitem="@layout/item_transaction" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvEmpty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/msgNoTransactionsFound"
+                    android:textColor="#80000000"
+                    android:textSize="@dimen/text_size_14"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Dim overlay — shown when sheet is open -->
+        <View
+            android:id="@+id/viewBg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80000000"
+            android:visibility="gone" />
+
+        <!-- Filter bottom sheet -->
+        <include
+            android:id="@+id/incFilterSheet"
+            layout="@layout/sheet_filter" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path name="paytouch_receipts" path="receipts/" />
+    <external-path name="paytouch_pictures" path="Pictures/PayTouch/" />
+</paths>
