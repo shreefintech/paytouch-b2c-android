@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.auth
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
@@ -14,6 +15,8 @@ import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.auth.viewmodel.LoginViewModel
+import com.shreefintech.paytouchconsumer.onboarding.UploadKycActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoginBinding
 import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -126,7 +129,7 @@ class LoginActivity : BaseActivity() {
                 binding.tvBtnMpin.setTextColor(ContextCompat.getColor(this, R.color.white))
                 binding.tvCredentialLabel.text  = getString(R.string.label_mpin)
                 binding.etCredential.hint       = getString(R.string.hint_mpin)
-                binding.tvForgotPassword.text   = getString(R.string.forgotMpin)
+                binding.tvForgotPassword.text   = getString(R.string.labelForgotMpin)
                 binding.etCredential.inputType  =
                     InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
                 binding.ivPasswordToggle.gone()
@@ -225,7 +228,9 @@ class LoginActivity : BaseActivity() {
                 binding.llSignIn -> {
                     if (Utility.stopClick()) return@OnClickListener
 
-                    onNext()
+                    // TODO(PAYTOUCH-514): replace with onNext() once login API is wired
+                    /*onNext()*/
+                    startActivity(Intent(mActivity, UploadKycActivity::class.java))
                 }
                 binding.tvForgotPassword -> {
                     if (Utility.stopClick()) return@OnClickListener

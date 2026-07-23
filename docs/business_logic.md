@@ -71,13 +71,15 @@ Logged In → Logged Out (automatic, on any 401 response from server)
 
 ## 2. KYC (Know Your Customer)
 
+**Screen:** `onboarding/UploadKycActivity` + `onboarding/viewmodel/UploadKycViewModel`
+
 ### What It Does
 Collects personal identity information and submits it to the server for verification. This unlocks the full account.
 
 ### Rules and Constraints
 - PAN card must match the regex pattern: `[A-Z]{5}[0-9]{4}[A-Z]{1}` (5 uppercase letters, 4 digits, 1 uppercase letter)
 - Aadhaar number must be exactly 12 digits
-- GST number, if provided, must match standard GST regex format
+- GST number is **optional** — validate format only when the field is non-empty; never block submission if blank
 - Date of birth is selected via a date picker (not typed)
 - Age is auto-calculated from the selected DOB
 - KYC data is also synced to the VPS backend after successful submission to the main API
@@ -144,6 +146,8 @@ A 4-digit PIN that can be used as an alternative to password login. Created once
 ---
 
 ## 4. Virtual Account
+
+**Screen:** `onboarding/CreateVirtualAccountActivity` + `onboarding/viewmodel/CreateVirtualAccountViewModel`
 
 ### What It Does
 Collects the user's banking details and supporting documents. This completes the onboarding sequence and unlocks all payment features.
