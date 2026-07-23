@@ -110,8 +110,8 @@ class TransactionDetailActivity : BaseActivity() {
         val refId = intent.getStringExtra(EXTRA_REF_ID) ?: ""
         val userId = intent.getStringExtra(EXTRA_USER_ID) ?: ""
 
-        binding.tvMobileNumber.text = "${getString(R.string.labelMobileNo)} $mobile"
-        binding.tvUsername.text = "${getString(R.string.labelUsername)} $username"
+        binding.tvMobileNumber.text = getString(R.string.labelMobileNoFmt, mobile)
+        binding.tvUsername.text = getString(R.string.labelUsernameFmt, username)
         binding.tvInfoAmount.text = amount
         binding.tvStatus.text = status
         binding.tvDate.text = date

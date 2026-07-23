@@ -17,6 +17,7 @@ import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionRep
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 
 class ElectricityActivity : BaseActivity() {
@@ -103,7 +104,7 @@ class ElectricityActivity : BaseActivity() {
         binding.tvPlatformFee.text = getString(R.string.hintPlatformFee)
         binding.tvTotalPayable.text = getString(R.string.hintTotalPayable)
         binding.tvCompany.text = getString(R.string.hintSelectCompany)
-        binding.tvCompany.setTextColor(0x80000000.toInt())
+        binding.tvCompany.setTextColor(mActivity.getThemeColor(R.attr.colorTextHint))
         binding.cbTerms.isChecked = false
         selectedOperator = null
         Utility.hideKeyboard(binding.clRoot)
@@ -130,6 +131,7 @@ class ElectricityActivity : BaseActivity() {
 
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // TODO(PAYTOUCH-546): Navigate to transaction status check screen
                 }
 
                 binding.llTabSmsReceipt -> {

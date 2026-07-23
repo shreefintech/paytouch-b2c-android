@@ -267,4 +267,12 @@
     <string name="msgReceiptShareFailed">Failed to share receipt</string>
     <string name="msgStoragePermissionRequired">Storage permission required to save receipt</string>
     <string name="msgSmsBody">Dear Customer, Your electricity bill payment of %1$s for Consumer %2$s has been successfully processed</string>
+
+    <string name="labelDetailDate">Date - %s</string>
+    <string name="labelDetailAmount">Amount - %s</string>
+    <string name="labelDetailAccountNumber">Account Number - %s</string>
+    <string name="labelDetailReference">Reference - %s</string>
+    <string name="labelMobileNoFmt">Mobile No. %s</string>
+    <string name="labelUsernameFmt">Username : %s</string>
+
 </resources>

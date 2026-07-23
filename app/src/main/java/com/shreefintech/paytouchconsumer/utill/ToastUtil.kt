@@ -228,7 +228,9 @@ object ToastUtil {
         contentRoot.addView(toastBinding.root, params)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            if (toastBinding.root.parent != null) contentRoot.removeView(toastBinding.root)
+            if (!activity.isDestroyed && toastBinding.root.parent != null) {
+                contentRoot.removeView(toastBinding.root)
+            }
         }, durationMs)
     }
 

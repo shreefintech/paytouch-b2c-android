@@ -39,19 +39,16 @@ class RecentTransactionAdp(
 
     private fun bindItem(binding: ItemRecentTransactionBinding, item: RecentTransactionItem) {
         with(binding) {
+            val context = root.context
             ivCategoryIcon.setImageResource(item.categoryIconRes)
             tvCategoryName.text = item.categoryName
             tvCollapsedDate.text = item.date
-            tvDetailDate.text = "Date - ${item.date}"
-            tvDetailAmount.text = "Amount - ${item.amount}"
-            tvDetailAccountNumber.text = "Account Number - ${item.accountNumber}"
-            tvDetailReference.text = "Reference - ${item.reference}"
+            tvDetailDate.text = context.getString(R.string.labelDetailDate, item.date)
+            tvDetailAmount.text = context.getString(R.string.labelDetailAmount, item.amount)
+            tvDetailAccountNumber.text = context.getString(R.string.labelDetailAccountNumber, item.accountNumber)
+            tvDetailReference.text = context.getString(R.string.labelDetailReference, item.reference)
 
-            val statusColor = when (item.status) {
-                "Success" -> ContextCompat.getColor(mContext, R.color.toast_text_success)
-                "Failed"  -> ContextCompat.getColor(mContext, R.color.form_wizard_reject)
-                else      -> ContextCompat.getColor(mContext, R.color.orange)
-            }
+
             if (item.isExpanded) {
 
                 llExpandedContent.visibility = View.VISIBLE
