@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.onboarding
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -19,6 +20,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.onboarding.viewmodel.CreateVirtualAccountViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityCreateVirtualAccountBinding
@@ -319,22 +321,8 @@ class CreateVirtualAccountActivity : BaseActivity() {
         // TODO(PAYTOUCH-514): re-enable validate() once virtual account API is wired
 //        if (!validate()) return
 
-        val aadharFrontUri = uploadUris[0] ?: run {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelAadharFront)))
-            return
-        }
-        val aadharBackUri = uploadUris[1] ?: run {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelAadharBack)))
-            return
-        }
-        val panUri = uploadUris[2] ?: run {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelPanUpload)))
-            return
-        }
-        val proofUri = uploadUris[3] ?: run {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelProof)))
-            return
-        }
+        val docMsg = validateDocuments()
+        if (docMsg != null) { ToastUtil.showDelete(mActivity, docMsg); return }
 
         viewModel.submitVirtualAccount(
             fullName       = binding.etFullName.text?.toString()?.trim()    ?: "",
@@ -348,10 +336,10 @@ class CreateVirtualAccountActivity : BaseActivity() {
             bankAccount    = binding.etBankAccount.text?.toString()?.trim() ?: "",
             vpa            = binding.etVpa.text?.toString()?.trim()         ?: "",
             branchName     = binding.etBranchName.text?.toString()?.trim() ?: "",
-            aadharFrontUri = aadharFrontUri,
-            aadharBackUri  = aadharBackUri,
-            panUri         = panUri,
-            proofUri       = proofUri,
+            aadharFrontUri = uploadUris[0]!!,
+            aadharBackUri  = uploadUris[1]!!,
+            panUri         = uploadUris[2]!!,
+            proofUri       = uploadUris[3]!!,
             onLoading      = { showProgress.set(true) },
             onSuccess      = {
                 showProgress.set(false)
@@ -423,7 +411,8 @@ class CreateVirtualAccountActivity : BaseActivity() {
 
                 binding.llCreateVirtualAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    onSubmit()
+                    // TODO(PAYTOUCH-514): replace with onSubmit() once virtual account API is wired
+                    startActivity(Intent(mActivity, HomeActivity::class.java))
                 }
             }
         }

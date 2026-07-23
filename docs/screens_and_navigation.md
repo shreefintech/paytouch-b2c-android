@@ -1,70 +1,49 @@
 # PayTouch Consumer — Screens & Navigation
 
----
-
-## Screen Inventory
-
-### ONBOARDING FLOW
+> **Status legend:** ✅ Implemented (UI) | 🔧 UI pending | 📋 Planned (not started)
 
 ---
 
-#### SplashActivity → "Splash / Launch Screen"
-**Purpose:** App entry point. Plays a branding video, determines where to route the user.
-
-**Entry points:** Android launcher (first screen of the app)
-
-**Exit points:**
-- No saved token → `LoginActivity`
-- Token exists + `requires_kyc = true` → `KYCActivity`
-- Token exists + `requires_mpin = true` → `MpinActivity`
-- Token exists + `requires_virtual_account = true` → `VirtualAccountActivity`
-- Token exists + all flags false → `DashboardCategoryActivity`
-
-**Data received:** None (reads SharedPreferences internally)
-
-**Key UI elements:**
-- Full-screen video playback (MediaPlayer)
-- Auto-routing after video ends or a timeout
+## Implemented Screens
 
 ---
 
-#### LoginActivity → "Login Screen"
+### ✅ LoginActivity — "Login Screen"
+
 **Purpose:** Authenticate the user with mobile number and password or MPIN.
 
 **Entry points:**
-- SplashActivity (no token)
+- App launch (no saved token)
 - Any screen (forced logout after 401)
-- DashboardCategoryActivity (explicit logout)
+- Any screen (explicit logout)
 
 **Exit points:**
-- Successful login, `requires_kyc = true` → `KYCActivity`
-- Successful login, `requires_mpin = true` → `MpinActivity`
-- Successful login, `requires_virtual_account = true` → `VirtualAccountActivity`
-- Successful login, all clear → `DashboardCategoryActivity`
+- Login success, `requires_kyc = true` → `UploadKycActivity`
+- Login success, `requires_mpin = true` → MPIN creation screen (planned)
+- Login success, `requires_virtual_account = true` → `CreateVirtualAccountActivity`
+- Login success, all clear → `HomeActivity`
 - "Register" tap → `CreateAccountActivity`
-- "Forgot Password" tap → Password reset flow
-
-**Data received:** None (reads LOGIN_PREF for remember-me pre-fill)
+- "Forgot Password" tap → `OtpVerificationActivity` (password reset)
 
 **Key UI elements:**
 - Mobile number field (pre-filled if remember-me was set)
 - Password field / MPIN field (toggle between modes)
 - Login mode toggle (Password / MPIN)
 - "Remember me" checkbox
-- "Register" button
 - "Forgot Password" link
+- "Register" button
+- Sign In button
 
 ---
 
-#### CreateAccountActivity → "Registration Screen"
+### ✅ CreateAccountActivity — "Registration Screen"
+
 **Purpose:** Create a new account.
 
 **Entry points:** `LoginActivity`
 
 **Exit points:**
-- Successful registration → same routing logic as login (KYC / MPIN / VA / Dashboard)
-
-**Data received:** None
+- Successful registration → same routing logic as login
 
 **Key UI elements:**
 - Name, mobile, email, password, confirm password fields
@@ -73,277 +52,180 @@
 
 ---
 
-#### KYCActivity → "KYC Verification Screen"
+### ✅ OtpVerificationActivity — "OTP Verification Screen"
+
+**Purpose:** Verify a one-time password sent to the registered mobile.
+
+**Entry points:**
+- `LoginActivity` (forgot password / forgot MPIN flow)
+- `CreateAccountActivity` (account creation OTP)
+
+**Exit points:**
+- OTP verified (password reset) → `ResetPasswordActivity`
+- OTP verified (MPIN reset) → `ResetMpinActivity`
+
+**Key UI elements:**
+- 6-digit OTP entry boxes
+- Resend OTP with countdown timer
+- Submit OTP button
+
+---
+
+### ✅ ResetPasswordActivity — "Reset Password Screen"
+
+**Purpose:** Set a new password after OTP verification.
+
+**Entry points:** `OtpVerificationActivity` (password reset flow)
+
+**Exit points:**
+- Successful reset → `LoginActivity`
+
+**Key UI elements:**
+- New password field
+- Confirm new password field
+- Change Password button
+
+---
+
+### ✅ ResetMpinActivity — "Reset MPIN Screen"
+
+**Purpose:** Set a new 4-digit MPIN after OTP verification.
+
+**Entry points:** `OtpVerificationActivity` (MPIN reset flow)
+
+**Exit points:**
+- Successful reset → `LoginActivity`
+
+**Key UI elements:**
+- New MPIN field (4-digit)
+- Confirm MPIN field
+- Change MPIN button
+
+---
+
+### ✅ UploadKycActivity — "KYC Verification Screen"
+
 **Purpose:** Collect identity information to verify the user.
 
 **Entry points:**
-- SplashActivity (if `requires_kyc = true`)
-- LoginActivity (post-login routing)
+- `LoginActivity` (post-login routing, `requires_kyc = true`)
+- App launch (token exists, `requires_kyc = true`)
 
 **Exit points:**
-- Successful KYC submission → `MpinActivity`
-
-**Data received:** Reads existing KYC data from `api/kyc/account-info` to pre-fill
+- Successful KYC submission → MPIN creation (planned)
 
 **Key UI elements:**
-- Mobile number (pre-filled, possibly read-only)
-- Full name, address, city fields
-- Date of birth (date picker — no text input)
-- Age (auto-calculated, read-only display)
+- Mobile number, full name, address, city fields
+- Date of birth (date picker)
+- Age (auto-calculated, read-only)
 - Email field
-- PAN card number field (validated before submit)
-- Aadhaar number field (validated before submit)
+- PAN card number (validated)
+- Aadhaar number (validated, 12 digits)
 - Optional GST field
 - Submit button
 
 ---
 
-#### MpinActivity → "MPIN Creation Screen"
-**Purpose:** Create a 4-digit security PIN.
+### ✅ CreateVirtualAccountActivity — "Virtual Account Setup"
+
+**Purpose:** Register banking details and upload documents to complete onboarding.
 
 **Entry points:**
-- KYCActivity (post-KYC routing)
-- SplashActivity (if `requires_mpin = true`)
+- Onboarding flow (`requires_virtual_account = true`)
 
 **Exit points:**
-- Successful MPIN creation → `VirtualAccountActivity`
-
-**Data received:** None
+- Successful submission → `HomeActivity`
 
 **Key UI elements:**
-- 4-digit PIN entry (numeric only)
-- 4-digit PIN confirmation entry
-- Submit button
+- Name, mobile, state (dropdown), city, district (dropdowns)
+- Aadhaar number, PAN number
+- IFSC code, bank account number, UPI ID, branch name
+- Four file upload slots (Aadhaar front, Aadhaar back, PAN, bank proof)
+- Create Virtual Account button
 
 ---
 
-#### VirtualAccountActivity → "Virtual Account Setup Screen"
-**Purpose:** Register banking details to complete onboarding.
+### ✅ HomeActivity — "Home / Dashboard Screen"
 
-**Entry points:**
-- MpinActivity (post-MPIN routing)
-- SplashActivity (if `requires_virtual_account = true`)
-
-**Exit points:**
-- Successful VA creation → `DashboardCategoryActivity` (onboarding complete)
-
-**Data received:** None
-
-**Key UI elements:**
-- Name, mobile, city fields
-- State spinner (Indian states list)
-- Aadhaar number, PAN number fields
-- Bank account number, IFSC code, UPI ID, branch name fields
-- Four file upload buttons (Aadhaar front, Aadhaar back, PAN image, bank proof)
-- File previews after selection
-- Submit button
-
----
-
-### MAIN APP
-
----
-
-#### DashboardCategoryActivity → "Main Dashboard / Home Screen"
 **Purpose:** Central menu — shows all available bill payment categories.
 
 **Entry points:**
-- VirtualAccountActivity (onboarding complete)
-- SplashActivity (already onboarded)
+- `CreateVirtualAccountActivity` (onboarding complete)
+- App launch (already onboarded)
 
 **Exit points:**
-- Category tile tap → respective Category Home Activity
-- Logout → `LoginActivity` (stack cleared)
-
-**Data received:** None (reads user from SharedPreferences)
+- Category tile tap → respective category screen (planned)
+- "Load Wallet" tap → Load Wallet screen (planned)
 
 **Key UI elements:**
-- Grid of 9 category tiles:
-  1. Electricity
-  2. Gas
-  3. Mobile Prepaid
-  4. Mobile Postpaid
-  5. DTH
-  6. FASTag
-  7. Loan Repayment
-  8. Municipal Taxes
-  9. My Account
-  10. Load Wallet
-- User name / wallet balance display (top)
-- Logout option (menu or icon)
+- Toolbar with PayTouch logo and back button
+- White card with "Categories" title
+- 3×3 grid of category tiles (Electricity, Gas, Prepaid, TV Cable, DTH, Fastag, Loan, My Account, Tax)
+- Load Wallet button at the bottom of the card
 
 ---
 
-### ELECTRICITY SCREENS (same pattern repeats for Gas, Postpaid, Cable, Broadband, Loan, Municipal)
+## Planned Screens
+
+The following screens are defined in the navigation plan but not yet implemented.
 
 ---
 
-#### ElectricityActivity → "Electricity Home"
-**Purpose:** Entry point for electricity bill payment. Shows sub-options.
+### 📋 Category Home Screens (one per payment type)
 
-**Entry points:** `DashboardCategoryActivity`
+Each category has a home screen with sub-options: Pay Bill, Recent Transactions, Transaction Report, Transaction Status.
 
-**Exit points:**
-- "Pay Bill" → `ElectricityPayBillActivity`
-- "Recent Transactions" → `ElectricityRecentTransactionActivity`
-- "Transaction Report" → `ElectricityTransactionReportActivity`
-- "Transaction Status" → `ElectricityTransactionStatusActivity`
-
----
-
-#### ElectricityPayBillActivity → "Pay Electricity Bill"
-**Purpose:** Full bill fetch-and-pay flow.
-
-**Entry points:** `ElectricityActivity`
-
-**Exit points:**
-- After payment → `ElectricityTransactionStatusActivity` or receipt screen
-
-**Data received:** None (user selects operator + consumer number on screen)
-
-**Key UI elements:**
-- Operator spinner (loaded from API)
-- Consumer number text field
-- "Fetch Bill" button
-- Bill details card (outstanding amount, due date, consumer name) — shown after fetch
-- Platform fee display
-- "Pay" button (enabled only after successful bill fetch)
-- Loading indicator during fetch and payment
+| Category | Home Activity | Status |
+|---|---|---|
+| Electricity | `ElectricityActivity` | Planned |
+| Gas | `GasActivity` | Planned |
+| Mobile Prepaid | `MobilePrepaidActivity` | Planned |
+| Mobile Postpaid | `PostpaidActivity` | Planned |
+| DTH | `DthActivity` | Planned |
+| FASTag | `FasTagActivity` | Planned |
+| Loan Repayment | `LoanRepaymentActivity` | Planned |
+| Municipal Tax | `MunicipalTaxActivity` | Planned |
 
 ---
 
-#### ElectricityRecentTransactionActivity → "Recent Electricity Transactions"
-**Purpose:** Display list of recent electricity payments from local Room DB.
+### 📋 Pay Bill Screens
 
-**Entry points:** `ElectricityActivity`
+One per category, following the same standard flow:
+1. Select operator (from API dropdown)
+2. Enter consumer/account number
+3. Fetch bill → display outstanding amount, due date
+4. Calculate and show platform fee
+5. User confirms → process payment
+6. Show transaction status / receipt
 
-**Exit points:** Back → `ElectricityActivity`
+**Key difference for Mobile Prepaid:** No fetch-bill step. User enters amount directly; optional plan selection from API.
 
-**Key UI elements:**
-- RecyclerView of transactions (txnId, consumer number, amount, status, date)
-- Pull-to-refresh or auto-load on entry
-
----
-
-#### ElectricityTransactionReportActivity → "Electricity Transaction Report"
-**Purpose:** Filtered view of electricity transactions.
-
-**Entry points:** `ElectricityActivity`
-
-**Key UI elements:**
-- From-date / to-date pickers
-- Status filter (All / Success / Failed / Processing)
-- Consumer number search field
-- "Search" button
-- Results RecyclerView
+**Key difference for DTH:** Plan selection step added after operator selection.
 
 ---
 
-#### ElectricityTransactionStatusActivity → "Electricity Transaction Status"
-**Purpose:** Look up a specific transaction by ID.
+### 📋 Transaction Screens (per category)
 
-**Entry points:**
-- `ElectricityActivity` (direct navigation)
-- `ElectricityPayBillActivity` (post-payment redirect)
-
-**Data received:** Optional `transaction_id` (Intent extra — pre-fills the search field if coming from payment flow)
-
-**Key UI elements:**
-- Transaction ID field
-- "Check Status" button
-- Status result card
+- `[Category]RecentTransactionActivity` — Recent payments from local Room DB
+- `[Category]TransactionReportActivity` — Filtered report (date range, status, consumer number)
+- `[Category]TransactionStatusActivity` — Look up a specific transaction by ID
+- `[Category]SMSReceiptActivity` — View the confirmation receipt for a completed payment
 
 ---
 
-#### ElectricitySMSReceiptActivity → "Electricity SMS Receipt"
-**Purpose:** Display the confirmation/receipt message for a completed payment.
+### 📋 MyAccountActivity — "My Account"
 
-**Entry points:** Post-payment flow
-
-**Data received:** `transaction_id` (Intent extra)
-
----
-
-### MOBILE PREPAID SCREENS
-
----
-
-#### MobilePrepaidActivity → "Mobile Prepaid Home"
-**Entry points:** `DashboardCategoryActivity`
-**Exit points:** PayBill, Recent, Report, Status screens
-
-#### MobilePrepaidPayBillActivity → "Prepaid Recharge"
-**Key difference from bill payment:** No fetch-bill step. User picks operator, circle, enters mobile and amount (or selects a plan).
-
-**Key UI elements:**
-- Operator spinner
-- Circle (telecom zone) spinner
-- Mobile number to recharge
-- Plan selection (optional — launches plan list)
-- Amount field (or auto-filled from plan)
-- "Recharge" button
-
----
-
-### DTH SCREENS
-
----
-
-#### DTHActivity → "DTH Home"
-#### DTHPayBillActivity → "DTH Recharge"
-**Key difference:** Has plan selection step. Plans fetched from `api/dth/plans` after operator is selected.
-
----
-
-### FASTAG SCREENS
-
----
-
-#### FasTagActivity → "FASTag Home"
-#### FasTagPayBillActivity → "FASTag Recharge"
-**Flow:** fetch-bill (account lookup) → confirm amount → process-recharge
-
----
-
-### LOAN REPAYMENT SCREENS
-
----
-
-#### LoanRepaymentActivity → "Loan Repayment Home"
-#### LoanRepaymentPayBillActivity → "Pay Loan EMI"
-**Flow:** Select lender → enter loan account number → fetch-bill → pay
-
----
-
-### MUNICIPAL TAX SCREENS
-
----
-
-#### MunicipalTaxActivity → "Municipal Tax Home"
-#### MunicipalTaxPayBillActivity → "Pay Municipal Tax"
-**Flow:** Select municipality → enter consumer number → fetch-bill → pay
-
----
-
-### ACCOUNT MANAGEMENT
-
----
-
-#### MyAccountActivity → "My Account"
 **Purpose:** View user profile, manage MPIN, view KYC status.
 
-**Entry points:** `DashboardCategoryActivity` ("My Account" tile)
+**Entry points:** `HomeActivity` ("My Account" tile)
 
 ---
 
-### WALLET
+### 📋 LoadWalletActivity — "Load Wallet"
 
----
-
-#### LoadWalletActivity → "Load Wallet"
 **Purpose:** Top up the user's digital wallet.
 
-**Entry points:** `DashboardCategoryActivity` ("Load Wallet" tile)
+**Entry points:** `HomeActivity` ("Load Wallet" button)
 
 ---
 
@@ -353,81 +235,63 @@
 [App Launch]
      │
      ▼
-SplashActivity (video + session check)
+Session check (read SharedPreferences)
      │
-     ├── No token ──────────────────────────────────────► LoginActivity
+     ├── No token ──────────────────────────────────────► LoginActivity ✅
      │                                                          │
-     │                                                          ├── "Register" ──► CreateAccountActivity
-     │                                                          │                          │
-     │                                                          │                          └── (same routing as login ↓)
-     │                                                          │
-     │                                                          └── Success ──┐
-     │                                                                        │
-     └── Token exists ────────────────────────────────────────────────────────┤
-                                                                              │
-                                                              Check onboarding flags:
-                                                                              │
-                                                    requires_kyc ────────────► KYCActivity
-                                                                              │      │
-                                                                              │      └── Success ──► MpinActivity
-                                                                              │                          │
-                                                    requires_mpin ───────────►──────────────────────────┘
-                                                                              │      │
-                                                                              │      └── Success ──► VirtualAccountActivity
-                                                                              │                             │
-                                                    requires_virtual_account ►──────────────────────────────┘
-                                                                              │      │
-                                                                              │      └── Success ──┐
-                                                                              │                    │
-                                                    All flags false ──────────────────────────────►│
-                                                                                                   ▼
-                                                                                    DashboardCategoryActivity
+     │                                                   ┌──────┴──────┐
+     │                                                   │             │
+     │                                            "Register"    Login success
+     │                                                   │             │
+     │                                         CreateAccountActivity ✅  │
+     │                                                               │
+     └── Token exists ─────────────────────────────────────────────►┤
+                                                                     │
+                                                     Check onboarding flags:
+                                                                     │
+                                       requires_kyc ────────────► UploadKycActivity ✅
+                                                                     │      │
+                                                                     │      └── Success ──► MpinActivity 📋
+                                                                     │
+                                       requires_mpin ───────────────────────────────►────►┐
+                                                                     │                    │
+                                                                     │      └── Success ──► CreateVirtualAccountActivity ✅
+                                                                     │
+                                       requires_virtual_account ─────────────────────────►┐
                                                                                           │
-                                     ┌────────────────────────────────────────────────────┼──────────────────────────┐
-                                     │                           │                         │                          │
-                                     ▼                           ▼                         ▼                          ▼
-                              ElectricityActivity         GasActivity            MobilePrepaidActivity         PostpaidActivity
-                                     │                           │                         │                          │
-                          ┌──────────┤               ┌──────────┤            ┌────────────┤             ┌────────────┤
-                          │          │               │          │            │            │             │            │
-                         Pay      Recent            Pay      Recent         Recharge   Recent          Pay        Recent
-                         Bill      Txns             Bill      Txns                      Txns           Bill        Txns
-                          │          │               │                                                  │
-                        Report    Status           Report                                             Report     Status
-                          │
-                        SMS Receipt
+                                       All flags false ───────────────────────────────────►┤
+                                                                                           ▼
+                                                                                    HomeActivity ✅
+                                                                                          │
+                                              ┌───────────────────────────────────────────┤
+                                              │                           │                │
+                                              ▼                           ▼                ▼
+                                    ElectricityActivity 📋         GasActivity 📋    ... (other categories)
+                                              │
+                                    ┌─────────┤
+                                    │         │
+                                   Pay      Recent      Report      Status      Receipt
+                                   Bill      Txns
 
-                                     │                           │                         │                          │
-                                     ▼                           ▼                         ▼                          ▼
-                               DTHActivity              FasTagActivity          LoanRepaymentActivity     MunicipalTaxActivity
-                                     │                           │                         │                          │
-                                (same sub-screens per category)
-
-                                     │                           │
-                                     ▼                           ▼
-                             MyAccountActivity           LoadWalletActivity
-
-
-[Session expires / 401 at any point]
-     │
-     └──────────────────────────────────────────────────────────► LoginActivity (stack cleared)
+[401 at any point]
+     └──────────────────────────────────────────────────────► LoginActivity (stack cleared)
 ```
+
+---
+
+## Navigation Rules
+
+- **Onboarding back stack:** Users cannot navigate back to a completed onboarding step. Use `FLAG_ACTIVITY_CLEAR_TOP` or equivalent.
+- **Post-login stack:** After successful login/registration, the back stack is cleared — the user cannot press Back to reach the login screen from Home.
+- **Forced logout (401):** Stack completely cleared with `FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK`.
+- **Within a category:** Back navigation returns to the Category Home screen.
+- **Result refresh:** Use `ActivityResultLauncher` when a child screen's data changes should trigger a refresh on the parent screen.
 
 ---
 
 ## Intent Extras Reference
 
-| From Screen | To Screen | Extra Key | Type | Purpose |
+| From | To | Extra Key | Type | Purpose |
 |---|---|---|---|---|
 | PayBillActivity | TransactionStatusActivity | `transaction_id` | String | Pre-fill status lookup after payment |
-| PayBillActivity | SMSReceiptActivity | `transaction_id` | String | Load receipt for completed transaction |
-| Any | Any | (none standard) | | Most screens re-fetch their own data on load |
-
----
-
-## Back Stack Rules
-
-- All onboarding screens use `FLAG_ACTIVITY_CLEAR_TOP` or similar so the user cannot navigate back to a completed onboarding step
-- After login, the back stack is cleared — the user cannot press Back to reach the login screen from the Dashboard
-- After forced logout (401), the stack is completely cleared with `FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK`
-- Within a bill category, Back navigation returns to the Category Home screen
+| PayBillActivity | SMSReceiptActivity | `transaction_id` | String | Load receipt for completed payment |

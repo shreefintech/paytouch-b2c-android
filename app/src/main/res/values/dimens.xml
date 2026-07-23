@@ -93,4 +93,5 @@
     <dimen name="btn_height">50dp</dimen>
     <dimen name="submit_btn_radius">25dp</dimen>
     <dimen name="upload_edit_size">28dp</dimen>
+    <dimen name="category_icon_size">52dp</dimen>
 </resources>

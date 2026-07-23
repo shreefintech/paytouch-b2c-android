@@ -162,4 +162,44 @@
     <string name="msgVaSubmitSuccess">Virtual account request submitted successfully</string>
     <string name="msgAccountCreatedSuccessfully">Account created successfully</string>
     <string name="btnSubmit">Submit</string>
+
+    <!-- Home screen -->
+    <string name="titleCategories">Categories</string>
+
+    <!-- Electricity screen -->
+    <string name="titleElectricityBill">Electricity Bill</string>
+    <string name="categoryElectricityBill">Electricity Bill</string>
+    <string name="tabPayBill">PayBill</string>
+    <string name="tabReport">Report</string>
+    <string name="tabStatus">Status</string>
+    <string name="tabSmsReceipt">SMS Receipt</string>
+    <string name="labelCategory">Category</string>
+    <string name="labelCompany">Company</string>
+    <string name="hintSelectCompany">Select Company</string>
+    <string name="labelConsumerNumber">Consumer Number</string>
+    <string name="hintConsumerNumber">Enter Consumer Number</string>
+    <string name="labelAmount">Amount</string>
+    <string name="hintAmount">Enter Amount</string>
+    <string name="labelPlatformFee">Platform Fee</string>
+    <string name="hintPlatformFee">Platform Fee</string>
+    <string name="labelTotalPayable">Total Payable</string>
+    <string name="hintTotalPayable">Payable Amount</string>
+    <string name="msgTermsAgreement">I agree to the platform fee terms &amp; conditions.</string>
+    <string name="btnProceedToPay">Proceed to pay</string>
+    <string name="btnReset">Reset</string>
+    <string name="titleRecentTransactions">Recent Transactions</string>
+    <string name="msgConsumerNumberEmpty">Please enter consumer number</string>
+    <string name="msgSelectCompany">Please select a company</string>
+    <string name="msgAmountEmpty">Please enter amount</string>
+    <string name="msgComingSoon">This section will be available soon</string>
+    <string name="categoryElectricity">Electricity</string>
+    <string name="categoryGas">Gas</string>
+    <string name="categoryPrepaid">Prepaid</string>
+    <string name="categoryTvCable">TV Cable</string>
+    <string name="categoryDth">DTH</string>
+    <string name="categoryFastag">Fastag</string>
+    <string name="categoryMyAccount">My Account</string>
+    <string name="btnLoadWallet">Load Wallet</string>
+    <string name="categoryLoan">Loan</string>
+    <string name="categoryTax">Tax</string>
 </resources>
