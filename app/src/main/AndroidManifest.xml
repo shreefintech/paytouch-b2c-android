@@ -97,37 +97,6 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
-        <activity
-            android:name="com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
-            android:name="com.shreefintech.paytouchconsumer.electricity.transactions.TransactionDetailActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name="com.shreefintech.paytouchconsumer.electricity.RecentTransactionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name="com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_provider_paths" />
-        </provider>
-
     </application>
 
 </manifest>

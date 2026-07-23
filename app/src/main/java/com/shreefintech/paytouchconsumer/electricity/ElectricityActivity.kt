@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
@@ -66,7 +67,7 @@ class ElectricityActivity : BaseActivity() {
             items = operatorList
         ) { selected, _ ->
             selectedOperator = selected
-            binding.tvCompany.setTextColor(0xFF000000.toInt())
+            binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
         }
     }
 
@@ -109,9 +110,7 @@ class ElectricityActivity : BaseActivity() {
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-            }
+            override fun handleOnBackPressed() { finish() }
         })
     }
 
@@ -154,12 +153,10 @@ class ElectricityActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     showCompanyDropdown()
                 }
-
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onProceedToPay()
                 }
-
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onReset()
@@ -172,5 +169,4 @@ class ElectricityActivity : BaseActivity() {
             }
         }
     }
-
 }
