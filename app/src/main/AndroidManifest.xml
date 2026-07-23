@@ -19,9 +19,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PaytouchConsumer">
         <activity
-            android:name=".MainActivity"
-            android:exported="false"/>
-        <activity
             android:name=".auth.LoginActivity"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -83,17 +80,22 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".electricity.ElectricityReportActivity"
+            android:name=".electricity.transactions.RecentTransactionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".electricity.ElectricityStatusActivity"
+            android:name=".electricity.transactions.SmsReceiptActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".electricity.ElectricitySmsReceiptActivity"
+            android:name=".electricity.transactions.TransactionDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".electricity.transactions.TransactionReportActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 

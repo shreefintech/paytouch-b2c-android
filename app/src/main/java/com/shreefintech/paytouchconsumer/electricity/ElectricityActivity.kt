@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
+import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect

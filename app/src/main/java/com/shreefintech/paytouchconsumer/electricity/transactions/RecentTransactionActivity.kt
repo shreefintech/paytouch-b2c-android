@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity
+package com.shreefintech.paytouchconsumer.electricity.transactions
 
 import android.graphics.Color
 import android.os.Bundle
@@ -34,7 +34,7 @@ class RecentTransactionActivity : BaseActivity() {
             insets
         }
 
-        LiquidGlassEffect.attach(
+        LiquidGlassEffect.Companion.attach(
             targetView   = binding.flCard,
             rootView     = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
