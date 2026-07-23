@@ -14,12 +14,15 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
+import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.LoginViewModel
-import com.shreefintech.paytouchconsumer.onboarding.UploadKycActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoginBinding
 import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.onboarding.CreateVirtualAccountActivity
+import com.shreefintech.paytouchconsumer.onboarding.UploadKycActivity
+import com.shreefintech.paytouchconsumer.retrofit.model.LoginItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -188,7 +191,7 @@ class LoginActivity : BaseActivity() {
             credential = credential,
             mode       = currentMode,
             onLoading  = { showProgress.set(true) },
-            onSuccess  = { showProgress.set(false) },
+            onSuccess  = { data -> showProgress.set(false); navigateAfterLogin(data) },
             onError    = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
         )
     }
@@ -210,6 +213,18 @@ class LoginActivity : BaseActivity() {
         SharedPreferenceHelper.setSharedPreferenceString(this, Constant.KEY_LOGIN_TYPE_PASSWORD, credential)
     }
 
+    private fun navigateAfterLogin(data: LoginItem?) {
+        val user = data?.user
+        val intent = when {
+            user?.requiresKyc == true            -> Intent(mActivity, UploadKycActivity::class.java)
+            user?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)
+            else                                 -> Intent(mActivity, HomeActivity::class.java)
+        }
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
     private fun clearSavedCredentials() {
         SharedPreferenceHelper.setSharedPreferenceBoolean(this, Constant.KEY_REMEMBER, false)
         SharedPreferenceHelper.setSharedPreferenceString(this, Constant.KEY_LOGIN_MOBILE, "")
@@ -227,8 +242,7 @@ class LoginActivity : BaseActivity() {
                 }
                 binding.llSignIn -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-514): replace with onNext() once login API is wired
-                    startActivity(Intent(mActivity, UploadKycActivity::class.java))
+                    onNext()
                 }
                 binding.tvForgotPassword -> {
                     if (Utility.stopClick()) return@OnClickListener

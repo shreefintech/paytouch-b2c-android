@@ -24,6 +24,12 @@
     <string name="msgPasswordShort">Password must be at least 8 characters</string>
     <string name="msgNoInternet">No internet connection</string>
     <string name="errGeneric">Something went wrong</string>
+    <string name="errBadRequest">Invalid request. Please check your input</string>
+    <string name="errUnauthorized">Session expired. Please login again</string>
+    <string name="errForbidden">You do not have permission to perform this action</string>
+    <string name="errNotFound">The requested resource was not found</string>
+    <string name="errValidation">Please check your input and try again</string>
+    <string name="errServer">Server error. Please try again later</string>
     <string name="msgMpinEmpty">Please enter your MPIN</string>
     <string name="msgMpinInvalid">MPIN must be exactly 4 digits</string>
 
@@ -274,5 +280,23 @@
     <string name="labelDetailReference">Reference - %s</string>
     <string name="labelMobileNoFmt">Mobile No. %s</string>
     <string name="labelUsernameFmt">Username : %s</string>
+
+    <string name="api_err_400">Bad Request</string>
+    <string name="api_err_401">Unauthorized. Please check your credentials.</string>
+    <string name="api_err_402">Request Not Implemented</string>
+    <string name="api_err_403">Access Forbidden</string>
+    <string name="api_err_404">Resource Not Found</string>
+    <string name="api_err_405">Method Not Allowed</string>
+    <string name="api_err_413">Content Too Large</string>
+    <string name="api_err_415">Unsupported Media Type</string>
+    <string name="api_err_425">Server unwilling to process request</string>
+    <string name="api_err_429">Too many requests. Try again later.</string>
+    <string name="api_err_500">Internal Server Error</string>
+    <string name="api_err_502">Bad Gateway</string>
+    <string name="api_err_503">Service Unavailable</string>
+    <string name="api_err_504">Gateway Timeout</string>
+    <string name="api_err_508">Server detected an infinite loop</string>
+    <string name="err_generic">Something went wrong. Please try again.</string>
+    <string name="api_err_422">Unprocessable Content</string>
 
 </resources>
