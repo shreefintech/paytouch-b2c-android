@@ -217,22 +217,6 @@ val fileParts = listOf(
 ApiClient.apiService.uploadFiles(auth, fields, fileParts).enqueue(...)
 ```
 
-### 5g. Suspend / Coroutine variant
-
-Use inside a `viewModelScope` or `lifecycleScope` coroutine.
-
-```kotlin
-// Declaration
-@GET("${CLIENT}resource/info")
-suspend fun getInfo(): Response<ResponseItem>
-
-// Usage — inside coroutine
-viewModelScope.launch {
-    val response = ApiClient.apiService.getInfo()
-    if (response.isSuccessful) { /* handle */ }
-}
-```
-
 ---
 
 ## 6. `General<T>` — Universal Response Wrapper

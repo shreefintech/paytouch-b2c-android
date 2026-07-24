@@ -2,12 +2,16 @@ package com.shreefintech.paytouchconsumer.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
+import android.text.TextWatcher
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -23,7 +27,6 @@ import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.onboarding.CreateVirtualAccountActivity
 import com.shreefintech.paytouchconsumer.onboarding.UploadKycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.LoginItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -45,7 +48,7 @@ class LoginActivity : BaseActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(
                 systemBars.left,
                 systemBars.top,
@@ -56,29 +59,27 @@ class LoginActivity : BaseActivity() {
         }
 
         LiquidGlassEffect.attach(
-            targetView   = binding.flCard,
-            rootView     = binding.root as ViewGroup,
+            targetView = binding.flCard,
+            rootView = binding.root as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion   = 0f,
-            blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
+            distortion = 0f,
+            blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
         binding.onClickListener = onClickListener()
-        binding.showProgress    = showProgress
+        binding.showProgress = showProgress
 
         onBack()
         setupInputFilters()
+        setupMpinBoxes()
         updateToggleUi(LoginMode.PASSWORD)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        loadSavedCredentials()
     }
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() { finish() }
+            override fun handleOnBackPressed() {
+                finish()
+            }
         })
     }
 
@@ -92,23 +93,54 @@ class LoginActivity : BaseActivity() {
             },
             emojiFilter
         )
-        setupCredentialFilter(currentMode)
+        binding.etCredential.filters = arrayOf(InputFilter.LengthFilter(20), emojiFilter)
     }
 
-    private fun setupCredentialFilter(mode: LoginMode) {
-        val emojiFilter = Utility.EmojiExcludeFilter()
-        binding.etCredential.filters = when (mode) {
-            LoginMode.PASSWORD -> arrayOf(InputFilter.LengthFilter(20), emojiFilter)
-            LoginMode.MPIN     -> arrayOf(
-                InputFilter.LengthFilter(4),
-                InputFilter { source, start, end, _, _, _ ->
-                    val sub = source.subSequence(start, end)
-                    if (sub.all { it.isDigit() }) null else sub.filter { it.isDigit() }
-                },
-                emojiFilter
-            )
+    private fun setupMpinBoxes() {
+        wireBoxes(
+            listOf(binding.etMpin1, binding.etMpin2, binding.etMpin3, binding.etMpin4)
+        )
+    }
+
+    private fun wireBoxes(boxes: List<AppCompatEditText>) {
+        boxes.forEachIndexed { index, editText ->
+            editText.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    if (s?.length == 1 && index < boxes.lastIndex) {
+                        boxes[index + 1].requestFocus()
+                    }
+                }
+            })
+            editText.setOnKeyListener { _, keyCode, event ->
+                if (keyCode == KeyEvent.KEYCODE_DEL
+                    && event.action == KeyEvent.ACTION_DOWN
+                    && editText.text.isNullOrEmpty()
+                    && index > 0
+                ) {
+                    boxes[index - 1].let { prev ->
+                        prev.requestFocus()
+                        prev.text?.clear()
+                    }
+                    true
+                } else {
+                    false
+                }
+            }
         }
     }
+
+    private fun collectMpin(): String =
+        listOf(binding.etMpin1, binding.etMpin2, binding.etMpin3, binding.etMpin4)
+            .joinToString("") { it.text.toString() }
 
     private fun updateToggleUi(mode: LoginMode) {
         currentMode = mode
@@ -118,36 +150,40 @@ class LoginActivity : BaseActivity() {
                 binding.tvBtnMpin.setBackgroundResource(R.drawable.bg_toggle_unselected)
                 binding.tvBtnPassword.setTextColor(ContextCompat.getColor(this, R.color.white))
                 binding.tvBtnMpin.setTextColor(getThemeColor(com.bumptech.glide.R.attr.colorPrimary))
-                binding.tvCredentialLabel.text  = getString(R.string.label_password)
-                binding.etCredential.hint       = getString(R.string.hint_password)
-                binding.tvForgotPassword.text   = getString(R.string.forgot_password)
-                binding.etCredential.inputType  =
+                binding.tvCredentialLabel.text = getString(R.string.label_password)
+                binding.tvForgotPassword.text = getString(R.string.forgot_password)
+                binding.etCredential.inputType =
                     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                binding.ivPasswordToggle.visible()
+                binding.flPasswordInput.visible()
+                binding.clMpinBoxes.gone()
+                listOf(binding.etMpin1, binding.etMpin2, binding.etMpin3, binding.etMpin4)
+                    .forEach { it.text?.clear() }
             }
+
             LoginMode.MPIN -> {
                 binding.tvBtnPassword.setBackgroundResource(R.drawable.bg_toggle_unselected)
                 binding.tvBtnMpin.setBackgroundResource(R.drawable.bg_toggle_selected)
                 binding.tvBtnPassword.setTextColor(getThemeColor(com.bumptech.glide.R.attr.colorPrimary))
                 binding.tvBtnMpin.setTextColor(ContextCompat.getColor(this, R.color.white))
-                binding.tvCredentialLabel.text  = getString(R.string.label_mpin)
-                binding.etCredential.hint       = getString(R.string.hint_mpin)
-                binding.tvForgotPassword.text   = getString(R.string.labelForgotMpin)
-                binding.etCredential.inputType  =
-                    InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
-                binding.ivPasswordToggle.gone()
+                binding.tvCredentialLabel.text = getString(R.string.label_mpin)
+                binding.tvForgotPassword.text = getString(R.string.labelForgotMpin)
+                binding.flPasswordInput.gone()
+                binding.clMpinBoxes.visible()
+                binding.etMpin1.requestFocus()
             }
         }
         isPasswordVisible = false
         binding.ivPasswordToggle.setImageResource(R.drawable.ic_eye_off)
         binding.etCredential.text?.clear()
-        setupCredentialFilter(mode)
     }
 
     private fun onNext() {
         Utility.hideKeyboard(binding.root)
-        val mobile     = binding.etMobile.text?.toString()?.trim() ?: ""
-        val credential = binding.etCredential.text?.toString() ?: ""
+        val mobile = binding.etMobile.text?.toString()?.trim() ?: ""
+        val credential = when (currentMode) {
+            LoginMode.PASSWORD -> binding.etCredential.text?.toString() ?: ""
+            LoginMode.MPIN -> collectMpin()
+        }
 
         var msg = ""
 
@@ -156,80 +192,67 @@ class LoginActivity : BaseActivity() {
                 msg = getString(R.string.msgMobileEmpty)
                 binding.etMobile.requestFocus()
             }
+
             mobile.length != 10 -> {
                 msg = getString(R.string.msgMobileInvalid)
                 binding.etMobile.requestFocus()
             }
+
             currentMode == LoginMode.PASSWORD && credential.isEmpty() -> {
                 msg = getString(R.string.msgPasswordEmpty)
                 binding.etCredential.requestFocus()
             }
-            currentMode == LoginMode.PASSWORD && credential.length < 6 -> {
-                msg = getString(R.string.msgPasswordShort)
-                binding.etCredential.requestFocus()
-            }
+
             currentMode == LoginMode.MPIN && credential.isEmpty() -> {
                 msg = getString(R.string.msgMpinEmpty)
-                binding.etCredential.requestFocus()
+                binding.etMpin1.requestFocus()
             }
+
             currentMode == LoginMode.MPIN && credential.length != 4 -> {
                 msg = getString(R.string.msgMpinInvalid)
-                binding.etCredential.requestFocus()
+                listOf(binding.etMpin1, binding.etMpin2, binding.etMpin3, binding.etMpin4)
+                    .firstOrNull { it.text.isNullOrEmpty() }?.requestFocus()
             }
+
             else -> handleSignIn(mobile, credential)
         }
-        if(msg != ""){
+        if (msg != "") {
             ToastUtil.showDelete(mActivity, msg)
         }
     }
 
     private fun handleSignIn(mobile: String, credential: String) {
-        if (binding.cbSaveCredentials.isChecked) saveCredentials(mobile, credential)
-        else clearSavedCredentials()
         viewModel.login(
-            mobile     = mobile,
+            mobile = mobile,
             credential = credential,
-            mode       = currentMode,
-            onLoading  = { showProgress.set(true) },
-            onSuccess  = { data -> showProgress.set(false); navigateAfterLogin(data) },
-            onError    = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
+            mode = currentMode,
+            onLoading = { showProgress.set(true) },
+            onSuccess = { data ->
+                showProgress.set(false)
+                ToastUtil.showSuccess(mActivity, getString(R.string.msgLoginSuccess))
+                navigateAfterLogin(data)
+            },
+            onError = { msg ->
+                showProgress.set(false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
         )
     }
 
-    private fun loadSavedCredentials() {
-        val remember = SharedPreferenceHelper.getSharedPreferenceBoolean(this, Constant.KEY_REMEMBER, false)
-        if (remember) {
-            val mobile = SharedPreferenceHelper.getSharedPreferenceString(this, Constant.KEY_LOGIN_MOBILE, "") ?: ""
-            val cred   = SharedPreferenceHelper.getSharedPreferenceString(this, Constant.KEY_LOGIN_TYPE_PASSWORD, "") ?: ""
-            binding.etMobile.setText(mobile)
-            binding.etCredential.setText(cred)
-            binding.cbSaveCredentials.isChecked = true
-        }
-    }
-
-    private fun saveCredentials(mobile: String, credential: String) {
-        SharedPreferenceHelper.setSharedPreferenceBoolean(this, Constant.KEY_REMEMBER, true)
-        SharedPreferenceHelper.setSharedPreferenceString(this, Constant.KEY_LOGIN_MOBILE, mobile)
-        SharedPreferenceHelper.setSharedPreferenceString(this, Constant.KEY_LOGIN_TYPE_PASSWORD, credential)
-    }
-
     private fun navigateAfterLogin(data: LoginItem?) {
-        val user = data?.user
         val intent = when {
-            user?.requiresKyc == true            -> Intent(mActivity, UploadKycActivity::class.java)
-            user?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)
-            else                                 -> Intent(mActivity, HomeActivity::class.java)
+            data?.requiresKyc == true -> Intent(mActivity, UploadKycActivity::class.java)
+            data?.requiresVirtualAccount == true -> Intent(
+                mActivity,
+                CreateVirtualAccountActivity::class.java
+            )
+
+            else -> Intent(mActivity, HomeActivity::class.java)
         }
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-        finish()
+        finishAffinity()
     }
 
-    private fun clearSavedCredentials() {
-        SharedPreferenceHelper.setSharedPreferenceBoolean(this, Constant.KEY_REMEMBER, false)
-        SharedPreferenceHelper.setSharedPreferenceString(this, Constant.KEY_LOGIN_MOBILE, "")
-        SharedPreferenceHelper.setSharedPreferenceString(this, Constant.KEY_LOGIN_TYPE_PASSWORD, "")
-    }
 
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->
@@ -237,26 +260,34 @@ class LoginActivity : BaseActivity() {
                 binding.tvBtnPassword -> {
                     updateToggleUi(LoginMode.PASSWORD)
                 }
+
                 binding.tvBtnMpin -> {
                     updateToggleUi(LoginMode.MPIN)
                 }
+
                 binding.llSignIn -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onNext()
                 }
+
                 binding.tvForgotPassword -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    val flowType = if (currentMode == LoginMode.MPIN) {
-                        Constant.FLOW_RESET_MPIN
-                    } else {
-                        Constant.FLOW_RESET_PASSWORD
+                    val mobile = binding.etMobile.text?.toString()?.trim() ?: ""
+                    if (mobile.isEmpty() || mobile.length != 10) {
+                        ToastUtil.showDelete(mActivity, getString(R.string.msgMobileInvalid))
+                        binding.etMobile.requestFocus()
+                        return@OnClickListener
                     }
-                    startActivity(OtpVerificationActivity.newIntent(mActivity, flowType))
+                    val flowType =
+                        if (currentMode == LoginMode.MPIN) Constant.FLOW_RESET_MPIN else Constant.FLOW_RESET_PASSWORD
+                    startActivity(OtpVerificationActivity.newIntent(mActivity, flowType, mobile))
                 }
+
                 binding.llCreateAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
                     startActivity(Intent(mActivity, CreateAccountActivity::class.java))
                 }
+
                 binding.ivPasswordToggle -> {
                     togglePasswordVisibility()
                 }

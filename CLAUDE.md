@@ -101,14 +101,20 @@ com.shreefintech.paytouchconsumer/
 
 ## Network Call Pattern
 
+All Retrofit endpoints must return `Call<T>` — **never** `suspend fun` / `Response<T>`. Always invoke with `.enqueue()`. The callback already runs on the main thread.
+
 ```kotlin
+// ApiService declaration
+fun someEndpoint(@Field("x") x: String): Call<SomeItem>
+
+// ViewModel call
 if (!Utility.isInternetAvailable(mActivity)) return
-ApiClient.apiService.someEndpoint(body).enqueue(object : Callback<General<SomeItem>> {
-    override fun onResponse(call, response) {
+ApiClient.apiService.someEndpoint(body).enqueue(object : Callback<SomeItem> {
+    override fun onResponse(call: Call<SomeItem>, response: Response<SomeItem>) {
         if (response.isSuccessful) { /* handle */ }
-        else { ToastUtil.show(mActivity, ApiHelper.parseErrorMessage(response)) }
+        else { ToastUtil.show(mActivity, ApiHelper.parseErrorMessage(mActivity, response.code(), response.errorBody()?.string())) }
     }
-    override fun onFailure(call, t) { ToastUtil.show(mActivity, t.localizedMessage) }
+    override fun onFailure(call: Call<SomeItem>, t: Throwable) { ToastUtil.show(mActivity, t.localizedMessage) }
 })
 ```
 

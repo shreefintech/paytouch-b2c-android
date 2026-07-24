@@ -2,22 +2,18 @@ package com.shreefintech.paytouchconsumer.auth.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.enums.LoginMode
+import com.shreefintech.paytouchconsumer.retrofit.ApiAdminClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.LoginItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -30,67 +26,96 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         onError: (String) -> Unit
     ) {
         val error = validate(mobile, credential, mode)
-        if (error != null) { onError(error); return }
+        if (error != null) {
+            onError(error); return
+        }
         if (!Utility.isInternetAvailable(getApplication())) {
             onError(getApplication<Application>().getString(R.string.msgNoInternet))
             return
         }
         onLoading()
-        viewModelScope.launch {
-            try {
-                val json = Gson().toJson(
-                    when (mode) {
-                        LoginMode.PASSWORD -> mapOf("mobile" to mobile, "password" to credential)
-                        LoginMode.MPIN     -> mapOf("mobile" to mobile, "mpin" to credential)
-                    }
-                )
-                val body = json.toRequestBody("application/json".toMediaTypeOrNull())
-                val response = withContext(Dispatchers.IO) {
-                    ApiClient.apiService.login(body)
-                }
-                withContext(Dispatchers.Main) {
-                    if (response.isSuccessful && response.body()?.success == true) {
-                        val data = response.body()?.data
-                        data?.let {
-                            SharedPreferenceHelper.setSharedPreferenceString(
-                                getApplication(), Constant.KEY_TOKEN, it.token ?: ""
-                            )
-                            SharedPreferenceHelper.setSharedPreferenceString(
-                                getApplication(), Constant.KEY_TOKEN_TYPE, it.tokenType ?: ""
-                            )
-                            it.user?.let { user ->
-                                SharedPreferenceHelper.setSharedPreferenceString(
-                                    getApplication(), Constant.KEY_USER_ID, user.id?.toString() ?: ""
-                                )
-                                SharedPreferenceHelper.setSharedPreferenceString(
-                                    getApplication(), Constant.KEY_MOBILE, user.mobile ?: ""
-                                )
-                                SharedPreferenceHelper.setSharedPreferenceString(
-                                    getApplication(), Constant.KEY_EMAIL, user.email ?: ""
-                                )
-                            }
-                        }
-                        onSuccess(data)
-                    } else {
-                        val msg = ApiHelper.parseErrorMessage(
-                            getApplication(),
-                            response.code(),
-                            response.errorBody()?.string()
-                        )
-                        onError(msg)
-                    }
-                }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    onError(
-                        e.localizedMessage
-                            ?: getApplication<Application>().getString(R.string.errGeneric)
+        val call = if (mode == LoginMode.PASSWORD) {
+            ApiClient.apiService.loginWithPassword(mobile, credential)
+        } else {
+            ApiClient.apiService.loginWithMpin(mobile, credential)
+        }
+        call.enqueue(object : Callback<LoginItem> {
+            override fun onResponse(call: Call<LoginItem>, response: Response<LoginItem>) {
+                if (response.isSuccessful) {
+                    val data = response.body()
+                    data?.let { saveSession(it) }
+                    onSuccess(data)
+                } else {
+                    val msg = ApiHelper.parseErrorMessage(
+                        getApplication(), response.code(), response.errorBody()?.string()
                     )
+                    onError(msg)
                 }
             }
+
+            override fun onFailure(call: Call<LoginItem>, t: Throwable) {
+                onError(
+                    t.localizedMessage
+                        ?: getApplication<Application>().getString(R.string.err_generic)
+                )
+            }
+        })
+    }
+
+    private fun saveSession(data: LoginItem) {
+        SharedPreferenceHelper.setSharedPreferenceString(
+            getApplication(),
+            Constant.KEY_TOKEN,
+            data.token ?: ""
+        )
+        SharedPreferenceHelper.setSharedPreferenceString(
+            getApplication(),
+            Constant.KEY_TOKEN_TYPE,
+            data.tokenType ?: ""
+        )
+        data.user?.let { user ->
+            SharedPreferenceHelper.setSharedPreferenceString(
+                getApplication(),
+                Constant.KEY_USER_ID,
+                user.id?.toString() ?: ""
+            )
+            SharedPreferenceHelper.setSharedPreferenceString(
+                getApplication(),
+                Constant.KEY_MOBILE,
+                user.mobile ?: ""
+            )
+            SharedPreferenceHelper.setSharedPreferenceString(
+                getApplication(),
+                Constant.KEY_EMAIL,
+                user.email ?: ""
+            )
+            SharedPreferenceHelper.setSharedPreferenceString(
+                getApplication(),
+                Constant.KEY_WALLET_BALANCE,
+                user.walletBalance ?: "0.00"
+            )
+            SharedPreferenceHelper.setSharedPreferenceString(
+                getApplication(),
+                Constant.KEY_REFERRAL_CODE,
+                user.referralCode ?: ""
+            )
+            fireVpsRegistration(
+                user.id ?: 0,
+                user.mobile ?: "",
+                user.email ?: "",
+                user.referralCode ?: ""
+            )
         }
+    }
+
+    private fun fireVpsRegistration(id: Int, mobile: String, email: String, referralCode: String) {
+        ApiAdminClient.apiService.registerUser(id, mobile, email, mobile, referralCode)
+            .enqueue(object : Callback<Any> {
+                override fun onResponse(call: Call<Any>, response: Response<Any>) {}
+                override fun onFailure(call: Call<Any>, t: Throwable) {
+                    t.printStackTrace()
+                }
+            })
     }
 
     private fun validate(mobile: String, credential: String, mode: LoginMode): String? {
@@ -101,14 +126,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
         return when (mode) {
             LoginMode.PASSWORD -> when {
-                credential.isBlank()    -> app.getString(R.string.msgPasswordEmpty)
-                credential.length < 8   -> app.getString(R.string.msgPasswordShort)
-                else                    -> null
+                credential.isBlank() -> app.getString(R.string.msgPasswordEmpty)
+                credential.length < 8 -> app.getString(R.string.msgPasswordShort)
+                else -> null
             }
+
             LoginMode.MPIN -> when {
-                credential.isBlank()                          -> app.getString(R.string.msgMpinEmpty)
-                !credential.matches(Regex("[0-9]{4}"))        -> app.getString(R.string.msgMpinInvalid)
-                else                                          -> null
+                credential.isBlank() -> app.getString(R.string.msgMpinEmpty)
+                !credential.matches(Regex("[0-9]{4}")) -> app.getString(R.string.msgMpinInvalid)
+                else -> null
             }
         }
     }

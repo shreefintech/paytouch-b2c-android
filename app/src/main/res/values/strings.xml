@@ -17,13 +17,14 @@
     <string name="no_account">Don\'t Have an account?</string>
     <string name="create_account">Create Account</string>
 
+    <string name="msgLoginSuccess">Login successful</string>
+
     <!-- Login validation messages -->
     <string name="msgMobileEmpty">Please enter your mobile number</string>
     <string name="msgMobileInvalid">Enter a valid 10-digit mobile number</string>
     <string name="msgPasswordEmpty">Please enter your password</string>
     <string name="msgPasswordShort">Password must be at least 8 characters</string>
     <string name="msgNoInternet">No internet connection</string>
-    <string name="errGeneric">Something went wrong</string>
     <string name="errBadRequest">Invalid request. Please check your input</string>
     <string name="errUnauthorized">Session expired. Please login again</string>
     <string name="errForbidden">You do not have permission to perform this action</string>

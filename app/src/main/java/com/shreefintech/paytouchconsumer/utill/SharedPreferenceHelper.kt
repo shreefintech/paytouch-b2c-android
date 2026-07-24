@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.utill
 
 import android.content.Context
+import com.shreefintech.paytouchconsumer.Constant
 import kotlin.collections.iterator
 
 object SharedPreferenceHelper {
@@ -99,5 +100,11 @@ object SharedPreferenceHelper {
         val settings = context.getSharedPreferences(PREF_FILE, 0)
         val editor = settings.edit()
         return editor.clear().commit()
+    }
+
+    fun isLoggedIn(context: Context): Boolean {
+        val token  = getSharedPreferenceString(context, Constant.KEY_TOKEN, "") ?: ""
+        val userId = getSharedPreferenceString(context, Constant.KEY_USER_ID, "") ?: ""
+        return token.isNotEmpty() && userId.isNotEmpty()
     }
 }

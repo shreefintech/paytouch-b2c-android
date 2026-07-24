@@ -27,9 +27,10 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 class OtpVerificationActivity : BaseActivity() {
 
     companion object {
-        fun newIntent(context: Context, flowType: String): Intent =
+        fun newIntent(context: Context, flowType: String, mobile: String): Intent =
             Intent(context, OtpVerificationActivity::class.java)
                 .putExtra(Constant.EXTRA_FLOW_TYPE, flowType)
+                .putExtra(Constant.EXTRA_MOBILE, mobile)
     }
 
     private lateinit var binding: ActivityOtpVerificationBinding
@@ -40,6 +41,9 @@ class OtpVerificationActivity : BaseActivity() {
 
     private val flowType by lazy {
         intent.getStringExtra(Constant.EXTRA_FLOW_TYPE) ?: Constant.FLOW_RESET_PASSWORD
+    }
+    private val mobile by lazy {
+        intent.getStringExtra(Constant.EXTRA_MOBILE) ?: ""
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +76,7 @@ class OtpVerificationActivity : BaseActivity() {
 
         onBack()
         setupOtpBoxes()
+        sendOtp()
         startResendTimer()
     }
 
@@ -84,6 +89,16 @@ class OtpVerificationActivity : BaseActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() { finish() }
         })
+    }
+
+    private fun sendOtp() {
+        viewModel.sendOtp(
+            context  = mActivity,
+            mobile   = mobile,
+            flowType = flowType,
+            onSuccess = {},
+            onError   = { msg -> ToastUtil.showDelete(mActivity, msg) }
+        )
     }
 
     private fun setupOtpBoxes() {
@@ -153,9 +168,9 @@ class OtpVerificationActivity : BaseActivity() {
         Utility.hideKeyboard(binding.clRoot)
         val otp = collectOtp()
         val msg = when {
-            otp.isEmpty()    -> getString(R.string.msgOtpEmpty)
-            otp.length != 6  -> getString(R.string.msgOtpIncomplete)
-            else             -> null
+            otp.isEmpty()   -> getString(R.string.msgOtpEmpty)
+            otp.length != 6 -> getString(R.string.msgOtpIncomplete)
+            else            -> null
         }
         if (msg != null) { ToastUtil.showDelete(mActivity, msg); return false }
         return true
@@ -165,6 +180,7 @@ class OtpVerificationActivity : BaseActivity() {
         if (!validate()) return
         viewModel.verifyOtp(
             context   = mActivity,
+            mobile    = mobile,
             otp       = collectOtp(),
             flowType  = flowType,
             onLoading = { showProgress.set(true) },
@@ -179,6 +195,7 @@ class OtpVerificationActivity : BaseActivity() {
     private fun onResendOtp() {
         viewModel.resendOtp(
             context   = mActivity,
+            mobile    = mobile,
             flowType  = flowType,
             onLoading = { showProgress.set(true) },
             onSuccess = { showProgress.set(false); startResendTimer() },
@@ -192,6 +209,7 @@ class OtpVerificationActivity : BaseActivity() {
         } else {
             Intent(mActivity, ResetPasswordActivity::class.java)
         }
+        intent.putExtra(Constant.EXTRA_MOBILE, mobile)
         startActivity(intent)
         finish()
     }

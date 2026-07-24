@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.auth
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
@@ -170,23 +171,29 @@ class CreateAccountActivity : BaseActivity() {
 
     private fun onCreateAccount() {
         if (!validate()) return
-        val mobile       = binding.etMobile.text?.toString()?.trim()      ?: ""
-        val email        = binding.etEmail.text?.toString()?.trim()        ?: ""
-        val referralCode = binding.etReferralCode.text?.toString()?.trim() ?: ""
-        val password     = binding.etPassword.text?.toString()             ?: ""
+        val mobile              = binding.etMobile.text?.toString()?.trim()         ?: ""
+        val email               = binding.etEmail.text?.toString()?.trim()           ?: ""
+        val referralCode        = binding.etReferralCode.text?.toString()?.trim()    ?: ""
+        val password            = binding.etPassword.text?.toString()                ?: ""
+        val passwordConfirmation = binding.etConfirmPassword.text?.toString()        ?: ""
         viewModel.register(
-            context      = mActivity,
-            mobile       = mobile,
-            email        = email,
-            referralCode = referralCode,
-            password     = password,
-            onLoading    = { showProgress.set(true) },
-            onSuccess    = {
+            context              = mActivity,
+            mobile               = mobile,
+            email                = email,
+            referralCode         = referralCode,
+            password             = password,
+            passwordConfirmation = passwordConfirmation,
+            onLoading            = { showProgress.set(true) },
+            onSuccess            = {
                 showProgress.set(false)
                 ToastUtil.showSuccess(mActivity, getString(R.string.msgAccountCreatedSuccessfully))
-                // TODO(PAYTOUCH-487): navigate to OtpVerificationActivity once register API is wired
+                val intent = Intent(mActivity, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                }
+                startActivity(intent)
+                finish()
             },
-            onError      = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
+            onError              = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
         )
     }
 
