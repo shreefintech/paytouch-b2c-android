@@ -28,7 +28,7 @@ object ApiClient {
         if (_apiService == null) _apiService = retrofit.create(ApiService::class.java)
     }
 
-    fun resetWithNewUrl(context: Context) {
+    fun resetWithNewUrl() {
         _retrofit = null
         _apiService = null
     }

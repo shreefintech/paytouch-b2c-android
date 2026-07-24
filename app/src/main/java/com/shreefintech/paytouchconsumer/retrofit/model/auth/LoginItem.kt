@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.retrofit.model
+package com.shreefintech.paytouchconsumer.retrofit.model.auth
 
 import com.google.gson.annotations.SerializedName
 

@@ -6,7 +6,7 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.MessageResponse
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
@@ -30,7 +30,7 @@ class OtpVerificationViewModel : ViewModel() {
         } else {
             ApiClient.apiService.sendPasswordOtp(mobile)
         }
-        enqueueOtp(context, call, onSuccess, onError)
+        enqueueMessage(context, call, onSuccess, onError)
     }
 
     fun verifyOtp(
@@ -52,7 +52,7 @@ class OtpVerificationViewModel : ViewModel() {
         } else {
             ApiClient.apiService.verifyPasswordOtp(mobile, otp)
         }
-        enqueueOtp(context, call, onSuccess, onError)
+        enqueueMessage(context, call, onSuccess, onError)
     }
 
     fun resendOtp(
@@ -73,22 +73,25 @@ class OtpVerificationViewModel : ViewModel() {
         } else {
             ApiClient.apiService.sendPasswordOtp(mobile)
         }
-        enqueueOtp(context, call, onSuccess, onError)
+        enqueueMessage(context, call, onSuccess, onError)
     }
 
-    private fun enqueueOtp(
+    private fun enqueueMessage(
         context: Context,
-        call: Call<MessageResponse>,
+        call: Call<MessageItem>,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        call.enqueue(object : Callback<MessageResponse> {
-            override fun onResponse(call: Call<MessageResponse>, response: Response<MessageResponse>) {
-                if (response.isSuccessful) onSuccess()
-                else onError(ApiHelper.parseErrorMessage(context, response.code(), response.errorBody()?.string()))
+        call.enqueue(object : Callback<MessageItem> {
+            override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+                if (response.isSuccessful && response.body()?.success == true) {
+                    onSuccess()
+                } else {
+                    onError(ApiHelper.parseErrorMessage(context, response.code(), response.errorBody()?.string()))
+                }
             }
 
-            override fun onFailure(call: Call<MessageResponse>, t: Throwable) {
+            override fun onFailure(call: Call<MessageItem>, t: Throwable) {
                 onError(t.localizedMessage ?: context.getString(R.string.err_generic))
             }
         })

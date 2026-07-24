@@ -1,9 +1,9 @@
 package com.shreefintech.paytouchconsumer.retrofit
 
-import com.shreefintech.paytouchconsumer.retrofit.model.LoginItem
-import com.shreefintech.paytouchconsumer.retrofit.model.MessageResponse
-import com.shreefintech.paytouchconsumer.retrofit.model.RegisterItem
-import com.shreefintech.paytouchconsumer.retrofit.model.UserResponse
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
+import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -22,7 +22,7 @@ interface ApiService {
     @GET("${AUTH}user")
     fun getUser(
         @Header("Authorization") authorization: String
-    ): Call<UserResponse>
+    ): Call<UserProfileItem>
 
     // ── Authentication ────────────────────────────────────────────────────────
 
@@ -56,14 +56,14 @@ interface ApiService {
     @POST("${AUTH}password/send-otp")
     fun sendPasswordOtp(
         @Field("mobile") mobile: String
-    ): Call<MessageResponse>
+    ): Call<MessageItem>
 
     @FormUrlEncoded
     @POST("${AUTH}password/verify-otp")
     fun verifyPasswordOtp(
         @Field("mobile") mobile: String,
         @Field("otp") otp: String
-    ): Call<MessageResponse>
+    ): Call<MessageItem>
 
     @FormUrlEncoded
     @POST("${AUTH}password/reset")
@@ -71,7 +71,7 @@ interface ApiService {
         @Field("mobile") mobile: String,
         @Field("new_password") newPassword: String,
         @Field("new_password_confirmation") newPasswordConfirmation: String
-    ): Call<MessageResponse>
+    ): Call<MessageItem>
 
     // ── Forgot MPIN OTP flow ──────────────────────────────────────────────────
 
@@ -79,14 +79,14 @@ interface ApiService {
     @POST("${AUTH}mpin/send-otp")
     fun sendMpinOtp(
         @Field("mobile") mobile: String
-    ): Call<MessageResponse>
+    ): Call<MessageItem>
 
     @FormUrlEncoded
     @POST("${AUTH}mpin/verify-otp")
     fun verifyMpinOtp(
         @Field("mobile") mobile: String,
         @Field("otp") otp: String
-    ): Call<MessageResponse>
+    ): Call<MessageItem>
 
     @FormUrlEncoded
     @POST("${AUTH}mpin/reset")
@@ -94,5 +94,5 @@ interface ApiService {
         @Field("mobile") mobile: String,
         @Field("new_mpin") newMpin: String,
         @Field("new_mpin_confirmation") newMpinConfirmation: String
-    ): Call<MessageResponse>
+    ): Call<MessageItem>
 }

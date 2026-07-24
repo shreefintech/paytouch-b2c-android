@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import androidx.activity.viewModels
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
@@ -12,7 +13,7 @@ import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
 import com.shreefintech.paytouchconsumer.onboarding.CreateVirtualAccountActivity
 import com.shreefintech.paytouchconsumer.onboarding.UploadKycActivity
-import com.shreefintech.paytouchconsumer.retrofit.model.UserResponse
+import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -48,14 +49,21 @@ class SplashActivity : BaseActivity() {
         }
         val token     = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN, "") ?: ""
         val tokenType = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN_TYPE, "Bearer") ?: "Bearer"
+        binding.progressBar.visibility = View.VISIBLE
         viewModel.validateSession(
             authorization = "$tokenType $token",
-            onSuccess     = { data -> routeByFlags(data) },
-            onError       = { navigate(Intent(mActivity, LoginActivity::class.java)) }
+            onSuccess = { data ->
+                binding.progressBar.visibility = View.GONE
+                routeByFlags(data)
+            },
+            onError = {
+                binding.progressBar.visibility = View.GONE
+                navigate(Intent(mActivity, LoginActivity::class.java))
+            }
         )
     }
 
-    private fun routeByFlags(data: UserResponse?) {
+    private fun routeByFlags(data: UserProfileItem?) {
         val intent = when {
             data?.requiresKyc == true            -> Intent(mActivity, UploadKycActivity::class.java)
             data?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)

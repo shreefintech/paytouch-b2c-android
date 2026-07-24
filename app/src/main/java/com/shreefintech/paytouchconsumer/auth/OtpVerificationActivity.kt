@@ -53,7 +53,7 @@ class OtpVerificationActivity : BaseActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(
                 systemBars.left,
                 systemBars.top,
@@ -64,15 +64,15 @@ class OtpVerificationActivity : BaseActivity() {
         }
 
         LiquidGlassEffect.attach(
-            targetView   = binding.flCard,
-            rootView     = binding.clRoot as ViewGroup,
+            targetView = binding.flCard,
+            rootView = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion   = 0f,
-            blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
+            distortion = 0f,
+            blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
         binding.onClickListener = onClickListener()
-        binding.showProgress    = showProgress
+        binding.showProgress = showProgress
 
         onBack()
         setupOtpBoxes()
@@ -87,17 +87,19 @@ class OtpVerificationActivity : BaseActivity() {
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() { finish() }
+            override fun handleOnBackPressed() {
+                finish()
+            }
         })
     }
 
     private fun sendOtp() {
         viewModel.sendOtp(
-            context  = mActivity,
-            mobile   = mobile,
+            context = mActivity,
+            mobile = mobile,
             flowType = flowType,
             onSuccess = {},
-            onError   = { msg -> ToastUtil.showDelete(mActivity, msg) }
+            onError = { msg -> ToastUtil.showDelete(mActivity, msg) }
         )
     }
 
@@ -108,7 +110,14 @@ class OtpVerificationActivity : BaseActivity() {
         )
         boxes.forEachIndexed { index, editText ->
             editText.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
                     if (s?.length == 1 && index < boxes.lastIndex) {
@@ -148,6 +157,7 @@ class OtpVerificationActivity : BaseActivity() {
                     String.format("%02d:%02d", min, sec)
                 )
             }
+
             override fun onFinish() {
                 isResendEnabled = true
                 binding.tvResendOtp.isClickable = true
@@ -168,38 +178,40 @@ class OtpVerificationActivity : BaseActivity() {
         Utility.hideKeyboard(binding.clRoot)
         val otp = collectOtp()
         val msg = when {
-            otp.isEmpty()   -> getString(R.string.msgOtpEmpty)
+            otp.isEmpty() -> getString(R.string.msgOtpEmpty)
             otp.length != 6 -> getString(R.string.msgOtpIncomplete)
-            else            -> null
+            else -> null
         }
-        if (msg != null) { ToastUtil.showDelete(mActivity, msg); return false }
+        if (msg != null) {
+            ToastUtil.showDelete(mActivity, msg); return false
+        }
         return true
     }
 
     private fun onSubmitOtp() {
         if (!validate()) return
         viewModel.verifyOtp(
-            context   = mActivity,
-            mobile    = mobile,
-            otp       = collectOtp(),
-            flowType  = flowType,
+            context = mActivity,
+            mobile = mobile,
+            otp = collectOtp(),
+            flowType = flowType,
             onLoading = { showProgress.set(true) },
             onSuccess = {
                 showProgress.set(false)
                 navigateToNextScreen()
             },
-            onError   = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
+            onError = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
         )
     }
 
     private fun onResendOtp() {
         viewModel.resendOtp(
-            context   = mActivity,
-            mobile    = mobile,
-            flowType  = flowType,
+            context = mActivity,
+            mobile = mobile,
+            flowType = flowType,
             onLoading = { showProgress.set(true) },
             onSuccess = { showProgress.set(false); startResendTimer() },
-            onError   = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
+            onError = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
         )
     }
 
@@ -221,10 +233,12 @@ class OtpVerificationActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onSubmitOtp()
                 }
+
                 binding.tvResendOtp -> {
                     if (!isResendEnabled || Utility.stopClick()) return@OnClickListener
                     onResendOtp()
                 }
+
                 binding.tvBackToSignIn -> {
                     if (Utility.stopClick()) return@OnClickListener
                     finish()

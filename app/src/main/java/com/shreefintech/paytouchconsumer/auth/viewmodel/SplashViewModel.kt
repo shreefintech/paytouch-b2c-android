@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.UserResponse
+import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -14,12 +14,12 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
 
     fun validateSession(
         authorization: String,
-        onSuccess: (UserResponse?) -> Unit,
+        onSuccess: (UserProfileItem?) -> Unit,
         onError: (String) -> Unit
     ) {
         ApiClient.apiService.getUser(authorization)
-            .enqueue(object : Callback<UserResponse> {
-                override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
+            .enqueue(object : Callback<UserProfileItem> {
+                override fun onResponse(call: Call<UserProfileItem>, response: Response<UserProfileItem>) {
                     if (response.isSuccessful) {
                         onSuccess(response.body())
                     } else {
@@ -31,7 +31,7 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                     }
                 }
 
-                override fun onFailure(call: Call<UserResponse>, t: Throwable) {
+                override fun onFailure(call: Call<UserProfileItem>, t: Throwable) {
                     onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.err_generic))
                 }
             })
