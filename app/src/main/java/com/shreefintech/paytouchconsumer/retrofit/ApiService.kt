@@ -1,10 +1,18 @@
 package com.shreefintech.paytouchconsumer.retrofit
 
+import com.shreefintech.paytouchconsumer.retrofit.model.General
+import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
+import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
-import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityProcessPaymentRequest
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -95,4 +103,30 @@ interface ApiService {
         @Field("new_mpin") newMpin: String,
         @Field("new_mpin_confirmation") newMpinConfirmation: String
     ): Call<MessageItem>
+
+    // ── Wallet ────────────────────────────────────────────────────────────────
+
+    @GET("${AUTH}wallet/user-data")
+    fun getUserWalletData(
+        @Header("Authorization") authorization: String
+    ): Call<General<WalletDataItem>>
+
+    // ── Electricity ───────────────────────────────────────────────────────────
+
+    @GET("${AUTH}electricity/operators")
+    fun getElectricityOperators(
+        @Header("Authorization") authorization: String
+    ): Call<General<List<ElectricityOperatorItem>>>
+
+    @POST("${AUTH}electricity/fetch-bill")
+    fun fetchElectricityBill(
+        @Header("Authorization") authorization: String,
+        @Body request: ElectricityFetchBillRequest
+    ): Call<General<ElectricityBillItem>>
+
+    @POST("${AUTH}electricity/process-payment")
+    fun processElectricityPayment(
+        @Header("Authorization") authorization: String,
+        @Body request: ElectricityProcessPaymentRequest
+    ): Call<ElectricityPaymentItem>
 }

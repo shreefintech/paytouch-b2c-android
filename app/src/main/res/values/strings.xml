@@ -196,8 +196,11 @@
     <string name="btnReset">Reset</string>
     <string name="titleRecentTransactions">Recent Transactions</string>
     <string name="msgConsumerNumberEmpty">Please enter consumer number</string>
+    <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 characters</string>
     <string name="msgSelectCompany">Please select a company</string>
     <string name="msgAmountEmpty">Please enter amount</string>
+    <string name="msgInsufficientBalance">Insufficient balance. Please add funds to your wallet.</string>
+    <string name="msgLoadingOperators">Loading providers, please try again in a moment.</string>
     <string name="msgComingSoon">This section will be available soon</string>
     <string name="categoryElectricity">Electricity</string>
     <string name="categoryGas">Gas</string>

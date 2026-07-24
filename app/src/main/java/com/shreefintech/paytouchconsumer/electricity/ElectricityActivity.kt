@@ -1,34 +1,66 @@
 package com.shreefintech.paytouchconsumer.electricity
 
 import android.content.Intent
+import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.TextWatcher
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
+import com.shreefintech.paytouchconsumer.retrofit.model.General
+import com.shreefintech.paytouchconsumer.retrofit.model.VpsBalanceItem
+import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ElectricityActivity : BaseActivity() {
 
     private lateinit var binding: ActivityElectricityBinding
 
-    private val operatorList = listOf(
-        "MSEDCL", "TPDDL", "BSES Rajdhani", "BSES Yamuna",
-        "BESCOM", "TNEB", "KSEB", "CESC", "Torrent Power", "UPPCL"
-    )
-    private var selectedOperator: String? = null
+    private var operatorItems: List<ElectricityOperatorItem> = emptyList()
+    private var selectedOperatorId: String? = null
+    private var selectedOperatorName: String? = null
+    private var fetchedBillItem: ElectricityBillItem? = null
+    private var billFetched = false
+    private var isLoading = false
+
+    private val adminHttpClient by lazy { okhttp3.OkHttpClient() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,57 +88,376 @@ class ElectricityActivity : BaseActivity() {
         )
 
         binding.onClickListener = onClickListener()
+        setupAmountWatcher()
+        setupConsumerNumberWatcher()
+        setupTermsText()
+        loadOperators()
         onBack()
     }
 
+    // ── Setup ─────────────────────────────────────────────────────────────────
+
+    private fun setupAmountWatcher() {
+        binding.etAmount.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val amount = s?.toString()?.trim()?.toDoubleOrNull()
+                if (amount == null || amount <= 0) {
+                    resetFeeDisplay()
+                    return
+                }
+                val fee = Utility.calculatePlatformFee(amount)
+                val total = amount + fee
+                val black = ContextCompat.getColor(mActivity, R.color.black)
+                binding.tvPlatformFee.text = "₹%.2f".format(fee)
+                binding.tvPlatformFee.setTextColor(black)
+                binding.tvTotalPayable.text = "₹%.2f".format(total)
+                binding.tvTotalPayable.setTextColor(black)
+            }
+        })
+    }
+
+    private fun setupConsumerNumberWatcher() {
+        binding.etConsumerNumber.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                if (billFetched) {
+                    billFetched = false
+                    fetchedBillItem = null
+                }
+            }
+        })
+    }
+
+    private fun setupTermsText() {
+        val fullText = getString(R.string.msgTermsAgreement)
+        val linkText = getString(R.string.termsLinkText)
+        val start = fullText.indexOf(linkText)
+        if (start < 0) return
+        val spannable = SpannableString(fullText)
+        spannable.setSpan(
+            object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_PLATFORM_TERMS)))
+                }
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = ContextCompat.getColor(mActivity, R.color.primary)
+                    ds.isUnderlineText = true
+                }
+            },
+            start,
+            start + linkText.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        binding.cbTerms.text = spannable
+        binding.cbTerms.movementMethod = LinkMovementMethod.getInstance()
+        binding.cbTerms.highlightColor = Color.TRANSPARENT
+    }
+
+    // ── API Calls ─────────────────────────────────────────────────────────────
+
+    private fun loadOperators() {
+        if (!Utility.isInternetAvailable(mActivity)) return
+        ApiClient.apiService.getElectricityOperators(bearerToken())
+            .enqueue(object : Callback<General<List<ElectricityOperatorItem>>> {
+                override fun onResponse(
+                    call: Call<General<List<ElectricityOperatorItem>>>,
+                    response: Response<General<List<ElectricityOperatorItem>>>
+                ) {
+                    if (response.isSuccessful && response.body()?.data != null) {
+                        operatorItems = response.body()!!.data!!
+                    } else {
+                        ToastUtil.showDelete(
+                            mActivity,
+                            ApiHelper.parseErrorMessage(
+                                mActivity, response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+                override fun onFailure(
+                    call: Call<General<List<ElectricityOperatorItem>>>,
+                    t: Throwable
+                ) {
+                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.err_generic))
+                }
+            })
+    }
+
+    private fun fetchBill(connectionNumber: String) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        setLoading(true)
+        val request = ElectricityFetchBillRequest(
+            connectionNumber = connectionNumber,
+            operatorId = selectedOperatorId ?: "",
+            circleId = "00"
+        )
+        ApiClient.apiService.fetchElectricityBill(bearerToken(), request)
+            .enqueue(object : Callback<General<ElectricityBillItem>> {
+                override fun onResponse(
+                    call: Call<General<ElectricityBillItem>>,
+                    response: Response<General<ElectricityBillItem>>
+                ) {
+                    setLoading(false)
+                    if (response.isSuccessful && response.body()?.data != null) {
+                        fetchedBillItem = response.body()!!.data!!
+                        billFetched = true
+                        binding.etAmount.setText(fetchedBillItem!!.billAmount ?: "")
+                    } else {
+                        ToastUtil.showDelete(
+                            mActivity,
+                            ApiHelper.parseErrorMessage(
+                                mActivity, response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+                override fun onFailure(call: Call<General<ElectricityBillItem>>, t: Throwable) {
+                    setLoading(false)
+                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.err_generic))
+                }
+            })
+    }
+
+    private fun verifyBalanceAndProcessPayment() {
+        val amount = binding.etAmount.text?.toString()?.trim()?.toDoubleOrNull() ?: 0.0
+        val fee = Utility.calculatePlatformFee(amount)
+        val total = amount + fee
+        setLoading(true)
+        checkVpsBalance(total) { processPayment(amount, fee, total) }
+    }
+
+    private fun checkVpsBalance(totalPayable: Double, onSufficient: () -> Unit) {
+        val userId = SharedPreferenceHelper.getSharedPreferenceString(
+            mActivity, Constant.KEY_USER_ID, ""
+        ) ?: ""
+        val url = "${Constant.BASE_URL_ADMIN}balance.php?id=$userId"
+        val request = okhttp3.Request.Builder().url(url).build()
+        adminHttpClient.newCall(request).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: okhttp3.Call, e: IOException) {
+                runOnUiThread {
+                    if (!isFinishing) checkWalletBalance(totalPayable, onSufficient)
+                }
+            }
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                val body = response.body?.string()
+                runOnUiThread {
+                    if (isFinishing) return@runOnUiThread
+                    try {
+                        val item = Gson().fromJson(body, VpsBalanceItem::class.java)
+                        val balance = item?.balance?.toDoubleOrNull() ?: 0.0
+                        if (balance >= totalPayable) onSufficient()
+                        else checkWalletBalance(totalPayable, onSufficient)
+                    } catch (e: Exception) {
+                        checkWalletBalance(totalPayable, onSufficient)
+                    }
+                }
+            }
+        })
+    }
+
+    private fun checkWalletBalance(totalPayable: Double, onSufficient: () -> Unit) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            setLoading(false)
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        ApiClient.apiService.getUserWalletData(bearerToken())
+            .enqueue(object : Callback<General<WalletDataItem>> {
+                override fun onResponse(
+                    call: Call<General<WalletDataItem>>,
+                    response: Response<General<WalletDataItem>>
+                ) {
+                    if (response.isSuccessful && response.body()?.data != null) {
+                        val balance =
+                            response.body()!!.data!!.walletBalance?.toDoubleOrNull() ?: 0.0
+                        if (balance >= totalPayable) {
+                            onSufficient()
+                        } else {
+                            setLoading(false)
+                            ToastUtil.showDelete(
+                                mActivity, getString(R.string.msgInsufficientBalance)
+                            )
+                        }
+                    } else {
+                        setLoading(false)
+                        ToastUtil.showDelete(
+                            mActivity,
+                            ApiHelper.parseErrorMessage(
+                                mActivity, response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+                override fun onFailure(call: Call<General<WalletDataItem>>, t: Throwable) {
+                    setLoading(false)
+                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.err_generic))
+                }
+            })
+    }
+
+    private fun processPayment(amount: Double, fee: Double, total: Double) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            setLoading(false)
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        val connectionNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
+        val request = ElectricityProcessPaymentRequest(
+            connectionNumber = connectionNumber,
+            operatorId = selectedOperatorId ?: "",
+            circleId = "00",
+            amount = amount,
+            platformFee = fee,
+            totalPayable = total
+        )
+        ApiClient.apiService.processElectricityPayment(bearerToken(), request)
+            .enqueue(object : Callback<ElectricityPaymentItem> {
+                override fun onResponse(
+                    call: Call<ElectricityPaymentItem>,
+                    response: Response<ElectricityPaymentItem>
+                ) {
+                    setLoading(false)
+                    val body = response.body()
+                    if (response.isSuccessful && body?.success == true) {
+                        navigateToReceipt(amount, fee, body)
+                    } else {
+                        val errMsg = body?.message
+                            ?: ApiHelper.parseErrorMessage(
+                                mActivity, response.code(), response.errorBody()?.string()
+                            )
+                        ToastUtil.showDelete(mActivity, errMsg)
+                    }
+                }
+                override fun onFailure(call: Call<ElectricityPaymentItem>, t: Throwable) {
+                    setLoading(false)
+                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.err_generic))
+                }
+            })
+    }
+
+    private fun navigateToReceipt(amount: Double, fee: Double, paymentItem: ElectricityPaymentItem) {
+        val mobile = SharedPreferenceHelper.getSharedPreferenceString(
+            mActivity, Constant.KEY_MOBILE, ""
+        ) ?: ""
+        val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
+        SmsReceiptActivity.start(
+            context = mActivity,
+            mobile = mobile,
+            txnId = paymentItem.transactionId ?: "",
+            amount = "₹%.2f".format(paymentItem.amount ?: amount),
+            status = paymentItem.status ?: "Pending",
+            username = fetchedBillItem?.customerName ?: "",
+            date = date,
+            platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
+            refId = paymentItem.reqId ?: "",
+            accountNo = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
+            companyName = selectedOperatorName ?: ""
+        )
+    }
+
+    // ── UI Helpers ────────────────────────────────────────────────────────────
+
     private fun showCompanyDropdown() {
         Utility.hideKeyboard(binding.clRoot)
+        if (operatorItems.isEmpty()) {
+            loadOperators()
+            ToastUtil.showWarning(mActivity, getString(R.string.msgLoadingOperators))
+            return
+        }
+        val names = operatorItems.map { it.name ?: "" }
         CustomDropdown.showDropdown(
             activity = mActivity,
             anchorView = binding.flCompanyAnchor,
             arrowView = binding.ivCompanyArrow,
             textView = binding.tvCompany,
-            items = operatorList
-        ) { selected, _ ->
-            selectedOperator = selected
+            items = names
+        ) { selected, index ->
+            selectedOperatorId = operatorItems.getOrNull(index)?.id
+            selectedOperatorName = selected
             binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
+            if (billFetched) {
+                billFetched = false
+                fetchedBillItem = null
+            }
         }
     }
 
-    private fun onProceedToPay() {
-        val consumerNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
-        val amount = binding.etAmount.text?.toString()?.trim() ?: ""
+    private fun setLoading(loading: Boolean) {
+        isLoading = loading
+        binding.llProceed.alpha = if (loading) 0.5f else 1f
+        binding.llReset.alpha = if (loading) 0.5f else 1f
+    }
 
-        if (consumerNumber.isEmpty()) {
+    private fun resetFeeDisplay() {
+        val hintColor = mActivity.getThemeColor(R.attr.colorTextHint)
+        binding.tvPlatformFee.text = getString(R.string.hintPlatformFee)
+        binding.tvPlatformFee.setTextColor(hintColor)
+        binding.tvTotalPayable.text = getString(R.string.hintTotalPayable)
+        binding.tvTotalPayable.setTextColor(hintColor)
+    }
+
+    private fun bearerToken(): String {
+        val token = SharedPreferenceHelper.getSharedPreferenceString(
+            mActivity, Constant.KEY_TOKEN, ""
+        ) ?: ""
+        return "Bearer $token"
+    }
+
+    // ── Actions ───────────────────────────────────────────────────────────────
+
+    private fun onProceedToPay() {
+        val connectionNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
+        if (connectionNumber.isEmpty()) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
-        if (selectedOperator.isNullOrEmpty()) {
+        if (connectionNumber.length < 10) {
+            binding.etConsumerNumber.requestFocus()
+            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
+            return
+        }
+        if (selectedOperatorId.isNullOrEmpty()) {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
             return
         }
-        if (amount.isEmpty()) {
-            binding.etAmount.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgAmountEmpty))
+        if (!billFetched) {
+            Utility.hideKeyboard(mActivity)
+            fetchBill(connectionNumber)
             return
         }
         if (!binding.cbTerms.isChecked) {
             ToastUtil.showDelete(mActivity, getString(R.string.msgTermsNotAccepted))
             return
         }
-        // TODO(PAYTOUCH-520): Call fetch-bill API then navigate to payment confirmation
+        val amount = binding.etAmount.text?.toString()?.trim()?.toDoubleOrNull() ?: 0.0
+        if (amount <= 0) {
+            binding.etAmount.requestFocus()
+            ToastUtil.showDelete(mActivity, getString(R.string.msgAmountEmpty))
+            return
+        }
+        Utility.hideKeyboard(mActivity)
+        verifyBalanceAndProcessPayment()
     }
 
     private fun onReset() {
         binding.etConsumerNumber.setText("")
         binding.etAmount.setText("")
-        binding.tvPlatformFee.text = getString(R.string.hintPlatformFee)
-        binding.tvTotalPayable.text = getString(R.string.hintTotalPayable)
         binding.tvCompany.text = getString(R.string.hintSelectCompany)
         binding.tvCompany.setTextColor(mActivity.getThemeColor(R.attr.colorTextHint))
         binding.cbTerms.isChecked = false
-        selectedOperator = null
+        selectedOperatorId = null
+        selectedOperatorName = null
+        billFetched = false
+        fetchedBillItem = null
+        resetFeeDisplay()
         Utility.hideKeyboard(binding.clRoot)
     }
 
@@ -123,17 +474,14 @@ class ElectricityActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
-
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
                     startActivity(Intent(mActivity, TransactionReportActivity::class.java))
                 }
-
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-546): Navigate to transaction status check screen
                 }
-
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-546): Pass real transaction data once API is wired
@@ -151,20 +499,20 @@ class ElectricityActivity : BaseActivity() {
                         companyName = "Paschim Gujarat Vij Company Ltd"
                     )
                 }
-
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
                     showCompanyDropdown()
                 }
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (isLoading) return@OnClickListener
                     onProceedToPay()
                 }
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (isLoading) return@OnClickListener
                     onReset()
                 }
-
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
                     startActivity(Intent(mActivity, RecentTransactionActivity::class.java))

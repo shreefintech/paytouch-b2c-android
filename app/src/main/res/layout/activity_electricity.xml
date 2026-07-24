@@ -128,7 +128,7 @@
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:src="@drawable/ic_download"
+                        android:src="@drawable/ic_report"
                         android:tint="@color/primary" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -192,7 +192,7 @@
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:src="@drawable/ic_share"
+                        android:src="@drawable/ic_sms"
                         android:tint="@color/primary" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -283,42 +283,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
-
-                            <!-- Category (static) -->
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="@dimen/margin_small"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/proza_libre_medium"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/labelCategory"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_12" />
-
-                                <FrameLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:background="@drawable/bg_form_field"
-                                    android:padding="@dimen/margin_small_medium">
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/proza_libre_medium"
-                                        android:includeFontPadding="false"
-                                        android:text="@string/categoryElectricityBill"
-                                        android:textColor="@color/black"
-                                        android:textSize="@dimen/text_size_12" />
-                                </FrameLayout>
-                            </LinearLayout>
-
                             <!-- Company (dropdown) -->
                             <LinearLayout
                                 android:layout_width="0dp"
@@ -340,6 +304,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
+                                    android:foreground="?selectableItemBackground"
                                     android:background="@drawable/bg_form_field"
                                     android:onClickListener="@{onClickListener}"
                                     android:padding="@dimen/margin_small_medium">
