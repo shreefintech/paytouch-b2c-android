@@ -292,7 +292,7 @@
                                     android:includeFontPadding="false"
                                     android:maxLines="1"
                                     android:text="@string/hintSelectCompany"
-                                    android:textColor="#80000000"
+                                    android:textColor="?attr/colorTextHint"
                                     android:textSize="@dimen/text_size_12" />
 
                                 <FrameLayout
@@ -354,7 +354,7 @@
                                     android:inputType="number"
                                     android:padding="@dimen/margin_small_medium"
                                     android:textColor="@color/black"
-                                    android:textColorHint="#80000000"
+                                    android:textColorHint="?attr/colorTextHint"
                                     android:textSize="@dimen/text_size_13" />
                             </LinearLayout>
 
@@ -399,7 +399,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/margin_medium"
-                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="0dp"
@@ -457,7 +456,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/labelCustomerName"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -485,7 +484,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/labelDueDate"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -513,7 +512,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/labelBillDate"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -541,7 +540,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/labelBillAmount"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -569,7 +568,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/labelConnectionNumber"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -597,7 +596,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/labelOperator"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -674,7 +673,7 @@
                             android:inputType="numberDecimal"
                             android:padding="@dimen/margin_small_medium"
                             android:textColor="@color/black"
-                            android:textColorHint="#80000000"
+                            android:textColorHint="?attr/colorTextHint"
                             android:textSize="@dimen/text_size_13" />
 
                         <!-- Platform Fee | Total Payable -->
@@ -714,7 +713,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/hintPlatformFee"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
                                 </FrameLayout>
                             </LinearLayout>
@@ -748,7 +747,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/hintTotalPayable"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
                                 </FrameLayout>
                             </LinearLayout>
