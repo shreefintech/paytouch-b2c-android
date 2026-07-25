@@ -401,6 +401,7 @@
                             android:layout_marginTop="@dimen/margin_medium"
                             app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="12dp"
+                            android:visibility="gone"
                             app:cardElevation="0dp"
                             app:strokeColor="@color/fetch_bill_stroke"
                             app:strokeWidth="1.5dp">
