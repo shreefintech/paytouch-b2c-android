@@ -38,7 +38,6 @@ class TransactionReportActivity : BaseActivity() {
 
     private val mAllList     = ArrayList<TransactionItem>()
     private val mDisplayList = ArrayList<TransactionItem>()
-    private var hasSearched  = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,12 +108,11 @@ class TransactionReportActivity : BaseActivity() {
                 callReport(fromDate, toDate, status, consumerNo)
             },
             onClear     = {
-                hasSearched = false
                 mAllList.clear()
                 mDisplayList.clear()
                 binding.etSearch.setText("")
                 transactionAdp.notifyDataSetChanged()
-                binding.tvEmpty.visibility = View.GONE
+                binding.tvEmpty.visibility = View.VISIBLE
                 binding.shimmerLayout.stopShimmer()
                 binding.shimmerLayout.visibility = View.GONE
                 binding.rvTransactions.visibility = View.VISIBLE
@@ -133,7 +131,6 @@ class TransactionReportActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
             return
         }
-        hasSearched = true
         showShimmer(true)
         val token   = "Bearer ${SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN, "")}"
         val request = ElectricityTransactionReportRequest(fromDate, toDate, status, consumerNo)
@@ -149,7 +146,7 @@ class TransactionReportActivity : BaseActivity() {
                         response.body()!!.data!!.forEachIndexed { index, item ->
                             mAllList.add(
                                 TransactionItem(
-                                    mobileNumber   = item.subscriberNo ?: "",
+                                    mobileNumber   = item.customerName ?: "",
                                     transactionId  = item.transactionId ?: "",
                                     amount         = "₹%.2f".format(item.totalPayable),
                                     status         = item.status ?: "",
@@ -212,7 +209,7 @@ class TransactionReportActivity : BaseActivity() {
         }
         transactionAdp.notifyDataSetChanged()
         binding.tvEmpty.visibility =
-            if (mDisplayList.isEmpty() && hasSearched) View.VISIBLE else View.GONE
+            if (mDisplayList.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun onBack() {

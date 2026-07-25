@@ -201,7 +201,7 @@
                     android:text="@string/msgNoTransactionsFound"
                     android:textColor="#80000000"
                     android:textSize="@dimen/text_size_14"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
             </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -211,7 +211,7 @@
             android:id="@+id/viewBg"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#80000000"
+            android:background="@color/btm_sheet_bg"
             android:visibility="gone" />
 
         <!-- Filter bottom sheet -->

@@ -27,6 +27,37 @@
     </style>
 
     <style name="Theme.PaytouchConsumer" parent="Base.Theme.PaytouchConsumer" />
+
+    <!-- ── DatePicker Dialog ─────────────────────────────────────────────── -->
+    <style name="Paytouch.DatePickerTheme" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorAccent">@color/primary</item>
+        <item name="colorControlActivated">@color/primary</item>
+        <item name="colorControlHighlight">#1AD52662</item>
+        <item name="android:datePickerStyle">@style/PaytouchDatePickerWidget</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Paytouch.Button.DialogPositive</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Paytouch.Button.DialogNegative</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/Paytouch.Button.DialogPositive</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/Paytouch.Button.DialogNegative</item>
+    </style>
+
+    <style name="PaytouchDatePickerWidget" parent="android:Widget.Material.Light.DatePicker">
+        <item name="android:headerBackground">@drawable/bg_datepicker_header</item>
+    </style>
+
+    <!-- Bold primary text — the confirm action -->
+    <style name="Paytouch.Button.DialogPositive" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <!-- Muted text — the dismiss action -->
+    <style name="Paytouch.Button.DialogNegative" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/hint_color</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
     <declare-styleable name="BlurView">
         <attr name="blurOverlayColor" format="color"/>
     </declare-styleable>

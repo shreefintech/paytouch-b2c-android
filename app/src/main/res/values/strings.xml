@@ -314,5 +314,6 @@
     <string name="labelConnectionNumber">Connection Number</string>
     <string name="labelOperator">Operator</string>
     <string name="btnClearAndEnterManually">Clear &amp; Enter Manually</string>
+    <string name="textFilter">Filter</string>
 
 </resources>
