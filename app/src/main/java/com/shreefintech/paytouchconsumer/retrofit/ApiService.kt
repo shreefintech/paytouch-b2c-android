@@ -122,7 +122,7 @@ interface ApiService {
     fun fetchElectricityBill(
         @Header("Authorization") authorization: String,
         @Body request: ElectricityFetchBillRequest
-    ): Call<General<ElectricityBillItem>>
+    ): Call<General<List<ElectricityBillItem>>>
 
     @POST("${AUTH}electricity/process-payment")
     fun processElectricityPayment(

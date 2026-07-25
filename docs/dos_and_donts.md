@@ -54,6 +54,9 @@ Never call `Toast.makeText()` directly in any Activity, ViewModel, or utility cl
 **DO use `ApiHelper.parseErrorMessage()` to extract error text from failed API responses.**
 Never show a raw server error string or exception message to the user. Always parse it through `ApiHelper`.
 
+**DO show loading state inside the button that triggered the API call — never use a full-screen loader or alpha-only dimming.**
+Every button that triggers a network call must contain both its label/icon and a `ProgressBar` child. Use one `ObservableBoolean` per button declared in the layout `<data>` block and toggled in Kotlin. Set it `true` before the call and `false` in both `onResponse` and `onFailure`. Guard the click handler with `if (showProgressXxx.get()) return`. For dropdown/list fields, show a small spinner inside the field slot (replacing the arrow icon) — never affect the rest of the screen. See the **Button & List Loading State Rule** section in `CLAUDE.md` for the full pattern with XML and Kotlin examples.
+
 **DO use a date picker for all date input fields.**
 For DOB, date range filters, and any other date field — use a picker dialog, never a free-text input.
 
@@ -151,3 +154,6 @@ Each feature must use exactly one base URL for all its calls. Do not call `payto
 
 **DON'T suppress VPS sync failures silently.**
 VPS sync calls are non-blocking, but failures must be logged so issues can be detected and debugged.
+
+**DON'T use a full-screen progress dialog, overlay, or pure alpha dimming for button-triggered API calls.**
+Full-screen loaders block the entire UI unnecessarily. Alpha-only dimming gives no clear feedback that a network call is in flight. Always show a `ProgressBar` inside the specific button that was tapped. For field-level list loading (dropdown, selector), show a localized spinner inside that field only — never a full-screen indicator. One `ObservableBoolean` per button; never a single shared `isLoading` flag driving multiple buttons' states.

@@ -302,5 +302,15 @@
     <string name="api_err_508">Server detected an infinite loop</string>
     <string name="err_generic">Something went wrong. Please try again.</string>
     <string name="api_err_422">Unprocessable Content</string>
+    <string name="btnFetchBill">Fetch Bill</string>
+
+    <!-- Bill Details card -->
+    <string name="titleBillDetailsFetched">Electricity Bill Details Fetched</string>
+    <string name="labelDueDate">Due Date</string>
+    <string name="labelBillDate">Bill Date</string>
+    <string name="labelBillAmount">Bill Amount</string>
+    <string name="labelConnectionNumber">Connection Number</string>
+    <string name="labelOperator">Operator</string>
+    <string name="btnClearAndEnterManually">Clear &amp; Enter Manually</string>
 
 </resources>
