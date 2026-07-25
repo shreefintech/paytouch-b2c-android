@@ -11,13 +11,24 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionReportBinding
 import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
+import com.shreefintech.paytouchconsumer.retrofit.model.General
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportRequest
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.TransactionFilterHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class TransactionReportActivity : BaseActivity() {
 
@@ -25,8 +36,9 @@ class TransactionReportActivity : BaseActivity() {
     private lateinit var transactionAdp: TransactionAdp
     private lateinit var filterHelper: TransactionFilterHelper
 
-    private val mAllList = ArrayList<TransactionItem>()
+    private val mAllList     = ArrayList<TransactionItem>()
     private val mDisplayList = ArrayList<TransactionItem>()
+    private var hasSearched  = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +47,7 @@ class TransactionReportActivity : BaseActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(
                 systemBars.left,
                 systemBars.top,
@@ -47,109 +59,24 @@ class TransactionReportActivity : BaseActivity() {
         }
 
         LiquidGlassEffect.attach(
-            targetView = binding.flCard,
-            rootView = binding.clRoot as ViewGroup,
+            targetView   = binding.flCard,
+            rootView     = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion = 0f,
-            blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-            strokeColor = Color.argb(180, 213, 38, 98),
-            strokeWidth = 1,
-            solidStroke = true,
+            distortion   = 0f,
+            blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
+            strokeColor  = Color.argb(180, 213, 38, 98),
+            strokeWidth  = 1,
+            solidStroke  = true,
         )
 
-        loadDummyData()
         setupRecyclerView()
         setupSearch()
         setupFilterSheet()
 
         binding.onClickListener = onClickListener()
         onBack()
-    }
 
-    private fun loadDummyData() {
-        mAllList.apply {
-            add(
-                TransactionItem(
-                    "9876*****0", "BC88213045", "₹149.00", "Success",
-                    R.drawable.ic_electricity, "Ravi Kumar", "18-07-2026, 09:15 am",
-                    "₹3.00", "₹152.00", "TXN10235", "USR001",
-                    "30723111936", "Paschim Gujarat Vij Company Ltd"
-                )
-            )
-            add(
-                TransactionItem(
-                    "9823*****1", "BC88214234", "₹320.00", "Failed",
-                    R.drawable.ic_electricity, "Priya Sharma", "17-07-2026, 02:45 pm",
-                    "₹5.00", "₹325.00", "TXN10236", "USR002",
-                    "30723222047", "Torrent Power Limited"
-                )
-            )
-            add(
-                TransactionItem(
-                    "9845*****2", "BC88215678", "₹85.50", "Pending",
-                    R.drawable.ic_gas, "Arjun Patel", "17-07-2026, 11:30 am",
-                    "₹2.00", "₹87.50", "TXN10237", "USR003",
-                    "30723333158", "Gujarat Gas Company Ltd"
-                )
-            )
-            add(
-                TransactionItem(
-                    "9812*****3", "BC88216543", "₹450.00", "Success",
-                    R.drawable.ic_electricity, "Sunita Desai", "16-07-2026, 04:20 pm",
-                    "₹8.00", "₹458.00", "TXN10238", "USR004",
-                    "30723444269", "MSEDCL Nagpur Zone"
-                )
-            )
-            add(
-                TransactionItem(
-                    "9867*****4", "BC88217890", "₹200.00", "Success",
-                    R.drawable.ic_gas, "Mohan Verma", "16-07-2026, 01:00 pm",
-                    "₹4.00", "₹204.00", "TXN10239", "USR005",
-                    "30723555370", "Mahanagar Gas Ltd"
-                )
-            )
-            add(
-                TransactionItem(
-                    "9834*****5", "BC88218123", "₹75.00", "Failed",
-                    R.drawable.ic_electricity, "Anita Singh", "15-07-2026, 10:10 am",
-                    "₹2.00", "₹77.00", "TXN10240", "USR006",
-                    "30723666481", "BSES Rajdhani Power Ltd"
-                )
-            )
-            add(
-                TransactionItem(
-                    "9856*****6", "BC88219456", "₹560.00", "Pending",
-                    R.drawable.ic_electricity, "Vikram Nair", "15-07-2026, 05:50 pm",
-                    "₹9.00", "₹569.00", "TXN10241", "USR007",
-                    "30723777592", "KSEB Kerala"
-                )
-            )
-            add(
-                TransactionItem(
-                    "9801*****7", "BC88220789", "₹130.00", "Success",
-                    R.drawable.ic_gas, "Kavita Mehta", "14-07-2026, 03:30 pm",
-                    "₹3.00", "₹133.00", "TXN10242", "USR008",
-                    "30723888603", "Indraprastha Gas Ltd"
-                )
-            )
-            add(
-                TransactionItem(
-                    "9878*****8", "BC88221012", "₹298.00", "Success",
-                    R.drawable.ic_electricity, "Deepak Sharma", "14-07-2026, 08:45 am",
-                    "₹5.00", "₹303.00", "TXN10243", "USR009",
-                    "30723999714", "TPDDL Delhi"
-                )
-            )
-            add(
-                TransactionItem(
-                    "9890*****9", "BC88222345", "₹695.00", "Failed",
-                    R.drawable.ic_electricity, "Radha Krishnan", "13-07-2026, 12:15 pm",
-                    "₹10.00", "₹705.00", "TXN10244", "USR010",
-                    "30724000825", "TANGEDCO Tamil Nadu"
-                )
-            )
-        }
-        mDisplayList.addAll(mAllList)
+        filterHelper.show()
     }
 
     private fun setupRecyclerView() {
@@ -159,7 +86,7 @@ class TransactionReportActivity : BaseActivity() {
         }
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
-            adapter = transactionAdp
+            adapter       = transactionAdp
         }
     }
 
@@ -175,26 +102,101 @@ class TransactionReportActivity : BaseActivity() {
 
     private fun setupFilterSheet() {
         filterHelper = TransactionFilterHelper(
-            activity = mActivity,
+            activity    = mActivity,
             sheetBinding = binding.incFilterSheet,
-            bgOverlay = binding.viewBg,
-            getList = { mAllList },
-            onApply = { filtered ->
-                mDisplayList.clear()
-                mDisplayList.addAll(filtered)
-                transactionAdp.notifyDataSetChanged()
-                binding.tvEmpty.visibility =
-                    if (mDisplayList.isEmpty()) View.VISIBLE else View.GONE
+            bgOverlay   = binding.viewBg,
+            onApply     = { fromDate, toDate, status, consumerNo ->
+                callReport(fromDate, toDate, status, consumerNo)
             },
-            onClear = {
-                binding.etSearch.setText("")
+            onClear     = {
+                hasSearched = false
+                mAllList.clear()
                 mDisplayList.clear()
-                mDisplayList.addAll(mAllList)
+                binding.etSearch.setText("")
                 transactionAdp.notifyDataSetChanged()
                 binding.tvEmpty.visibility = View.GONE
+                binding.shimmerLayout.stopShimmer()
+                binding.shimmerLayout.visibility = View.GONE
+                binding.rvTransactions.visibility = View.VISIBLE
             }
         )
         filterHelper.setup()
+    }
+
+    private fun callReport(
+        fromDate: String?,
+        toDate: String?,
+        status: String?,
+        consumerNo: String?
+    ) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        hasSearched = true
+        showShimmer(true)
+        val token   = "Bearer ${SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN, "")}"
+        val request = ElectricityTransactionReportRequest(fromDate, toDate, status, consumerNo)
+        ApiClient.apiService.getElectricityPaymentReport(token, request)
+            .enqueue(object : Callback<General<List<ElectricityTransactionReportDataItem>>> {
+                override fun onResponse(
+                    call: Call<General<List<ElectricityTransactionReportDataItem>>>,
+                    response: Response<General<List<ElectricityTransactionReportDataItem>>>
+                ) {
+                    showShimmer(false)
+                    mAllList.clear()
+                    if (response.isSuccessful && response.body()?.data != null) {
+                        response.body()!!.data!!.forEachIndexed { index, item ->
+                            mAllList.add(
+                                TransactionItem(
+                                    mobileNumber   = item.subscriberNo ?: "",
+                                    transactionId  = item.transactionId ?: "",
+                                    amount         = "₹%.2f".format(item.totalPayable),
+                                    status         = item.status ?: "",
+                                    categoryIconRes = R.drawable.ic_electricity,
+                                    username       = item.customerName ?: "",
+                                    date           = item.createdAt ?: "",
+                                    platformFee    = "₹%.2f".format(item.platformFee),
+                                    totalPayable   = "₹%.2f".format(item.totalPayable),
+                                    referenceId    = item.transactionId ?: "",
+                                    userId         = (index + 1).toString(),
+                                    accountNumber  = item.subscriberNo ?: "",
+                                    companyName    = if (!item.subservice.isNullOrEmpty()) item.subservice else item.operatorId ?: ""
+                                )
+                            )
+                        }
+                    } else {
+                        val msg = ApiHelper.parseErrorMessage(
+                            mActivity, response.code(), response.errorBody()?.string()
+                        )
+                        if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
+                    }
+                    filterList(binding.etSearch.text?.toString()?.trim() ?: "")
+                }
+
+                override fun onFailure(
+                    call: Call<General<List<ElectricityTransactionReportDataItem>>>,
+                    t: Throwable
+                ) {
+                    showShimmer(false)
+                    mAllList.clear()
+                    filterList("")
+                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.err_generic))
+                }
+            })
+    }
+
+    private fun showShimmer(show: Boolean) {
+        if (show) {
+            binding.rvTransactions.visibility = View.GONE
+            binding.tvEmpty.visibility        = View.GONE
+            binding.shimmerLayout.visibility  = View.VISIBLE
+            binding.shimmerLayout.startShimmer()
+        } else {
+            binding.shimmerLayout.stopShimmer()
+            binding.shimmerLayout.visibility  = View.GONE
+            binding.rvTransactions.visibility = View.VISIBLE
+        }
     }
 
     private fun filterList(query: String) {
@@ -210,7 +212,7 @@ class TransactionReportActivity : BaseActivity() {
         }
         transactionAdp.notifyDataSetChanged()
         binding.tvEmpty.visibility =
-            if (mDisplayList.isEmpty()) View.VISIBLE else View.GONE
+            if (mDisplayList.isEmpty() && hasSearched) View.VISIBLE else View.GONE
     }
 
     private fun onBack() {
@@ -232,7 +234,6 @@ class TransactionReportActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
-
                 binding.flFilter -> {
                     if (Utility.stopClick()) return@OnClickListener
                     filterHelper.show()

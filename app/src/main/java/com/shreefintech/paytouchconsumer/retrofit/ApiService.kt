@@ -11,6 +11,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityF
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -129,4 +131,10 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: ElectricityProcessPaymentRequest
     ): Call<ElectricityPaymentItem>
+
+    @POST("${AUTH}electricity/payment-report")
+    fun getElectricityPaymentReport(
+        @Header("Authorization") authorization: String,
+        @Body request: ElectricityTransactionReportRequest
+    ): Call<General<List<ElectricityTransactionReportDataItem>>>
 }

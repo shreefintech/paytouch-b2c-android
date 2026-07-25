@@ -217,6 +217,8 @@
     <string name="titleTransactionReport">Transaction Report</string>
     <string name="hintSearchTransaction">Search mobile no. or Transaction ID</string>
     <string name="msgNoTransactionsFound">No transactions found</string>
+    <string name="msgSelectAtLeastOneFilter">Please select at least one filter</string>
+    <string name="msgSelectBothDates">Please select both From and To date</string>
     <string name="textFromDate">From Date</string>
     <string name="dateHint">yyyy-mm-dd</string>
     <string name="textToDate">To Date</string>
