@@ -25,6 +25,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.electricity.transactions.ElectricityTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.electricity.viewmodel.ElectricityViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -393,7 +394,7 @@ class ElectricityActivity : BaseActivity() {
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-546): Navigate to transaction status check screen
+                    ElectricityTransactionStatusActivity.start(mActivity)
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener

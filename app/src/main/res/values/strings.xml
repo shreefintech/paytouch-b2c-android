@@ -305,6 +305,8 @@
     <string name="err_generic">Something went wrong. Please try again.</string>
     <string name="api_err_422">Unprocessable Content</string>
     <string name="btnFetchBill">Fetch Bill</string>
+    <string name="btnSearch">Search</string>
+    <string name="msgEnterSearchQuery">Please enter subscriber no. or transaction ID</string>
 
     <!-- Bill Details card -->
     <string name="titleBillDetailsFetched">Electricity Bill Details Fetched</string>

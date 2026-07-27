@@ -30,7 +30,7 @@ class TransactionAdp(
         val item = mArrayList[position]
         holder.binding.apply {
             ivCategoryIcon.setImageResource(item.categoryIconRes)
-            tvMobile.text = item.mobileNumber
+            tvMobile.text = item.username
             tvTransactionId.text = item.transactionId
             tvAmount.text = item.amount
             tvStatus.text = item.status

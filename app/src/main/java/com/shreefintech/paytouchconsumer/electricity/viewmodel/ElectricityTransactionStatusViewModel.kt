@@ -10,20 +10,17 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class TransactionReportViewModel(application: Application) : AndroidViewModel(application) {
+class ElectricityTransactionStatusViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun getTransactionReport(
-        fromDate: String?,
-        toDate: String?,
-        status: String?,
-        consumerNo: String?,
+    fun searchTransactionStatus(
+        query: String?,
         onLoading: () -> Unit,
         onSuccess: (ArrayList<TransactionItem>) -> Unit,
         onError: (String) -> Unit
@@ -33,9 +30,9 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
             return
         }
         onLoading()
-        ApiClient.apiService.getElectricityPaymentReport(
+        ApiClient.apiService.getElectricityTransactionStatus(
             bearerToken(),
-            ElectricityTransactionReportRequest(fromDate, toDate, status, consumerNo)
+            ElectricityTransactionStatusRequest(transactionId = query)
         ).enqueue(object : Callback<General<List<ElectricityTransactionReportDataItem>>> {
             override fun onResponse(
                 call: Call<General<List<ElectricityTransactionReportDataItem>>>,
@@ -67,7 +64,7 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
 
     private fun mapToTransactionItem(index: Int, item: ElectricityTransactionReportDataItem): TransactionItem {
         return TransactionItem(
-            mobileNumber    = "",
+            mobileNumber    = item.subscriberNo ?: "--",
             transactionId   = item.transactionId ?: "--",
             amount          = "₹%.2f".format(item.totalPayable),
             status          = item.status ?: "--",
@@ -79,7 +76,7 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
             referenceId     = item.transactionId ?: "--",
             userId          = (index + 1).toString(),
             accountNumber   = item.subscriberNo ?: "--",
-            companyName     = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--"
+            companyName     = item.operatorId ?: "--"
         )
     }
 
