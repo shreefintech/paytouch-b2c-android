@@ -68,7 +68,9 @@ class TransactionReportActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         onBack()
 
-        filterHelper.show()
+        if (savedInstanceState == null) {
+            binding.root.post { filterHelper.show() }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -105,10 +107,10 @@ class TransactionReportActivity : BaseActivity() {
                 mDisplayList.clear()
                 binding.etSearch.setText("")
                 transactionAdp.notifyDataSetChanged()
-                binding.tvEmpty.visibility        = View.VISIBLE
                 binding.shimmerLayout.stopShimmer()
                 binding.shimmerLayout.visibility  = View.GONE
-                binding.rvTransactions.visibility = View.VISIBLE
+                binding.rvTransactions.visibility = View.GONE
+                binding.tvEmpty.visibility        = View.VISIBLE
             }
         )
         filterHelper.setup()
@@ -188,7 +190,7 @@ class TransactionReportActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
-                binding.flFilter -> {
+                binding.ivFilter -> {
                     if (Utility.stopClick()) return@OnClickListener
                     filterHelper.show()
                 }

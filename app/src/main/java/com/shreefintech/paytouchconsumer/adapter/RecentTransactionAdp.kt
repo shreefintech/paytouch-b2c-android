@@ -67,5 +67,17 @@ class RecentTransactionAdp(
         }
     }
 
+    fun updateList(items: List<RecentTransactionItem>) {
+        mArrayList.clear()
+        mArrayList.addAll(items)
+        notifyDataSetChanged()
+    }
+
+    fun appendList(items: List<RecentTransactionItem>) {
+        val insertStart = mArrayList.size
+        mArrayList.addAll(items)
+        notifyItemRangeInserted(insertStart, items.size)
+    }
+
     override fun getItemCount(): Int = mArrayList.size
 }
