@@ -61,5 +61,11 @@ class TransactionAdp(
         }
     }
 
+    fun updateList(items: List<TransactionItem>) {
+        mArrayList.clear()
+        mArrayList.addAll(items)
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int = mArrayList.size
 }

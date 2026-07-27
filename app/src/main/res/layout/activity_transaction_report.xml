@@ -134,7 +134,7 @@
                 <!-- Filter button -->
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/flFilter"
+                    android:id="@+id/ivFilter"
                     android:layout_width="@dimen/btn_height"
                     android:layout_height="@dimen/btn_height"
                     android:background="?selectableItemBackground"
@@ -202,7 +202,7 @@
                     android:text="@string/msgNoTransactionsFound"
                     android:textColor="#80000000"
                     android:textSize="@dimen/text_size_14"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
             </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

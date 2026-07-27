@@ -14,7 +14,6 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.RecentTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityRecentTransactionBinding
-import com.shreefintech.paytouchconsumer.electricity.model.RecentTransactionItem
 import com.shreefintech.paytouchconsumer.electricity.viewmodel.RecentTransactionViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -25,8 +24,6 @@ class RecentTransactionActivity : BaseActivity() {
     private lateinit var binding: ActivityRecentTransactionBinding
     private lateinit var recentTransactionAdp: RecentTransactionAdp
     private lateinit var viewModel: RecentTransactionViewModel
-
-    private val mList = ArrayList<RecentTransactionItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +57,7 @@ class RecentTransactionActivity : BaseActivity() {
     }
 
     private fun setupRecyclerView() {
-        recentTransactionAdp = RecentTransactionAdp(mActivity, mList)
+        recentTransactionAdp = RecentTransactionAdp(mActivity, ArrayList())
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
             adapter = recentTransactionAdp
@@ -93,9 +90,7 @@ class RecentTransactionActivity : BaseActivity() {
                     binding.tvEmpty.visibility = View.VISIBLE
                 } else {
                     binding.rvTransactions.visibility = View.VISIBLE
-                    mList.clear()
-                    mList.addAll(items)
-                    recentTransactionAdp.notifyDataSetChanged()
+                    recentTransactionAdp.updateList(items)
                 }
             },
             onError = { error ->
@@ -115,9 +110,7 @@ class RecentTransactionActivity : BaseActivity() {
             onSuccess = { items ->
                 binding.pbLoadMore.visibility = View.GONE
                 if (items.isNotEmpty()) {
-                    val insertStart = mList.size
-                    mList.addAll(items)
-                    recentTransactionAdp.notifyItemRangeInserted(insertStart, items.size)
+                    recentTransactionAdp.appendList(items)
                 }
             },
             onError = { error ->
