@@ -188,7 +188,7 @@ class TransactionReportActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
-                binding.flFilter -> {
+                binding.ivFilter -> {
                     if (Utility.stopClick()) return@OnClickListener
                     filterHelper.show()
                 }
