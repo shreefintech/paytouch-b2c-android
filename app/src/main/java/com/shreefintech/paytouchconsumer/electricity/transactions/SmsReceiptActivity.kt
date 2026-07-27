@@ -8,6 +8,11 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Typeface
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
@@ -26,21 +32,24 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivitySmsReceiptBinding
 import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
+import com.shreefintech.paytouchconsumer.electricity.viewmodel.SmsReceiptViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import com.shreefintech.paytouchconsumer.utill.Utility.gone
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class SmsReceiptActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySmsReceiptBinding
-
-    private var isReceiptTab = true
     private var savedImageUri: Uri? = null
+
+    private val viewModel: SmsReceiptViewModel by viewModels()
 
     private val writePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -53,13 +62,21 @@ class SmsReceiptActivity : BaseActivity() {
         intent.getStringExtra(EXTRA_ITEM)?.let { Gson().fromJson(it, SmsReceiptItem::class.java) }
     }
 
+    private val isFromPayment: Boolean by lazy {
+        intent.getBooleanExtra(EXTRA_FROM_PAYMENT, false)
+    }
+
     companion object {
         private const val EXTRA_ITEM = "extra_item"
+        private const val EXTRA_FROM_PAYMENT = "extra_from_payment"
+        private const val TAB_RECEIPT = 0
+        private const val TAB_DISPLAY = 1
 
-        fun start(context: Context, item: SmsReceiptItem) {
+        fun start(context: Context, item: SmsReceiptItem, fromPayment: Boolean = false) {
             context.startActivity(
                 Intent(context, SmsReceiptActivity::class.java).apply {
                     putExtra(EXTRA_ITEM, Gson().toJson(item))
+                    putExtra(EXTRA_FROM_PAYMENT, fromPayment)
                 }
             )
         }
@@ -87,92 +104,130 @@ class SmsReceiptActivity : BaseActivity() {
             solidStroke = true,
         )
 
-        populateData()
-        selectReceiptTab()
+        if (isFromPayment) {
+            binding.llTitleRow.visibility = View.GONE
+            binding.llReceiptContent.visibility = View.VISIBLE
+            binding.llDisplayContent.visibility = View.GONE
+            binding.llBtnContainer.visible()
+        } else {
+            binding.llTitleRow.visibility = View.VISIBLE
+            selectTab(TAB_RECEIPT)
+        }
         binding.onClickListener = onClickListener()
         onBack()
+
+        populateData()
+        loadLatestPayments()
     }
+
+    // ── API Call ──────────────────────────────────────────────
+
+    private fun loadLatestPayments() {
+        viewModel.getLatestPayments(
+            onLoading = { showReceiptLoading(true) },
+            onSuccess = { item ->
+                showReceiptLoading(false)
+                populateReceiptFromApi(item)
+            },
+            onError = { msg ->
+                showReceiptLoading(false)
+                if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
+    // ── Populate ──────────────────────────────────────────────
 
     private fun populateData() {
         val item = receiptItem ?: return
-        val txnId = item.txnId
-        val amount = item.amount
-        val status = item.status
-        val username = item.username
-        val date = item.date
-        val platformFee = item.platformFee
-        val refId = item.refId
-        val accountNo = item.accountNo
-        val companyName = item.companyName
+        binding.tvConsumerNo.text = item.accountNo
+        binding.tvCustomerName.text = item.username
+        binding.tvCompanyName.text = item.companyName
+        binding.tvReceiptDate.text = item.date
+        binding.tvAmountPaid.text = item.amount
+        binding.tvPaytouchTxnId.text = item.txnId
+        binding.tvBConnectTxnId.text = item.refId
+        binding.tvCcf.text = item.platformFee
+        binding.tvReceiptStatus.text = "● ${item.status}"
+        applyStatusStyle(item.status)
+    }
 
-        // Receipt tab fields
-        binding.tvConsumerNo.text = accountNo
-        binding.tvCustomerName.text = username
-        binding.tvCompanyName.text = companyName
+    private fun populateReceiptFromApi(item: ElectricityVerifyPaymentDataItem) {
+        val amount = "₹${item.totalPayable ?: "--"}"
+        val consumerNo = item.subscriberNo ?: "--"
+        val txnId = item.transactionId ?: "--"
+        val date = formatDate(item.createdAt)
+        val status = item.status ?: "Pending"
+
+        binding.tvConsumerNo.text = consumerNo
+        binding.tvCustomerName.text = item.customerName ?: "--"
+        binding.tvCompanyName.text = item.operatorName ?: "--"
         binding.tvReceiptDate.text = date
         binding.tvAmountPaid.text = amount
         binding.tvPaytouchTxnId.text = txnId
-        binding.tvBConnectTxnId.text = refId
-        binding.tvCcf.text = platformFee
+        binding.tvBConnectTxnId.text = item.ccf ?: "--"
+        binding.tvCcf.text = item.platformFee ?: "--"
         binding.tvReceiptStatus.text = "● $status"
+        applyStatusStyle(status)
 
-        val (bgColor, textColor) = when (status) {
-            "Success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
-            "Failed" -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
-            else -> Pair(R.color.toast_bg_warning, R.color.toast_text_warning)
+        val smsBodyText = getString(R.string.msgSmsBody, amount, consumerNo)
+        val spannable = SpannableString(smsBodyText)
+        val amountStart = smsBodyText.indexOf(amount)
+        if (amountStart >= 0) {
+            val amountEnd = amountStart + amount.length
+            spannable.setSpan(ForegroundColorSpan(ContextCompat.getColor(mActivity, R.color.primary)), amountStart, amountEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannable.setSpan(StyleSpan(Typeface.BOLD), amountStart, amountEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
-        binding.cvReceiptStatusBadge.setCardBackgroundColor(
-            ContextCompat.getColor(mActivity, bgColor)
-        )
-        binding.tvReceiptStatus.setTextColor(ContextCompat.getColor(mActivity, textColor))
-
-        // Display tab fields
-        binding.tvSmsBody.text = getString(R.string.msgSmsBody, amount, accountNo)
-        binding.tvSmsBConnectTxn.text = refId
+        binding.tvSmsBody.text = spannable
+        binding.tvSmsBConnectTxn.text = txnId
         binding.tvSmsDate.text = date
     }
 
-    // ── Tab switching ─────────────────────────────────────────
-
-    private fun selectReceiptTab() {
-        isReceiptTab = true
-        val primary = ContextCompat.getColor(mActivity, R.color.primary)
-        val transparent = Color.TRANSPARENT
-
-        // Active pill: white bg, primary text
-        binding.cvTabReceipt.setCardBackgroundColor(primary)
-        binding.tvTabReceipt.setTextColor(Color.WHITE)
-        binding.tvTabReceipt.text = getString(R.string.tabReceipt)
-
-        // Inactive pill: primary bg (blends into container), white text
-        binding.cvTabDisplay.setCardBackgroundColor(transparent)
-        binding.tvTabDisplay.setTextColor(primary)
-
-        binding.tvTabDisplay.text = getString(R.string.tabDisplay)
-
-        binding.llReceiptContent.visibility = View.VISIBLE
-        binding.llDisplayContent.visibility = View.GONE
-        binding.llBtnContainer.visible()
+    private fun applyStatusStyle(status: String?) {
+        val (bgColor, textColor) = when (status) {
+            "Success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
+            "Failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
+            else      -> Pair(R.color.toast_bg_warning, R.color.toast_text_warning)
+        }
+        binding.cvReceiptStatusBadge.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
+        binding.tvReceiptStatus.setTextColor(ContextCompat.getColor(mActivity, textColor))
     }
 
-    private fun selectDisplayTab() {
-        isReceiptTab = false
-        val primary = ContextCompat.getColor(mActivity, R.color.primary)
-        val transparent = Color.TRANSPARENT
+    private fun formatDate(createdAt: String?): String {
+        if (createdAt.isNullOrBlank()) return "--"
+        return try {
+            val input = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val output = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
+            val date = input.parse(createdAt.substringBefore("."))
+            if (date != null) output.format(date) else createdAt
+        } catch (e: Exception) {
+            createdAt
+        }
+    }
 
-        // Active pill: white bg, primary text
-        binding.cvTabDisplay.setCardBackgroundColor(primary)
-        binding.tvTabDisplay.setTextColor(Color.WHITE)
-        binding.tvTabDisplay.text = getString(R.string.tabDisplay)
+    // ── Tab Switching ─────────────────────────────────────────
 
-        // Inactive pill: primary bg (blends into container), white text
-        binding.cvTabReceipt.setCardBackgroundColor(transparent)
-        binding.tvTabReceipt.setTextColor(primary)
-        binding.tvTabReceipt.text = getString(R.string.tabReceipt)
+    private fun selectTab(tab: Int) {
+        val isReceipt = tab == TAB_RECEIPT
+        binding.llReceiptContent.visibility = if (isReceipt) View.VISIBLE else View.GONE
+        binding.llDisplayContent.visibility = if (isReceipt) View.GONE else View.VISIBLE
+        binding.llBtnContainer.visibility = if (isReceipt) View.VISIBLE else View.GONE
 
-        binding.llReceiptContent.visibility = View.GONE
-        binding.llDisplayContent.visibility = View.VISIBLE
-        binding.llBtnContainer.gone()
+        val activeColor = ContextCompat.getColor(mActivity, R.color.primary)
+        val inactiveColor = android.graphics.Color.TRANSPARENT
+        val activeTextColor = ContextCompat.getColor(mActivity, R.color.white)
+        val inactiveTextColor = ContextCompat.getColor(mActivity, R.color.primary)
+
+        binding.cvTabReceipt.setCardBackgroundColor(if (isReceipt) activeColor else inactiveColor)
+        binding.cvTabDisplay.setCardBackgroundColor(if (isReceipt) inactiveColor else activeColor)
+        binding.tvTabReceipt.setTextColor(if (isReceipt) activeTextColor else inactiveTextColor)
+        binding.tvTabDisplay.setTextColor(if (isReceipt) inactiveTextColor else activeTextColor)
+    }
+
+    // ── Loading State ─────────────────────────────────────────
+
+    private fun showReceiptLoading(show: Boolean) {
+        binding.pbReceiptLoading.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     // ── Download & Share ──────────────────────────────────────
@@ -189,8 +244,7 @@ class SmsReceiptActivity : BaseActivity() {
     }
 
     private fun performDownload() {
-        val target = if (isReceiptTab) binding.cvReceiptCard else binding.cvSmsCard
-        val bitmap = captureViewAsBitmap(target)
+        val bitmap = captureViewAsBitmap(binding.cvReceiptCard)
         val uri = saveBitmapAndGetUri(bitmap)
         if (uri != null) {
             savedImageUri = uri
@@ -207,8 +261,7 @@ class SmsReceiptActivity : BaseActivity() {
     }
 
     private fun shareReceipt() {
-        val target = if (isReceiptTab) binding.cvReceiptCard else binding.cvSmsCard
-        val bitmap = captureViewAsBitmap(target)
+        val bitmap = captureViewAsBitmap(binding.cvReceiptCard)
         try {
             val dir = File(cacheDir, "receipts").also { it.mkdirs() }
             val file = File(dir, "receipt_${System.currentTimeMillis()}.png")
@@ -311,11 +364,11 @@ class SmsReceiptActivity : BaseActivity() {
                 }
                 binding.cvTabReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    selectReceiptTab()
+                    selectTab(TAB_RECEIPT)
                 }
                 binding.cvTabDisplay -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    selectDisplayTab()
+                    selectTab(TAB_DISPLAY)
                 }
                 binding.cvDownload -> {
                     if (Utility.stopClick()) return@OnClickListener

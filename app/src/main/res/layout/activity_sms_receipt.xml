@@ -165,6 +165,16 @@
                             android:visibility="gone"
                             android:orientation="vertical">
 
+                            <ProgressBar
+                                android:id="@+id/pbReceiptLoading"
+                                style="?android:attr/progressBarStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:indeterminateTint="@color/primary"
+                                android:visibility="gone"
+                                android:layout_marginBottom="@dimen/margin_medium" />
+
                             <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/cvReceiptCard"
                                 android:layout_width="match_parent"
@@ -521,6 +531,15 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
                             android:orientation="vertical">
+
+                            <ProgressBar
+                                android:id="@+id/pbDisplayLoading"
+                                style="?android:attr/progressBarStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:indeterminateTint="@color/primary"
+                                android:visibility="gone"
+                                android:layout_marginBottom="@dimen/margin_medium" />
 
                             <!-- Header: electricity icon + title -->
                             <LinearLayout

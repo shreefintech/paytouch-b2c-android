@@ -228,7 +228,7 @@ class ElectricityActivity : BaseActivity() {
         val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
         SmsReceiptActivity.start(
             context = mActivity,
-            SmsReceiptItem(mobile = mobile,
+            item = SmsReceiptItem(mobile = mobile,
             txnId = paymentItem.transactionId ?: "",
             amount = "₹%.2f".format(paymentItem.amount ?: amount),
             status = paymentItem.status ?: "Pending",
@@ -237,7 +237,8 @@ class ElectricityActivity : BaseActivity() {
             platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
             refId = paymentItem.reqId ?: "",
             accountNo = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
-            companyName = selectedOperatorName ?: "")
+            companyName = selectedOperatorName ?: ""),
+            fromPayment = true
         )
     }
 
