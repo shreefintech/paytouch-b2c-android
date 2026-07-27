@@ -278,7 +278,6 @@ class SmsReceiptActivity : BaseActivity() {
             startActivity(Intent.createChooser(intent, getString(R.string.titleShareReceipt)))
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.d("test26", "${e.message}")
             ToastUtil.showDelete(mActivity, getString(R.string.msgReceiptShareFailed))
         }
     }
