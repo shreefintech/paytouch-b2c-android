@@ -15,7 +15,7 @@
         <item name="colorPrimary">@color/primary</item>
         <!-- Text -->
         <item name="colorTextBody">@color/black</item>
-        <item name="colorTextSubtitle">@color/hint_color</item>
+        <item name="colorTextSubtitle">@color/sub_text_color</item>
         <item name="colorTextHint">@color/hint_color</item>
         <item name="colorTextOnBrand">@color/primary</item>
         <!-- Icons -->
