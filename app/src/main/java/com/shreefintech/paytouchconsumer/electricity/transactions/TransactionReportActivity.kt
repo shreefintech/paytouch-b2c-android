@@ -7,32 +7,25 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.shreefintech.paytouchconsumer.BaseActivity
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionReportBinding
 import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
+import com.shreefintech.paytouchconsumer.electricity.viewmodel.TransactionReportViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
-import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportRequest
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.TransactionFilterHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class TransactionReportActivity : BaseActivity() {
 
     private lateinit var binding: ActivityTransactionReportBinding
+    private val viewModel: TransactionReportViewModel by viewModels()
     private lateinit var transactionAdp: TransactionAdp
     private lateinit var filterHelper: TransactionFilterHelper
 
@@ -101,20 +94,20 @@ class TransactionReportActivity : BaseActivity() {
 
     private fun setupFilterSheet() {
         filterHelper = TransactionFilterHelper(
-            activity    = mActivity,
+            activity     = mActivity,
             sheetBinding = binding.incFilterSheet,
-            bgOverlay   = binding.viewBg,
-            onApply     = { fromDate, toDate, status, consumerNo ->
+            bgOverlay    = binding.viewBg,
+            onApply      = { fromDate, toDate, status, consumerNo ->
                 callReport(fromDate, toDate, status, consumerNo)
             },
-            onClear     = {
+            onClear      = {
                 mAllList.clear()
                 mDisplayList.clear()
                 binding.etSearch.setText("")
                 transactionAdp.notifyDataSetChanged()
-                binding.tvEmpty.visibility = View.VISIBLE
+                binding.tvEmpty.visibility        = View.VISIBLE
                 binding.shimmerLayout.stopShimmer()
-                binding.shimmerLayout.visibility = View.GONE
+                binding.shimmerLayout.visibility  = View.GONE
                 binding.rvTransactions.visibility = View.VISIBLE
             }
         )
@@ -127,60 +120,25 @@ class TransactionReportActivity : BaseActivity() {
         status: String?,
         consumerNo: String?
     ) {
-        if (!Utility.isInternetAvailable(mActivity)) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
-            return
-        }
-        showShimmer(true)
-        val token   = "Bearer ${SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN, "")}"
-        val request = ElectricityTransactionReportRequest(fromDate, toDate, status, consumerNo)
-        ApiClient.apiService.getElectricityPaymentReport(token, request)
-            .enqueue(object : Callback<General<List<ElectricityTransactionReportDataItem>>> {
-                override fun onResponse(
-                    call: Call<General<List<ElectricityTransactionReportDataItem>>>,
-                    response: Response<General<List<ElectricityTransactionReportDataItem>>>
-                ) {
-                    showShimmer(false)
-                    mAllList.clear()
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        response.body()!!.data!!.forEachIndexed { index, item ->
-                            mAllList.add(
-                                TransactionItem(
-                                    mobileNumber   = item.customerName ?: "",
-                                    transactionId  = item.transactionId ?: "",
-                                    amount         = "₹%.2f".format(item.totalPayable),
-                                    status         = item.status ?: "",
-                                    categoryIconRes = R.drawable.ic_electricity,
-                                    username       = item.customerName ?: "",
-                                    date           = item.createdAt ?: "",
-                                    platformFee    = "₹%.2f".format(item.platformFee),
-                                    totalPayable   = "₹%.2f".format(item.totalPayable),
-                                    referenceId    = item.transactionId ?: "",
-                                    userId         = (index + 1).toString(),
-                                    accountNumber  = item.subscriberNo ?: "",
-                                    companyName    = if (!item.subservice.isNullOrEmpty()) item.subservice else item.operatorId ?: ""
-                                )
-                            )
-                        }
-                    } else {
-                        val msg = ApiHelper.parseErrorMessage(
-                            mActivity, response.code(), response.errorBody()?.string()
-                        )
-                        if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
-                    }
-                    filterList(binding.etSearch.text?.toString()?.trim() ?: "")
-                }
-
-                override fun onFailure(
-                    call: Call<General<List<ElectricityTransactionReportDataItem>>>,
-                    t: Throwable
-                ) {
-                    showShimmer(false)
-                    mAllList.clear()
-                    filterList("")
-                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.err_generic))
-                }
-            })
+        viewModel.getTransactionReport(
+            fromDate   = fromDate,
+            toDate     = toDate,
+            status     = status,
+            consumerNo = consumerNo,
+            onLoading  = { showShimmer(true) },
+            onSuccess  = { list ->
+                showShimmer(false)
+                mAllList.clear()
+                mAllList.addAll(list)
+                filterList(binding.etSearch.text?.toString()?.trim() ?: "")
+            },
+            onError    = { msg ->
+                showShimmer(false)
+                mAllList.clear()
+                filterList(binding.etSearch.text?.toString()?.trim() ?: "")
+                if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
+            }
+        )
     }
 
     private fun showShimmer(show: Boolean) {
@@ -208,8 +166,7 @@ class TransactionReportActivity : BaseActivity() {
             }
         }
         transactionAdp.notifyDataSetChanged()
-        binding.tvEmpty.visibility =
-            if (mDisplayList.isEmpty()) View.VISIBLE else View.GONE
+        binding.tvEmpty.visibility = if (mDisplayList.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun onBack() {

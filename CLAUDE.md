@@ -366,6 +366,38 @@ private val launcher = registerForActivityResult(
 
 ---
 
+### Intent Data Passing (Object Transfer Rule)
+
+**Always pass a single object between Activities as a JSON string — never as individual `putExtra` fields.**
+
+Serialize with `Gson().toJson(item)` into one `putExtra(EXTRA_ITEM, json)`. Deserialize lazily in the receiving Activity. This avoids fragile multi-field extraction and keeps the companion `start()` contract clean as the model evolves.
+
+```kotlin
+// Sender — companion object of the receiving Activity
+private const val EXTRA_ITEM = "extra_item"
+
+fun start(context: Context, item: MyItem) {
+    context.startActivity(
+        Intent(context, MyDetailActivity::class.java).apply {
+            putExtra(EXTRA_ITEM, Gson().toJson(item))
+        }
+    )
+}
+
+// Receiver — field in the Activity
+private val myItem: MyItem? by lazy {
+    intent.getStringExtra(EXTRA_ITEM)?.let { Gson().fromJson(it, MyItem::class.java) }
+}
+```
+
+**Rules:**
+- One extra key (`EXTRA_ITEM`) — never one `putExtra` call per field.
+- Declare `EXTRA_ITEM` as a `private const` in the companion object.
+- Access the lazy property in `onCreate()` or later — never before `super.onCreate()`.
+- Guard every function that uses the item with `val item = myItem ?: return`.
+
+---
+
 ### Bottom Sheet Pattern
 
 Use this pattern whenever a screen needs an in-place form or detail panel that slides up from the bottom. **Never use `Dialog` — always use `BottomSheetBehavior` embedded in the layout.**
