@@ -400,22 +400,7 @@ class ElectricityActivity : BaseActivity() {
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-546): Pass real transaction data once API is wired
-                    SmsReceiptActivity.start(
-                        context = mActivity,
-                        SmsReceiptItem(
-                            mobile = "9876543210",
-                            txnId = "BC88213045",
-                            amount = "₹149.00",
-                            status = "Success",
-                            username = "Ravi Kumar",
-                            date = "18-07-2026, 09:15 am",
-                            platformFee = "₹3.00",
-                            refId = "TXN10235",
-                            accountNo = "30723111936",
-                            companyName = "Paschim Gujarat Vij Company Ltd"
-                        )
-                    )
+                    SmsReceiptActivity.start(mActivity)
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener

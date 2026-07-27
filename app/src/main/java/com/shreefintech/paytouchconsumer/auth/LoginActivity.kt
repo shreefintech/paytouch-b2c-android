@@ -1,11 +1,17 @@
 package com.shreefintech.paytouchconsumer.auth
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
 import android.text.TextWatcher
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
@@ -72,7 +78,37 @@ class LoginActivity : BaseActivity() {
         onBack()
         setupInputFilters()
         setupMpinBoxes()
+        setupTermsText()
         updateToggleUi(LoginMode.PASSWORD)
+    }
+
+    private fun setupTermsText() {
+        val fullText = getString(R.string.labelTermsConditions)
+        val linkText = getString(R.string.termsLinkText)
+        val start = fullText.indexOf(linkText)
+        if (start < 0) {
+            binding.tvTerms.text = fullText
+            return
+        }
+        val spannable = SpannableString(fullText)
+        spannable.setSpan(
+            object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_PLATFORM_TERMS)))
+                }
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = ContextCompat.getColor(mActivity, R.color.primary)
+                    ds.isUnderlineText = true
+                }
+            },
+            start,
+            start + linkText.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        binding.tvTerms.text = spannable
+        binding.tvTerms.movementMethod = LinkMovementMethod.getInstance()
+        binding.tvTerms.highlightColor = ContextCompat.getColor(mActivity, android.R.color.transparent)
     }
 
     private fun onBack() {
@@ -212,6 +248,10 @@ class LoginActivity : BaseActivity() {
                 msg = getString(R.string.msgMpinInvalid)
                 listOf(binding.etMpin1, binding.etMpin2, binding.etMpin3, binding.etMpin4)
                     .firstOrNull { it.text.isNullOrEmpty() }?.requestFocus()
+            }
+
+            !binding.cbTerms.isChecked -> {
+                msg = getString(R.string.msgTermsNotAccepted)
             }
 
             else -> handleSignIn(mobile, credential)

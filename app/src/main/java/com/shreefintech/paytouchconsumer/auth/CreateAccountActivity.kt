@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.auth
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
@@ -19,6 +20,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.CreateAccountViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityCreateAccountBinding
@@ -95,7 +97,7 @@ class CreateAccountActivity : BaseActivity() {
 
         spannable.setSpan(object : ClickableSpan() {
             override fun onClick(widget: View) {
-                // TODO(PAYTOUCH-487): open terms & conditions URL
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_PLATFORM_TERMS)))
             }
 
             override fun updateDrawState(ds: TextPaint) {

@@ -18,6 +18,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -72,10 +73,10 @@ class SmsReceiptActivity : BaseActivity() {
         private const val TAB_RECEIPT = 0
         private const val TAB_DISPLAY = 1
 
-        fun start(context: Context, item: SmsReceiptItem, fromPayment: Boolean = false) {
+        fun start(context: Context, item: SmsReceiptItem? = null, fromPayment: Boolean = false) {
             context.startActivity(
                 Intent(context, SmsReceiptActivity::class.java).apply {
-                    putExtra(EXTRA_ITEM, Gson().toJson(item))
+                    item?.let { putExtra(EXTRA_ITEM, Gson().toJson(it)) }
                     putExtra(EXTRA_FROM_PAYMENT, fromPayment)
                 }
             )
@@ -185,8 +186,8 @@ class SmsReceiptActivity : BaseActivity() {
 
     private fun applyStatusStyle(status: String?) {
         val (bgColor, textColor) = when (status) {
-            "Success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
-            "Failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
+            "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
+            "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.toast_text_warning)
         }
         binding.cvReceiptStatusBadge.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
@@ -276,6 +277,8 @@ class SmsReceiptActivity : BaseActivity() {
             }
             startActivity(Intent.createChooser(intent, getString(R.string.titleShareReceipt)))
         } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("test26", "${e.message}")
             ToastUtil.showDelete(mActivity, getString(R.string.msgReceiptShareFailed))
         }
     }
