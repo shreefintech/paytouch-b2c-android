@@ -140,15 +140,15 @@ class SmsReceiptActivity : BaseActivity() {
 
     private fun populateData() {
         val item = receiptItem ?: return
-        binding.tvConsumerNo.text = item.accountNo
-        binding.tvCustomerName.text = item.username
-        binding.tvCompanyName.text = item.companyName
-        binding.tvReceiptDate.text = item.date
-        binding.tvAmountPaid.text = item.amount
-        binding.tvPaytouchTxnId.text = item.txnId
-        binding.tvBConnectTxnId.text = item.refId
-        binding.tvCcf.text = item.platformFee
-        binding.tvReceiptStatus.text = "● ${item.status}"
+        binding.tvConsumerNo.text = item.accountNo ?: "--"
+        binding.tvCustomerName.text = item.username ?: "--"
+        binding.tvCompanyName.text = item.companyName ?: "--"
+        binding.tvReceiptDate.text = item.date ?: "--"
+        binding.tvAmountPaid.text = item.amount ?: "--"
+        binding.tvPaytouchTxnId.text = item.txnId ?: "--"
+        binding.tvBConnectTxnId.text = item.refId ?: "--"
+        binding.tvCcf.text = item.platformFee ?: "--"
+        binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, item.status ?: "--")
         applyStatusStyle(item.status)
     }
 
@@ -167,7 +167,7 @@ class SmsReceiptActivity : BaseActivity() {
         binding.tvPaytouchTxnId.text = txnId
         binding.tvBConnectTxnId.text = item.ccf ?: "--"
         binding.tvCcf.text = item.platformFee ?: "--"
-        binding.tvReceiptStatus.text = "● $status"
+        binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, status)
         applyStatusStyle(status)
 
         val smsBodyText = getString(R.string.msgSmsBody, amount, consumerNo)
@@ -227,7 +227,9 @@ class SmsReceiptActivity : BaseActivity() {
     // ── Loading State ─────────────────────────────────────────
 
     private fun showReceiptLoading(show: Boolean) {
-        binding.pbReceiptLoading.visibility = if (show) View.VISIBLE else View.GONE
+        val visibility = if (show) View.VISIBLE else View.GONE
+        binding.pbReceiptLoading.visibility = visibility
+        binding.pbDisplayLoading.visibility = visibility
     }
 
     // ── Download & Share ──────────────────────────────────────
