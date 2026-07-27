@@ -14,11 +14,11 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
-import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
@@ -26,26 +26,16 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
+import com.shreefintech.paytouchconsumer.electricity.viewmodel.ElectricityViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
-import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.VpsBalanceItem
-import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -53,6 +43,7 @@ import java.util.Locale
 class ElectricityActivity : BaseActivity() {
 
     private lateinit var binding: ActivityElectricityBinding
+    private val viewModel: ElectricityViewModel by viewModels()
 
     private var operatorItems: List<ElectricityOperatorItem> = emptyList()
     private var selectedOperatorId: String? = null
@@ -62,8 +53,6 @@ class ElectricityActivity : BaseActivity() {
 
     private val showProgressFetch = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
-
-    private val adminHttpClient by lazy { okhttp3.OkHttpClient() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -173,197 +162,61 @@ class ElectricityActivity : BaseActivity() {
         binding.tvTerms.highlightColor = Color.TRANSPARENT
     }
 
-    // ── API Calls ─────────────────────────────────────────────────────────────
+    // ── API Calls (via ViewModel) ─────────────────────────────────────────────
 
     private fun loadOperators() {
-        if (!Utility.isInternetAvailable(mActivity)) return
-        setOperatorLoading(true)
-        ApiClient.apiService.getElectricityOperators(bearerToken())
-            .enqueue(object : Callback<General<List<ElectricityOperatorItem>>> {
-                override fun onResponse(
-                    call: Call<General<List<ElectricityOperatorItem>>>,
-                    response: Response<General<List<ElectricityOperatorItem>>>
-                ) {
-                    setOperatorLoading(false)
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        operatorItems = response.body()!!.data!!
-                    } else {
-                        ToastUtil.showDelete(
-                            mActivity,
-                            ApiHelper.parseErrorMessage(
-                                mActivity, response.code(), response.errorBody()?.string()
-                            )
-                        )
-                    }
-                }
-                override fun onFailure(
-                    call: Call<General<List<ElectricityOperatorItem>>>,
-                    t: Throwable
-                ) {
-                    setOperatorLoading(false)
-                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.err_generic))
-                }
-            })
+        viewModel.loadOperators(
+            onLoading = { setOperatorLoading(true) },
+            onSuccess = { operators ->
+                setOperatorLoading(false)
+                operatorItems = operators
+            },
+            onError = { msg ->
+                setOperatorLoading(false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
     }
 
     private fun fetchBill(connectionNumber: String) {
-        if (!Utility.isInternetAvailable(mActivity)) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
-            return
-        }
-        showProgressFetch.set(true)
-        val request = ElectricityFetchBillRequest(
+        viewModel.fetchBill(
             connectionNumber = connectionNumber,
             operatorId = selectedOperatorId ?: "",
-            circleId = "00"
+            onLoading = { showProgressFetch.set(true) },
+            onSuccess = { bill ->
+                showProgressFetch.set(false)
+                fetchedBillItem = bill
+                billFetched = true
+                showBillDetails()
+            },
+            onError = { msg ->
+                showProgressFetch.set(false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
         )
-        ApiClient.apiService.fetchElectricityBill(bearerToken(), request)
-            .enqueue(object : Callback<General<List<ElectricityBillItem>>> {
-                override fun onResponse(
-                    call: Call<General<List<ElectricityBillItem>>>,
-                    response: Response<General<List<ElectricityBillItem>>>
-                ) {
-                    showProgressFetch.set(false)
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        val bill = response.body()!!.data!!.firstOrNull()
-                        if (bill != null) {
-                            fetchedBillItem = bill
-                            billFetched = true
-                            showBillDetails()
-                        } else {
-                            ToastUtil.showDelete(mActivity, getString(R.string.err_generic))
-                        }
-                    } else {
-                        ToastUtil.showDelete(
-                            mActivity,
-                            ApiHelper.parseErrorMessage(
-                                mActivity, response.code(), response.errorBody()?.string()
-                            )
-                        )
-                    }
-                }
-                override fun onFailure(call: Call<General<List<ElectricityBillItem>>>, t: Throwable) {
-                    showProgressFetch.set(false)
-                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.err_generic))
-                }
-            })
     }
 
     private fun verifyBalanceAndProcessPayment() {
         val amount = binding.etAmount.text?.toString()?.trim()?.toDoubleOrNull() ?: 0.0
         val fee = Utility.calculatePlatformFee(amount)
         val total = amount + fee
-        showProgressPay.set(true)
-        checkVpsBalance(total) { processPayment(amount, fee, total) }
-    }
-
-    private fun checkVpsBalance(totalPayable: Double, onSufficient: () -> Unit) {
-        val userId = SharedPreferenceHelper.getSharedPreferenceString(
-            mActivity, Constant.KEY_USER_ID, ""
-        ) ?: ""
-        val url = "${Constant.BASE_URL_ADMIN}balance.php?id=$userId"
-        val request = okhttp3.Request.Builder().url(url).build()
-        adminHttpClient.newCall(request).enqueue(object : okhttp3.Callback {
-            override fun onFailure(call: okhttp3.Call, e: IOException) {
-                runOnUiThread {
-                    if (!isFinishing) checkWalletBalance(totalPayable, onSufficient)
-                }
-            }
-            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                val body = response.body?.string()
-                runOnUiThread {
-                    if (isFinishing) return@runOnUiThread
-                    try {
-                        val item = Gson().fromJson(body, VpsBalanceItem::class.java)
-                        val balance = item?.balance?.toDoubleOrNull() ?: 0.0
-                        if (balance >= totalPayable) onSufficient()
-                        else checkWalletBalance(totalPayable, onSufficient)
-                    } catch (e: Exception) {
-                        checkWalletBalance(totalPayable, onSufficient)
-                    }
-                }
-            }
-        })
-    }
-
-    private fun checkWalletBalance(totalPayable: Double, onSufficient: () -> Unit) {
-        if (!Utility.isInternetAvailable(mActivity)) {
-            showProgressPay.set(false)
-            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
-            return
-        }
-        ApiClient.apiService.getUserWalletData(bearerToken())
-            .enqueue(object : Callback<General<WalletDataItem>> {
-                override fun onResponse(
-                    call: Call<General<WalletDataItem>>,
-                    response: Response<General<WalletDataItem>>
-                ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        val balance =
-                            response.body()!!.data!!.walletBalance?.toDoubleOrNull() ?: 0.0
-                        if (balance >= totalPayable) {
-                            onSufficient()
-                        } else {
-                            showProgressPay.set(false)
-                            ToastUtil.showDelete(
-                                mActivity, getString(R.string.msgInsufficientBalance)
-                            )
-                        }
-                    } else {
-                        showProgressPay.set(false)
-                        ToastUtil.showDelete(
-                            mActivity,
-                            ApiHelper.parseErrorMessage(
-                                mActivity, response.code(), response.errorBody()?.string()
-                            )
-                        )
-                    }
-                }
-                override fun onFailure(call: Call<General<WalletDataItem>>, t: Throwable) {
-                    showProgressPay.set(false)
-                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.err_generic))
-                }
-            })
-    }
-
-    private fun processPayment(amount: Double, fee: Double, total: Double) {
-        if (!Utility.isInternetAvailable(mActivity)) {
-            showProgressPay.set(false)
-            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
-            return
-        }
         val connectionNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
-        val request = ElectricityProcessPaymentRequest(
+        viewModel.verifyAndPay(
             connectionNumber = connectionNumber,
             operatorId = selectedOperatorId ?: "",
-            circleId = "00",
             amount = amount,
-            platformFee = fee,
-            totalPayable = total
+            fee = fee,
+            total = total,
+            onLoading = { showProgressPay.set(true) },
+            onSuccess = { paymentItem ->
+                showProgressPay.set(false)
+                navigateToReceipt(amount, fee, paymentItem)
+            },
+            onError = { msg ->
+                showProgressPay.set(false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
         )
-        ApiClient.apiService.processElectricityPayment(bearerToken(), request)
-            .enqueue(object : Callback<ElectricityPaymentItem> {
-                override fun onResponse(
-                    call: Call<ElectricityPaymentItem>,
-                    response: Response<ElectricityPaymentItem>
-                ) {
-                    showProgressPay.set(false)
-                    val body = response.body()
-                    if (response.isSuccessful && body?.success == true) {
-                        navigateToReceipt(amount, fee, body)
-                    } else {
-                        val errMsg = body?.message
-                            ?: ApiHelper.parseErrorMessage(
-                                mActivity, response.code(), response.errorBody()?.string()
-                            )
-                        ToastUtil.showDelete(mActivity, errMsg)
-                    }
-                }
-                override fun onFailure(call: Call<ElectricityPaymentItem>, t: Throwable) {
-                    showProgressPay.set(false)
-                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.err_generic))
-                }
-            })
     }
 
     private fun navigateToReceipt(amount: Double, fee: Double, paymentItem: ElectricityPaymentItem) {
@@ -447,13 +300,6 @@ class ElectricityActivity : BaseActivity() {
         binding.tvPlatformFee.setTextColor(hintColor)
         binding.tvTotalPayable.text = getString(R.string.hintTotalPayable)
         binding.tvTotalPayable.setTextColor(hintColor)
-    }
-
-    private fun bearerToken(): String {
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            mActivity, Constant.KEY_TOKEN, ""
-        ) ?: ""
-        return "Bearer $token"
     }
 
     // ── Actions ───────────────────────────────────────────────────────────────

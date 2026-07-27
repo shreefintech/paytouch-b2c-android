@@ -110,8 +110,8 @@ Use one store, accessed through `SharedPreferenceHelper`. Do not call `getShared
 **DON'T create multiple Retrofit instances for the same base URL.**
 One `ApiClient` per distinct base URL. If a second distinct backend is needed (e.g., VPS admin), create exactly one named client for it — not a new instance for each screen.
 
-**DON'T hardcode any URL, key, or token in Activity/ViewModel code.**
-All constants belong in `Constant.kt`. Especially: no hardcoded development URLs (ngrok, localhost) in any file that will be compiled for production.
+**DON'T hardcode any active URL, key, or token in Activity/ViewModel code.**
+All constants belong in `Constant.kt`. Commented-out development reference URLs (e.g. ngrok, localhost) inside `Constant.kt` are acceptable and must not be removed — they serve as reference during development.
 
 **DON'T store a static mutable field for a token or shared state.**
 Storing a dynamic token in a `companion object` or `static` field is a race condition anti-pattern. Use `SharedPreferenceHelper` or a Repository singleton.
