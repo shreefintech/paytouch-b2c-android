@@ -1,13 +1,11 @@
 package com.shreefintech.paytouchconsumer.electricity.viewmodel
 
 import android.app.Application
-import android.os.Handler
-import android.os.Looper
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
-import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.retrofit.ApiAdminClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -20,21 +18,11 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityP
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
-import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.IOException
 
 class ElectricityViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val adminHttpClient = OkHttpClient()
-    private val mainHandler = Handler(Looper.getMainLooper())
-
-    override fun onCleared() {
-        super.onCleared()
-        adminHttpClient.dispatcher.executorService.shutdown()
-    }
 
     // ── Public API ────────────────────────────────────────────────────────────
 
@@ -43,7 +31,10 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
         onSuccess: (List<ElectricityOperatorItem>) -> Unit,
         onError: (String) -> Unit
     ) {
-        if (!Utility.isInternetAvailable(getApplication())) return
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
         onLoading()
         ApiClient.apiService.getElectricityOperators(bearerToken())
             .enqueue(object : Callback<General<List<ElectricityOperatorItem>>> {
@@ -142,26 +133,18 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
         onSufficient: () -> Unit,
         onFallback: () -> Unit
     ) {
-        val url = "${Constant.BASE_URL_ADMIN}balance.php?id=$userId"
-        val request = okhttp3.Request.Builder().url(url).build()
-        adminHttpClient.newCall(request).enqueue(object : okhttp3.Callback {
-            override fun onFailure(call: okhttp3.Call, e: IOException) {
-                mainHandler.post { onFallback() }
-            }
-
-            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                val body = response.body?.string()
-                mainHandler.post {
-                    try {
-                        val item = Gson().fromJson(body, VpsBalanceItem::class.java)
-                        val balance = item?.balance?.toDoubleOrNull() ?: 0.0
-                        if (balance >= totalPayable) onSufficient() else onFallback()
-                    } catch (e: Exception) {
-                        onFallback()
-                    }
+        ApiAdminClient.apiService.getVpsBalance(userId)
+            .enqueue(object : Callback<VpsBalanceItem> {
+                override fun onResponse(call: Call<VpsBalanceItem>, response: Response<VpsBalanceItem>) {
+                    val balance = response.body()?.balance?.toDoubleOrNull() ?: 0.0
+                    if (response.isSuccessful && balance >= totalPayable) onSufficient()
+                    else onFallback()
                 }
-            }
-        })
+
+                override fun onFailure(call: Call<VpsBalanceItem>, t: Throwable) {
+                    onFallback()
+                }
+            })
     }
 
     private fun checkWalletBalance(
