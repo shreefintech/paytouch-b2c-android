@@ -227,9 +227,7 @@ class LoginActivity : BaseActivity() {
                 }
                 binding.llSignIn -> {
                     if (Utility.stopClick()) return@OnClickListener
-
                     // TODO(PAYTOUCH-514): replace with onNext() once login API is wired
-                    /*onNext()*/
                     startActivity(Intent(mActivity, UploadKycActivity::class.java))
                 }
                 binding.tvForgotPassword -> {
@@ -243,7 +241,7 @@ class LoginActivity : BaseActivity() {
                 }
                 binding.llCreateAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(android.content.Intent(mActivity, CreateAccountActivity::class.java))
+                    startActivity(Intent(mActivity, CreateAccountActivity::class.java))
                 }
                 binding.ivPasswordToggle -> {
                     togglePasswordVisibility()

@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.onboarding
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -19,6 +20,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.onboarding.viewmodel.CreateVirtualAccountViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityCreateVirtualAccountBinding
@@ -315,26 +317,18 @@ class CreateVirtualAccountActivity : BaseActivity() {
         else -> null
     }
 
+    // TODO(PAYTOUCH-520): onSubmit() is intentionally unreachable — llCreateVirtualAccount navigates directly to HomeActivity pending virtual-account API wiring; restore this call once the API is connected.
     private fun onSubmit() {
         // TODO(PAYTOUCH-514): re-enable validate() once virtual account API is wired
 //        if (!validate()) return
 
-        val aadharFrontUri = uploadUris[0] ?: run {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelAadharFront)))
-            return
-        }
-        val aadharBackUri = uploadUris[1] ?: run {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelAadharBack)))
-            return
-        }
-        val panUri = uploadUris[2] ?: run {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelPanUpload)))
-            return
-        }
-        val proofUri = uploadUris[3] ?: run {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgDocumentRequired, getString(R.string.labelProof)))
-            return
-        }
+        val docMsg = validateDocuments()
+        if (docMsg != null) { ToastUtil.showDelete(mActivity, docMsg); return }
+
+        val aadharFrontUri = uploadUris[0] ?: return
+        val aadharBackUri  = uploadUris[1] ?: return
+        val panUri         = uploadUris[2] ?: return
+        val proofUri       = uploadUris[3] ?: return
 
         viewModel.submitVirtualAccount(
             fullName       = binding.etFullName.text?.toString()?.trim()    ?: "",
@@ -423,7 +417,8 @@ class CreateVirtualAccountActivity : BaseActivity() {
 
                 binding.llCreateVirtualAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    onSubmit()
+                    // TODO(PAYTOUCH-514): replace with onSubmit() once virtual account API is wired
+                    startActivity(Intent(mActivity, HomeActivity::class.java))
                 }
             }
         }

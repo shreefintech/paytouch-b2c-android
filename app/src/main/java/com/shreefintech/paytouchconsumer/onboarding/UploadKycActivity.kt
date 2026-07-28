@@ -135,7 +135,11 @@ class UploadKycActivity : BaseActivity() {
     private fun calculateAge(dob: Calendar): Int {
         val today = Calendar.getInstance()
         var age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR)
-        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) age--
+        val notYetHadBirthday =
+            today.get(Calendar.MONTH) < dob.get(Calendar.MONTH) ||
+            (today.get(Calendar.MONTH) == dob.get(Calendar.MONTH) &&
+             today.get(Calendar.DAY_OF_MONTH) < dob.get(Calendar.DAY_OF_MONTH))
+        if (notYetHadBirthday) age--
         return age
     }
 
@@ -240,7 +244,6 @@ class UploadKycActivity : BaseActivity() {
                 binding.llSubmit -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-514): replace with onSubmitKyc() once KYC API is wired
-//                    onSubmitKyc()
                     startActivity(Intent(mActivity, CreateVirtualAccountActivity::class.java))
                     finish()
                 }
