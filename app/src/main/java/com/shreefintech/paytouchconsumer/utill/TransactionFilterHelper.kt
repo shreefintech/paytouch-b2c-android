@@ -54,19 +54,41 @@ class TransactionFilterHelper(
             }
         })
 
-        bgOverlay.setOnClickListener { hide() }
-        sheetBinding.ivClose.setOnClickListener { hide() }
+        sheetBinding.ivClose.setOnClickListener {
+            hide()
+        }
 
         sheetBinding.cvSelectFromDate.setOnClickListener {
-            showDatePicker(sheetBinding.tvFromDate) { date -> selectedFromDate = date }
+            Utility.hideKeyboard(activity)
+            val today = Calendar.getInstance()
+            val maxCal = parseDate(selectedToDate) ?: today
+            showDatePicker(
+                textView        = sheetBinding.tvFromDate,
+                preSelectedDate = selectedFromDate,
+                minCal          = null,
+                maxCal          = maxCal
+            ) { date -> selectedFromDate = date }
         }
         sheetBinding.cvSelectToDate.setOnClickListener {
-            showDatePicker(sheetBinding.tvToDate) { date -> selectedToDate = date }
+            Utility.hideKeyboard(activity)
+            showDatePicker(
+                textView        = sheetBinding.tvToDate,
+                preSelectedDate = selectedToDate,
+                minCal          = parseDate(selectedFromDate),
+                maxCal          = Calendar.getInstance()
+            ) { date -> selectedToDate = date }
         }
-        sheetBinding.cvSelectEntries.setOnClickListener { showStatusDropdown() }
+        sheetBinding.cvSelectEntries.setOnClickListener {
+            Utility.hideKeyboard(activity)
+            showStatusDropdown()
+        }
 
-        sheetBinding.btnReset.setOnClickListener { clearFilter() }
-        sheetBinding.btnApply.setOnClickListener { applyFilter() }
+        sheetBinding.btnReset.setOnClickListener {
+            clearFilter()
+        }
+        sheetBinding.btnApply.setOnClickListener {
+            applyFilter()
+        }
     }
 
     // ─── Show / Hide ─────────────────────────────────────────────────────────
@@ -77,6 +99,7 @@ class TransactionFilterHelper(
     }
 
     fun hide() {
+        Utility.hideKeyboard(activity)
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
@@ -84,9 +107,15 @@ class TransactionFilterHelper(
 
     // ─── Date picker ─────────────────────────────────────────────────────────
 
-    private fun showDatePicker(textView: AppCompatTextView, onSelected: (String) -> Unit) {
-        val cal = Calendar.getInstance()
-        DatePickerDialog(
+    private fun showDatePicker(
+        textView: AppCompatTextView,
+        preSelectedDate: String?,
+        minCal: Calendar?,
+        maxCal: Calendar,
+        onSelected: (String) -> Unit
+    ) {
+        val initCal = parseDate(preSelectedDate) ?: Calendar.getInstance()
+        val dialog = DatePickerDialog(
             activity,
             R.style.Paytouch_DatePickerTheme,
             { _, year, month, day ->
@@ -94,10 +123,26 @@ class TransactionFilterHelper(
                 textView.text = formatted
                 onSelected(formatted)
             },
-            cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH),
-            cal.get(Calendar.DAY_OF_MONTH)
-        ).show()
+            initCal.get(Calendar.YEAR),
+            initCal.get(Calendar.MONTH),
+            initCal.get(Calendar.DAY_OF_MONTH)
+        )
+        minCal?.let { dialog.datePicker.minDate = it.timeInMillis }
+        dialog.datePicker.maxDate = maxCal.timeInMillis
+        dialog.show()
+    }
+
+    private fun parseDate(dateStr: String?): Calendar? {
+        if (dateStr.isNullOrEmpty()) return null
+        return try {
+            val parts = dateStr.split("-")
+            Calendar.getInstance().apply {
+                set(parts[0].toInt(), parts[1].toInt() - 1, parts[2].toInt(), 0, 0, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+        } catch (e: Exception) {
+            null
+        }
     }
 
     // ─── Status dropdown ─────────────────────────────────────────────────────
@@ -121,13 +166,8 @@ class TransactionFilterHelper(
         val fromDateSet = !selectedFromDate.isNullOrEmpty()
         val toDateSet = !selectedToDate.isNullOrEmpty()
 
-        if (fromDateSet != toDateSet) {
-            ToastUtil.showDelete(activity, activity.getString(R.string.msgSelectBothDates))
-            return
-        }
-
-        // Status alone does not count as a filter
-        if (consumerNo.isEmpty() && !fromDateSet) {
+        val hasAnyFilter = fromDateSet || toDateSet || consumerNo.isNotEmpty() || selectedStatus != null
+        if (!hasAnyFilter) {
             ToastUtil.showDelete(activity, activity.getString(R.string.msgSelectAtLeastOneFilter))
             return
         }

@@ -67,7 +67,7 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
 
     private fun mapToTransactionItem(index: Int, item: ElectricityTransactionReportDataItem): TransactionItem {
         return TransactionItem(
-            mobileNumber    = "",
+            mobileNumber    = item.consumerNo ?: "--",
             transactionId   = item.transactionId ?: "--",
             amount          = "₹%.2f".format(item.totalPayable ?: 0.0),
             status          = item.status ?: "--",
@@ -78,7 +78,7 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
             totalPayable    = "₹%.2f".format(item.totalPayable ?: 0.0),
             referenceId     = item.transactionId ?: "--",
             userId          = (index + 1).toString(),
-            accountNumber   = item.subscriberNo ?: "--",
+            accountNumber   = item.consumerNo ?: "--",
             companyName     = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--"
         )
     }

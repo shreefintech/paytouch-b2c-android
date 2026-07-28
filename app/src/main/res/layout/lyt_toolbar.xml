@@ -20,6 +20,7 @@
             android:layout_margin="@dimen/margin_medium"
             android:onClick="@{onClickListener}"
             android:src="@drawable/iv_back"
+            android:background="?selectableItemBackground"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>

@@ -72,21 +72,30 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvUsername.text      = getString(R.string.labelUsernameFmt, item.username)
         binding.tvInfoAmount.text    = item.amount
         binding.tvStatus.text        = item.status
-        binding.tvDate.text          = item.date
+        binding.tvDate.text          = formatDate(item.date)
         binding.tvPaymentAmount.text = item.amount
         binding.tvPlatformFee.text   = item.platformFee
         binding.tvTotalPayable.text  = item.totalPayable
         binding.tvTransactionId.text = item.transactionId
-        binding.tvReferenceId.text   = item.referenceId
-        binding.tvUserId.text        = item.userId
+
 
         val (bgColor, textColor) = when (item.status) {
-            "Success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
-            "Failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
+            "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
+            "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.orange)
         }
         binding.cvStatus.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
         binding.tvStatus.setTextColor(ContextCompat.getColor(mActivity, textColor))
+    }
+
+    private fun formatDate(raw: String?): String {
+        if (raw.isNullOrBlank()) return "--"
+        return try {
+            val parts = raw.substringBefore("T").split("-")
+            "${parts[2]}/${parts[1]}/${parts[0]}"
+        } catch (e: Exception) {
+            raw
+        }
     }
 
     private fun openSmsReceipt() {

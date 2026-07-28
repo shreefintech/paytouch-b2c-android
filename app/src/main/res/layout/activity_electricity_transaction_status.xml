@@ -109,7 +109,7 @@
                         android:paddingEnd="@dimen/margin_small_medium"
                         android:singleLine="true"
                         android:textColor="@color/black"
-                        android:textColorHint="#80000000"
+                        android:textColorHint="?attr/colorTextSubtitle"
                         android:textSize="@dimen/text_size_13" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -203,7 +203,7 @@
                 android:fontFamily="@font/proza_libre_medium"
                 android:includeFontPadding="false"
                 android:text="@string/msgNoTransactionsFound"
-                android:textColor="#80000000"
+                android:textColor="?attr/colorTextSubtitle"
                 android:textSize="@dimen/text_size_14"
                 android:visibility="visible" />
 

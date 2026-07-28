@@ -46,7 +46,8 @@ class TransactionReportActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
-            binding.incFilterSheet.root.setPadding(0, 0, 0, systemBars.bottom)
+
+            binding.incFilterSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
             insets
         }
 
@@ -104,11 +105,7 @@ class TransactionReportActivity : BaseActivity() {
                 mAllList.clear()
                 mDisplayList.clear()
                 binding.etSearch.setText("")
-                transactionAdp.notifyDataSetChanged()
-                binding.tvEmpty.visibility        = View.VISIBLE
-                binding.shimmerLayout.stopShimmer()
-                binding.shimmerLayout.visibility  = View.GONE
-                binding.rvTransactions.visibility = View.VISIBLE
+                callReport(null, null, null, null)
             }
         )
         filterHelper.setup()

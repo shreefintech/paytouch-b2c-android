@@ -84,108 +84,143 @@
                             android:layout_marginTop="@dimen/margin_large"
                             android:orientation="horizontal">
 
-                            <LinearLayout
-                                android:id="@+id/llElectricity"
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:layout_marginEnd="@dimen/margin_small"
-                                android:background="@drawable/bg_category_item"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="vertical"
-                                android:paddingTop="@dimen/margin_medium"
-                                android:paddingBottom="@dimen/margin_medium"
-                                android:paddingStart="@dimen/margin_small"
-                                android:paddingEnd="@dimen/margin_small">
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
+                                android:layout_marginEnd="@dimen/margin_small">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/category_icon_size"
-                                    android:layout_height="@dimen/category_icon_size"
-                                    android:layout_gravity="center"
-                                    android:background="@drawable/bg_toggle_selected"
-                                    android:src="@drawable/ic_electricity"/>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:id="@+id/llElectricity"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/margin_small"
-                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:background="?selectableItemBackground"
                                     android:gravity="center"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/categoryElectricity"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_11" />
-                            </LinearLayout>
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="vertical"
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingBottom="@dimen/margin_medium"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/margin_small">
 
-                            <LinearLayout
-                                android:id="@+id/llGas"
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="@dimen/category_icon_size"
+                                        android:layout_height="@dimen/category_icon_size"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:src="@drawable/ic_electricity"/>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryElectricity"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+
+
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
                                 android:layout_marginStart="@dimen/margin_small"
-                                android:layout_marginEnd="@dimen/margin_small"
-                                android:background="@drawable/bg_category_item"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="vertical"
-                                android:paddingTop="@dimen/margin_medium"
-                                android:paddingBottom="@dimen/margin_medium"
-                                android:paddingStart="@dimen/margin_small"
-                                android:paddingEnd="@dimen/margin_small">
+                                android:layout_marginEnd="@dimen/margin_small">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/category_icon_size"
-                                    android:layout_height="@dimen/category_icon_size"
-                                    android:layout_gravity="center"
-                                    android:background="@drawable/bg_toggle_selected"
-                                    android:src="@drawable/ic_gas"/>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:id="@+id/llGas"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/margin_small"
-                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:background="?selectableItemBackground"
                                     android:gravity="center"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/categoryGas"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_11" />
-                            </LinearLayout>
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="vertical"
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingBottom="@dimen/margin_medium"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/margin_small">
 
-                            <LinearLayout
-                                android:id="@+id/llPrepaid"
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="@dimen/category_icon_size"
+                                        android:layout_height="@dimen/category_icon_size"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:src="@drawable/ic_gas"/>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryGas"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+
+
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
                                 android:layout_marginStart="@dimen/margin_small"
-                                android:background="@drawable/bg_category_item"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="vertical"
-                                android:paddingTop="@dimen/margin_medium"
-                                android:paddingBottom="@dimen/margin_medium"
-                                android:paddingStart="@dimen/margin_small"
-                                android:paddingEnd="@dimen/margin_small">
+                                android:layout_marginEnd="@dimen/margin_small">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/category_icon_size"
-                                    android:layout_height="@dimen/category_icon_size"
-                                    android:background="@drawable/bg_toggle_selected"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_prepaid"/>
 
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:id="@+id/llPrepaid"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/margin_small"
-                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:background="?selectableItemBackground"
                                     android:gravity="center"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/categoryPrepaid"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_11" />
-                            </LinearLayout>
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="vertical"
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingBottom="@dimen/margin_medium"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/margin_small">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="@dimen/category_icon_size"
+                                        android:layout_height="@dimen/category_icon_size"
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_prepaid"/>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryPrepaid"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+
+                            </com.google.android.material.card.MaterialCardView>
 
                         </LinearLayout>
 
@@ -196,108 +231,141 @@
                             android:layout_marginTop="@dimen/margin_extra_large"
                             android:orientation="horizontal">
 
-                            <LinearLayout
-                                android:id="@+id/llTvCable"
+
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:layout_marginEnd="@dimen/margin_small"
-                                android:background="@drawable/bg_category_item"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="vertical"
-                                android:paddingTop="@dimen/margin_medium"
-                                android:paddingBottom="@dimen/margin_medium"
-                                android:paddingStart="@dimen/margin_small"
-                                android:paddingEnd="@dimen/margin_small">
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
+                                android:layout_marginEnd="@dimen/margin_small">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/category_icon_size"
-                                    android:layout_height="@dimen/category_icon_size"
-                                    android:layout_gravity="center"
-                                    android:background="@drawable/bg_toggle_selected"
-                                    android:src="@drawable/ic_tv"/>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:id="@+id/llTvCable"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/margin_small"
-                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:background="?selectableItemBackground"
                                     android:gravity="center"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/categoryTvCable"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_11" />
-                            </LinearLayout>
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="vertical"
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingBottom="@dimen/margin_medium"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/margin_small">
 
-                            <LinearLayout
-                                android:id="@+id/llDth"
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="@dimen/category_icon_size"
+                                        android:layout_height="@dimen/category_icon_size"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:src="@drawable/ic_tv"/>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryTvCable"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
                                 android:layout_marginStart="@dimen/margin_small"
-                                android:layout_marginEnd="@dimen/margin_small"
-                                android:background="@drawable/bg_category_item"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="vertical"
-                                android:paddingTop="@dimen/margin_medium"
-                                android:paddingBottom="@dimen/margin_medium"
-                                android:paddingStart="@dimen/margin_small"
-                                android:paddingEnd="@dimen/margin_small">
+                                android:layout_marginEnd="@dimen/margin_small">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/category_icon_size"
-                                    android:layout_height="@dimen/category_icon_size"
-                                    android:layout_gravity="center"
-                                    android:background="@drawable/bg_toggle_selected"
-                                    android:src="@drawable/ic_broadband"/>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:id="@+id/llDth"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/margin_small"
-                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:background="?selectableItemBackground"
                                     android:gravity="center"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/categoryDth"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_11" />
-                            </LinearLayout>
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="vertical"
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingBottom="@dimen/margin_medium"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/margin_small">
 
-                            <LinearLayout
-                                android:id="@+id/llFastag"
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="@dimen/category_icon_size"
+                                        android:layout_height="@dimen/category_icon_size"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:src="@drawable/ic_broadband"/>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryDth"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
                                 android:layout_marginStart="@dimen/margin_small"
-                                android:background="@drawable/bg_category_item"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="vertical"
-                                android:paddingTop="@dimen/margin_medium"
-                                android:paddingBottom="@dimen/margin_medium"
-                                android:paddingStart="@dimen/margin_small"
-                                android:paddingEnd="@dimen/margin_small">
+                                android:layout_marginEnd="@dimen/margin_small">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/category_icon_size"
-                                    android:layout_height="@dimen/category_icon_size"
-                                    android:layout_gravity="center"
-                                    android:background="@drawable/bg_toggle_selected"
-                                    android:src="@drawable/ic_fastag"/>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:id="@+id/llFastag"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/margin_small"
-                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:background="?selectableItemBackground"
                                     android:gravity="center"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/categoryFastag"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_11" />
-                            </LinearLayout>
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="vertical"
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingBottom="@dimen/margin_medium"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/margin_small">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="@dimen/category_icon_size"
+                                        android:layout_height="@dimen/category_icon_size"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:src="@drawable/ic_fastag"/>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryFastag"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+
 
                         </LinearLayout>
 
@@ -308,108 +376,139 @@
                             android:layout_marginTop="@dimen/margin_extra_large"
                             android:orientation="horizontal">
 
-                            <LinearLayout
-                                android:id="@+id/llLoan"
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:layout_marginEnd="@dimen/margin_small"
-                                android:background="@drawable/bg_category_item"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="vertical"
-                                android:paddingTop="@dimen/margin_medium"
-                                android:paddingBottom="@dimen/margin_medium"
-                                android:paddingStart="@dimen/margin_small"
-                                android:paddingEnd="@dimen/margin_small">
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
+                                android:layout_marginEnd="@dimen/margin_small">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/category_icon_size"
-                                    android:layout_height="@dimen/category_icon_size"
-                                    android:layout_gravity="center"
-                                    android:background="@drawable/bg_toggle_selected"
-                                    android:src="@drawable/ic_loan"/>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:id="@+id/llLoan"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/margin_small"
-                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:background="?selectableItemBackground"
                                     android:gravity="center"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/categoryLoan"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_11" />
-                            </LinearLayout>
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="vertical"
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingBottom="@dimen/margin_medium"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/margin_small">
 
-                            <LinearLayout
-                                android:id="@+id/llMyAccount"
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="@dimen/category_icon_size"
+                                        android:layout_height="@dimen/category_icon_size"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:src="@drawable/ic_loan"/>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryLoan"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
                                 android:layout_marginStart="@dimen/margin_small"
-                                android:layout_marginEnd="@dimen/margin_small"
-                                android:background="@drawable/bg_category_item"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="vertical"
-                                android:paddingTop="@dimen/margin_medium"
-                                android:paddingBottom="@dimen/margin_medium"
-                                android:paddingStart="@dimen/margin_small"
-                                android:paddingEnd="@dimen/margin_small">
+                                android:layout_marginEnd="@dimen/margin_small">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/category_icon_size"
-                                    android:layout_height="@dimen/category_icon_size"
-                                    android:layout_gravity="center"
-                                    android:background="@drawable/bg_toggle_selected"
-                                    android:src="@drawable/ic_profile" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:id="@+id/llMyAccount"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/margin_small"
-                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:background="?selectableItemBackground"
                                     android:gravity="center"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/categoryMyAccount"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_11" />
-                            </LinearLayout>
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="vertical"
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingBottom="@dimen/margin_medium"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/margin_small">
 
-                            <LinearLayout
-                                android:id="@+id/llTax"
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="@dimen/category_icon_size"
+                                        android:layout_height="@dimen/category_icon_size"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:src="@drawable/ic_profile" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryMyAccount"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
                                 android:layout_marginStart="@dimen/margin_small"
-                                android:background="@drawable/bg_category_item"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="vertical"
-                                android:paddingTop="@dimen/margin_medium"
-                                android:paddingBottom="@dimen/margin_medium"
-                                android:paddingStart="@dimen/margin_small"
-                                android:paddingEnd="@dimen/margin_small">
+                                android:layout_marginEnd="@dimen/margin_small">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/category_icon_size"
-                                    android:layout_height="@dimen/category_icon_size"
-                                    android:layout_gravity="center"
-                                    android:background="@drawable/bg_toggle_selected"
-                                    android:src="@drawable/ic_tax" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:id="@+id/llTax"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/margin_small"
-                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:background="?selectableItemBackground"
                                     android:gravity="center"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/categoryTax"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_11" />
-                            </LinearLayout>
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="vertical"
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingBottom="@dimen/margin_medium"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/margin_small">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="@dimen/category_icon_size"
+                                        android:layout_height="@dimen/category_icon_size"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:src="@drawable/ic_tax" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryTax"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
 
                         </LinearLayout>
 
@@ -428,11 +527,13 @@
                     android:onClickListener="@{onClickListener}"
                     app:cardBackgroundColor="@color/primary"
                     app:cardCornerRadius="16dp"
+                    app:strokeWidth="0dp"
                     app:cardElevation="0dp">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:background="?selectableItemBackground"
                         android:clipChildren="true">
 
                         <!-- Decorative wallet illustration clipped on right -->

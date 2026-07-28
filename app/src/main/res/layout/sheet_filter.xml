@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bottom_sheet_bg"
         android:clipToPadding="false"
-        android:onClick="@null"
+        android:clickable="true"
         app:behavior_hideable="true"
         app:behavior_peekHeight="0dp"
         app:behavior_skipCollapsed="true"
@@ -102,6 +102,7 @@
                             android:ellipsize="end"
                             android:fontFamily="@font/proza_libre_regular"
                             android:hint="@string/dateHint"
+                            android:textColorHint="?attr/colorTextHint"
                             android:singleLine="true"
                             android:textColor="@color/primary"
                             android:textSize="@dimen/text_size_13" />
@@ -165,6 +166,7 @@
                             android:ellipsize="end"
                             android:fontFamily="@font/proza_libre_regular"
                             android:hint="@string/dateHint"
+                            android:textColorHint="?attr/colorTextHint"
                             android:singleLine="true"
                             android:textColor="@color/primary"
                             android:textSize="@dimen/text_size_13" />
@@ -225,17 +227,18 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="@dimen/margin_large">
+                        android:orientation="horizontal">
 
                         <androidx.appcompat.widget.AppCompatEditText
                             android:id="@+id/tvSearch"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:background="@null"
                             android:ellipsize="end"
+                            android:paddingHorizontal="@dimen/margin_large"
                             android:fontFamily="@font/proza_libre_regular"
+                            android:textColorHint="?attr/colorTextHint"
                             android:hint="@string/hintEnterMobileNumber"
                             android:singleLine="true"
                             android:textColor="@color/primary"
@@ -293,6 +296,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ellipsize="end"
+                        android:textColorHint="?attr/colorTextHint"
                         android:hint="@string/hintStatus"
                         android:fontFamily="@font/proza_libre_regular"
                         android:singleLine="true"
