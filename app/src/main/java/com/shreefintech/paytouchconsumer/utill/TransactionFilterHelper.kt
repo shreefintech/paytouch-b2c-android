@@ -134,7 +134,7 @@ class TransactionFilterHelper(
     // ─── Apply / Clear ───────────────────────────────────────────────────────
 
     private fun applyFilter() {
-        val mobile = sheetBinding.tvSearch.text?.toString()?.trim() ?: ""
+        val mobile = sheetBinding.etSearch.text?.toString()?.trim() ?: ""
         val list   = getList()
         val filtered = ArrayList(list.filter { item ->
             val matchesMobile = mobile.isEmpty() || item.mobileNumber.contains(mobile, ignoreCase = true)
@@ -156,7 +156,7 @@ class TransactionFilterHelper(
         sheetBinding.tvToDate.text     = ""
         sheetBinding.tvEntityType.text = ""
         sheetBinding.tvEntries.text    = ""
-        sheetBinding.tvSearch.setText("")
+        sheetBinding.etSearch.setText("")
         onClear()
         hide()
     }
