@@ -106,9 +106,9 @@ if (!Utility.isInternetAvailable(mActivity)) return
 ApiClient.apiService.someEndpoint(body).enqueue(object : Callback<General<SomeItem>> {
     override fun onResponse(call, response) {
         if (response.isSuccessful) { /* handle */ }
-        else { ToastUtil.show(mActivity, ApiHelper.parseErrorMessage(response)) }
+        else { ToastUtil.showDelete(mActivity, ApiHelper.parseErrorMessage(response)) }
     }
-    override fun onFailure(call, t) { ToastUtil.show(mActivity, t.localizedMessage) }
+    override fun onFailure(call, t) { ToastUtil.showDelete(mActivity, t.localizedMessage) }
 })
 ```
 

@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.electricity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
+import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -99,7 +101,7 @@ class ElectricityActivity : BaseActivity() {
         binding.tvPlatformFee.text    = getString(R.string.hintPlatformFee)
         binding.tvTotalPayable.text   = getString(R.string.hintTotalPayable)
         binding.tvCompany.text        = getString(R.string.hintSelectCompany)
-        binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.dropdown_hint_color))
+        binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.hint_color))
         binding.cbTerms.isChecked     = false
         selectedOperator              = null
         Utility.hideKeyboard(binding.clRoot)

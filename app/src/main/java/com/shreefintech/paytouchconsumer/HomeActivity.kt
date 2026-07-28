@@ -65,55 +65,55 @@ class HomeActivity : BaseActivity() {
                 binding.llGas -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-520): Navigate to Gas bill payment screen
-                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                    ToastUtil.showDelete(mActivity, getString(R.string.msgComingSoon))
                 }
 
                 binding.llPrepaid -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-520): Navigate to Prepaid recharge screen
-                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                    ToastUtil.showDelete(mActivity, getString(R.string.msgComingSoon))
                 }
 
                 binding.llTvCable -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-520): Navigate to TV Cable payment screen
-                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                    ToastUtil.showDelete(mActivity, getString(R.string.msgComingSoon))
                 }
 
                 binding.llDth -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-520): Navigate to DTH recharge screen
-                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                    ToastUtil.showDelete(mActivity, getString(R.string.msgComingSoon))
                 }
 
                 binding.llFastag -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-520): Navigate to Fastag recharge screen
-                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                    ToastUtil.showDelete(mActivity, getString(R.string.msgComingSoon))
                 }
 
                 binding.llLoan -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-520): Navigate to Loan payment screen
-                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                    ToastUtil.showDelete(mActivity, getString(R.string.msgComingSoon))
                 }
 
                 binding.llMyAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-520): Navigate to My Account screen
-                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                    ToastUtil.showDelete(mActivity, getString(R.string.msgComingSoon))
                 }
 
                 binding.llTax -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-520): Navigate to Tax payment screen
-                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                    ToastUtil.showDelete(mActivity, getString(R.string.msgComingSoon))
                 }
 
                 binding.cvLoadWallet -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-520): Navigate to Load Wallet screen
-                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                    ToastUtil.showDelete(mActivity, getString(R.string.msgComingSoon))
                 }
             }
         }
