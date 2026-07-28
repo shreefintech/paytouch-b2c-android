@@ -34,7 +34,6 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - `mpin` (String, required when using MPIN mode)
 
 ### Request Fields (Register)
-- `name` (String, required)
 - `mobile` (String, required, 10 digits)
 - `email` (String, required, valid format)
 - `password` (String, required, min 8 chars)

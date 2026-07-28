@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.BaseActivity
@@ -23,7 +23,7 @@ class RecentTransactionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityRecentTransactionBinding
     private lateinit var recentTransactionAdp: RecentTransactionAdp
-    private lateinit var viewModel: RecentTransactionViewModel
+    private val viewModel: RecentTransactionViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +47,6 @@ class RecentTransactionActivity : BaseActivity() {
             solidStroke  = true,
         )
 
-        viewModel = ViewModelProvider(this)[RecentTransactionViewModel::class.java]
         setupRecyclerView()
 
         binding.onClickListener = onClickListener()
