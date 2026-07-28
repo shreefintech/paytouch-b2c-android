@@ -131,6 +131,14 @@ class ElectricityActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onReset()
                 }
+
+                binding.llTabReport,
+                binding.llTabStatus,
+                binding.llTabSmsReceipt,
+                binding.llRecentTransactions -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                }
             }
         }
     }

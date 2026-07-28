@@ -358,7 +358,7 @@
                                             android:fontFamily="@font/proza_libre_medium"
                                             android:includeFontPadding="false"
                                             android:text="@string/hintSelectCompany"
-                                            android:textColor="#80000000"
+                                            android:textColor="?attr/colorTextSubtitle"
                                             android:textSize="@dimen/text_size_12" />
 
                                         <androidx.appcompat.widget.AppCompatImageView
@@ -394,7 +394,7 @@
                             android:inputType="text"
                             android:padding="@dimen/margin_small_medium"
                             android:textColor="@color/black"
-                            android:textColorHint="#80000000"
+                            android:textColorHint="?attr/colorTextSubtitle"
                             android:textSize="@dimen/text_size_13" />
 
                         <!-- Amount -->
@@ -419,7 +419,7 @@
                             android:inputType="numberDecimal"
                             android:padding="@dimen/margin_small_medium"
                             android:textColor="@color/black"
-                            android:textColorHint="#80000000"
+                            android:textColorHint="?attr/colorTextSubtitle"
                             android:textSize="@dimen/text_size_13" />
 
                         <!-- Platform Fee | Total Payable -->
@@ -459,7 +459,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/hintPlatformFee"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextSubtitle"
                                         android:textSize="@dimen/text_size_12" />
                                 </FrameLayout>
                             </LinearLayout>
@@ -493,7 +493,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/hintTotalPayable"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextSubtitle"
                                         android:textSize="@dimen/text_size_12" />
                                 </FrameLayout>
                             </LinearLayout>
