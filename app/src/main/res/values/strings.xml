@@ -173,6 +173,9 @@
     <!-- Home screen -->
     <string name="titleCategories">Categories</string>
 
+    <!-- Gas screen -->
+    <string name="titleGasBill">Gas Bill</string>
+
     <!-- Electricity screen -->
     <string name="titleElectricityBill">Electricity Bill</string>
     <string name="categoryElectricityBill">Electricity Bill</string>
@@ -311,6 +314,7 @@
 
     <!-- Bill Details card -->
     <string name="titleBillDetailsFetched">Electricity Bill Details Fetched</string>
+    <string name="titleGasBillDetailsFetched">Gas Bill Details Fetched</string>
     <string name="labelDueDate">Due Date</string>
     <string name="labelBillDate">Bill Date</string>
     <string name="labelBillAmount">Bill Amount</string>
