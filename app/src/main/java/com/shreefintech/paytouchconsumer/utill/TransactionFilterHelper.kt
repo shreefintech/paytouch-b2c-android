@@ -117,7 +117,7 @@ class TransactionFilterHelper(
     // ─── Apply / Clear ───────────────────────────────────────────────────────
 
     private fun applyFilter() {
-        val consumerNo = sheetBinding.tvSearch.text?.toString()?.trim() ?: ""
+        val consumerNo = sheetBinding.etSearch.text?.toString()?.trim() ?: ""
         val fromDateSet = !selectedFromDate.isNullOrEmpty()
         val toDateSet = !selectedToDate.isNullOrEmpty()
 
@@ -148,7 +148,7 @@ class TransactionFilterHelper(
         sheetBinding.tvFromDate.text = ""
         sheetBinding.tvToDate.text = ""
         sheetBinding.tvEntries.text = ""
-        sheetBinding.tvSearch.setText("")
+        sheetBinding.etSearch.setText("")
         onClear()
         hide()
     }

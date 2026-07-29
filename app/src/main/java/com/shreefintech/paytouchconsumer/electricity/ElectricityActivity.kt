@@ -63,7 +63,7 @@ class ElectricityActivity : BaseActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(
                 systemBars.left,
                 systemBars.top,
@@ -74,11 +74,11 @@ class ElectricityActivity : BaseActivity() {
         }
 
         LiquidGlassEffect.attach(
-            targetView = binding.flCard,
-            rootView = binding.clRoot as ViewGroup,
+            targetView   = binding.flCard,
+            rootView     = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion = 0f,
-            blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
+            distortion   = 0f,
+            blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
         binding.onClickListener = onClickListener()
@@ -228,16 +228,18 @@ class ElectricityActivity : BaseActivity() {
         val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
         SmsReceiptActivity.start(
             context = mActivity,
-            SmsReceiptItem(mobile = mobile,
-            txnId = paymentItem.transactionId ?: "",
-            amount = "₹%.2f".format(paymentItem.amount ?: amount),
-            status = paymentItem.status ?: "Pending",
-            username = fetchedBillItem?.userName ?: "",
-            date = date,
-            platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
-            refId = paymentItem.reqId ?: "",
-            accountNo = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
-            companyName = selectedOperatorName ?: "")
+            item = SmsReceiptItem(
+                mobile = mobile,
+                txnId = paymentItem.transactionId ?: "",
+                amount = "₹%.2f".format(paymentItem.amount ?: amount),
+                status = paymentItem.status ?: "Pending",
+                username = fetchedBillItem?.userName ?: "",
+                date = date,
+                platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
+                refId = paymentItem.reqId ?: "",
+                accountNo = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
+                companyName = selectedOperatorName ?: ""
+            )
         )
     }
 
@@ -252,11 +254,11 @@ class ElectricityActivity : BaseActivity() {
         }
         val names = operatorItems.map { it.name ?: "" }
         CustomDropdown.showDropdown(
-            activity = mActivity,
+            activity   = mActivity,
             anchorView = binding.flCompanyAnchor,
-            arrowView = binding.ivCompanyArrow,
-            textView = binding.tvCompany,
-            items = names
+            arrowView  = binding.ivCompanyArrow,
+            textView   = binding.tvCompany,
+            items      = names
         ) { selected, index ->
             selectedOperatorId = operatorItems.getOrNull(index)?.id
             selectedOperatorName = selected
@@ -271,7 +273,7 @@ class ElectricityActivity : BaseActivity() {
 
     private fun setOperatorLoading(loading: Boolean) {
         binding.pbCompanyLoading.visibility = if (loading) View.VISIBLE else View.GONE
-        binding.ivCompanyArrow.visibility = if (loading) View.GONE else View.VISIBLE
+        binding.ivCompanyArrow.visibility   = if (loading) View.GONE else View.VISIBLE
         binding.flCompanyAnchor.isClickable = !loading
         binding.flCompanyAnchor.isFocusable = !loading
     }

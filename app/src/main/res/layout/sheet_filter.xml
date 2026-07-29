@@ -229,7 +229,7 @@
                         android:paddingHorizontal="@dimen/margin_large">
 
                         <androidx.appcompat.widget.AppCompatEditText
-                            android:id="@+id/tvSearch"
+                            android:id="@+id/etSearch"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"

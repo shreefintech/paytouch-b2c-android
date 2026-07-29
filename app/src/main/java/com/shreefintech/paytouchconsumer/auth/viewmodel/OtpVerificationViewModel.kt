@@ -18,6 +18,7 @@ class OtpVerificationViewModel : ViewModel() {
         context: Context,
         mobile: String,
         flowType: String,
+        onLoading: () -> Unit,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
@@ -25,6 +26,7 @@ class OtpVerificationViewModel : ViewModel() {
             onError(context.getString(R.string.msgNoInternet))
             return
         }
+        onLoading()
         val call = if (flowType == Constant.FLOW_RESET_MPIN) {
             ApiClient.apiService.sendMpinOtp(mobile)
         } else {
@@ -92,7 +94,7 @@ class OtpVerificationViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<MessageItem>, t: Throwable) {
-                onError(t.localizedMessage ?: context.getString(R.string.err_generic))
+                onError(t.localizedMessage ?: context.getString(R.string.errGeneric))
             }
         })
     }
