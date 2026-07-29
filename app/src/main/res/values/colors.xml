@@ -40,6 +40,8 @@
     <color name="toast_text_expired">#5C5C5C</color>
     <color name="toast_border_expired">#5C5C5C</color>
 
+    <color name="filter_status_bg">#33D74E7D</color>
+
 
     <!-- LiquidGlass Effect -->
     <color name="stroke_color">#66FFFFFF</color>           <!-- semi-transparent white border -->

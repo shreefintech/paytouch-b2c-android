@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity.transactions
+package com.shreefintech.paytouchconsumer.gas.transactions
 
 import android.graphics.Color
 import android.os.Bundle
@@ -14,19 +14,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
-import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionReportBinding
+import com.shreefintech.paytouchconsumer.databinding.ActivityGasTransactionReportBinding
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
-import com.shreefintech.paytouchconsumer.electricity.viewmodel.TransactionReportViewModel
-import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.transactions.TransactionDetailActivity
+import com.shreefintech.paytouchconsumer.gas.viewmodel.GasTransactionReportViewModel
+import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.TransactionFilterHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
-class TransactionReportActivity : BaseActivity() {
+class GasTransactionReportActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityTransactionReportBinding
-    private val viewModel: TransactionReportViewModel by viewModels()
+    private lateinit var binding: ActivityGasTransactionReportBinding
+    private val viewModel: GasTransactionReportViewModel by viewModels()
     private lateinit var transactionAdp: TransactionAdp
     private lateinit var filterHelper: TransactionFilterHelper
 
@@ -35,7 +35,7 @@ class TransactionReportActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityTransactionReportBinding.inflate(layoutInflater)
+        binding = ActivityGasTransactionReportBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
@@ -47,7 +47,6 @@ class TransactionReportActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
-
             binding.incFilterSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
             insets
         }

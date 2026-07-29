@@ -95,4 +95,5 @@
     <dimen name="upload_edit_size">28dp</dimen>
     <dimen name="category_icon_size">52dp</dimen>
     <dimen name="text_size_15">15sp</dimen>
+    <dimen name="filter_status_height">30dp</dimen>
 </resources>

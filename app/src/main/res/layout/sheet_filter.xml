@@ -51,14 +51,122 @@
             app:layout_constraintEnd_toEndOf="@id/dummyView" />
 
         <LinearLayout
-            android:id="@+id/llDateContainer"
+            android:id="@+id/llContainer3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_extra_large"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            android:orientation="horizontal">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvStatusAll"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/filter_status_height"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                app:cardCornerRadius="7dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/filter_status_bg"
+                app:strokeColor="?attr/colorPrimary"
+                app:strokeWidth="1dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvStatusAll"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:fontFamily="@font/proza_libre_regular"
+                    android:includeFontPadding="false"
+                    android:text="@string/filterStatusAll"
+                    android:textSize="@dimen/text_size_12" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvStatusSuccess"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/filter_status_height"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="4dp"
+                app:cardCornerRadius="7dp"
+                app:cardBackgroundColor="@color/filter_status_bg"
+                app:strokeColor="?attr/colorPrimary"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvStatusSuccess"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:fontFamily="@font/proza_libre_regular"
+                    android:includeFontPadding="false"
+                    android:text="@string/filterStatusSuccess"
+                    android:textSize="@dimen/text_size_12" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvStatusFailed"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/filter_status_height"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="4dp"
+                app:cardCornerRadius="7dp"
+                app:cardBackgroundColor="@color/filter_status_bg"
+                app:strokeColor="?attr/colorPrimary"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvStatusFailed"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:fontFamily="@font/proza_libre_regular"
+                    android:includeFontPadding="false"
+                    android:text="@string/filterStatusFailed"
+                    android:textSize="@dimen/text_size_12" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvStatusPending"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/filter_status_height"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                app:cardCornerRadius="7dp"
+                app:cardBackgroundColor="@color/filter_status_bg"
+                app:strokeColor="?attr/colorPrimary"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvStatusPending"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:fontFamily="@font/proza_libre_regular"
+                    android:includeFontPadding="false"
+                    android:text="@string/filterStatusPending"
+                    android:textSize="@dimen/text_size_12" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llDateContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="@id/dummyView"
             app:layout_constraintStart_toStartOf="@id/dummyView"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle">
+            app:layout_constraintTop_toBottomOf="@id/llContainer3">
 
             <!-- From Date -->
             <LinearLayout
@@ -252,81 +360,17 @@
 
         </LinearLayout>
 
-
-        <LinearLayout
-            android:id="@+id/llContainer3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_medium"
-            app:layout_constraintEnd_toEndOf="@id/dummyView"
-            app:layout_constraintStart_toStartOf="@id/dummyView"
-            app:layout_constraintTop_toBottomOf="@id/llContainer2"
-            android:orientation="vertical">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/proza_libre_semi_bold"
-                android:includeFontPadding="false"
-                android:text="@string/textStatus"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_13" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cvSelectEntries"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/input_height"
-                android:layout_marginTop="@dimen/margin_small"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/primary"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="@dimen/margin_large">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tvEntries"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ellipsize="end"
-                        android:textColorHint="?attr/colorTextHint"
-                        android:hint="@string/hintStatus"
-                        android:fontFamily="@font/proza_libre_regular"
-                        android:singleLine="true"
-                        android:textColor="@color/primary"
-                        android:textSize="@dimen/text_size_13" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/ivEntriesArrow"
-                        android:layout_width="@dimen/icon_small"
-                        android:layout_height="@dimen/icon_small"
-                        android:src="@drawable/ic_down_arrow"
-                        android:tint="@color/primary" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
-
         <!--  Apply -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/margin_large"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingBottom="30dp"
             app:layout_constraintEnd_toEndOf="@id/dummyView"
             app:layout_constraintStart_toStartOf="@id/dummyView"
-            app:layout_constraintTop_toBottomOf="@id/llContainer3">
+            app:layout_constraintTop_toBottomOf="@id/llContainer2">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReset"

@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemTransactionBinding
-import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
+import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 
 class TransactionAdp(
     private val mContext: Context,

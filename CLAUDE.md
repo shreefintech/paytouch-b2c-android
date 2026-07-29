@@ -266,6 +266,44 @@ The **Electricity Bill Payment** screen is the canonical design reference for al
 
 ---
 
+## Transaction Screens — Shared Structure Across All Modules
+
+Every bill payment module (Electricity, Gas, Water, DTH, Mobile, etc.) has three transaction screens: **Status**, **Report**, and **Detail**. The UI is identical across all modules — only the API endpoint and category icon differ.
+
+### What is shared (never duplicate)
+
+| Component | Location | Shared By |
+|---|---|---|
+| `TransactionAdp` | `adapter/TransactionAdp.kt` | All modules — category-agnostic, icon driven by `item.categoryIconRes` |
+| `TransactionItem` | `electricity/model/TransactionItem.kt` | All modules — UI model, no API fields |
+| `TransactionDetailActivity` | `electricity/transactions/TransactionDetailActivity.kt` | All modules — reused as-is |
+| `TransactionFilterHelper` | `utill/TransactionFilterHelper.kt` | All report screens |
+| `item_transaction.xml` | `res/layout/item_transaction.xml` | All modules via `TransactionAdp` |
+| `lyt_shimmer_transaction_item.xml` | `res/layout/` | All transaction activity layouts |
+| `sheet_filter.xml` | `res/layout/sheet_filter.xml` | All report screens |
+
+### What is created per module
+
+Each new module (e.g. Gas) needs only:
+- `{Category}TransactionStatusActivity` + `activity_{category}_transaction_status.xml`
+- `{Category}TransactionReportActivity` + `activity_{category}_transaction_report.xml`
+- `{Category}TransactionStatusViewModel` — calls `api/{category}/transaction-status`
+- `{Category}TransactionReportViewModel` — calls `api/{category}/payment-report`
+- `{Category}TransactionReportDataItem` — response DTO
+- `{Category}TransactionStatusRequest` + `{Category}TransactionReportRequest` — request bodies
+- 2 `ApiService` entries
+
+### Rules
+
+- **Never create a new `TransactionDetailActivity` per module** — all modules share the one in `electricity/transactions/`.
+- **Never create a new adapter or item layout per module** — `TransactionAdp` and `item_transaction.xml` are category-agnostic.
+- **`TransactionDetailActivity` has no SMS Receipt button** — it was removed. Do not add it back.
+- The activity layouts for status and report are **copied from the electricity versions** with only the title string changed. Do not redesign them.
+- The category icon is set in the ViewModel's `mapToTransactionItem()` — pass `R.drawable.ic_{category}` there.
+- Electricity is the canonical reference — when implementing any module's transaction screens, mirror `ElectricityTransactionStatusActivity` and `TransactionReportActivity` exactly.
+
+---
+
 ## Android Activity Guidelines
 
 ### Click Handling

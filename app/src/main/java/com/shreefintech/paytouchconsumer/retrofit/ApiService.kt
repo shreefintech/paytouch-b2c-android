@@ -12,6 +12,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
@@ -183,6 +186,18 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: GasProcessPaymentRequest
     ): Call<GasPaymentItem>
+
+    @POST("${AUTH}gas/transaction-status")
+    fun getGasTransactionStatus(
+        @Header("Authorization") authorization: String,
+        @Body request: GasTransactionStatusRequest
+    ): Call<General<List<GasTransactionReportDataItem>>>
+
+    @POST("${AUTH}gas/payment-report")
+    fun getGasPaymentReport(
+        @Header("Authorization") authorization: String,
+        @Body request: GasTransactionReportRequest
+    ): Call<General<List<GasTransactionReportDataItem>>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

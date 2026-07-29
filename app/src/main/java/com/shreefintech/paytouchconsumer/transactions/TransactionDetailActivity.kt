@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity.transactions
+package com.shreefintech.paytouchconsumer.transactions
 
 import android.content.Context
 import android.content.Intent
@@ -14,9 +14,8 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
-import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
-import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 class TransactionDetailActivity : BaseActivity() {
@@ -50,7 +49,7 @@ class TransactionDetailActivity : BaseActivity() {
             insets
         }
 
-        LiquidGlassEffect.attach(
+        LiquidGlassEffect.Companion.attach(
             targetView   = binding.flCard,
             rootView     = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
@@ -98,25 +97,6 @@ class TransactionDetailActivity : BaseActivity() {
         }
     }
 
-    private fun openSmsReceipt() {
-        val item = transactionItem ?: return
-        SmsReceiptActivity.start(
-            context = mActivity,
-            item    = SmsReceiptItem(
-                mobile      = item.mobileNumber,
-                txnId       = item.transactionId,
-                amount      = item.amount,
-                status      = item.status,
-                username    = item.username,
-                date        = item.date,
-                platformFee = item.platformFee,
-                refId       = item.referenceId,
-                accountNo   = item.accountNumber,
-                companyName = item.companyName
-            )
-        )
-    }
-
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -131,10 +111,6 @@ class TransactionDetailActivity : BaseActivity() {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
-                }
-                binding.cvSmsReceipt -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    openSmsReceipt()
                 }
             }
         }

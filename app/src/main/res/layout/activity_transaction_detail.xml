@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/img_screen_bg"
-        tools:context=".electricity.transactions.TransactionDetailActivity">
+        tools:context=".transactions.TransactionDetailActivity">
 
         <!-- Toolbar -->
         <include
@@ -58,37 +58,6 @@
                 android:src="@drawable/img_bharat_connect" />
         </LinearLayout>
 
-        <!-- SMS Receipt button — fixed bottom -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cvSmsReceipt"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/page_margin_horizontal"
-            android:layout_marginEnd="@dimen/page_margin_horizontal"
-            android:layout_marginBottom="@dimen/page_margin_vertical"
-            android:onClickListener="@{onClickListener}"
-            app:cardBackgroundColor="@color/primary"
-            app:cardCornerRadius="@dimen/normal_card_radius"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingTop="14dp"
-                android:paddingBottom="14dp"
-                android:fontFamily="@font/proza_libre_semi_bold"
-                android:includeFontPadding="false"
-                android:text="@string/tabSmsReceipt"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size_14" />
-        </com.google.android.material.card.MaterialCardView>
-
         <!-- Glass card — fills remaining space -->
         <FrameLayout
             android:id="@+id/flCard"
@@ -97,8 +66,8 @@
             android:layout_marginStart="@dimen/page_margin_horizontal"
             android:layout_marginTop="@dimen/margin_medium"
             android:layout_marginEnd="@dimen/page_margin_horizontal"
-            android:layout_marginBottom="@dimen/margin_medium"
-            app:layout_constraintBottom_toTopOf="@id/cvSmsReceipt"
+            android:layout_marginBottom="@dimen/page_margin_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/llTitle"

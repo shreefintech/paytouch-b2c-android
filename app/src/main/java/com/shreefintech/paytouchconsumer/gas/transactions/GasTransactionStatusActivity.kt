@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity.transactions
+package com.shreefintech.paytouchconsumer.gas.transactions
 
 import android.content.Context
 import android.content.Intent
@@ -14,26 +14,26 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
-import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityTransactionStatusBinding
+import com.shreefintech.paytouchconsumer.databinding.ActivityGasTransactionStatusBinding
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
-import com.shreefintech.paytouchconsumer.electricity.viewmodel.ElectricityTransactionStatusViewModel
-import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.transactions.TransactionDetailActivity
+import com.shreefintech.paytouchconsumer.gas.viewmodel.GasTransactionStatusViewModel
+import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 
-class ElectricityTransactionStatusActivity : BaseActivity() {
+class GasTransactionStatusActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityElectricityTransactionStatusBinding
-    private val viewModel: ElectricityTransactionStatusViewModel by viewModels()
+    private lateinit var binding: ActivityGasTransactionStatusBinding
+    private val viewModel: GasTransactionStatusViewModel by viewModels()
     private lateinit var transactionAdp: TransactionAdp
 
-    private val mArrayList          = ArrayList<TransactionItem>()
-    private val showProgressSearch  = ObservableBoolean(false)
+    private val mArrayList         = ArrayList<TransactionItem>()
+    private val showProgressSearch = ObservableBoolean(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityElectricityTransactionStatusBinding.inflate(layoutInflater)
+        binding = ActivityGasTransactionStatusBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
@@ -92,9 +92,9 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
         getTransactionStatusList(query)
     }
 
-    private fun getTransactionStatusList(query : String? = null){
+    private fun getTransactionStatusList(query: String? = null) {
         viewModel.searchTransactionStatus(
-            query = query,
+            query     = query,
             onLoading = { showShimmer(true) },
             onSuccess = { list ->
                 showShimmer(false)
@@ -103,7 +103,7 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
                 transactionAdp.notifyDataSetChanged()
                 binding.tvEmpty.visibility = if (mArrayList.isEmpty()) View.VISIBLE else View.GONE
             },
-            onError = { msg ->
+            onError   = { msg ->
                 showShimmer(false)
                 mArrayList.clear()
                 transactionAdp.notifyDataSetChanged()
@@ -152,7 +152,7 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
 
         fun start(context: Context, transactionId: String? = null) {
             context.startActivity(
-                Intent(context, ElectricityTransactionStatusActivity::class.java).apply {
+                Intent(context, GasTransactionStatusActivity::class.java).apply {
                     transactionId?.let { putExtra(EXTRA_TRANSACTION_ID, it) }
                 }
             )
