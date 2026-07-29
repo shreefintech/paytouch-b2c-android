@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.electricity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +11,13 @@ import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
+import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
+import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 
 class ElectricityActivity : BaseActivity() {
@@ -99,7 +104,7 @@ class ElectricityActivity : BaseActivity() {
         binding.tvPlatformFee.text    = getString(R.string.hintPlatformFee)
         binding.tvTotalPayable.text   = getString(R.string.hintTotalPayable)
         binding.tvCompany.text        = getString(R.string.hintSelectCompany)
-        binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.dropdown_hint_color))
+        binding.tvCompany.setTextColor(getThemeColor(R.attr.colorTextHint))
         binding.cbTerms.isChecked     = false
         selectedOperator              = null
         Utility.hideKeyboard(binding.clRoot)
@@ -132,13 +137,37 @@ class ElectricityActivity : BaseActivity() {
                     onReset()
                 }
 
-                binding.llTabReport,
-                binding.llTabStatus,
-                binding.llTabSmsReceipt,
                 binding.llRecentTransactions -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
+                }
+
+                binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
                     ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
                 }
+                binding.llTabSmsReceipt -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    // TODO(PAYTOUCH-546): Replace dummy data with real transaction data once API is integrated
+                    SmsReceiptActivity.start(
+                        context     = mActivity,
+                        mobile      = "9876543210",
+                        txnId       = "TXN123456789",
+                        amount      = "₹1,200.00",
+                        status      = "Success",
+                        username    = "Rahul Sharma",
+                        date        = "2025-07-29",
+                        platformFee = "₹2.00",
+                        refId       = "REF987654321",
+                        accountNo   = "123456789012",
+                        companyName = "MSEDCL"
+                    )
+                }
+                binding.llTabReport -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, TransactionReportActivity::class.java))
+                }
+
             }
         }
     }

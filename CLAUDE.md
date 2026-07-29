@@ -106,9 +106,9 @@ if (!Utility.isInternetAvailable(mActivity)) return
 ApiClient.apiService.someEndpoint(body).enqueue(object : Callback<General<SomeItem>> {
     override fun onResponse(call, response) {
         if (response.isSuccessful) { /* handle */ }
-        else { ToastUtil.show(mActivity, ApiHelper.parseErrorMessage(response)) }
+        else { ToastUtil.showDelete(mActivity, ApiHelper.parseErrorMessage(response)) }
     }
-    override fun onFailure(call, t) { ToastUtil.show(mActivity, t.localizedMessage) }
+    override fun onFailure(call, t) { ToastUtil.showDelete(mActivity, t.localizedMessage) }
 })
 ```
 
@@ -174,6 +174,38 @@ When implementing UI:
 * Mention all missing assets in the output under **Missing Assets**.
 
 Placeholder naming examples: `ic_edit_placeholder`, `bg_card_placeholder`, `img_banner_placeholder`
+
+---
+
+## Card Background Rule
+
+**Always use `MaterialCardView` for card/container backgrounds. Never create a new `drawable` shape file for backgrounds that `MaterialCardView` can achieve.**
+
+`MaterialCardView` handles:
+- White or solid-color card backgrounds → `app:cardBackgroundColor`
+- Rounded corners → `app:cardCornerRadius`
+- Bordered stroke → `app:strokeColor` + `app:strokeWidth`
+- Pill / badge shapes → `app:cardCornerRadius="20dp"` (or any large value)
+- Elevation / shadow → `app:cardElevation`
+
+Only create a `drawable` shape file when `MaterialCardView` genuinely cannot fulfill the requirement — e.g., gradient fills, complex multi-layer shapes, or vector path shapes. Default to `MaterialCardView` first; reach for a drawable shape only as a last resort.
+
+**Exception — status badge chips:** Small inline status indicators (Success / Failed / Pending chips) may use a custom `drawable` shape file instead of `MaterialCardView`. These are typically `<shape>` ovals or rectangles with a solid fill and are acceptable as drawables since wrapping them in `MaterialCardView` adds unnecessary view hierarchy depth for a purely decorative, non-interactive element.
+
+---
+
+## Bill Payment Modules — Shared UI Pattern
+
+The **Electricity Bill Payment** screen is the canonical design reference for all bill payment modules (Gas, Water, Broadband, Mobile, DTH, Cable, FASTag, Loans, Taxes, etc.).
+
+**What "reusable UI" means here:**
+
+- Each module gets its **own Activity** and its own `activity_*.xml` — do not share Activities across modules.
+- **RecyclerView item layouts** (`item_*.xml`) and other shared XML components (operator selector items, plan card items, etc.) are **shared across modules** — do not duplicate XML files. Reference the same layout from each module's adapter.
+- When implementing a new bill payment module, always check if the required item layout already exists (e.g., `item_operator.xml`, `item_plan.xml`) before creating a new one.
+- If the design is identical to an existing item layout, reuse it directly. Only create a new layout file when the structure genuinely differs.
+
+**In short:** different Activity + same item layouts. Never copy-paste XML from one module's item file into another — always `include` or reuse the existing layout.
 
 ---
 

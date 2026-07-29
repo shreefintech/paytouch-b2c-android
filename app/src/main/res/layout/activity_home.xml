@@ -99,12 +99,11 @@
                                 android:paddingStart="@dimen/margin_small"
                                 android:paddingEnd="@dimen/margin_small">
 
-
-
                                 <androidx.appcompat.widget.AppCompatImageView
                                     android:layout_width="@dimen/category_icon_size"
                                     android:layout_height="@dimen/category_icon_size"
                                     android:layout_gravity="center"
+                                    android:background="@drawable/bg_toggle_selected"
                                     android:src="@drawable/ic_electricity"/>
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -139,6 +138,7 @@
                                     android:layout_width="@dimen/category_icon_size"
                                     android:layout_height="@dimen/category_icon_size"
                                     android:layout_gravity="center"
+                                    android:background="@drawable/bg_toggle_selected"
                                     android:src="@drawable/ic_gas"/>
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -171,6 +171,7 @@
                                 <androidx.appcompat.widget.AppCompatImageView
                                     android:layout_width="@dimen/category_icon_size"
                                     android:layout_height="@dimen/category_icon_size"
+                                    android:background="@drawable/bg_toggle_selected"
                                     android:layout_gravity="center"
                                     android:src="@drawable/ic_prepaid"/>
 
@@ -214,6 +215,7 @@
                                     android:layout_width="@dimen/category_icon_size"
                                     android:layout_height="@dimen/category_icon_size"
                                     android:layout_gravity="center"
+                                    android:background="@drawable/bg_toggle_selected"
                                     android:src="@drawable/ic_tv"/>
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -248,6 +250,7 @@
                                     android:layout_width="@dimen/category_icon_size"
                                     android:layout_height="@dimen/category_icon_size"
                                     android:layout_gravity="center"
+                                    android:background="@drawable/bg_toggle_selected"
                                     android:src="@drawable/ic_broadband"/>
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -281,6 +284,7 @@
                                     android:layout_width="@dimen/category_icon_size"
                                     android:layout_height="@dimen/category_icon_size"
                                     android:layout_gravity="center"
+                                    android:background="@drawable/bg_toggle_selected"
                                     android:src="@drawable/ic_fastag"/>
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -323,6 +327,7 @@
                                     android:layout_width="@dimen/category_icon_size"
                                     android:layout_height="@dimen/category_icon_size"
                                     android:layout_gravity="center"
+                                    android:background="@drawable/bg_toggle_selected"
                                     android:src="@drawable/ic_loan"/>
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -357,6 +362,7 @@
                                     android:layout_width="@dimen/category_icon_size"
                                     android:layout_height="@dimen/category_icon_size"
                                     android:layout_gravity="center"
+                                    android:background="@drawable/bg_toggle_selected"
                                     android:src="@drawable/ic_profile" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -390,6 +396,7 @@
                                     android:layout_width="@dimen/category_icon_size"
                                     android:layout_height="@dimen/category_icon_size"
                                     android:layout_gravity="center"
+                                    android:background="@drawable/bg_toggle_selected"
                                     android:src="@drawable/ic_tax" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
