@@ -82,6 +82,7 @@ com.shreefintech.paytouchconsumer/
 7. Network errors must be parsed via **ApiHelper.parseErrorMessage()**.
 8. Adapters must not contain business logic or network calls.
 9. ViewModels must not store Activity/Context references.
+10. **All API endpoints must be declared in `ApiService` or `ApiAdminService`** — never construct `OkHttpClient` or `Retrofit` directly inside a ViewModel or Activity. Each backend URL has exactly one registered client: `ApiClient` for `paytouch.in`, `ApiAdminClient` for `admin.paytouch.in`. Add a new endpoint to the appropriate service interface; do not bypass it with a raw HTTP call.
 
 ---
 
@@ -180,21 +181,28 @@ For all tasks:
 
 ## API Response Wrapper
 
-Most API responses are wrapped in `General<T>` with fields: `data`, `success`, `meta`, `message`.
+Response structure depends on the actual API contract — there is no single mandatory wrapper for every endpoint. Match the model to what the server returns.
 
-**Auth endpoints exception:** The auth API (`/api/login`, `/api/register`, `/api/user`, `/api/password/*`, `/api/mpin/*`) return **unwrapped** JSON — no `General<T>` wrapper. Use dedicated `Item` models for these:
+**`General<T>` wrapped** — use when the API envelope is `{"data": ..., "success": ..., "meta": ..., "message": ...}`:
+- Declare: `Call<General<YourItem?>>`
+- Success check: `response.isSuccessful && response.body()?.data != null`
 
-| Endpoint | Response model |
-|---|---|
-| `GET /api/user` | `UserProfileItem` |
-| `POST /api/login` | `LoginItem` |
-| `POST /api/register` | `RegisterItem` |
-| `POST /api/*/send-otp`, `verify-otp`, `reset` | `MessageItem` |
+**Flat / direct response** — use when the API returns a top-level object with no `data` key:
+- Declare: `Call<YourItem>` with the fields your endpoint returns
+- Success check depends on fields present:
+  - Has `success: Boolean` field → `response.isSuccessful && response.body()?.success == true`
+  - No `success` field → `response.isSuccessful` is sufficient
 
-**Success check rules:**
-- `General<T>` endpoints: `response.isSuccessful && response.body()?.data != null`
-- `MessageItem` endpoints: `response.isSuccessful && response.body()?.success == true`
-- `LoginItem` / `UserProfileItem` / `RegisterItem` endpoints: `response.isSuccessful` is sufficient (no explicit `success` field).
+**Auth endpoints** (`/api/login`, `/api/register`, `/api/user`, `/api/password/*`, `/api/mpin/*`) always return flat/unwrapped JSON:
+
+| Endpoint | Response model | Success check |
+|---|---|---|
+| `GET /api/user` | `UserProfileItem` | `response.isSuccessful` |
+| `POST /api/login` | `LoginItem` | `response.isSuccessful` |
+| `POST /api/register` | `RegisterItem` | `response.isSuccessful` |
+| `POST /api/*/send-otp`, `verify-otp`, `reset` | `MessageItem` | `response.isSuccessful && body?.success == true` |
+
+**Rule:** Always check `docs/api_reference.md` first to confirm the actual response shape before choosing a wrapper. Never guess or assume `General<T>` — use whatever the real API returns.
 
 ---
 
