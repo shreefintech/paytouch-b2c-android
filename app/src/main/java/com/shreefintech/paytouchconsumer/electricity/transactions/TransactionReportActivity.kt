@@ -102,8 +102,6 @@ class TransactionReportActivity : BaseActivity() {
                 callReport(fromDate, toDate, status, consumerNo)
             },
             onClear      = {
-                mAllList.clear()
-                mDisplayList.clear()
                 binding.etSearch.setText("")
                 callReport(null, null, null, null)
             }

@@ -54,7 +54,7 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
                 }
 
                 override fun onFailure(call: Call<General<List<ElectricityOperatorItem>>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.err_generic))
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
@@ -86,7 +86,7 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
                 if (response.isSuccessful && response.body()?.data != null) {
                     val bill = response.body()!!.data!!.firstOrNull()
                     if (bill != null) onSuccess(bill)
-                    else onError(getString(R.string.err_generic))
+                    else onError(getString(R.string.errGeneric))
                 } else {
                     onError(
                         ApiHelper.parseErrorMessage(
@@ -97,7 +97,7 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
             }
 
             override fun onFailure(call: Call<General<List<ElectricityBillItem>>>, t: Throwable) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }
@@ -176,7 +176,7 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
                 }
 
                 override fun onFailure(call: Call<General<WalletDataItem>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.err_generic))
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
@@ -224,7 +224,7 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
             }
 
             override fun onFailure(call: Call<ElectricityPaymentItem>, t: Throwable) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }
