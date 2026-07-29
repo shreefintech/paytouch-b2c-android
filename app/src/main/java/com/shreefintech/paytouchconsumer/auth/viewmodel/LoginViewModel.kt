@@ -112,9 +112,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         ApiAdminClient.apiService.registerUser(id, mobile, email, mobile, referralCode)
             .enqueue(object : Callback<Any> {
                 override fun onResponse(call: Call<Any>, response: Response<Any>) {
-                    if (!response.isSuccessful) {
-                        android.util.Log.e("VPS", "Registration failed: ${response.code()} ${response.errorBody()?.string()}")
-                    }
                 }
                 override fun onFailure(call: Call<Any>, t: Throwable) {
                     t.printStackTrace()
