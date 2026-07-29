@@ -5,8 +5,8 @@ import android.app.DatePickerDialog
 import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.SheetFilterBinding
-import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
@@ -16,21 +16,20 @@ class TransactionFilterHelper(
     private val activity: Activity,
     private val sheetBinding: SheetFilterBinding,
     private val bgOverlay: View,
-    private val getList: () -> ArrayList<TransactionItem>,
-    private val onApply: (filtered: ArrayList<TransactionItem>) -> Unit,
+    private val onApply: (fromDate: String?, toDate: String?, status: String?, consumerNo: String?) -> Unit,
     private val onClear: () -> Unit
 ) {
 
     private lateinit var behavior: BottomSheetBehavior<View>
 
     private var selectedFromDate: String? = null
-    private var selectedToDate:   String? = null
-    private var selectedUserId:   String? = null
-    private var selectedStatus:   String? = null
+    private var selectedToDate: String? = null
+    private var selectedStatus: String? = null
 
     companion object {
+        private const val STATUS_ALL = "All Status"
         private const val STATUS_SUCCESS = "Success"
-        private const val STATUS_FAILED  = "Failed"
+        private const val STATUS_FAILED = "Failed"
         private const val STATUS_PENDING = "Pending"
     }
 
@@ -43,12 +42,10 @@ class TransactionFilterHelper(
         behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
-                    BottomSheetBehavior.STATE_EXPANDED      -> bgOverlay.visible()
-                    BottomSheetBehavior.STATE_HIDDEN        -> bgOverlay.gone()
-                    BottomSheetBehavior.STATE_SETTLING      -> bgOverlay.visible()
-                    BottomSheetBehavior.STATE_COLLAPSED     -> {}
-                    BottomSheetBehavior.STATE_DRAGGING      -> {}
-                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {}
+                    BottomSheetBehavior.STATE_EXPANDED -> bgOverlay.visible()
+                    BottomSheetBehavior.STATE_HIDDEN -> bgOverlay.gone()
+                    BottomSheetBehavior.STATE_SETTLING -> bgOverlay.visible()
+                    else -> {}
                 }
             }
 
@@ -66,8 +63,7 @@ class TransactionFilterHelper(
         sheetBinding.cvSelectToDate.setOnClickListener {
             showDatePicker(sheetBinding.tvToDate) { date -> selectedToDate = date }
         }
-        sheetBinding.cvSelectEntityType.setOnClickListener { showUserIdDropdown() }
-        sheetBinding.cvSelectEntries.setOnClickListener    { showStatusDropdown() }
+        sheetBinding.cvSelectEntries.setOnClickListener { showStatusDropdown() }
 
         sheetBinding.btnReset.setOnClickListener { clearFilter() }
         sheetBinding.btnApply.setOnClickListener { applyFilter() }
@@ -76,6 +72,7 @@ class TransactionFilterHelper(
     // ─── Show / Hide ─────────────────────────────────────────────────────────
 
     fun show() {
+        bgOverlay.visible()
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
@@ -83,8 +80,7 @@ class TransactionFilterHelper(
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
-    fun isVisible(): Boolean =
-        behavior.state != BottomSheetBehavior.STATE_HIDDEN
+    fun isVisible(): Boolean = behavior.state != BottomSheetBehavior.STATE_HIDDEN
 
     // ─── Date picker ─────────────────────────────────────────────────────────
 
@@ -92,6 +88,7 @@ class TransactionFilterHelper(
         val cal = Calendar.getInstance()
         DatePickerDialog(
             activity,
+            R.style.Paytouch_DatePickerTheme,
             { _, year, month, day ->
                 val formatted = "%04d-%02d-%02d".format(year, month + 1, day)
                 textView.text = formatted
@@ -103,59 +100,54 @@ class TransactionFilterHelper(
         ).show()
     }
 
-    // ─── Dropdowns ───────────────────────────────────────────────────────────
-
-    private fun showUserIdDropdown() {
-        val ids = getList().map { it.userId }.distinct()
-        if (ids.isEmpty()) return
-        CustomDropdown.showDropdown(
-            activity   = activity,
-            anchorView = sheetBinding.cvSelectEntityType,
-            arrowView  = sheetBinding.ivEntityTypeArrow,
-            textView   = sheetBinding.tvEntityType,
-            items      = ids
-        ) { selected, _ ->
-            selectedUserId = selected
-        }
-    }
+    // ─── Status dropdown ─────────────────────────────────────────────────────
 
     private fun showStatusDropdown() {
         CustomDropdown.showDropdown(
-            activity   = activity,
+            activity = activity,
             anchorView = sheetBinding.cvSelectEntries,
-            arrowView  = sheetBinding.ivEntriesArrow,
-            textView   = sheetBinding.tvEntries,
-            items      = listOf(STATUS_SUCCESS, STATUS_FAILED, STATUS_PENDING)
+            arrowView = sheetBinding.ivEntriesArrow,
+            textView = sheetBinding.tvEntries,
+            items = listOf(STATUS_ALL, STATUS_SUCCESS, STATUS_FAILED, STATUS_PENDING)
         ) { selected, _ ->
-            selectedStatus = selected
+            selectedStatus = if (selected == STATUS_ALL) null else selected
         }
     }
 
     // ─── Apply / Clear ───────────────────────────────────────────────────────
 
     private fun applyFilter() {
-        val mobile = sheetBinding.etSearch.text?.toString()?.trim() ?: ""
-        val list   = getList()
-        val filtered = ArrayList(list.filter { item ->
-            val matchesMobile = mobile.isEmpty() || item.mobileNumber.contains(mobile, ignoreCase = true)
-            val matchesUserId = selectedUserId == null || item.userId == selectedUserId
-            val matchesStatus = selectedStatus == null || item.status == selectedStatus
-            // TODO(PAYTOUCH-546): Add date filtering once API returns date field in TransactionItem
-            matchesMobile && matchesUserId && matchesStatus
-        })
-        onApply(filtered)
+        val consumerNo = sheetBinding.etSearch.text?.toString()?.trim() ?: ""
+        val fromDateSet = !selectedFromDate.isNullOrEmpty()
+        val toDateSet = !selectedToDate.isNullOrEmpty()
+
+        if (fromDateSet != toDateSet) {
+            ToastUtil.showDelete(activity, activity.getString(R.string.msgSelectBothDates))
+            return
+        }
+
+        // Status alone does not count as a filter
+        if (consumerNo.isEmpty() && !fromDateSet) {
+            ToastUtil.showDelete(activity, activity.getString(R.string.msgSelectAtLeastOneFilter))
+            return
+        }
+
+        onApply(
+            selectedFromDate,
+            selectedToDate,
+            selectedStatus,
+            consumerNo.ifEmpty { null }
+        )
         hide()
     }
 
     private fun clearFilter() {
         selectedFromDate = null
-        selectedToDate   = null
-        selectedUserId   = null
-        selectedStatus   = null
-        sheetBinding.tvFromDate.text   = ""
-        sheetBinding.tvToDate.text     = ""
-        sheetBinding.tvEntityType.text = ""
-        sheetBinding.tvEntries.text    = ""
+        selectedToDate = null
+        selectedStatus = null
+        sheetBinding.tvFromDate.text = ""
+        sheetBinding.tvToDate.text = ""
+        sheetBinding.tvEntries.text = ""
         sheetBinding.etSearch.setText("")
         onClear()
         hide()

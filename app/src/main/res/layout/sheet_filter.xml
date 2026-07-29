@@ -28,26 +28,38 @@
             app:layout_constraintTop_toTopOf="parent" />
 
 
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/textFilter"
+            android:layout_marginTop="@dimen/margin_large"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            android:textSize="@dimen/text_size_18" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivClose"
             android:layout_width="@dimen/icon_medium"
             android:layout_height="@dimen/icon_medium"
-            android:layout_marginTop="@dimen/margin_large"
             android:src="@drawable/ic_close"
             android:background="?selectableItemBackgroundBorderless"
-            app:layout_constraintEnd_toEndOf="@id/dummyView"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/tvTitle"
+            app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+            app:layout_constraintEnd_toEndOf="@id/dummyView" />
 
         <LinearLayout
             android:id="@+id/llDateContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/margin_extra_large"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="@id/dummyView"
             app:layout_constraintStart_toStartOf="@id/dummyView"
-            app:layout_constraintTop_toBottomOf="@id/ivClose">
+            app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
             <!-- From Date -->
             <LinearLayout
@@ -182,69 +194,6 @@
             app:layout_constraintEnd_toEndOf="@id/dummyView"
             app:layout_constraintStart_toStartOf="@id/dummyView"
             app:layout_constraintTop_toBottomOf="@id/llDateContainer">
-
-            <!-- From Date -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/proza_libre_semi_bold"
-                    android:includeFontPadding="false"
-                    android:text="@string/textUserId"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_13" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cvSelectEntityType"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/input_height"
-                    android:layout_marginTop="@dimen/margin_small"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/primary"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="@dimen/margin_large">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/tvEntityType"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:ellipsize="end"
-                            android:hint="@string/hintEnterUserId"
-                            android:fontFamily="@font/proza_libre_regular"
-                            android:singleLine="true"
-                            android:textColor="@color/primary"
-                            android:textSize="@dimen/text_size_13" />
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/ivEntityTypeArrow"
-                            android:layout_width="@dimen/icon_small"
-                            android:layout_height="@dimen/icon_small"
-                            android:src="@drawable/ic_down_arrow"
-                            android:tint="@color/primary" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
-
-            <Space
-                android:layout_width="16dp"
-                android:layout_height="1dp" />
 
             <!-- To Date -->
             <LinearLayout

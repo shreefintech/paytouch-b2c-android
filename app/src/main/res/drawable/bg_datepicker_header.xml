@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Diagonal gradient: brand magenta → deep burgundy -->
+    <gradient
+        android:angle="135"
+        android:centerColor="#BC1A52"
+        android:endColor="#8C0D3F"
+        android:startColor="#D52662"
+        android:type="linear" />
+</shape>

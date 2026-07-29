@@ -56,4 +56,5 @@
 
 
     <color name="fetch_bill_stroke">#0BA93F</color>
+    <color name="btm_sheet_bg">#80000000</color>
 </resources>

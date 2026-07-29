@@ -10,6 +10,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
@@ -21,35 +22,17 @@ class TransactionDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivityTransactionDetailBinding
 
+    private val transactionItem: TransactionItem? by lazy {
+        intent.getStringExtra(EXTRA_ITEM)?.let { Gson().fromJson(it, TransactionItem::class.java) }
+    }
+
     companion object {
-        private const val EXTRA_MOBILE = "extra_mobile"
-        private const val EXTRA_TXN_ID = "extra_txn_id"
-        private const val EXTRA_AMOUNT = "extra_amount"
-        private const val EXTRA_STATUS = "extra_status"
-        private const val EXTRA_USERNAME = "extra_username"
-        private const val EXTRA_DATE = "extra_date"
-        private const val EXTRA_PLATFORM_FEE = "extra_platform_fee"
-        private const val EXTRA_TOTAL = "extra_total"
-        private const val EXTRA_REF_ID = "extra_ref_id"
-        private const val EXTRA_USER_ID = "extra_user_id"
-        private const val EXTRA_ACCOUNT_NO = "extra_account_no"
-        private const val EXTRA_COMPANY = "extra_company"
+        private const val EXTRA_ITEM = "extra_item"
 
         fun start(context: Context, item: TransactionItem) {
             context.startActivity(
                 Intent(context, TransactionDetailActivity::class.java).apply {
-                    putExtra(EXTRA_MOBILE, item.mobileNumber)
-                    putExtra(EXTRA_TXN_ID, item.transactionId)
-                    putExtra(EXTRA_AMOUNT, item.amount)
-                    putExtra(EXTRA_STATUS, item.status)
-                    putExtra(EXTRA_USERNAME, item.username)
-                    putExtra(EXTRA_DATE, item.date)
-                    putExtra(EXTRA_PLATFORM_FEE, item.platformFee)
-                    putExtra(EXTRA_TOTAL, item.totalPayable)
-                    putExtra(EXTRA_REF_ID, item.referenceId)
-                    putExtra(EXTRA_USER_ID, item.userId)
-                    putExtra(EXTRA_ACCOUNT_NO, item.accountNumber)
-                    putExtra(EXTRA_COMPANY, item.companyName)
+                    putExtra(EXTRA_ITEM, Gson().toJson(item))
                 }
             )
         }
@@ -67,14 +50,14 @@ class TransactionDetailActivity : BaseActivity() {
         }
 
         LiquidGlassEffect.attach(
-            targetView = binding.flCard,
-            rootView = binding.clRoot as ViewGroup,
+            targetView   = binding.flCard,
+            rootView     = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion = 0f,
-            blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-            strokeColor = Color.argb(180, 213, 38, 98),
-            strokeWidth = 1,
-            solidStroke = true,
+            distortion   = 0f,
+            blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
+            strokeColor  = Color.argb(180, 213, 38, 98),
+            strokeWidth  = 1,
+            solidStroke  = true,
         )
 
         populateData()
@@ -82,53 +65,44 @@ class TransactionDetailActivity : BaseActivity() {
         onBack()
     }
 
-    private fun openSmsReceipt() {
-        SmsReceiptActivity.start(
-            context = mActivity,
-            mobile = intent.getStringExtra(EXTRA_MOBILE) ?: "",
-            txnId = intent.getStringExtra(EXTRA_TXN_ID) ?: "",
-            amount = intent.getStringExtra(EXTRA_AMOUNT) ?: "",
-            status = intent.getStringExtra(EXTRA_STATUS) ?: "",
-            username = intent.getStringExtra(EXTRA_USERNAME) ?: "",
-            date = intent.getStringExtra(EXTRA_DATE) ?: "",
-            platformFee = intent.getStringExtra(EXTRA_PLATFORM_FEE) ?: "",
-            refId = intent.getStringExtra(EXTRA_REF_ID) ?: "",
-            accountNo = intent.getStringExtra(EXTRA_ACCOUNT_NO) ?: "",
-            companyName = intent.getStringExtra(EXTRA_COMPANY) ?: ""
-        )
-    }
-
     private fun populateData() {
-        val mobile = intent.getStringExtra(EXTRA_MOBILE) ?: ""
-        val txnId = intent.getStringExtra(EXTRA_TXN_ID) ?: ""
-        val amount = intent.getStringExtra(EXTRA_AMOUNT) ?: ""
-        val status = intent.getStringExtra(EXTRA_STATUS) ?: ""
-        val username = intent.getStringExtra(EXTRA_USERNAME) ?: ""
-        val date = intent.getStringExtra(EXTRA_DATE) ?: ""
-        val platformFee = intent.getStringExtra(EXTRA_PLATFORM_FEE) ?: ""
-        val total = intent.getStringExtra(EXTRA_TOTAL) ?: ""
-        val refId = intent.getStringExtra(EXTRA_REF_ID) ?: ""
-        val userId = intent.getStringExtra(EXTRA_USER_ID) ?: ""
+        val item = transactionItem ?: return
+        binding.tvMobileNumber.text  = getString(R.string.labelMobileNoFmt, item.mobileNumber)
+        binding.tvUsername.text      = getString(R.string.labelUsernameFmt, item.username)
+        binding.tvInfoAmount.text    = item.amount
+        binding.tvStatus.text        = item.status
+        binding.tvDate.text          = item.date
+        binding.tvPaymentAmount.text = item.amount
+        binding.tvPlatformFee.text   = item.platformFee
+        binding.tvTotalPayable.text  = item.totalPayable
+        binding.tvTransactionId.text = item.transactionId
+        binding.tvReferenceId.text   = item.referenceId
+        binding.tvUserId.text        = item.userId
 
-        binding.tvMobileNumber.text = getString(R.string.labelMobileNoFmt, mobile)
-        binding.tvUsername.text = getString(R.string.labelUsernameFmt, username)
-        binding.tvInfoAmount.text = amount
-        binding.tvStatus.text = status
-        binding.tvDate.text = date
-        binding.tvPaymentAmount.text = amount
-        binding.tvPlatformFee.text = platformFee
-        binding.tvTotalPayable.text = total
-        binding.tvTransactionId.text = txnId
-        binding.tvReferenceId.text = refId
-        binding.tvUserId.text = userId
-
-        val (bgColor, textColor) = when (status) {
+        val (bgColor, textColor) = when (item.status) {
             "Success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
-            "Failed" -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
-            else -> Pair(R.color.toast_bg_warning, R.color.orange)
+            "Failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
+            else      -> Pair(R.color.toast_bg_warning, R.color.orange)
         }
         binding.cvStatus.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
         binding.tvStatus.setTextColor(ContextCompat.getColor(mActivity, textColor))
+    }
+
+    private fun openSmsReceipt() {
+        val item = transactionItem ?: return
+        SmsReceiptActivity.start(
+            context     = mActivity,
+            mobile      = item.mobileNumber,
+            txnId       = item.transactionId,
+            amount      = item.amount,
+            status      = item.status,
+            username    = item.username,
+            date        = item.date,
+            platformFee = item.platformFee,
+            refId       = item.referenceId,
+            accountNo   = item.accountNumber,
+            companyName = item.companyName
+        )
     }
 
     private fun onBack() {
