@@ -142,9 +142,26 @@ class ElectricityActivity : BaseActivity() {
                     startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
                 }
 
+                binding.llTabStatus -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, SmsReceiptActivity::class.java))
+                    // TODO(PAYTOUCH-546): Replace dummy data with real transaction data once API is integrated
+                    SmsReceiptActivity.start(
+                        context     = mActivity,
+                        mobile      = "9876543210",
+                        txnId       = "TXN123456789",
+                        amount      = "₹1,200.00",
+                        status      = "Success",
+                        username    = "Rahul Sharma",
+                        date        = "2025-07-29",
+                        platformFee = "₹2.00",
+                        refId       = "REF987654321",
+                        accountNo   = "123456789012",
+                        companyName = "MSEDCL"
+                    )
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
