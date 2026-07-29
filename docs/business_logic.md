@@ -19,8 +19,6 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
   - `requires_mpin = true` → send to MPIN creation screen
   - `requires_virtual_account = true` → send to `CreateVirtualAccountActivity`
   - All false → send to `HomeActivity`
-- "Remember Me" saves the mobile number to SharedPreferences so it pre-fills on next open
-- Login type preference (password vs. MPIN) is also persisted between sessions
 
 ### API Endpoints
 | Method | Path | Purpose |
@@ -65,7 +63,6 @@ Logged In → Logged Out (automatic, on any 401 response)
 ### Edge Cases
 - 401 from any API endpoint → immediate forced logout + LoginActivity (stack cleared)
 - If token exists in SharedPreferences at app start, Splash skips login and routes based on onboarding flags
-- "Remember Me" checked → save mobile in SharedPreferences; pre-fill on next open
 
 ---
 
@@ -393,9 +390,6 @@ Example: PYTCH19012026091530M
 | `AUTH` | `ReferralCode` | String | Referral code |
 | `app_prefs` | `mpin_created` | Boolean | MPIN setup complete |
 | `app_prefs` | `virtual_account` | Boolean | VA setup complete |
-| `LOGIN_PREF` | `REMEMBER` | Boolean | Remember me flag |
-| `LOGIN_PREF` | `MOBILE` | String | Saved mobile for auto-fill |
-| `LOGIN_PREF` | `LOGIN_TYPE_PASSWORD` | Boolean | true=password, false=MPIN |
 
 ### Rules
 - Token is checked at Splash; no token → go to Login

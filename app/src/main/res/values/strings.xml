@@ -10,6 +10,7 @@
     <string name="label_mpin">MPIN</string>
     <string name="hint_password">Enter your password</string>
     <string name="hint_mpin">Enter 4-digit MPIN</string>
+    <string name="label_save_credentials">Save Credentials</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="labelForgotMpin">Forgot MPIN?</string>
     <string name="sign_in">Sign In</string>
@@ -24,7 +25,12 @@
     <string name="msgPasswordEmpty">Please enter your password</string>
     <string name="msgPasswordShort">Password must be at least 8 characters</string>
     <string name="msgNoInternet">No internet connection</string>
-
+    <string name="errBadRequest">Invalid request. Please check your input</string>
+    <string name="errUnauthorized">Session expired. Please login again</string>
+    <string name="errForbidden">You do not have permission to perform this action</string>
+    <string name="errNotFound">The requested resource was not found</string>
+    <string name="errValidation">Please check your input and try again</string>
+    <string name="errServer">Server error. Please try again later</string>
     <string name="msgMpinEmpty">Please enter your MPIN</string>
     <string name="msgMpinInvalid">MPIN must be exactly 4 digits</string>
 
@@ -293,5 +299,37 @@
     <string name="apiErr508">Server detected an infinite loop</string>
     <string name="errGeneric">Something went wrong. Please try again.</string>
     <string name="apiErr422">Unprocessable Content</string>
+    <string name="api_err_400">Bad Request</string>
+    <string name="api_err_401">Unauthorized. Please check your credentials.</string>
+    <string name="api_err_402">Request Not Implemented</string>
+    <string name="api_err_403">Access Forbidden</string>
+    <string name="api_err_404">Resource Not Found</string>
+    <string name="api_err_405">Method Not Allowed</string>
+    <string name="api_err_413">Content Too Large</string>
+    <string name="api_err_415">Unsupported Media Type</string>
+    <string name="api_err_425">Server unwilling to process request</string>
+    <string name="api_err_429">Too many requests. Try again later.</string>
+    <string name="api_err_500">Internal Server Error</string>
+    <string name="api_err_502">Bad Gateway</string>
+    <string name="api_err_503">Service Unavailable</string>
+    <string name="api_err_504">Gateway Timeout</string>
+    <string name="api_err_508">Server detected an infinite loop</string>
+    <string name="err_generic">Something went wrong. Please try again.</string>
+    <string name="api_err_422">Unprocessable Content</string>
+    <string name="btnFetchBill">Fetch Bill</string>
+    <string name="btnClear">Clear</string>
+    <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 digits</string>
+    <string name="msgLoadingOperators">Loading operators, please wait…</string>
+
+    <!-- Bill Details card -->
+    <string name="titleBillDetailsFetched">Electricity Bill Details Fetched</string>
+    <string name="labelDueDate">Due Date</string>
+    <string name="labelBillDate">Bill Date</string>
+    <string name="labelBillAmount">Bill Amount</string>
+    <string name="labelConnectionNumber">Connection Number</string>
+    <string name="labelOperator">Operator</string>
+    <string name="btnClearAndEnterManually">Clear &amp; Enter Manually</string>
+
+    <string name="msgInsufficientBalance">Insufficient balance. Please add funds to your wallet.</string>
 
 </resources>

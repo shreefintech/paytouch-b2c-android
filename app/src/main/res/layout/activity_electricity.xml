@@ -5,9 +5,19 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
+
+        <variable
+            name="showProgressFetch"
+            type="androidx.databinding.ObservableBoolean" />
+
+        <variable
+            name="showProgressPay"
+            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -128,7 +138,7 @@
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:src="@drawable/ic_download"
+                        android:src="@drawable/ic_report"
                         android:tint="@color/primary" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -192,7 +202,7 @@
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:src="@drawable/ic_share"
+                        android:src="@drawable/ic_sms"
                         android:tint="@color/primary" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -213,50 +223,18 @@
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cvTabs">
+            app:layout_constraintTop_toBottomOf="@id/cvTabs"
+            app:layout_constraintVertical_bias="0.0">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingVertical="@dimen/margin_extra_large">
-
-                <!-- Recent Transactions row — pinned to bottom -->
-                <LinearLayout
-                    android:id="@+id/llRecentTransactions"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/page_margin_horizontal"
-                    android:layout_marginTop="@dimen/margin_large"
-                    android:layout_marginEnd="@dimen/page_margin_horizontal"
-                    android:background="@drawable/bg_white_rounded"
-                    android:gravity="center_vertical"
-                    android:onClickListener="@{onClickListener}"
-                    android:orientation="horizontal"
-                    android:padding="@dimen/margin_large"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/flCard">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/proza_libre_bold"
-                        android:includeFontPadding="false"
-                        android:text="@string/titleRecentTransactions"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/text_size_14" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_right_arrow"
-                        android:tint="@color/primary" />
-                </LinearLayout>
 
                 <!-- Glass form card — fills space between tab bar and recent transactions -->
                 <FrameLayout
@@ -278,124 +256,401 @@
                         android:orientation="vertical"
                         android:padding="@dimen/margin_large">
 
-                        <!-- Category | Company row -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <!-- Category (static) -->
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="@dimen/margin_small"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/proza_libre_medium"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/labelCategory"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_12" />
-
-                                <FrameLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:background="@drawable/bg_form_field"
-                                    android:padding="@dimen/margin_small_medium">
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/proza_libre_medium"
-                                        android:includeFontPadding="false"
-                                        android:text="@string/categoryElectricityBill"
-                                        android:textColor="@color/black"
-                                        android:textSize="@dimen/text_size_12" />
-                                </FrameLayout>
-                            </LinearLayout>
-
-                            <!-- Company (dropdown) -->
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/proza_libre_medium"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/labelCompany"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_12" />
-
-                                <FrameLayout
-                                    android:id="@+id/flCompanyAnchor"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:background="@drawable/bg_form_field"
-                                    android:onClickListener="@{onClickListener}"
-                                    android:padding="@dimen/margin_small_medium">
-
-                                    <LinearLayout
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:gravity="center_vertical"
-                                        android:orientation="horizontal">
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:id="@+id/tvCompany"
-                                            android:layout_width="0dp"
-                                            android:layout_height="wrap_content"
-                                            android:layout_weight="1"
-                                            android:fontFamily="@font/proza_libre_medium"
-                                            android:includeFontPadding="false"
-                                            android:text="@string/hintSelectCompany"
-                                            android:textColor="?attr/colorTextSubtitle"
-                                            android:textSize="@dimen/text_size_12" />
-
-                                        <androidx.appcompat.widget.AppCompatImageView
-                                            android:id="@+id/ivCompanyArrow"
-                                            android:layout_width="14dp"
-                                            android:layout_height="14dp"
-                                            android:src="@drawable/ic_down_arrow"
-                                            android:tint="@color/primary" />
-                                    </LinearLayout>
-                                </FrameLayout>
-                            </LinearLayout>
-                        </LinearLayout>
-
-                        <!-- Consumer Number -->
+                        <!-- Company -->
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/margin_medium"
                             android:fontFamily="@font/proza_libre_medium"
                             android:includeFontPadding="false"
-                            android:text="@string/labelConsumerNumber"
+                            android:text="@string/labelCompany"
                             android:textColor="@color/black"
                             android:textSize="@dimen/text_size_12" />
 
-                        <androidx.appcompat.widget.AppCompatEditText
-                            android:id="@+id/etConsumerNumber"
+                        <FrameLayout
+                            android:id="@+id/flCompanyAnchor"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:background="@drawable/bg_form_field"
-                            android:fontFamily="@font/proza_libre_medium"
-                            android:hint="@string/hintConsumerNumber"
-                            android:inputType="text"
-                            android:padding="@dimen/margin_small_medium"
-                            android:textColor="@color/black"
-                            android:textColorHint="?attr/colorTextSubtitle"
-                            android:textSize="@dimen/text_size_13" />
+                            android:foreground="?selectableItemBackground"
+                            android:onClickListener="@{onClickListener}"
+                            android:padding="@dimen/margin_small_medium">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvCompany"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:text="@string/hintSelectCompany"
+                                    android:textColor="?attr/colorTextHint"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <FrameLayout
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivCompanyArrow"
+                                        android:layout_width="14dp"
+                                        android:layout_height="14dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_down_arrow"
+                                        android:tint="@color/primary" />
+
+                                    <ProgressBar
+                                        android:id="@+id/pbCompanyLoading"
+                                        style="?android:attr/progressBarStyleSmall"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:indeterminateTint="@color/primary"
+                                        android:visibility="gone" />
+                                </FrameLayout>
+                            </LinearLayout>
+                        </FrameLayout>
+
+                        <!-- Consumer Number -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="bottom"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:text="@string/labelConsumerNumber"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <androidx.appcompat.widget.AppCompatEditText
+                                    android:id="@+id/etConsumerNumber"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:background="@drawable/bg_form_field"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:hint="@string/hintConsumerNumber"
+                                    android:inputType="number"
+                                    android:padding="@dimen/margin_small_medium"
+                                    android:textColor="@color/black"
+                                    android:textColorHint="?attr/colorTextHint"
+                                    android:textSize="@dimen/text_size_13" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/llFetchBill"
+                                android:layout_width="100dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:background="@drawable/bg_toggle_selected"
+                                android:gravity="center"
+                                android:onClickListener="@{onClickListener}"
+                                android:orientation="horizontal"
+                                android:padding="@dimen/margin_small_medium">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:text="@string/btnFetchBill"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/text_size_13"
+                                    android:visibility="@{showProgressFetch ? View.GONE : View.VISIBLE}" />
+
+                                <ProgressBar
+                                    style="?android:attr/progressBarStyleSmall"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:indeterminateTint="@color/white"
+                                    android:visibility="@{showProgressFetch ? View.VISIBLE : View.GONE}"
+                                    tools:visibility="gone" />
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+
+                        <!-- Bill Details Card -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvBillDetails"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="12dp"
+                            android:visibility="gone"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/fetch_bill_stroke"
+                            app:strokeWidth="1.5dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="@dimen/margin_medium">
+
+                                <!-- Header: check icon + title -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:layout_width="28dp"
+                                        android:layout_height="28dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_procced_to_pay_1" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/titleBillDetailsFetched"
+                                        android:textColor="@color/fetch_bill_stroke"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:layout_marginBottom="@dimen/margin_small"
+                                    android:background="#1A000000" />
+
+                                <!-- Customer Name -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelCustomerName"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvBillCustomerName"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                                <!-- Due Date -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelDueDate"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvBillDueDate"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                                <!-- Bill Date -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelBillDate"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvBillDate"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                                <!-- Bill Amount -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelBillAmount"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvBillAmount"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/fetch_bill_stroke"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                                <!-- Connection Number -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelConnectionNumber"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvBillConnectionNumber"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                                <!-- Operator -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelOperator"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvBillOperator"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                                <!-- Clear & Enter Manually -->
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cvClearBill"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:onClickListener="@{onClickListener}"
+                                    app:cardBackgroundColor="?attr/colorPrimary"
+                                    app:cardCornerRadius="10dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:orientation="horizontal"
+                                        android:padding="@dimen/margin_small_medium">
+
+                                        <ImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:src="@drawable/ic_close"
+                                            android:tint="@color/white" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="8dp"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/btnClearAndEnterManually"
+                                            android:textColor="@color/white"
+                                            android:textSize="@dimen/text_size_13" />
+                                    </LinearLayout>
+                                </com.google.android.material.card.MaterialCardView>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         <!-- Amount -->
                         <androidx.appcompat.widget.AppCompatTextView
@@ -419,7 +674,7 @@
                             android:inputType="numberDecimal"
                             android:padding="@dimen/margin_small_medium"
                             android:textColor="@color/black"
-                            android:textColorHint="?attr/colorTextSubtitle"
+                            android:textColorHint="?attr/colorTextHint"
                             android:textSize="@dimen/text_size_13" />
 
                         <!-- Platform Fee | Total Payable -->
@@ -459,7 +714,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/hintPlatformFee"
-                                        android:textColor="?attr/colorTextSubtitle"
+                                        android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
                                 </FrameLayout>
                             </LinearLayout>
@@ -493,27 +748,37 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
                                         android:text="@string/hintTotalPayable"
-                                        android:textColor="?attr/colorTextSubtitle"
+                                        android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
                                 </FrameLayout>
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- Terms checkbox row -->
-                        <com.google.android.material.checkbox.MaterialCheckBox
-                            android:id="@+id/cbTerms"
-                            android:layout_width="wrap_content"
+                        <!-- Terms checkbox row: checkbox box + separate textview to avoid LinkMovementMethod stealing checkbox toggle -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/margin_medium"
-                            android:ellipsize="end"
-                            app:buttonTint="@color/primary"
-                            android:fontFamily="@font/proza_libre_medium"
-                            android:includeFontPadding="false"
-                            android:maxLines="2"
-                            android:text="@string/msgTermsAgreement"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/text_size_12"
-                            app:buttonIconTint="@color/white" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.checkbox.MaterialCheckBox
+                                android:id="@+id/cbTerms"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:buttonIconTint="@color/white"
+                                app:buttonTint="@color/primary" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvTerms"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:includeFontPadding="false"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/text_size_12" />
+                        </LinearLayout>
 
 
                         <!-- Action buttons -->
@@ -538,7 +803,8 @@
                                 <androidx.appcompat.widget.AppCompatImageView
                                     android:layout_width="18dp"
                                     android:layout_height="18dp"
-                                    android:src="@drawable/ic_procced_to_pay" />
+                                    android:src="@drawable/ic_procced_to_pay"
+                                    android:visibility="@{showProgressPay ? View.GONE : View.VISIBLE}" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:layout_width="wrap_content"
@@ -548,7 +814,16 @@
                                     android:includeFontPadding="false"
                                     android:text="@string/btnProceedToPay"
                                     android:textColor="?attr/colorPrimary"
-                                    android:textSize="@dimen/text_size_12" />
+                                    android:textSize="@dimen/text_size_12"
+                                    android:visibility="@{showProgressPay ? View.GONE : View.VISIBLE}" />
+
+                                <ProgressBar
+                                    style="?android:attr/progressBarStyleSmall"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:indeterminateTint="?attr/colorPrimary"
+                                    android:visibility="@{showProgressPay ? View.VISIBLE : View.GONE}"
+                                    tools:visibility="gone" />
                             </LinearLayout>
 
                             <!-- Reset -->
@@ -582,6 +857,41 @@
 
                     </LinearLayout>
                 </FrameLayout>
+
+
+                <!-- Recent Transactions row -->
+                <LinearLayout
+                    android:id="@+id/llRecentTransactions"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/page_margin_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:layout_marginEnd="@dimen/page_margin_horizontal"
+                    android:background="@drawable/bg_white_rounded"
+                    android:gravity="center_vertical"
+                    android:onClickListener="@{onClickListener}"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/margin_large"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/flCard">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/proza_libre_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/titleRecentTransactions"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_14" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_right_arrow"
+                        android:tint="@color/primary" />
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

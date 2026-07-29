@@ -18,6 +18,9 @@ object Constant {
 
     const val KEY_REFERRAL_CODE = "ReferralCode"
 
+    // External URLs
+    const val URL_PLATFORM_TERMS = "https://www.paytouch.in/terms/platform"
+
     // Auth flow type extras
     const val EXTRA_FLOW_TYPE = "FLOW_TYPE"
     const val EXTRA_MOBILE = "EXTRA_MOBILE"

@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:textSize="@dimen/text_size_14"
+            android:textSize="@dimen/text_size_12"
             android:fontFamily="@font/proza_libre_medium"
             android:textColor="?attr/colorOnSurface" />
 

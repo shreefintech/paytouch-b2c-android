@@ -82,6 +82,7 @@ com.shreefintech.paytouchconsumer/
 7. Network errors must be parsed via **ApiHelper.parseErrorMessage()**.
 8. Adapters must not contain business logic or network calls.
 9. ViewModels must not store Activity/Context references.
+10. **All API endpoints must be declared in `ApiService` or `ApiAdminService`** — never construct `OkHttpClient` or `Retrofit` directly inside a ViewModel or Activity. Each backend URL has exactly one registered client: `ApiClient` for `paytouch.in`, `ApiAdminClient` for `admin.paytouch.in`. Add a new endpoint to the appropriate service interface; do not bypass it with a raw HTTP call.
 
 ---
 
@@ -180,21 +181,28 @@ For all tasks:
 
 ## API Response Wrapper
 
-Most API responses are wrapped in `General<T>` with fields: `data`, `success`, `meta`, `message`.
+Response structure depends on the actual API contract — there is no single mandatory wrapper for every endpoint. Match the model to what the server returns.
 
-**Auth endpoints exception:** The auth API (`/api/login`, `/api/register`, `/api/user`, `/api/password/*`, `/api/mpin/*`) return **unwrapped** JSON — no `General<T>` wrapper. Use dedicated `Item` models for these:
+**`General<T>` wrapped** — use when the API envelope is `{"data": ..., "success": ..., "meta": ..., "message": ...}`:
+- Declare: `Call<General<YourItem?>>`
+- Success check: `response.isSuccessful && response.body()?.data != null`
 
-| Endpoint | Response model |
-|---|---|
-| `GET /api/user` | `UserProfileItem` |
-| `POST /api/login` | `LoginItem` |
-| `POST /api/register` | `RegisterItem` |
-| `POST /api/*/send-otp`, `verify-otp`, `reset` | `MessageItem` |
+**Flat / direct response** — use when the API returns a top-level object with no `data` key:
+- Declare: `Call<YourItem>` with the fields your endpoint returns
+- Success check depends on fields present:
+  - Has `success: Boolean` field → `response.isSuccessful && response.body()?.success == true`
+  - No `success` field → `response.isSuccessful` is sufficient
 
-**Success check rules:**
-- `General<T>` endpoints: `response.isSuccessful && response.body()?.data != null`
-- `MessageItem` endpoints: `response.isSuccessful && response.body()?.success == true`
-- `LoginItem` / `UserProfileItem` / `RegisterItem` endpoints: `response.isSuccessful` is sufficient (no explicit `success` field).
+**Auth endpoints** (`/api/login`, `/api/register`, `/api/user`, `/api/password/*`, `/api/mpin/*`) always return flat/unwrapped JSON:
+
+| Endpoint | Response model | Success check |
+|---|---|---|
+| `GET /api/user` | `UserProfileItem` | `response.isSuccessful` |
+| `POST /api/login` | `LoginItem` | `response.isSuccessful` |
+| `POST /api/register` | `RegisterItem` | `response.isSuccessful` |
+| `POST /api/*/send-otp`, `verify-otp`, `reset` | `MessageItem` | `response.isSuccessful && body?.success == true` |
+
+**Rule:** Always check `docs/api_reference.md` first to confirm the actual response shape before choosing a wrapper. Never guess or assume `General<T>` — use whatever the real API returns.
 
 ---
 
@@ -424,6 +432,128 @@ binding.incSheet.root.setPadding(0, 0, 0, systemBars.bottom)
 ```
 
 > No bottom sheets are implemented yet in this project. The first screen to add one should follow this pattern exactly.
+
+---
+
+## Button & List Loading State Rule
+
+**This is a hard rule for all screens — no exceptions.**
+
+### Button-triggered API calls
+
+Every button that triggers an API call must show a `ProgressBar` **inside the button itself** while the call is in flight. Never use a full-screen loader, never use only alpha dimming for button actions.
+
+**Pattern:**
+
+1. Add `ObservableBoolean` variables per button in the layout `<data>` block, plus `import android.view.View`:
+
+```xml
+<data>
+    <import type="android.view.View" />
+    <variable name="onClickListener" type="android.view.View.OnClickListener" />
+    <variable name="showProgressFetch" type="androidx.databinding.ObservableBoolean" />
+    <variable name="showProgressPay"   type="androidx.databinding.ObservableBoolean" />
+</data>
+```
+
+2. Inside the button container, add both the label/icon and a `ProgressBar`. Toggle them with the `ObservableBoolean`:
+
+```xml
+<LinearLayout
+    android:id="@+id/llFetchBill"
+    android:layout_width="100dp"
+    android:layout_height="@dimen/btn_height"
+    android:background="@drawable/bg_toggle_selected"
+    android:gravity="center"
+    android:onClickListener="@{onClickListener}">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btnFetchBill"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_12"
+        android:visibility="@{showProgressFetch ? View.GONE : View.VISIBLE}" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:indeterminateTint="@color/white"
+        android:visibility="@{showProgressFetch ? View.VISIBLE : View.GONE}" />
+</LinearLayout>
+```
+
+3. In Kotlin, declare one `ObservableBoolean` per button, assign to binding in `onCreate()`, and toggle on API start/finish:
+
+```kotlin
+private val showProgressFetch = ObservableBoolean(false)
+private val showProgressPay   = ObservableBoolean(false)
+
+// in onCreate(), after binding setup:
+binding.showProgressFetch = showProgressFetch
+binding.showProgressPay   = showProgressPay
+
+// when starting the API call:
+showProgressFetch.set(true)
+
+// in both onResponse() and onFailure():
+showProgressFetch.set(false)
+```
+
+4. Guard the click handler so the button cannot be tapped while its progress is showing:
+
+```kotlin
+binding.llFetchBill -> {
+    if (Utility.stopClick()) return@OnClickListener
+    if (showProgressFetch.get()) return@OnClickListener
+    onFetchBill()
+}
+```
+
+### List / dropdown field loading
+
+When a field's data is loaded via API (e.g. an operator dropdown), show a small `ProgressBar` **inside the field slot** — replacing the arrow or trailing icon — while loading. Do NOT show a full-screen overlay or affect any other part of the screen.
+
+```xml
+<!-- inside the field row, wrap the trailing icon in a FrameLayout -->
+<FrameLayout android:layout_width="16dp" android:layout_height="16dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivCompanyArrow"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_down_arrow"
+        android:tint="@color/primary" />
+
+    <ProgressBar
+        android:id="@+id/pbCompanyLoading"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:indeterminateTint="@color/primary"
+        android:visibility="gone" />
+</FrameLayout>
+```
+
+```kotlin
+private fun setOperatorLoading(loading: Boolean) {
+    binding.pbCompanyLoading.visibility = if (loading) View.VISIBLE else View.GONE
+    binding.ivCompanyArrow.visibility   = if (loading) View.GONE else View.VISIBLE
+    binding.flCompanyAnchor.isClickable = !loading
+    binding.flCompanyAnchor.isFocusable = !loading
+}
+```
+
+### What NOT to do
+
+| Anti-pattern | Correct approach |
+|---|---|
+| Full-screen progress dialog / overlay | In-button ProgressBar |
+| `view.alpha = 0.5f` as the only loading signal | In-button ProgressBar (alpha may be used additionally, never alone) |
+| Single shared `isLoading` flag for multiple buttons | One `ObservableBoolean` per button |
+| Showing a spinner that covers the whole screen for a button tap | Show only inside that button |
 
 ---
 
