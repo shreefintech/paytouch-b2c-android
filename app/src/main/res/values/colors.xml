@@ -56,7 +56,6 @@
     <color name="sheet_divider">#15000000</color>              <!-- sheet section divider line -->
     <color name="sms_row_highlight">#FFF0F5</color>            <!-- tinted row bg in SMS display tab -->
 
-
     <color name="fetch_bill_stroke">#0BA93F</color>
     <color name="btm_sheet_bg">#80000000</color>
 </resources>

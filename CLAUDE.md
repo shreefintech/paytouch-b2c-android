@@ -275,8 +275,8 @@ Every bill payment module (Electricity, Gas, Water, DTH, Mobile, etc.) has three
 | Component | Location | Shared By |
 |---|---|---|
 | `TransactionAdp` | `adapter/TransactionAdp.kt` | All modules — category-agnostic, icon driven by `item.categoryIconRes` |
-| `TransactionItem` | `electricity/model/TransactionItem.kt` | All modules — UI model, no API fields |
-| `TransactionDetailActivity` | `electricity/transactions/TransactionDetailActivity.kt` | All modules — reused as-is |
+| `TransactionItem` | `transactions/model/TransactionItem.kt` | All modules — UI model, no API fields |
+| `TransactionDetailActivity` | `transactions/TransactionDetailActivity.kt` | All modules — reused as-is |
 | `TransactionFilterHelper` | `utill/TransactionFilterHelper.kt` | All report screens |
 | `item_transaction.xml` | `res/layout/item_transaction.xml` | All modules via `TransactionAdp` |
 | `lyt_shimmer_transaction_item.xml` | `res/layout/` | All transaction activity layouts |
@@ -295,7 +295,7 @@ Each new module (e.g. Gas) needs only:
 
 ### Rules
 
-- **Never create a new `TransactionDetailActivity` per module** — all modules share the one in `electricity/transactions/`.
+- **Never create a new `TransactionDetailActivity` per module** — all modules share the one in `transactions/`.
 - **Never create a new adapter or item layout per module** — `TransactionAdp` and `item_transaction.xml` are category-agnostic.
 - **`TransactionDetailActivity` has no SMS Receipt button** — it was removed. Do not add it back.
 - The activity layouts for status and report are **copied from the electricity versions** with only the title string changed. Do not redesign them.

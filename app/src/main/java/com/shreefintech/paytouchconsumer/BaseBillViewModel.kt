@@ -23,6 +23,10 @@ abstract class BaseBillViewModel(application: Application) : AndroidViewModel(ap
         onSufficient: () -> Unit,
         onFallback: () -> Unit
     ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onFallback()
+            return
+        }
         ApiAdminClient.apiService.getVpsBalance(userId)
             .enqueue(object : Callback<VpsBalanceItem> {
                 override fun onResponse(call: Call<VpsBalanceItem>, response: Response<VpsBalanceItem>) {
