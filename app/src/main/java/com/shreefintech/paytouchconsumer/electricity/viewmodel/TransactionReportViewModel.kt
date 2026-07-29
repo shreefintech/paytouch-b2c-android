@@ -60,7 +60,7 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
                 call: Call<General<List<ElectricityTransactionReportDataItem>>>,
                 t: Throwable
             ) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }
@@ -77,7 +77,7 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
             platformFee     = "₹%.2f".format(item.platformFee),
             totalPayable    = "₹%.2f".format(item.totalPayable),
             referenceId     = item.transactionId ?: "--",
-            userId          = (index + 1).toString(),
+            userId          = item.id.toString(),
             accountNumber   = item.subscriberNo ?: "--",
             companyName     = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--"
         )

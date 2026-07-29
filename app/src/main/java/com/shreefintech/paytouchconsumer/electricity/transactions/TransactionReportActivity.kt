@@ -101,14 +101,8 @@ class TransactionReportActivity : BaseActivity() {
                 callReport(fromDate, toDate, status, consumerNo)
             },
             onClear      = {
-                mAllList.clear()
-                mDisplayList.clear()
                 binding.etSearch.setText("")
-                transactionAdp.notifyDataSetChanged()
-                binding.tvEmpty.visibility        = View.VISIBLE
-                binding.shimmerLayout.stopShimmer()
-                binding.shimmerLayout.visibility  = View.GONE
-                binding.rvTransactions.visibility = View.VISIBLE
+                callReport(null, null, null, null)
             }
         )
         filterHelper.setup()
