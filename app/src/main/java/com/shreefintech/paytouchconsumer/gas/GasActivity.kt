@@ -24,8 +24,8 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityGasBinding
 import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
-import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
-import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.gas.transactions.GasRecentTransactionActivity
+import com.shreefintech.paytouchconsumer.gas.transactions.GasSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionReportActivity
 import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.gas.viewmodel.GasViewModel
@@ -226,8 +226,7 @@ class GasActivity : BaseActivity() {
             mActivity, Constant.KEY_MOBILE, ""
         ) ?: ""
         val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
-        // TODO(PAYTOUCH-585): Replace with GasSmsReceiptActivity; current screen title says "Electricity Payment Confirmation"
-        SmsReceiptActivity.start(
+        GasSmsReceiptActivity.start(
             context = mActivity,
             item = SmsReceiptItem(
                 mobile = mobile,
@@ -403,8 +402,7 @@ class GasActivity : BaseActivity() {
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-585): Replace with GasSmsReceiptActivity once created — current screen title shows "Electricity Payment Confirmation"
-                    SmsReceiptActivity.start(mActivity)
+                    GasSmsReceiptActivity.start(mActivity)
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener
@@ -431,8 +429,7 @@ class GasActivity : BaseActivity() {
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-585): Replace with GasRecentTransactionActivity once created — current screen calls electricity operators API
-                    startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
+                    GasRecentTransactionActivity.start(mActivity)
                 }
             }
         }

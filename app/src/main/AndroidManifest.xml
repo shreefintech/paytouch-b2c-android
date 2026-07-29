@@ -102,6 +102,16 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".gas.transactions.GasRecentTransactionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".gas.transactions.GasSmsReceiptActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".electricity.transactions.RecentTransactionActivity"
             android:exported="false"
             android:screenOrientation="portrait"
