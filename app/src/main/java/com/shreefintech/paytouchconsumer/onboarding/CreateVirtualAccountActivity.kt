@@ -317,12 +317,18 @@ class CreateVirtualAccountActivity : BaseActivity() {
         else -> null
     }
 
+    // TODO(PAYTOUCH-520): onSubmit() is intentionally unreachable — llCreateVirtualAccount navigates directly to HomeActivity pending virtual-account API wiring; restore this call once the API is connected.
     private fun onSubmit() {
         // TODO(PAYTOUCH-514): re-enable validate() once virtual account API is wired
 //        if (!validate()) return
 
         val docMsg = validateDocuments()
         if (docMsg != null) { ToastUtil.showDelete(mActivity, docMsg); return }
+
+        val aadharFrontUri = uploadUris[0] ?: return
+        val aadharBackUri  = uploadUris[1] ?: return
+        val panUri         = uploadUris[2] ?: return
+        val proofUri       = uploadUris[3] ?: return
 
         viewModel.submitVirtualAccount(
             fullName       = binding.etFullName.text?.toString()?.trim()    ?: "",
@@ -336,10 +342,10 @@ class CreateVirtualAccountActivity : BaseActivity() {
             bankAccount    = binding.etBankAccount.text?.toString()?.trim() ?: "",
             vpa            = binding.etVpa.text?.toString()?.trim()         ?: "",
             branchName     = binding.etBranchName.text?.toString()?.trim() ?: "",
-            aadharFrontUri = uploadUris[0]!!,
-            aadharBackUri  = uploadUris[1]!!,
-            panUri         = uploadUris[2]!!,
-            proofUri       = uploadUris[3]!!,
+            aadharFrontUri = aadharFrontUri,
+            aadharBackUri  = aadharBackUri,
+            panUri         = panUri,
+            proofUri       = proofUri,
             onLoading      = { showProgress.set(true) },
             onSuccess      = {
                 showProgress.set(false)

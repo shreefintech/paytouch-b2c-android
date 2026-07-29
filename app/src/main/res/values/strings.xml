@@ -196,11 +196,8 @@
     <string name="btnReset">Reset</string>
     <string name="titleRecentTransactions">Recent Transactions</string>
     <string name="msgConsumerNumberEmpty">Please enter consumer number</string>
-    <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 characters</string>
     <string name="msgSelectCompany">Please select a company</string>
     <string name="msgAmountEmpty">Please enter amount</string>
-    <string name="msgInsufficientBalance">Insufficient balance. Please add funds to your wallet.</string>
-    <string name="msgLoadingOperators">Loading providers, please try again in a moment.</string>
     <string name="msgComingSoon">This section will be available soon</string>
     <string name="categoryElectricity">Electricity</string>
     <string name="categoryGas">Gas</string>
@@ -288,6 +285,23 @@
     <string name="labelMobileNoFmt">Mobile No. %s</string>
     <string name="labelUsernameFmt">Username : %s</string>
 
+    <string name="apiErr400">Bad Request</string>
+    <string name="apiErr401">Unauthorized. Please check your credentials.</string>
+    <string name="apiErr402">Request Not Implemented</string>
+    <string name="apiErr403">Access Forbidden</string>
+    <string name="apiErr404">Resource Not Found</string>
+    <string name="apiErr405">Method Not Allowed</string>
+    <string name="apiErr413">Content Too Large</string>
+    <string name="apiErr415">Unsupported Media Type</string>
+    <string name="apiErr425">Server unwilling to process request</string>
+    <string name="apiErr429">Too many requests. Try again later.</string>
+    <string name="apiErr500">Internal Server Error</string>
+    <string name="apiErr502">Bad Gateway</string>
+    <string name="apiErr503">Service Unavailable</string>
+    <string name="apiErr504">Gateway Timeout</string>
+    <string name="apiErr508">Server detected an infinite loop</string>
+    <string name="errGeneric">Something went wrong. Please try again.</string>
+    <string name="apiErr422">Unprocessable Content</string>
     <string name="api_err_400">Bad Request</string>
     <string name="api_err_401">Unauthorized. Please check your credentials.</string>
     <string name="api_err_402">Request Not Implemented</string>
@@ -308,6 +322,9 @@
     <string name="btnFetchBill">Fetch Bill</string>
     <string name="btnSearch">Search</string>
     <string name="msgEnterSearchQuery">Please enter subscriber no. or transaction ID</string>
+    <string name="btnClear">Clear</string>
+    <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 digits</string>
+    <string name="msgLoadingOperators">Loading operators, please wait…</string>
 
     <!-- Bill Details card -->
     <string name="titleBillDetailsFetched">Electricity Bill Details Fetched</string>
@@ -318,5 +335,7 @@
     <string name="labelOperator">Operator</string>
     <string name="btnClearAndEnterManually">Clear &amp; Enter Manually</string>
     <string name="textFilter">Filter</string>
+
+    <string name="msgInsufficientBalance">Insufficient balance. Please add funds to your wallet.</string>
 
 </resources>

@@ -56,7 +56,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             override fun onFailure(call: Call<LoginItem>, t: Throwable) {
                 onError(
                     t.localizedMessage
-                        ?: getApplication<Application>().getString(R.string.err_generic)
+                        ?: getApplication<Application>().getString(R.string.errGeneric)
                 )
             }
         })
@@ -111,7 +111,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private fun fireVpsRegistration(id: Int, mobile: String, email: String, referralCode: String) {
         ApiAdminClient.apiService.registerUser(id, mobile, email, mobile, referralCode)
             .enqueue(object : Callback<Any> {
-                override fun onResponse(call: Call<Any>, response: Response<Any>) {}
+                override fun onResponse(call: Call<Any>, response: Response<Any>) {
+                }
                 override fun onFailure(call: Call<Any>, t: Throwable) {
                     t.printStackTrace()
                 }
