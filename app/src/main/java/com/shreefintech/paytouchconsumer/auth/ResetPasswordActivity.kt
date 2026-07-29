@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.ResetPasswordViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityResetPasswordBinding
@@ -26,6 +27,7 @@ class ResetPasswordActivity : BaseActivity() {
     private var showProgress = ObservableBoolean(false)
     private var isNewPasswordVisible     = false
     private var isConfirmPasswordVisible = false
+    private val mobile by lazy { intent.getStringExtra(Constant.EXTRA_MOBILE) ?: "" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,6 +117,7 @@ class ResetPasswordActivity : BaseActivity() {
         val newPassword = binding.etNewPassword.text?.toString() ?: ""
         viewModel.changePassword(
             context     = mActivity,
+            mobile      = mobile,
             newPassword = newPassword,
             onLoading   = { showProgress.set(true) },
             onSuccess   = { showProgress.set(false); navigateToLogin() },

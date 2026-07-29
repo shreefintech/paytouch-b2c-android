@@ -144,7 +144,7 @@ class ElectricityActivity : BaseActivity() {
 
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    ToastUtil.show(mActivity, getString(R.string.msgComingSoon))
+                    ToastUtil.showDelete(mActivity, getString(R.string.msgComingSoon))
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener

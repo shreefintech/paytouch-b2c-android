@@ -14,6 +14,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.ResetMpinViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityResetMpinBinding
@@ -26,6 +27,7 @@ class ResetMpinActivity : BaseActivity() {
     private lateinit var binding: ActivityResetMpinBinding
     private val viewModel: ResetMpinViewModel by viewModels()
     private var showProgress = ObservableBoolean(false)
+    private val mobile by lazy { intent.getStringExtra(Constant.EXTRA_MOBILE) ?: "" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -157,6 +159,7 @@ class ResetMpinActivity : BaseActivity() {
         )
         viewModel.changeMpin(
             context   = mActivity,
+            mobile    = mobile,
             newMpin   = newMpin,
             onLoading = { showProgress.set(true) },
             onSuccess = { showProgress.set(false); navigateToLogin() },

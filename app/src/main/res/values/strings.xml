@@ -10,12 +10,13 @@
     <string name="label_mpin">MPIN</string>
     <string name="hint_password">Enter your password</string>
     <string name="hint_mpin">Enter 4-digit MPIN</string>
-    <string name="label_save_credentials">Save Credentials</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="labelForgotMpin">Forgot MPIN?</string>
     <string name="sign_in">Sign In</string>
     <string name="no_account">Don\'t Have an account?</string>
     <string name="create_account">Create Account</string>
+
+    <string name="msgLoginSuccess">Login successful</string>
 
     <!-- Login validation messages -->
     <string name="msgMobileEmpty">Please enter your mobile number</string>
@@ -23,7 +24,7 @@
     <string name="msgPasswordEmpty">Please enter your password</string>
     <string name="msgPasswordShort">Password must be at least 8 characters</string>
     <string name="msgNoInternet">No internet connection</string>
-    <string name="errGeneric">Something went wrong</string>
+
     <string name="msgMpinEmpty">Please enter your MPIN</string>
     <string name="msgMpinInvalid">MPIN must be exactly 4 digits</string>
 
@@ -274,5 +275,23 @@
     <string name="labelDetailReference">Reference - %s</string>
     <string name="labelMobileNoFmt">Mobile No. %s</string>
     <string name="labelUsernameFmt">Username : %s</string>
+
+    <string name="apiErr400">Bad Request</string>
+    <string name="apiErr401">Unauthorized. Please check your credentials.</string>
+    <string name="apiErr402">Request Not Implemented</string>
+    <string name="apiErr403">Access Forbidden</string>
+    <string name="apiErr404">Resource Not Found</string>
+    <string name="apiErr405">Method Not Allowed</string>
+    <string name="apiErr413">Content Too Large</string>
+    <string name="apiErr415">Unsupported Media Type</string>
+    <string name="apiErr425">Server unwilling to process request</string>
+    <string name="apiErr429">Too many requests. Try again later.</string>
+    <string name="apiErr500">Internal Server Error</string>
+    <string name="apiErr502">Bad Gateway</string>
+    <string name="apiErr503">Service Unavailable</string>
+    <string name="apiErr504">Gateway Timeout</string>
+    <string name="apiErr508">Server detected an infinite loop</string>
+    <string name="errGeneric">Something went wrong. Please try again.</string>
+    <string name="apiErr422">Unprocessable Content</string>
 
 </resources>

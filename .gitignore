@@ -24,6 +24,6 @@ captures/
 .DS_Store
 
 #cUrl file
-app/src/main/java/com/shreefintech/dashboard/retrofit/CurlInterceptor.kt
+app/src/main/java/com/shreefintech/paytouchconsumer/retrofit/CurlInterceptor.kt
 
 design/

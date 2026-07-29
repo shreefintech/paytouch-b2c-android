@@ -84,6 +84,17 @@ Data Binding is the project's established pattern. Use it consistently.
 **DON'T put network calls in Activities.**
 All network calls must go in a ViewModel. The ViewModel calls `ApiClient.apiService` directly and surfaces results via `onLoading`/`onSuccess`/`onError` callbacks. Activities are pure UI responders.
 
+**DON'T use `suspend fun` or coroutines for Retrofit API calls.**
+All Retrofit endpoint declarations must return `Call<T>` (not `Response<T>`) and must be invoked with `.enqueue()`. Never use `suspend fun` on an `ApiService` method, and never wrap a Retrofit call in `viewModelScope.launch`. The `.enqueue()` callback already executes on the main thread — no dispatcher needed.
+
+```kotlin
+// Correct
+fun someEndpoint(...): Call<SomeItem>
+
+// Wrong — do not use
+suspend fun someEndpoint(...): Response<SomeItem>
+```
+
 **Repository, LiveData, and StateFlow are NOT required for standard one-shot API calls.** Use them only when:
 - Data must outlive the screen (shared across multiple destinations)
 - Data is heavy and needs caching or pagination

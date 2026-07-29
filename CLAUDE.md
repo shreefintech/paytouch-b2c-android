@@ -97,18 +97,38 @@ com.shreefintech.paytouchconsumer/
 | Drawable | `ic_` icons, `bg_` backgrounds, `img_` images | `ic_wallet`, `bg_category_item`, `img_screen_bg` |
 | Strings | camelCase with context prefix | `msgNoInternet`, `categoryElectricity`, `btnLoadWallet` |
 
+### Naming Hard Rules (non-negotiable)
+
+- **Models/DTOs MUST end in `Item`** — never `Response`, `Model`, `Dto`, `Data`, or `Entity`.
+  - ✅ `LoginItem`, `UserProfileItem`, `MessageItem`, `TransactionItem`
+  - ❌ `LoginResponse`, `UserModel`, `MessageDto`
+- **Adapters MUST end in `Adp`** — never `Adapter`.
+  - ✅ `TransactionAdp` ❌ `TransactionAdapter`
+- **Activities MUST end in `Activity`** — never `Screen`, `Page`, `View`.
+- **ViewModels MUST end in `ViewModel`**.
+- **Layouts MUST use the correct prefix** — `activity_`, `item_`, `lyt_`, `sheet_`, `dialog_`.
+- **Drawables MUST use `ic_` / `bg_` / `img_`** — never bare names or other prefixes.
+- **String IDs MUST use camelCase context prefixes**: `msg` (messages/toasts), `title` (screen titles), `label` (field labels), `hint` (input hints), `btn` (button text), `err` (error strings), `category` (category names).
+- When two `Item` classes would share the same name, qualify the outer context: `UserProfileItem` (user from GET /user) vs `UserItem` (user nested in login response).
+
 ---
 
 ## Network Call Pattern
 
+All Retrofit endpoints must return `Call<T>` — **never** `suspend fun` / `Response<T>`. Always invoke with `.enqueue()`. The callback already runs on the main thread.
+
 ```kotlin
+// ApiService declaration
+fun someEndpoint(@Field("x") x: String): Call<SomeItem>
+
+// ViewModel call
 if (!Utility.isInternetAvailable(mActivity)) return
-ApiClient.apiService.someEndpoint(body).enqueue(object : Callback<General<SomeItem>> {
-    override fun onResponse(call, response) {
+ApiClient.apiService.someEndpoint(body).enqueue(object : Callback<SomeItem> {
+    override fun onResponse(call: Call<SomeItem>, response: Response<SomeItem>) {
         if (response.isSuccessful) { /* handle */ }
-        else { ToastUtil.showDelete(mActivity, ApiHelper.parseErrorMessage(response)) }
+        else { ToastUtil.show(mActivity, ApiHelper.parseErrorMessage(mActivity, response.code(), response.errorBody()?.string())) }
     }
-    override fun onFailure(call, t) { ToastUtil.showDelete(mActivity, t.localizedMessage) }
+    override fun onFailure(call: Call<SomeItem>, t: Throwable) { ToastUtil.show(mActivity, t.localizedMessage) }
 })
 ```
 
@@ -160,7 +180,21 @@ For all tasks:
 
 ## API Response Wrapper
 
-All API responses are wrapped in `General<T>` with fields: `data`, `success`, `meta`, `message`.
+Most API responses are wrapped in `General<T>` with fields: `data`, `success`, `meta`, `message`.
+
+**Auth endpoints exception:** The auth API (`/api/login`, `/api/register`, `/api/user`, `/api/password/*`, `/api/mpin/*`) return **unwrapped** JSON — no `General<T>` wrapper. Use dedicated `Item` models for these:
+
+| Endpoint | Response model |
+|---|---|
+| `GET /api/user` | `UserProfileItem` |
+| `POST /api/login` | `LoginItem` |
+| `POST /api/register` | `RegisterItem` |
+| `POST /api/*/send-otp`, `verify-otp`, `reset` | `MessageItem` |
+
+**Success check rules:**
+- `General<T>` endpoints: `response.isSuccessful && response.body()?.data != null`
+- `MessageItem` endpoints: `response.isSuccessful && response.body()?.success == true`
+- `LoginItem` / `UserProfileItem` / `RegisterItem` endpoints: `response.isSuccessful` is sufficient (no explicit `success` field).
 
 ---
 
@@ -410,19 +444,21 @@ Always prefer targeted adapter updates over full list refreshes.
 
 ## Project Documentation
 
-All project docs live in `docs/`. Read the relevant files before starting any task.
+All project docs live in `docs/`. **Read the relevant files before starting any task — not after.** Assumptions made without reading the docs will contradict established rules.
 
-| File | When to read |
-|---|---|
-| `caveman.md` | First — always. Plain-English system overview. |
-| `business_logic.md` | Before writing any feature, flow, or data-related code. Source of truth for domain rules. |
-| `dos_and_donts.md` | Before making any structural or architectural decision. |
-| `screens_and_navigation.md` | When implementing a new screen or navigation flow. |
-| `api_reference.md` | When wiring up any API call. |
+| File | What it contains | Read when |
+|---|---|---|
+| `docs/caveman.md` | Plain-English system overview — what the app does, who uses it, how the pieces connect | **Always first**, on every new task |
+| `docs/business_logic.md` | Domain rules: fee tiers, onboarding sequence, routing flags, validation rules | Before any feature, flow, or data-related code |
+| `docs/dos_and_donts.md` | Explicit DOs and DON'Ts for architecture, API, naming, RecyclerView, UI patterns | Before any structural or architectural decision |
+| `docs/screens_and_navigation.md` | Screen list, navigation graph, back-stack rules, intent extras | Before implementing a new screen or navigation flow |
+| `docs/api_reference.md` | All endpoint signatures, request fields, response shapes, auth headers | Before wiring any API call |
+| `docs/api_call_guide.md` | Code patterns for making Retrofit calls, OkHttp setup, error parsing | Before writing any networking code |
 
 ### Rules
 
-- **Always read `caveman.md` first** on any new task.
-- **Never override `business_logic.md` with assumptions** — if code contradicts it, flag it.
-- **`dos_and_donts.md` is non-negotiable** — treat it as a hard constraint, not a suggestion.
+- **Always read `caveman.md` first** — it provides the mental model everything else depends on.
+- **`business_logic.md` is the source of truth** — never override it with assumptions; if code contradicts it, flag it.
+- **`dos_and_donts.md` is non-negotiable** — treat every rule there as a hard constraint, not a suggestion.
+- **`api_reference.md` before any API call** — never guess endpoint paths, field names, or response shapes.
 - If a task touches something not covered by any doc, **ask before proceeding**.
