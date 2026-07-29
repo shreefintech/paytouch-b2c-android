@@ -61,13 +61,12 @@ object ApiClient {
 
 ### 4a. Header Interceptor (always active)
 
-Automatically appends `Accept` and `Content-Type` to every outgoing request:
+Automatically appends `Accept` to every outgoing request:
 
 ```kotlin
 .addInterceptor { chain ->
     val request = chain.request().newBuilder()
         .addHeader("Accept", "application/json")
-        .addHeader("Content-Type", "application/json")
         .build()
     chain.proceed(request)
 }
@@ -90,7 +89,7 @@ curl -X POST -H "Accept: application/json" -H "Authorization: Bearer <token>" \
   --data '{"field":"value"}' "https://base-url/api/endpoint"
 ```
 
-**Timeouts:** connect / read / write all set to **60 seconds**.
+**Timeouts:** connect / read / write all set to **30 seconds**.
 
 ---
 
@@ -336,5 +335,5 @@ ToastUtil.show()                → only way to show messages to the user
 General<T>                      → all responses wrapped here — never custom wrappers
 @Header("Authorization")        → "Bearer <token>" passed per-endpoint, not globally
 CurlInterceptor (DEBUG only)    → logcat tag: CURL
-Timeouts                        → 60s connect / read / write
+Timeouts                        → 30s connect / read / write
 ```
