@@ -190,7 +190,7 @@
                                     android:layout_weight="1"
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
-                                    android:textColor="#80000000"
+                                    android:textColor="?attr/colorTextSubtitle"
                                     android:textSize="@dimen/text_size_13"
                                     tools:text="Username : Testuser" />
 
@@ -271,7 +271,7 @@
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
                                     android:text="@string/labelDate"
-                                    android:textColor="#80000000"
+                                    android:textColor="?attr/colorTextSubtitle"
                                     android:textSize="@dimen/text_size_13" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -300,7 +300,7 @@
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
                                     android:text="@string/labelAmount"
-                                    android:textColor="#80000000"
+                                    android:textColor="?attr/colorTextSubtitle"
                                     android:textSize="@dimen/text_size_13" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -329,7 +329,7 @@
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
                                     android:text="@string/labelPlatformFee"
-                                    android:textColor="#80000000"
+                                    android:textColor="?attr/colorTextSubtitle"
                                     android:textSize="@dimen/text_size_13" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -438,7 +438,7 @@
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
                                     android:text="@string/labelTransactionId"
-                                    android:textColor="#80000000"
+                                    android:textColor="?attr/colorTextSubtitle"
                                     android:textSize="@dimen/text_size_13" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -467,7 +467,7 @@
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
                                     android:text="@string/labelReferenceId"
-                                    android:textColor="#80000000"
+                                    android:textColor="?attr/colorTextSubtitle"
                                     android:textSize="@dimen/text_size_13" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -496,7 +496,7 @@
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
                                     android:text="@string/labelUserIdDetail"
-                                    android:textColor="#80000000"
+                                    android:textColor="?attr/colorTextSubtitle"
                                     android:textSize="@dimen/text_size_13" />
 
                                 <androidx.appcompat.widget.AppCompatTextView

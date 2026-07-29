@@ -32,7 +32,7 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                 }
 
                 override fun onFailure(call: Call<UserProfileItem>, t: Throwable) {
-                    onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.err_generic))
+                    onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
                 }
             })
     }
