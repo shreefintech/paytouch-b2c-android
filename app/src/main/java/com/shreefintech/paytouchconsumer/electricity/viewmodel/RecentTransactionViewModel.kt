@@ -125,7 +125,7 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
                 ) {
                     loading = false
                     hasMore = false
-                    onError(t.localizedMessage ?: getString(R.string.err_generic))
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
