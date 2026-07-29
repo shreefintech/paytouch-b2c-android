@@ -51,7 +51,7 @@ class GasActivity : BaseActivity() {
     private var selectedOperatorId: String? = null
     private var selectedOperatorName: String? = null
     private var fetchedBillItem: GasBillItem? = null
-    private var billFetched = false
+    private var isBillFetched = false
 
     private val showProgressFetch = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -126,8 +126,8 @@ class GasActivity : BaseActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                if (billFetched) {
-                    billFetched = false
+                if (isBillFetched) {
+                    isBillFetched = false
                     fetchedBillItem = null
                     binding.cvBillDetails.visibility = View.GONE
                 }
@@ -188,7 +188,7 @@ class GasActivity : BaseActivity() {
             onSuccess = { bill ->
                 showProgressFetch.set(false)
                 fetchedBillItem = bill
-                billFetched = true
+                isBillFetched = true
                 showBillDetails()
             },
             onError = { msg ->
@@ -226,6 +226,7 @@ class GasActivity : BaseActivity() {
             mActivity, Constant.KEY_MOBILE, ""
         ) ?: ""
         val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
+        // TODO(PAYTOUCH-585): Replace with GasSmsReceiptActivity; current screen title says "Electricity Payment Confirmation"
         SmsReceiptActivity.start(
             context = mActivity,
             item = SmsReceiptItem(
@@ -264,8 +265,8 @@ class GasActivity : BaseActivity() {
             selectedOperatorId = operatorItems.getOrNull(index)?.id
             selectedOperatorName = selected
             binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-            if (billFetched) {
-                billFetched = false
+            if (isBillFetched) {
+                isBillFetched = false
                 fetchedBillItem = null
                 binding.cvBillDetails.visibility = View.GONE
             }
@@ -293,7 +294,7 @@ class GasActivity : BaseActivity() {
     }
 
     private fun onClearBill() {
-        billFetched = false
+        isBillFetched = false
         fetchedBillItem = null
         binding.cvBillDetails.visibility = View.GONE
         binding.etAmount.setText("")
@@ -345,7 +346,7 @@ class GasActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
             return
         }
-        if (!billFetched) {
+        if (!isBillFetched) {
             Utility.hideKeyboard(mActivity)
             fetchBill(consumerNumber)
             return
@@ -372,7 +373,7 @@ class GasActivity : BaseActivity() {
         binding.cbTerms.isChecked = false
         selectedOperatorId = null
         selectedOperatorName = null
-        billFetched = false
+        isBillFetched = false
         fetchedBillItem = null
         binding.cvBillDetails.visibility = View.GONE
         resetFeeDisplay()
@@ -394,14 +395,17 @@ class GasActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // TODO(PAYTOUCH-585): Replace with GasTransactionReportActivity once created — current screen calls electricity report API
                     startActivity(Intent(mActivity, TransactionReportActivity::class.java))
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // TODO(PAYTOUCH-585): Replace with GasTransactionStatusActivity once created — current screen calls electricity status API
                     ElectricityTransactionStatusActivity.start(mActivity)
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // TODO(PAYTOUCH-585): Replace with GasSmsReceiptActivity once created — current screen title shows "Electricity Payment Confirmation"
                     SmsReceiptActivity.start(mActivity)
                 }
                 binding.llFetchBill -> {
@@ -429,6 +433,7 @@ class GasActivity : BaseActivity() {
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // TODO(PAYTOUCH-585): Replace with GasRecentTransactionActivity once created — current screen calls electricity operators API
                     startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
                 }
             }
