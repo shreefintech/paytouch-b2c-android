@@ -7,21 +7,23 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.RecentTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityRecentTransactionBinding
-import com.shreefintech.paytouchconsumer.electricity.model.RecentTransactionItem
+import com.shreefintech.paytouchconsumer.electricity.viewmodel.RecentTransactionViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 class RecentTransactionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityRecentTransactionBinding
     private lateinit var recentTransactionAdp: RecentTransactionAdp
-
-    private val mList = ArrayList<RecentTransactionItem>()
+    private lateinit var viewModel: RecentTransactionViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,96 +47,77 @@ class RecentTransactionActivity : BaseActivity() {
             solidStroke  = true,
         )
 
-        loadDummyData()
+        viewModel = ViewModelProvider(this)[RecentTransactionViewModel::class.java]
         setupRecyclerView()
 
         binding.onClickListener = onClickListener()
         onBack()
-    }
 
-    private fun loadDummyData() {
-        mList.apply {
-            add(
-                RecentTransactionItem(
-                    "Electricity Bill",
-                    "Jadav Jayesh Trikambhai",
-                    "25 Apr 2026",
-                    "Pending",
-                    "₹1,724",
-                    "30723111936",
-                    "PYTCH250426195020166",
-                    R.drawable.ic_electricity
-                )
-            )
-            add(
-                RecentTransactionItem(
-                    "Electricity Bill",
-                    "Ravi Kumar",
-                    "24 Apr 2026",
-                    "Success",
-                    "₹892",
-                    "45612347891",
-                    "PYTCH240426084532177",
-                    R.drawable.ic_electricity
-                )
-            )
-            add(
-                RecentTransactionItem(
-                    "Gas Bill",
-                    "Priya Sharma",
-                    "23 Apr 2026",
-                    "Failed",
-                    "₹530",
-                    "78451236542",
-                    "PYTCH230426153218288",
-                    R.drawable.ic_gas
-                )
-            )
-            add(
-                RecentTransactionItem(
-                    "Electricity Bill",
-                    "Arjun Patel",
-                    "22 Apr 2026",
-                    "Success",
-                    "₹2,140",
-                    "56789012345",
-                    "PYTCH220426112245399",
-                    R.drawable.ic_electricity
-                )
-            )
-            add(
-                RecentTransactionItem(
-                    "Gas Bill",
-                    "Sunita Desai",
-                    "21 Apr 2026",
-                    "Pending",
-                    "₹318",
-                    "89034567890",
-                    "PYTCH210426091830410",
-                    R.drawable.ic_gas
-                )
-            )
-            add(
-                RecentTransactionItem(
-                    "Electricity Bill",
-                    "Mohan Verma",
-                    "20 Apr 2026",
-                    "Success",
-                    "₹1,456",
-                    "12345678901",
-                    "PYTCH200426145612521",
-                    R.drawable.ic_electricity
-                )
-            )
-        }
+        loadInitialData()
     }
 
     private fun setupRecyclerView() {
-        recentTransactionAdp = RecentTransactionAdp(mActivity, mList)
+        recentTransactionAdp = RecentTransactionAdp(mActivity, ArrayList())
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
             adapter = recentTransactionAdp
         }
+        binding.rvTransactions.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy <= 0) return
+                val lm          = recyclerView.layoutManager as LinearLayoutManager
+                val lastVisible = lm.findLastVisibleItemPosition()
+                val total       = recentTransactionAdp.itemCount
+                if (total > 0 && lastVisible >= total - 3) {
+                    loadNextPage()
+                }
+            }
+        })
+    }
+
+    private fun loadInitialData() {
+        viewModel.loadOperatorsThenData(
+            onLoading = {
+                binding.shimmerLayout.visibility = View.VISIBLE
+                binding.shimmerLayout.startShimmer()
+                binding.rvTransactions.visibility = View.GONE
+                binding.tvEmpty.visibility        = View.GONE
+            },
+            onSuccess = { items ->
+                binding.shimmerLayout.stopShimmer()
+                binding.shimmerLayout.visibility = View.GONE
+                if (items.isEmpty()) {
+                    binding.tvEmpty.visibility = View.VISIBLE
+                } else {
+                    binding.rvTransactions.visibility = View.VISIBLE
+                    recentTransactionAdp.updateList(items)
+                }
+            },
+            onError = { error ->
+                binding.shimmerLayout.stopShimmer()
+                binding.shimmerLayout.visibility = View.GONE
+                binding.tvEmpty.visibility       = View.VISIBLE
+                ToastUtil.showDelete(mActivity, error)
+            }
+        )
+    }
+
+    private fun loadNextPage() {
+        viewModel.loadNextPage(
+            onLoading = {
+                binding.pbLoadMore.visibility = View.VISIBLE
+            },
+            onSuccess = { items ->
+                binding.pbLoadMore.visibility = View.GONE
+                if (items.isNotEmpty()) {
+                    recentTransactionAdp.appendList(items)
+                }
+            },
+            onError = { error ->
+                binding.pbLoadMore.visibility = View.GONE
+                ToastUtil.showDelete(mActivity, error)
+            }
+        )
     }
 
     private fun onBack() {

@@ -204,6 +204,23 @@ Response structure depends on the actual API contract — there is no single man
 
 **Rule:** Always check `docs/api_reference.md` first to confirm the actual response shape before choosing a wrapper. Never guess or assume `General<T>` — use whatever the real API returns.
 
+**All model/DTO fields must be nullable.** Every field in every `*Item` class that maps to an API response must be declared with `?`. This is a hard rule — no exceptions for numeric types (`Int?`, `Double?`, `Long?`) or primitives. Gson defaults missing fields to `null` rather than crashing, which prevents API shape changes from causing `NullPointerException` at runtime. Use `?: fallback` at the call site, not at the model definition.
+
+```kotlin
+// Correct — all fields nullable
+data class SomeItem(
+    @field:SerializedName("id")     val id: Int?,
+    @field:SerializedName("amount") val amount: Double?,
+    @field:SerializedName("name")   val name: String?
+)
+
+// Wrong — non-nullable primitives crash when the API omits the field
+data class SomeItem(
+    @field:SerializedName("id")     val id: Int,
+    @field:SerializedName("amount") val amount: Double
+)
+```
+
 ---
 
 ## Resources & Assets
@@ -404,11 +421,10 @@ private val myItem: MyItem? by lazy {
 
 Use this pattern whenever a screen needs an in-place form or detail panel that slides up from the bottom. **Never use `Dialog` — always use `BottomSheetBehavior` embedded in the layout.**
 
-**Sheet XML** (`sheet_*.xml`) — root `FrameLayout` with `BottomSheetBehavior` + `@drawable/bottom_sheet_bg`:
+**Sheet XML** (`sheet_*.xml`) — root ViewGroup (`ConstraintLayout`, `FrameLayout`, etc.) with `BottomSheetBehavior` attributes + `@drawable/bottom_sheet_bg`:
 
 ```xml
-<FrameLayout
-    android:id="@+id/flSheetMain"
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_bg"
@@ -417,7 +433,7 @@ Use this pattern whenever a screen needs an in-place form or detail panel that s
     app:behavior_skipCollapsed="true"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
     <!-- Drag handle, title row with close button, form fields, action button -->
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
 **Activity layout** — sheet and `viewBg` overlay as direct children of `CoordinatorLayout`:
@@ -463,7 +479,7 @@ Also apply insets so the sheet sits above the navigation bar:
 binding.incSheet.root.setPadding(0, 0, 0, systemBars.bottom)
 ```
 
-> No bottom sheets are implemented yet in this project. The first screen to add one should follow this pattern exactly.
+> `sheet_filter.xml` (TransactionReportActivity) is the canonical reference implementation for this pattern.
 
 ---
 

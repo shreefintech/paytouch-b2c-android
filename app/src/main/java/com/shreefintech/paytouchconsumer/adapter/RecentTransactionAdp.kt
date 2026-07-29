@@ -43,14 +43,21 @@ class RecentTransactionAdp(
             ivCategoryIcon.setImageResource(item.categoryIconRes)
             tvCategoryName.text = item.categoryName
             tvCollapsedDate.text = item.date
-            tvDetailDate.text = context.getString(R.string.labelDetailDate, item.date)
+
+            val statusText = item.status.replaceFirstChar { it.uppercaseChar() }
+            val textColor = when (item.status.lowercase()) {
+                "success" -> ContextCompat.getColor(context, R.color.toast_text_success)
+                "failed"  -> ContextCompat.getColor(context, R.color.form_wizard_reject)
+                else      -> ContextCompat.getColor(context, R.color.orange)
+            }
+            tvStatus.text = "● $statusText"
+            tvStatus.setTextColor(textColor)
+
             tvDetailAmount.text = context.getString(R.string.labelDetailAmount, item.amount)
             tvDetailAccountNumber.text = context.getString(R.string.labelDetailAccountNumber, item.accountNumber)
             tvDetailReference.text = context.getString(R.string.labelDetailReference, item.reference)
 
-
             if (item.isExpanded) {
-
                 llExpandedContent.visibility = View.VISIBLE
                 ivChevron.rotation = 180f
             } else {
@@ -58,6 +65,18 @@ class RecentTransactionAdp(
                 ivChevron.rotation = 0f
             }
         }
+    }
+
+    fun updateList(items: List<RecentTransactionItem>) {
+        mArrayList.clear()
+        mArrayList.addAll(items)
+        notifyDataSetChanged()
+    }
+
+    fun appendList(items: List<RecentTransactionItem>) {
+        val insertStart = mArrayList.size
+        mArrayList.addAll(items)
+        notifyItemRangeInserted(insertStart, items.size)
     }
 
     override fun getItemCount(): Int = mArrayList.size

@@ -12,7 +12,6 @@
         android:background="@drawable/bottom_sheet_bg"
         android:clipToPadding="false"
         android:onClick="@null"
-        android:orientation="vertical"
         app:behavior_hideable="true"
         app:behavior_peekHeight="0dp"
         app:behavior_skipCollapsed="true"
@@ -28,7 +27,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -68,7 +67,7 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/proza_libre_semi_bold"
@@ -131,7 +130,7 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/proza_libre_semi_bold"
@@ -202,7 +201,7 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/proza_libre_semi_bold"
@@ -261,7 +260,7 @@
             app:layout_constraintTop_toBottomOf="@id/llContainer2"
             android:orientation="vertical">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/proza_libre_semi_bold"

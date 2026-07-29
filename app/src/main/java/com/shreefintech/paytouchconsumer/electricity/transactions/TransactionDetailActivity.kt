@@ -14,6 +14,7 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
+import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -91,17 +92,19 @@ class TransactionDetailActivity : BaseActivity() {
     private fun openSmsReceipt() {
         val item = transactionItem ?: return
         SmsReceiptActivity.start(
-            context     = mActivity,
-            mobile      = item.mobileNumber,
-            txnId       = item.transactionId,
-            amount      = item.amount,
-            status      = item.status,
-            username    = item.username,
-            date        = item.date,
-            platformFee = item.platformFee,
-            refId       = item.referenceId,
-            accountNo   = item.accountNumber,
-            companyName = item.companyName
+            context = mActivity,
+            item    = SmsReceiptItem(
+                mobile      = item.mobileNumber,
+                txnId       = item.transactionId,
+                amount      = item.amount,
+                status      = item.status,
+                username    = item.username,
+                date        = item.date,
+                platformFee = item.platformFee,
+                refId       = item.referenceId,
+                accountNo   = item.accountNumber,
+                companyName = item.companyName
+            )
         )
     }
 

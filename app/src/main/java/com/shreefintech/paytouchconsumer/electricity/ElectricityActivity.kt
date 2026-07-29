@@ -23,6 +23,7 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
+import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
@@ -225,17 +226,19 @@ class ElectricityActivity : BaseActivity() {
         ) ?: ""
         val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
         SmsReceiptActivity.start(
-            context     = mActivity,
-            mobile      = mobile,
-            txnId       = paymentItem.transactionId ?: "",
-            amount      = "₹%.2f".format(paymentItem.amount ?: amount),
-            status      = paymentItem.status ?: "Pending",
-            username    = fetchedBillItem?.userName ?: "",
-            date        = date,
-            platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
-            refId       = paymentItem.reqId ?: "",
-            accountNo   = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
-            companyName = selectedOperatorName ?: ""
+            context = mActivity,
+            item = SmsReceiptItem(
+                mobile = mobile,
+                txnId = paymentItem.transactionId ?: "",
+                amount = "₹%.2f".format(paymentItem.amount ?: amount),
+                status = paymentItem.status ?: "Pending",
+                username = fetchedBillItem?.userName ?: "",
+                date = date,
+                platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
+                refId = paymentItem.reqId ?: "",
+                accountNo = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
+                companyName = selectedOperatorName ?: ""
+            )
         )
     }
 
@@ -422,17 +425,19 @@ class ElectricityActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-546): Replace dummy data with real transaction data once API is integrated
                     SmsReceiptActivity.start(
-                        context     = mActivity,
-                        mobile      = "9876543210",
-                        txnId       = "TXN123456789",
-                        amount      = "₹1,200.00",
-                        status      = "Success",
-                        username    = "Rahul Sharma",
-                        date        = "2025-07-29",
-                        platformFee = "₹2.00",
-                        refId       = "REF987654321",
-                        accountNo   = "123456789012",
-                        companyName = "MSEDCL"
+                        context = mActivity,
+                        item = SmsReceiptItem(
+                            mobile = "9876543210",
+                            txnId = "TXN123456789",
+                            amount = "₹1,200.00",
+                            status = "Success",
+                            username = "Rahul Sharma",
+                            date = "2025-07-29",
+                            platformFee = "₹2.00",
+                            refId = "REF987654321",
+                            accountNo = "123456789012",
+                            companyName = "MSEDCL"
+                        )
                     )
                 }
                 binding.llTabReport -> {

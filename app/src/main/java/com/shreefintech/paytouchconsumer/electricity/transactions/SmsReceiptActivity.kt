@@ -21,9 +21,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivitySmsReceiptBinding
+import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -47,43 +49,17 @@ class SmsReceiptActivity : BaseActivity() {
         else ToastUtil.showDelete(mActivity, getString(R.string.msgStoragePermissionRequired))
     }
 
-    companion object {
-        private const val EXTRA_MOBILE = "sr_mobile"
-        private const val EXTRA_TXN_ID = "sr_txn_id"
-        private const val EXTRA_AMOUNT = "sr_amount"
-        private const val EXTRA_STATUS = "sr_status"
-        private const val EXTRA_USERNAME = "sr_username"
-        private const val EXTRA_DATE = "sr_date"
-        private const val EXTRA_PLATFORM_FEE = "sr_platform_fee"
-        private const val EXTRA_REF_ID = "sr_ref_id"
-        private const val EXTRA_ACCOUNT_NO = "sr_account_no"
-        private const val EXTRA_COMPANY = "sr_company"
+    private val receiptItem: SmsReceiptItem? by lazy {
+        intent.getStringExtra(EXTRA_ITEM)?.let { Gson().fromJson(it, SmsReceiptItem::class.java) }
+    }
 
-        fun start(
-            context: Context,
-            mobile: String,
-            txnId: String,
-            amount: String,
-            status: String,
-            username: String,
-            date: String,
-            platformFee: String,
-            refId: String,
-            accountNo: String,
-            companyName: String
-        ) {
+    companion object {
+        private const val EXTRA_ITEM = "extra_item"
+
+        fun start(context: Context, item: SmsReceiptItem) {
             context.startActivity(
                 Intent(context, SmsReceiptActivity::class.java).apply {
-                    putExtra(EXTRA_MOBILE, mobile)
-                    putExtra(EXTRA_TXN_ID, txnId)
-                    putExtra(EXTRA_AMOUNT, amount)
-                    putExtra(EXTRA_STATUS, status)
-                    putExtra(EXTRA_USERNAME, username)
-                    putExtra(EXTRA_DATE, date)
-                    putExtra(EXTRA_PLATFORM_FEE, platformFee)
-                    putExtra(EXTRA_REF_ID, refId)
-                    putExtra(EXTRA_ACCOUNT_NO, accountNo)
-                    putExtra(EXTRA_COMPANY, companyName)
+                    putExtra(EXTRA_ITEM, Gson().toJson(item))
                 }
             )
         }
@@ -118,16 +94,16 @@ class SmsReceiptActivity : BaseActivity() {
     }
 
     private fun populateData() {
-        val mobile = intent.getStringExtra(EXTRA_MOBILE) ?: ""
-        val txnId = intent.getStringExtra(EXTRA_TXN_ID) ?: ""
-        val amount = intent.getStringExtra(EXTRA_AMOUNT) ?: ""
-        val status = intent.getStringExtra(EXTRA_STATUS) ?: ""
-        val username = intent.getStringExtra(EXTRA_USERNAME) ?: ""
-        val date = intent.getStringExtra(EXTRA_DATE) ?: ""
-        val platformFee = intent.getStringExtra(EXTRA_PLATFORM_FEE) ?: ""
-        val refId = intent.getStringExtra(EXTRA_REF_ID) ?: ""
-        val accountNo = intent.getStringExtra(EXTRA_ACCOUNT_NO) ?: ""
-        val companyName = intent.getStringExtra(EXTRA_COMPANY) ?: ""
+        val item = receiptItem ?: return
+        val txnId = item.txnId
+        val amount = item.amount
+        val status = item.status
+        val username = item.username
+        val date = item.date
+        val platformFee = item.platformFee
+        val refId = item.refId
+        val accountNo = item.accountNo
+        val companyName = item.companyName
 
         // Receipt tab fields
         binding.tvConsumerNo.text = accountNo

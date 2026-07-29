@@ -55,26 +55,44 @@
                 <!-- Category name — visible when COLLAPSED -->
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvCategoryName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/proza_libre_bold"
+                    android:fontFamily="@font/proza_libre_semi_bold"
                     android:includeFontPadding="false"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_14"
+                    android:textSize="@dimen/text_size_12"
                     tools:text="Electricity Bill" />
 
-                <!-- Date — visible when COLLAPSED -->
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tvCollapsedDate"
+                <!-- Date + Status row — visible when COLLAPSED -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="@font/proza_libre_regular"
-                    android:includeFontPadding="false"
-                    android:textColor="?attr/colorTextSubtitle"
-                    android:textSize="@dimen/text_size_12"
-                    tools:text="25 Apr 2026" />
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvCollapsedDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/proza_libre_regular"
+                        android:includeFontPadding="false"
+                        android:textColor="?attr/colorTextSubtitle"
+                        android:textSize="@dimen/text_size_12"
+                        tools:text="25/04/2026 02:32 PM" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_small"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:includeFontPadding="false"
+                        android:textSize="@dimen/text_size_12"
+                        tools:text="● Success"
+                        tools:textColor="@color/toast_text_success" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -106,17 +124,6 @@
                 android:layerType="software" />
 
             <!-- Detail rows -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvDetailDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_extra_small"
-                android:fontFamily="@font/proza_libre_regular"
-                android:includeFontPadding="false"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_13"
-                tools:text="Date - 25 Apr 2026" />
-
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvDetailAmount"
                 android:layout_width="match_parent"

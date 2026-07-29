@@ -281,7 +281,7 @@ Resolution order (same as iOS behavior):
 
 1. Deserialize error body → return `message` field if non-empty.
 2. Map HTTP status code to a localized string (400, 401, 403, 404, 422, 500, …).
-3. Fall back to `R.string.err_generic`.
+3. Fall back to `R.string.errGeneric`.
 
 ---
 
