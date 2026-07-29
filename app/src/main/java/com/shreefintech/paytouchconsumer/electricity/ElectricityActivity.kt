@@ -12,9 +12,12 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
+import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 
 class ElectricityActivity : BaseActivity() {
@@ -101,7 +104,7 @@ class ElectricityActivity : BaseActivity() {
         binding.tvPlatformFee.text    = getString(R.string.hintPlatformFee)
         binding.tvTotalPayable.text   = getString(R.string.hintTotalPayable)
         binding.tvCompany.text        = getString(R.string.hintSelectCompany)
-        binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.hint_color))
+        binding.tvCompany.setTextColor(getThemeColor(R.attr.colorTextHint))
         binding.cbTerms.isChecked     = false
         selectedOperator              = null
         Utility.hideKeyboard(binding.clRoot)
@@ -138,6 +141,16 @@ class ElectricityActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
                 }
+
+                binding.llTabSmsReceipt -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, SmsReceiptActivity::class.java))
+                }
+                binding.llTabReport -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, TransactionReportActivity::class.java))
+                }
+
             }
         }
     }
