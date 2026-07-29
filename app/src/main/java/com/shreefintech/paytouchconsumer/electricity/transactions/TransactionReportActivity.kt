@@ -68,7 +68,7 @@ class TransactionReportActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         onBack()
 
-        filterHelper.show()
+        callReport(null, null, null, null)
     }
 
     private fun setupRecyclerView() {
@@ -188,7 +188,7 @@ class TransactionReportActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
-                binding.flFilter -> {
+                binding.ivFilter -> {
                     if (Utility.stopClick()) return@OnClickListener
                     filterHelper.show()
                 }

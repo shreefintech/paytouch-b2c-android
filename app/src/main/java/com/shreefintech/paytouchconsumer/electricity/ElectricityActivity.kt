@@ -23,6 +23,7 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
+import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
@@ -226,7 +227,7 @@ class ElectricityActivity : BaseActivity() {
         val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
         SmsReceiptActivity.start(
             context = mActivity,
-            mobile = mobile,
+            SmsReceiptItem(mobile = mobile,
             txnId = paymentItem.transactionId ?: "",
             amount = "₹%.2f".format(paymentItem.amount ?: amount),
             status = paymentItem.status ?: "Pending",
@@ -235,7 +236,7 @@ class ElectricityActivity : BaseActivity() {
             platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
             refId = paymentItem.reqId ?: "",
             accountNo = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
-            companyName = selectedOperatorName ?: ""
+            companyName = selectedOperatorName ?: "")
         )
     }
 
@@ -400,16 +401,18 @@ class ElectricityActivity : BaseActivity() {
                     // TODO(PAYTOUCH-546): Pass real transaction data once API is wired
                     SmsReceiptActivity.start(
                         context = mActivity,
-                        mobile = "9876543210",
-                        txnId = "BC88213045",
-                        amount = "₹149.00",
-                        status = "Success",
-                        username = "Ravi Kumar",
-                        date = "18-07-2026, 09:15 am",
-                        platformFee = "₹3.00",
-                        refId = "TXN10235",
-                        accountNo = "30723111936",
-                        companyName = "Paschim Gujarat Vij Company Ltd"
+                        SmsReceiptItem(
+                            mobile = "9876543210",
+                            txnId = "BC88213045",
+                            amount = "₹149.00",
+                            status = "Success",
+                            username = "Ravi Kumar",
+                            date = "18-07-2026, 09:15 am",
+                            platformFee = "₹3.00",
+                            refId = "TXN10235",
+                            accountNo = "30723111936",
+                            companyName = "Paschim Gujarat Vij Company Ltd"
+                        )
                     )
                 }
                 binding.llFetchBill -> {
