@@ -71,7 +71,7 @@
                     android:layout_marginTop="2dp"
                     android:fontFamily="@font/proza_libre_regular"
                     android:includeFontPadding="false"
-                    android:textColor="#80000000"
+                    android:textColor="?attr/colorTextSubtitle"
                     android:textSize="@dimen/text_size_12"
                     tools:text="25 Apr 2026" />
 

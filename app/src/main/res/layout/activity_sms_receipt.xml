@@ -219,7 +219,7 @@
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelConsumerNo"
-                                            android:textColor="#80000000"
+                                            android:textColor="?attr/colorTextSubtitle"
                                             android:textSize="@dimen/text_size_13" />
 
                                         <androidx.appcompat.widget.AppCompatTextView
@@ -248,7 +248,7 @@
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelCustomerName"
-                                            android:textColor="#80000000"
+                                            android:textColor="?attr/colorTextSubtitle"
                                             android:textSize="@dimen/text_size_13" />
 
                                         <androidx.appcompat.widget.AppCompatTextView
@@ -277,7 +277,7 @@
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelCompanyName"
-                                            android:textColor="#80000000"
+                                            android:textColor="?attr/colorTextSubtitle"
                                             android:textSize="@dimen/text_size_13" />
 
                                         <androidx.appcompat.widget.AppCompatTextView
@@ -316,7 +316,7 @@
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelTransactionDate"
-                                            android:textColor="#80000000"
+                                            android:textColor="?attr/colorTextSubtitle"
                                             android:textSize="@dimen/text_size_13" />
 
                                         <androidx.appcompat.widget.AppCompatTextView
@@ -345,7 +345,7 @@
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelAmountPaid"
-                                            android:textColor="#80000000"
+                                            android:textColor="?attr/colorTextSubtitle"
                                             android:textSize="@dimen/text_size_13" />
 
                                         <com.google.android.material.card.MaterialCardView
@@ -395,7 +395,7 @@
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelPaytouchTxnId"
-                                            android:textColor="#80000000"
+                                            android:textColor="?attr/colorTextSubtitle"
                                             android:textSize="@dimen/text_size_13" />
 
                                         <androidx.appcompat.widget.AppCompatTextView
@@ -424,7 +424,7 @@
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelBConnectTxnId"
-                                            android:textColor="#80000000"
+                                            android:textColor="?attr/colorTextSubtitle"
                                             android:textSize="@dimen/text_size_13" />
 
                                         <androidx.appcompat.widget.AppCompatTextView
@@ -453,7 +453,7 @@
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelCcf"
-                                            android:textColor="#80000000"
+                                            android:textColor="?attr/colorTextSubtitle"
                                             android:textSize="@dimen/text_size_13" />
 
                                         <androidx.appcompat.widget.AppCompatTextView
@@ -482,7 +482,7 @@
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelStatus"
-                                            android:textColor="#80000000"
+                                            android:textColor="?attr/colorTextSubtitle"
                                             android:textSize="@dimen/text_size_13" />
 
                                         <com.google.android.material.card.MaterialCardView
@@ -614,7 +614,7 @@
                                         android:layout_height="wrap_content"
                                         android:fontFamily="@font/proza_libre_regular"
                                         android:includeFontPadding="false"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextSubtitle"
                                         android:textSize="@dimen/text_size_13"
                                         tools:text="Dear Customer, Your electricity bill payment of ₹149.00 for Consumer 30723111936 has been successfully processed" />
 
@@ -664,7 +664,7 @@
                                                 android:layout_height="wrap_content"
                                                 android:fontFamily="@font/proza_libre_regular"
                                                 android:includeFontPadding="false"
-                                                android:textColor="#80000000"
+                                                android:textColor="?attr/colorTextSubtitle"
                                                 android:textSize="@dimen/text_size_12"
                                                 tools:text="PYTCH250426195020166" />
                                         </LinearLayout>
@@ -714,7 +714,7 @@
                                                 android:layout_height="wrap_content"
                                                 android:fontFamily="@font/proza_libre_regular"
                                                 android:includeFontPadding="false"
-                                                android:textColor="#80000000"
+                                                android:textColor="?attr/colorTextSubtitle"
                                                 android:textSize="@dimen/text_size_12"
                                                 tools:text="25/04/2026, 19:50" />
                                         </LinearLayout>
@@ -729,7 +729,7 @@
                                         android:gravity="end"
                                         android:includeFontPadding="false"
                                         android:text="@string/labelPaytouchSignature"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextSubtitle"
                                         android:textSize="@dimen/text_size_13" />
 
                                     <!-- Thank you for using -->
@@ -741,7 +741,7 @@
                                         android:gravity="center"
                                         android:includeFontPadding="false"
                                         android:text="@string/msgThankYouForUsing"
-                                        android:textColor="#80000000"
+                                        android:textColor="?attr/colorTextSubtitle"
                                         android:textSize="@dimen/text_size_13" />
 
                                     <!-- Shree Fintech -->

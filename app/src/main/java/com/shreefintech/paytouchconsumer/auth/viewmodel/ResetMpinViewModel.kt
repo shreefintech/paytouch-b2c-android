@@ -37,7 +37,7 @@ class ResetMpinViewModel : ViewModel() {
                 }
 
                 override fun onFailure(call: Call<MessageItem>, t: Throwable) {
-                    onError(t.localizedMessage ?: context.getString(R.string.err_generic))
+                    onError(t.localizedMessage ?: context.getString(R.string.errGeneric))
                 }
             })
     }

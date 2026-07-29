@@ -54,7 +54,7 @@ class CreateAccountViewModel : ViewModel() {
                 }
 
                 override fun onFailure(call: Call<RegisterItem>, t: Throwable) {
-                    onError(t.localizedMessage ?: context.getString(R.string.err_generic))
+                    onError(t.localizedMessage ?: context.getString(R.string.errGeneric))
                 }
             })
     }

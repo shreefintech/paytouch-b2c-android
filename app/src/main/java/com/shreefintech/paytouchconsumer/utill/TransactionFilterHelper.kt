@@ -106,7 +106,7 @@ class TransactionFilterHelper(
     // ─── Dropdowns ───────────────────────────────────────────────────────────
 
     private fun showUserIdDropdown() {
-        val ids = getList().map { it.transactionId }.distinct()
+        val ids = getList().map { it.userId }.distinct()
         if (ids.isEmpty()) return
         CustomDropdown.showDropdown(
             activity   = activity,
@@ -134,11 +134,11 @@ class TransactionFilterHelper(
     // ─── Apply / Clear ───────────────────────────────────────────────────────
 
     private fun applyFilter() {
-        val mobile = sheetBinding.tvSearch.text?.toString()?.trim() ?: ""
+        val mobile = sheetBinding.etSearch.text?.toString()?.trim() ?: ""
         val list   = getList()
         val filtered = ArrayList(list.filter { item ->
             val matchesMobile = mobile.isEmpty() || item.mobileNumber.contains(mobile, ignoreCase = true)
-            val matchesUserId = selectedUserId == null || item.transactionId == selectedUserId
+            val matchesUserId = selectedUserId == null || item.userId == selectedUserId
             val matchesStatus = selectedStatus == null || item.status == selectedStatus
             // TODO(PAYTOUCH-546): Add date filtering once API returns date field in TransactionItem
             matchesMobile && matchesUserId && matchesStatus
@@ -156,7 +156,7 @@ class TransactionFilterHelper(
         sheetBinding.tvToDate.text     = ""
         sheetBinding.tvEntityType.text = ""
         sheetBinding.tvEntries.text    = ""
-        sheetBinding.tvSearch.setText("")
+        sheetBinding.etSearch.setText("")
         onClear()
         hide()
     }

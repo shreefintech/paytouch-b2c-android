@@ -301,7 +301,7 @@
 
                         </LinearLayout>
 
-                        <!-- Row 3: TV Cable | My Account | TV Cable -->
+                        <!-- Row 3: Loan | My Account | Tax -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
