@@ -316,7 +316,6 @@
     <string name="api_err_503">Service Unavailable</string>
     <string name="api_err_504">Gateway Timeout</string>
     <string name="api_err_508">Server detected an infinite loop</string>
-    <string name="err_generic">Something went wrong. Please try again.</string>
     <string name="api_err_422">Unprocessable Content</string>
     <string name="btnFetchBill">Fetch Bill</string>
     <string name="btnClear">Clear</string>
