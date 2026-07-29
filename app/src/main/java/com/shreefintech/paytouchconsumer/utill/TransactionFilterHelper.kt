@@ -106,7 +106,7 @@ class TransactionFilterHelper(
     // ─── Dropdowns ───────────────────────────────────────────────────────────
 
     private fun showUserIdDropdown() {
-        val ids = getList().map { it.transactionId }.distinct()
+        val ids = getList().map { it.userId }.distinct()
         if (ids.isEmpty()) return
         CustomDropdown.showDropdown(
             activity   = activity,
@@ -138,7 +138,7 @@ class TransactionFilterHelper(
         val list   = getList()
         val filtered = ArrayList(list.filter { item ->
             val matchesMobile = mobile.isEmpty() || item.mobileNumber.contains(mobile, ignoreCase = true)
-            val matchesUserId = selectedUserId == null || item.transactionId == selectedUserId
+            val matchesUserId = selectedUserId == null || item.userId == selectedUserId
             val matchesStatus = selectedStatus == null || item.status == selectedStatus
             // TODO(PAYTOUCH-546): Add date filtering once API returns date field in TransactionItem
             matchesMobile && matchesUserId && matchesStatus
