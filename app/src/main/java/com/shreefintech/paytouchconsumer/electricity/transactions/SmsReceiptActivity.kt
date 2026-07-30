@@ -48,8 +48,6 @@ import java.util.Locale
 class SmsReceiptActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySmsReceiptBinding
-    private var savedImageUri: Uri? = null
-
     private val viewModel: SmsReceiptViewModel by viewModels()
 
     private val writePermissionLauncher = registerForActivityResult(
@@ -254,7 +252,6 @@ class SmsReceiptActivity : BaseActivity() {
         val bitmap = captureViewAsBitmap(binding.cvReceiptCard)
         val uri = saveBitmapAndGetUri(bitmap)
         if (uri != null) {
-            savedImageUri = uri
             ToastUtil.showInActivityWithAction(
                 activity = mActivity,
                 message = getString(R.string.msgReceiptDownloaded),

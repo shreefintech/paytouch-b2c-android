@@ -40,8 +40,8 @@ class ElectricityTransactionStatusViewModel(application: Application) : AndroidV
             ) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     val list = ArrayList<TransactionItem>()
-                    response.body()!!.data!!.forEachIndexed { index, item ->
-                        list.add(mapToTransactionItem(index, item))
+                    response.body()!!.data!!.forEach { item ->
+                        list.add(mapToTransactionItem(item))
                     }
                     onSuccess(list)
                 } else {
@@ -62,8 +62,10 @@ class ElectricityTransactionStatusViewModel(application: Application) : AndroidV
         })
     }
 
-    private fun mapToTransactionItem(index: Int, item: ElectricityTransactionReportDataItem): TransactionItem {
+    private fun mapToTransactionItem(item: ElectricityTransactionReportDataItem): TransactionItem {
         return TransactionItem(
+            // subscriberNo (status API) and consumerNo (report API) represent the same field;
+            // the status API returns it as subscriberNo, the report API returns it as consumerNo.
             mobileNumber    = item.subscriberNo ?: "--",
             transactionId   = item.transactionId ?: "--",
             amount          = "₹%.2f".format(item.totalPayable ?: 0.0),

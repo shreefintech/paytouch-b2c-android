@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -63,7 +62,6 @@ class TransactionDetailActivity : BaseActivity() {
 
         populateData()
         binding.onClickListener = onClickListener()
-        onBack()
     }
 
     private fun populateData() {
@@ -80,7 +78,7 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvReferenceId.text   = item.referenceId
         binding.tvUserId.text        = item.userId
 
-        val (bgColor, textColor) = when (item.status) {
+        val (bgColor, textColor) = when (item.status ?: "") {
             "Success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
             "Failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.orange)
@@ -106,14 +104,6 @@ class TransactionDetailActivity : BaseActivity() {
                 companyName = item.companyName
             )
         )
-    }
-
-    private fun onBack() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-            }
-        })
     }
 
     private fun onClickListener(): View.OnClickListener {
