@@ -28,11 +28,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.databinding.ObservableBoolean
 import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivitySmsReceiptBinding
-import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.electricity.viewmodel.SmsReceiptViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentDataItem
@@ -49,16 +49,13 @@ class SmsReceiptActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySmsReceiptBinding
     private val viewModel: SmsReceiptViewModel by viewModels()
+    private val showProgressReceipt = ObservableBoolean(false)
 
     private val writePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) performDownload()
         else ToastUtil.showDelete(mActivity, getString(R.string.msgStoragePermissionRequired))
-    }
-
-    private val receiptItem: SmsReceiptItem? by lazy {
-        intent.getStringExtra(EXTRA_ITEM)?.let { Gson().fromJson(it, SmsReceiptItem::class.java) }
     }
 
     private val isFromPayment: Boolean by lazy {
@@ -71,10 +68,9 @@ class SmsReceiptActivity : BaseActivity() {
         private const val TAB_RECEIPT = 0
         private const val TAB_DISPLAY = 1
 
-        fun start(context: Context, item: SmsReceiptItem? = null, fromPayment: Boolean = false) {
+        fun start(context: Context, fromPayment: Boolean = false) {
             context.startActivity(
                 Intent(context, SmsReceiptActivity::class.java).apply {
-                    item?.let { putExtra(EXTRA_ITEM, Gson().toJson(it)) }
                     putExtra(EXTRA_FROM_PAYMENT, fromPayment)
                 }
             )
@@ -112,10 +108,10 @@ class SmsReceiptActivity : BaseActivity() {
             binding.llTitleRow.visibility = View.VISIBLE
             selectTab(TAB_RECEIPT)
         }
+        binding.showProgressReceipt = showProgressReceipt
         binding.onClickListener = onClickListener()
         onBack()
 
-        populateData()
         // Always fetch the latest completed payment from the API — both the Receipt tab and the
         // SMS Display tab need server-side fields (operatorName, ccf, createdAt) that are not
         // available in the local SmsReceiptItem passed via intent. populateData() pre-fills the
@@ -143,20 +139,6 @@ class SmsReceiptActivity : BaseActivity() {
 
     // ── Populate ──────────────────────────────────────────────
 
-    private fun populateData() {
-        val item = receiptItem ?: return
-        binding.tvConsumerNo.text = item.accountNo ?: "--"
-        binding.tvCustomerName.text = item.username ?: "--"
-        binding.tvCompanyName.text = item.companyName ?: "--"
-        binding.tvReceiptDate.text = item.date ?: "--"
-        binding.tvAmountPaid.text = item.amount ?: "--"
-        binding.tvPaytouchTxnId.text = item.txnId ?: "--"
-        binding.tvBConnectTxnId.text = item.refId ?: "--"
-        binding.tvCcf.text = item.platformFee ?: "--"
-        binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, item.status ?: "--")
-        applyStatusStyle(item.status)
-    }
-
     private fun populateReceiptFromApi(item: ElectricityVerifyPaymentDataItem) {
         val amount = "₹${item.totalPayable ?: "--"}"
         val consumerNo = item.subscriberNo ?: "--"
@@ -171,7 +153,7 @@ class SmsReceiptActivity : BaseActivity() {
         binding.tvAmountPaid.text = amount
         binding.tvPaytouchTxnId.text = txnId
         binding.tvBConnectTxnId.text = item.transactionId ?: "--"
-        binding.tvCcf.text = item.platformFee ?: "--"
+        binding.tvCcf.text = item.ccf ?: item.platformFee ?: "--"
         binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, status)
         applyStatusStyle(status)
 
@@ -232,9 +214,7 @@ class SmsReceiptActivity : BaseActivity() {
     // ── Loading State ─────────────────────────────────────────
 
     private fun showReceiptLoading(show: Boolean) {
-        val visibility = if (show) View.VISIBLE else View.GONE
-        binding.pbReceiptLoading.visibility = visibility
-        binding.pbDisplayLoading.visibility = visibility
+        showProgressReceipt.set(show)
     }
 
     // ── Download & Share ──────────────────────────────────────

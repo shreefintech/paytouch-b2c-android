@@ -23,7 +23,6 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
-import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.ElectricityTransactionStatusActivity
@@ -212,33 +211,12 @@ class ElectricityActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { paymentItem ->
                 showProgressPay.set(false)
-                navigateToReceipt(amount, fee, paymentItem)
+                SmsReceiptActivity.start(mActivity)
             },
             onError = { msg ->
                 showProgressPay.set(false)
                 ToastUtil.showDelete(mActivity, msg)
             }
-        )
-    }
-
-    private fun navigateToReceipt(amount: Double, fee: Double, paymentItem: ElectricityPaymentItem) {
-        val mobile = SharedPreferenceHelper.getSharedPreferenceString(
-            mActivity, Constant.KEY_MOBILE, ""
-        ) ?: ""
-        val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
-        SmsReceiptActivity.start(
-            context = mActivity,
-            item = SmsReceiptItem(mobile = mobile,
-            txnId = paymentItem.transactionId ?: "",
-            amount = "₹%.2f".format(paymentItem.amount ?: amount),
-            status = paymentItem.status ?: "Pending",
-            username = fetchedBillItem?.userName ?: "",
-            date = date,
-            platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
-            refId = paymentItem.reqId ?: "",
-            accountNo = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
-            companyName = selectedOperatorName ?: ""),
-            fromPayment = true
         )
     }
 
