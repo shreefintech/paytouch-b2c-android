@@ -49,7 +49,7 @@ class SmsReceiptViewModel(application: Application) : AndroidViewModel(applicati
                 call: Call<General<ElectricityVerifyPaymentDataItem>>,
                 t: Throwable
             ) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }

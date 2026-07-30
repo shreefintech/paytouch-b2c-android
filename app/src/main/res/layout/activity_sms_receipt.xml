@@ -4,9 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" />
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgressReceipt"
+            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -174,7 +178,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_horizontal"
                                 android:indeterminateTint="@color/primary"
-                                android:visibility="gone"
+                                android:visibility="@{showProgressReceipt ? View.VISIBLE : View.GONE}"
                                 android:layout_marginBottom="@dimen/margin_medium" />
 
                             <com.google.android.material.card.MaterialCardView
@@ -573,7 +577,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:indeterminateTint="@color/primary"
-                                android:visibility="gone"
+                                android:visibility="@{showProgressReceipt ? View.VISIBLE : View.GONE}"
                                 android:layout_marginBottom="@dimen/margin_medium" />
 
                             <!-- Header: electricity icon + title -->
