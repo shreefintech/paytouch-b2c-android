@@ -40,7 +40,6 @@ class SmsReceiptActivity : BaseActivity() {
     private lateinit var binding: ActivitySmsReceiptBinding
 
     private var isReceiptTab = true
-    private var savedImageUri: Uri? = null
 
     private val writePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -95,15 +94,15 @@ class SmsReceiptActivity : BaseActivity() {
 
     private fun populateData() {
         val item = receiptItem ?: return
-        val txnId = item.txnId
-        val amount = item.amount
-        val status = item.status
-        val username = item.username
-        val date = item.date
-        val platformFee = item.platformFee
-        val refId = item.refId
-        val accountNo = item.accountNo
-        val companyName = item.companyName
+        val txnId = item.txnId ?: "--"
+        val amount = item.amount ?: "--"
+        val status = item.status ?: "--"
+        val username = item.username ?: "--"
+        val date = item.date ?: "--"
+        val platformFee = item.platformFee ?: "--"
+        val refId = item.refId ?: "--"
+        val accountNo = item.accountNo ?: "--"
+        val companyName = item.companyName ?: "--"
 
         // Receipt tab fields
         binding.tvConsumerNo.text = accountNo
@@ -193,7 +192,6 @@ class SmsReceiptActivity : BaseActivity() {
         val bitmap = captureViewAsBitmap(target)
         val uri = saveBitmapAndGetUri(bitmap)
         if (uri != null) {
-            savedImageUri = uri
             ToastUtil.showInActivityWithAction(
                 activity = mActivity,
                 message = getString(R.string.msgReceiptDownloaded),
