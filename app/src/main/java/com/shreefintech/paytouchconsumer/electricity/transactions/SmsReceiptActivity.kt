@@ -18,7 +18,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -29,7 +28,6 @@ import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
-import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivitySmsReceiptBinding
@@ -63,7 +61,6 @@ class SmsReceiptActivity : BaseActivity() {
     }
 
     companion object {
-        private const val EXTRA_ITEM = "extra_item"
         private const val EXTRA_FROM_PAYMENT = "extra_from_payment"
         private const val TAB_RECEIPT = 0
         private const val TAB_DISPLAY = 1

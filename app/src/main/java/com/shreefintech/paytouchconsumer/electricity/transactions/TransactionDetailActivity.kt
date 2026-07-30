@@ -78,8 +78,8 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvUserId.text        = item.userId
 
         val (bgColor, textColor) = when (item.status ?: "") {
-            "Success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
-            "Failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
+            "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
+            "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.orange)
         }
         binding.cvStatus.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))

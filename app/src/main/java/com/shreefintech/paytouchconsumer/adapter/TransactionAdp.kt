@@ -36,11 +36,11 @@ class TransactionAdp(
             tvStatus.text = item.status
 
             val (bgRes, textColor) = when (item.status) {
-                "Success" -> Pair(
+                "success" -> Pair(
                     R.drawable.bg_status_success,
                     ContextCompat.getColor(mContext, R.color.toast_text_success)
                 )
-                "Failed" -> Pair(
+                "failed" -> Pair(
                     R.drawable.bg_status_failed,
                     ContextCompat.getColor(mContext, R.color.form_wizard_reject)
                 )

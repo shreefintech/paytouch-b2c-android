@@ -31,15 +31,10 @@ import com.shreefintech.paytouchconsumer.electricity.viewmodel.ElectricityViewMo
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ElectricityActivity : BaseActivity() {
 
@@ -209,9 +204,9 @@ class ElectricityActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { paymentItem ->
+            onSuccess = { _ ->
                 showProgressPay.set(false)
-                SmsReceiptActivity.start(mActivity)
+                SmsReceiptActivity.start(mActivity, fromPayment = true)
             },
             onError = { msg ->
                 showProgressPay.set(false)
