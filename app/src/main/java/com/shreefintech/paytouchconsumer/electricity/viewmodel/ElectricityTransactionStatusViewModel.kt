@@ -10,20 +10,17 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class TransactionReportViewModel(application: Application) : AndroidViewModel(application) {
+class ElectricityTransactionStatusViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun getTransactionReport(
-        fromDate: String?,
-        toDate: String?,
-        status: String?,
-        consumerNo: String?,
+    fun searchTransactionStatus(
+        query: String?,
         onLoading: () -> Unit,
         onSuccess: (ArrayList<TransactionItem>) -> Unit,
         onError: (String) -> Unit
@@ -33,9 +30,9 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
             return
         }
         onLoading()
-        ApiClient.apiService.getElectricityPaymentReport(
+        ApiClient.apiService.getElectricityTransactionStatus(
             bearerToken(),
-            ElectricityTransactionReportRequest(fromDate, toDate, status, consumerNo)
+            ElectricityTransactionStatusRequest(transactionId = query)
         ).enqueue(object : Callback<General<List<ElectricityTransactionReportDataItem>>> {
             override fun onResponse(
                 call: Call<General<List<ElectricityTransactionReportDataItem>>>,
@@ -43,8 +40,8 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
             ) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     val list = ArrayList<TransactionItem>()
-                    response.body()!!.data!!.forEachIndexed { index, item ->
-                        list.add(mapToTransactionItem(index, item))
+                    response.body()!!.data!!.forEach { item ->
+                        list.add(mapToTransactionItem(item))
                     }
                     onSuccess(list)
                 } else {
@@ -65,9 +62,11 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
         })
     }
 
-    private fun mapToTransactionItem(index: Int, item: ElectricityTransactionReportDataItem): TransactionItem {
+    private fun mapToTransactionItem(item: ElectricityTransactionReportDataItem): TransactionItem {
         return TransactionItem(
-            mobileNumber    = item.consumerNo ?: "--",
+            // subscriberNo (status API) and consumerNo (report API) represent the same field;
+            // the status API returns it as subscriberNo, the report API returns it as consumerNo.
+            mobileNumber    = item.subscriberNo ?: "--",
             transactionId   = item.transactionId ?: "--",
             amount          = "₹%.2f".format(item.totalPayable ?: 0.0),
             status          = item.status ?: "--",
@@ -78,7 +77,7 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
             totalPayable    = "₹%.2f".format(item.totalPayable ?: 0.0),
             referenceId     = item.transactionId ?: "--",
             userId          = item.id?.toString() ?: "--",
-            accountNumber   = item.consumerNo ?: "--",
+            accountNumber   = item.subscriberNo ?: "--",
             companyName     = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--"
         )
     }

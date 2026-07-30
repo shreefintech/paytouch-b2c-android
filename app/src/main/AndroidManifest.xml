@@ -104,6 +104,12 @@
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".electricity.transactions.ElectricityTransactionStatusActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

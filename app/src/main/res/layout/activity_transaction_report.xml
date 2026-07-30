@@ -95,20 +95,6 @@
                         android:orientation="horizontal"
                         android:outlineProvider="background">
 
-                        <!-- Primary icon section -->
-                        <FrameLayout
-                            android:layout_width="@dimen/btn_height"
-                            android:layout_height="match_parent"
-                            android:background="@color/primary">
-
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_search"
-                                android:tint="@color/white" />
-                        </FrameLayout>
-
                         <!-- Search EditText -->
                         <androidx.appcompat.widget.AppCompatEditText
                             android:id="@+id/etSearch"

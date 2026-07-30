@@ -212,7 +212,7 @@
 
     <!-- Transaction Report screen -->
     <string name="titleTransactionReport">Transaction Report</string>
-    <string name="hintSearchTransaction">Search mobile no. or Transaction ID</string>
+    <string name="hintSearchTransaction">Search consumer no. or Transaction ID</string>
     <string name="msgNoTransactionsFound">No transactions found</string>
     <string name="msgSelectAtLeastOneFilter">Please select at least one filter</string>
     <string name="msgSelectBothDates">Please select both From and To date</string>
@@ -301,23 +301,9 @@
     <string name="apiErr508">Server detected an infinite loop</string>
     <string name="errGeneric">Something went wrong. Please try again.</string>
     <string name="apiErr422">Unprocessable Content</string>
-    <string name="api_err_400">Bad Request</string>
-    <string name="api_err_401">Unauthorized. Please check your credentials.</string>
-    <string name="api_err_402">Request Not Implemented</string>
-    <string name="api_err_403">Access Forbidden</string>
-    <string name="api_err_404">Resource Not Found</string>
-    <string name="api_err_405">Method Not Allowed</string>
-    <string name="api_err_413">Content Too Large</string>
-    <string name="api_err_415">Unsupported Media Type</string>
-    <string name="api_err_425">Server unwilling to process request</string>
-    <string name="api_err_429">Too many requests. Try again later.</string>
-    <string name="api_err_500">Internal Server Error</string>
-    <string name="api_err_502">Bad Gateway</string>
-    <string name="api_err_503">Service Unavailable</string>
-    <string name="api_err_504">Gateway Timeout</string>
-    <string name="api_err_508">Server detected an infinite loop</string>
-    <string name="api_err_422">Unprocessable Content</string>
     <string name="btnFetchBill">Fetch Bill</string>
+    <string name="btnSearch">Search</string>
+    <string name="msgEnterSearchQuery">Please enter consumer no. or transaction ID</string>
     <string name="btnClear">Clear</string>
     <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 digits</string>
     <string name="msgLoadingOperators">Loading operators, please wait…</string>

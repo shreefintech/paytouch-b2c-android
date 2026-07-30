@@ -13,6 +13,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityP
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
 import retrofit2.Call
 import retrofit2.http.Body
@@ -138,6 +139,12 @@ interface ApiService {
     fun getElectricityPaymentReport(
         @Header("Authorization") authorization: String,
         @Body request: ElectricityTransactionReportRequest
+    ): Call<General<List<ElectricityTransactionReportDataItem>>>
+
+    @POST("${AUTH}electricity/transaction-status")
+    fun getElectricityTransactionStatus(
+        @Header("Authorization") authorization: String,
+        @Body request: ElectricityTransactionStatusRequest
     ): Call<General<List<ElectricityTransactionReportDataItem>>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
