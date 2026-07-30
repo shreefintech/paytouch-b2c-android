@@ -57,7 +57,7 @@ class ElectricityTransactionStatusViewModel(application: Application) : AndroidV
                 call: Call<General<List<ElectricityTransactionReportDataItem>>>,
                 t: Throwable
             ) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }
@@ -66,15 +66,15 @@ class ElectricityTransactionStatusViewModel(application: Application) : AndroidV
         return TransactionItem(
             mobileNumber    = item.subscriberNo ?: "--",
             transactionId   = item.transactionId ?: "--",
-            amount          = "₹%.2f".format(item.totalPayable),
+            amount          = "₹%.2f".format(item.totalPayable ?: 0.0),
             status          = item.status ?: "--",
             categoryIconRes = R.drawable.ic_electricity,
             username        = item.customerName ?: "--",
             date            = item.createdAt ?: "--",
-            platformFee     = "₹%.2f".format(item.platformFee),
-            totalPayable    = "₹%.2f".format(item.totalPayable),
+            platformFee     = "₹%.2f".format(item.platformFee ?: 0.0),
+            totalPayable    = "₹%.2f".format(item.totalPayable ?: 0.0),
             referenceId     = item.transactionId ?: "--",
-            userId          = (index + 1).toString(),
+            userId          = item.id.toString(),
             accountNumber   = item.subscriberNo ?: "--",
             companyName     = item.operatorId ?: "--"
         )
