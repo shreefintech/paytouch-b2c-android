@@ -44,7 +44,7 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
                 if (response.isSuccessful && response.body()?.data != null) {
                     val list = ArrayList<TransactionItem>()
                     response.body()!!.data!!.forEachIndexed { index, item ->
-                        list.add(mapToTransactionItem(index, item))
+                        list.add(mapToTransactionItem(item))
                     }
                     onSuccess(list)
                 } else {
@@ -60,12 +60,12 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
                 call: Call<General<List<ElectricityTransactionReportDataItem>>>,
                 t: Throwable
             ) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }
 
-    private fun mapToTransactionItem(index: Int, item: ElectricityTransactionReportDataItem): TransactionItem {
+    private fun mapToTransactionItem(item: ElectricityTransactionReportDataItem): TransactionItem {
         return TransactionItem(
             mobileNumber    = item.consumerNo ?: "--",
             transactionId   = item.transactionId ?: "--",
