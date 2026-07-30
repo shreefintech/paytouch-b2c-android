@@ -57,7 +57,7 @@ class ElectricityTransactionStatusViewModel(application: Application) : AndroidV
                 call: Call<General<List<ElectricityTransactionReportDataItem>>>,
                 t: Throwable
             ) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }

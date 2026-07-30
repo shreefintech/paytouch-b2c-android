@@ -118,6 +118,10 @@ class SmsReceiptActivity : BaseActivity() {
         onBack()
 
         populateData()
+        // Always fetch the latest completed payment from the API — both the Receipt tab and the
+        // SMS Display tab need server-side fields (operatorName, ccf, createdAt) that are not
+        // available in the local SmsReceiptItem passed via intent. populateData() pre-fills the
+        // views instantly so there is no blank flash before the API responds.
         loadLatestPayments()
     }
 
@@ -186,8 +190,8 @@ class SmsReceiptActivity : BaseActivity() {
 
     private fun applyStatusStyle(status: String?) {
         val (bgColor, textColor) = when (status) {
-            "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
-            "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
+            "Success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
+            "Failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.toast_text_warning)
         }
         binding.cvReceiptStatusBadge.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
