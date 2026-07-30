@@ -122,6 +122,7 @@
                 android:layout_marginStart="@dimen/margin_small"
                 android:background="@drawable/bg_toggle_selected"
                 android:clickable="true"
+                android:contentDescription="@string/btnSearch"
                 android:focusable="true"
                 android:gravity="center"
                 android:onClickListener="@{onClickListener}"

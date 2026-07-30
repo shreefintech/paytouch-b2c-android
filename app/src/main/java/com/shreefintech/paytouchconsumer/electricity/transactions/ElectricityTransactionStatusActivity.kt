@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -61,6 +62,12 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
         binding.showProgressSearch = showProgressSearch
         binding.onClickListener    = onClickListener()
 
+        binding.etSearch.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                searchStatus(); true
+            } else false
+        }
+
         setupRecyclerView()
 
         prefillTransactionId?.let { txnId ->
@@ -78,7 +85,9 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(mActivity)
             adapter       = transactionAdp
         }
-        getTransactionStatusList()
+        if (prefillTransactionId == null) {
+            getTransactionStatusList()
+        }
     }
 
     private fun searchStatus() {

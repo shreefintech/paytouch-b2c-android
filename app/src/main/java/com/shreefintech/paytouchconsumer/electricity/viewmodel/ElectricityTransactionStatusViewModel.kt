@@ -74,9 +74,9 @@ class ElectricityTransactionStatusViewModel(application: Application) : AndroidV
             platformFee     = "₹%.2f".format(item.platformFee ?: 0.0),
             totalPayable    = "₹%.2f".format(item.totalPayable ?: 0.0),
             referenceId     = item.transactionId ?: "--",
-            userId          = item.id.toString(),
+            userId          = item.id?.toString() ?: "--",
             accountNumber   = item.subscriberNo ?: "--",
-            companyName     = item.operatorId ?: "--"
+            companyName     = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--"
         )
     }
 
