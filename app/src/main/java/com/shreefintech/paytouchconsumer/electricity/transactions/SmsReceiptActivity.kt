@@ -125,6 +125,8 @@ class SmsReceiptActivity : BaseActivity() {
 
     // ── API Call ──────────────────────────────────────────────
 
+    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadLatestPayments() }
+    //  once the no-internet placeholder design is finalised.
     private fun loadLatestPayments() {
         viewModel.getLatestPayments(
             onLoading = { showReceiptLoading(true) },
@@ -168,7 +170,7 @@ class SmsReceiptActivity : BaseActivity() {
         binding.tvReceiptDate.text = date
         binding.tvAmountPaid.text = amount
         binding.tvPaytouchTxnId.text = txnId
-        binding.tvBConnectTxnId.text = item.ccf ?: "--"
+        binding.tvBConnectTxnId.text = item.transactionId ?: "--"
         binding.tvCcf.text = item.platformFee ?: "--"
         binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, status)
         applyStatusStyle(status)
@@ -188,8 +190,8 @@ class SmsReceiptActivity : BaseActivity() {
 
     private fun applyStatusStyle(status: String?) {
         val (bgColor, textColor) = when (status) {
-            "Success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
-            "Failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
+            "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
+            "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.toast_text_warning)
         }
         binding.cvReceiptStatusBadge.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
