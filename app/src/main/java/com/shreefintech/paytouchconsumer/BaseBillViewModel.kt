@@ -66,7 +66,7 @@ abstract class BaseBillViewModel(application: Application) : AndroidViewModel(ap
                 }
 
                 override fun onFailure(call: Call<General<WalletDataItem>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.err_generic))
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
