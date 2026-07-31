@@ -239,6 +239,11 @@ class LoginActivity : BaseActivity() {
                 binding.etCredential.requestFocus()
             }
 
+            currentMode == LoginMode.PASSWORD && credential.length < 8 -> {
+                msg = getString(R.string.msgPasswordShort)
+                binding.etCredential.requestFocus()
+            }
+
             currentMode == LoginMode.MPIN && credential.isEmpty() -> {
                 msg = getString(R.string.msgMpinEmpty)
                 binding.etMpin1.requestFocus()
@@ -281,13 +286,10 @@ class LoginActivity : BaseActivity() {
 
     private fun navigateAfterLogin(data: LoginItem?) {
         val intent = when {
-            data?.requiresKyc == true -> Intent(mActivity, UploadKycActivity::class.java)
-            data?.requiresVirtualAccount == true -> Intent(
-                mActivity,
-                CreateVirtualAccountActivity::class.java
-            )
-
-            else -> Intent(mActivity, HomeActivity::class.java)
+            data?.requiresKyc == true            -> Intent(mActivity, UploadKycActivity::class.java)
+            data?.requiresMpin == true           -> Intent(mActivity, ResetMpinActivity::class.java)
+            data?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)
+            else                                 -> Intent(mActivity, HomeActivity::class.java)
         }
         startActivity(intent)
         finishAffinity()

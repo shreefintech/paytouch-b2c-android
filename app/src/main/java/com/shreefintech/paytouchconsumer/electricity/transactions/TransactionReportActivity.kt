@@ -46,7 +46,8 @@ class TransactionReportActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
-            binding.incFilterSheet.root.setPadding(0, 0, 0, systemBars.bottom)
+
+            binding.incFilterSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
             insets
         }
 

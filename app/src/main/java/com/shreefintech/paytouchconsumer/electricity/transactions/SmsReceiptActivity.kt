@@ -8,7 +8,10 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Path
+import android.graphics.RectF
 import android.graphics.Typeface
+import com.google.android.material.card.MaterialCardView
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -110,9 +113,7 @@ class SmsReceiptActivity : BaseActivity() {
         onBack()
 
         // Always fetch the latest completed payment from the API — both the Receipt tab and the
-        // SMS Display tab need server-side fields (operatorName, ccf, createdAt) that are not
-        // available in the local SmsReceiptItem passed via intent. populateData() pre-fills the
-        // views instantly so there is no blank flash before the API responds.
+        // SMS Display tab need server-side fields (operatorName, ccf, createdAt).
         loadLatestPayments()
     }
 
@@ -168,7 +169,7 @@ class SmsReceiptActivity : BaseActivity() {
     }
 
     private fun applyStatusStyle(status: String?) {
-        val (bgColor, textColor) = when (status) {
+        val (bgColor, textColor) = when (status?.lowercase()) {
             "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
             "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.toast_text_warning)
@@ -269,11 +270,21 @@ class SmsReceiptActivity : BaseActivity() {
             (view.height * scale).toInt().coerceAtLeast(1),
             Bitmap.Config.ARGB_8888
         )
-        // Direct pixel-level fill — guarantees fully opaque white in every corner,
-        // including the transparent corner pixels left by the card's rounded clip.
-        bitmap.eraseColor(Color.WHITE)
         val canvas = Canvas(bitmap)
         canvas.scale(scale, scale)
+        // clipToOutline is hardware-only and has no effect on a software canvas.
+        // Manually clip to the card's rounded rect so corners stay transparent.
+        val cornerRadius = (view as? MaterialCardView)?.radius ?: 0f
+        if (cornerRadius > 0f) {
+            val path = Path().apply {
+                addRoundRect(
+                    RectF(0f, 0f, view.width.toFloat(), view.height.toFloat()),
+                    cornerRadius, cornerRadius,
+                    Path.Direction.CW
+                )
+            }
+            canvas.clipPath(path)
+        }
         view.draw(canvas)
         return bitmap
     }

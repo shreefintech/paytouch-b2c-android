@@ -12,9 +12,11 @@
         android:layout_marginBottom="@dimen/margin_small">
 
         <LinearLayout
+            android:id="@+id/llContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
+            android:background="?selectableItemBackground"
             android:orientation="horizontal"
             android:padding="@dimen/margin_medium">
 

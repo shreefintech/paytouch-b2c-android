@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class ElectricityTransactionReportDataItem(
     @field:SerializedName("id")             val id: Int?,
+    @field:SerializedName("consumer_no")  val consumerNo: String?,
     @field:SerializedName("subscriber_no")  val subscriberNo: String?,
-    @field:SerializedName("consumer_no")    val consumerNo: String?,
     @field:SerializedName("operator_id")    val operatorId: String?,
     @field:SerializedName("subservice")     val subservice: String?,
     @field:SerializedName("customer_name")  val customerName: String?,

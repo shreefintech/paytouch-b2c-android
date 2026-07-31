@@ -129,6 +129,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:onClickListener="@{onClickListener}"
+                    android:background="?selectableItemBackground"
                     android:orientation="vertical"
                     android:paddingStart="@dimen/margin_extra_small"
                     android:paddingTop="@dimen/margin_small"
@@ -162,6 +163,7 @@
                     android:gravity="center"
                     android:onClickListener="@{onClickListener}"
                     android:orientation="vertical"
+                    android:background="?selectableItemBackground"
                     android:paddingStart="@dimen/margin_extra_small"
                     android:paddingTop="@dimen/margin_small"
                     android:paddingEnd="@dimen/margin_extra_small"
@@ -194,6 +196,7 @@
                     android:gravity="center"
                     android:onClickListener="@{onClickListener}"
                     android:orientation="vertical"
+                    android:background="?selectableItemBackground"
                     android:paddingStart="@dimen/margin_extra_small"
                     android:paddingTop="@dimen/margin_small"
                     android:paddingEnd="@dimen/margin_extra_small"
@@ -358,37 +361,46 @@
                                     android:textSize="@dimen/text_size_13" />
                             </LinearLayout>
 
-                            <LinearLayout
-                                android:id="@+id/llFetchBill"
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="100dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/margin_small"
-                                android:background="@drawable/bg_toggle_selected"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="horizontal"
-                                android:padding="@dimen/margin_small_medium">
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="?attr/colorPrimary"
+                                app:strokeWidth="0dp">
 
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:id="@+id/llFetchBill"
+                                    android:layout_width="100dp"
                                     android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:fontFamily="@font/proza_libre_medium"
-                                    android:includeFontPadding="false"
-                                    android:maxLines="1"
-                                    android:text="@string/btnFetchBill"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/text_size_13"
-                                    android:visibility="@{showProgressFetch ? View.GONE : View.VISIBLE}" />
+                                    android:background="?selectableItemBackground"
+                                    android:gravity="center"
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="horizontal"
+                                    android:padding="@dimen/margin_small_medium">
 
-                                <ProgressBar
-                                    style="?android:attr/progressBarStyleSmall"
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:indeterminateTint="@color/white"
-                                    android:visibility="@{showProgressFetch ? View.VISIBLE : View.GONE}"
-                                    tools:visibility="gone" />
-                            </LinearLayout>
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:ellipsize="end"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:maxLines="1"
+                                        android:text="@string/btnFetchBill"
+                                        android:textColor="@color/white"
+                                        android:textSize="@dimen/text_size_13"
+                                        android:visibility="@{showProgressFetch ? View.GONE : View.VISIBLE}" />
+
+                                    <ProgressBar
+                                        style="?android:attr/progressBarStyleSmall"
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:indeterminateTint="@color/white"
+                                        android:visibility="@{showProgressFetch ? View.VISIBLE : View.GONE}"
+                                        tools:visibility="gone" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
 
 
                         </LinearLayout>
@@ -789,70 +801,93 @@
                             android:orientation="horizontal">
 
                             <!-- Proceed to pay -->
-                            <LinearLayout
-                                android:id="@+id/llProceed"
+
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="@dimen/btn_height"
                                 android:layout_marginEnd="@dimen/margin_small"
-                                android:layout_weight="1"
-                                android:background="@drawable/bg_reset_btn"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="horizontal">
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
+                                android:layout_weight="1">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="18dp"
-                                    android:layout_height="18dp"
-                                    android:src="@drawable/ic_procced_to_pay"
-                                    android:visibility="@{showProgressPay ? View.GONE : View.VISIBLE}" />
+                                <LinearLayout
+                                    android:id="@+id/llProceed"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="?selectableItemBackground"
+                                    android:gravity="center"
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="horizontal">
 
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="6dp"
-                                    android:fontFamily="@font/proza_libre_medium"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/btnProceedToPay"
-                                    android:textColor="?attr/colorPrimary"
-                                    android:textSize="@dimen/text_size_12"
-                                    android:visibility="@{showProgressPay ? View.GONE : View.VISIBLE}" />
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/ic_procced_to_pay"
+                                        android:visibility="@{showProgressPay ? View.GONE : View.VISIBLE}" />
 
-                                <ProgressBar
-                                    style="?android:attr/progressBarStyleSmall"
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:indeterminateTint="?attr/colorPrimary"
-                                    android:visibility="@{showProgressPay ? View.VISIBLE : View.GONE}"
-                                    tools:visibility="gone" />
-                            </LinearLayout>
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/btnProceedToPay"
+                                        android:textColor="?attr/colorPrimary"
+                                        android:textSize="@dimen/text_size_12"
+                                        android:visibility="@{showProgressPay ? View.GONE : View.VISIBLE}" />
+
+                                    <ProgressBar
+                                        style="?android:attr/progressBarStyleSmall"
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:indeterminateTint="?attr/colorPrimary"
+                                        android:visibility="@{showProgressPay ? View.VISIBLE : View.GONE}"
+                                        tools:visibility="gone" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
 
                             <!-- Reset -->
-                            <LinearLayout
-                                android:id="@+id/llReset"
+
+
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="@dimen/btn_height"
-                                android:layout_weight="1"
-                                android:background="@drawable/bg_toggle_selected"
-                                android:gravity="center"
-                                android:onClickListener="@{onClickListener}"
-                                android:orientation="horizontal">
+                                android:layout_marginEnd="@dimen/margin_small"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="?attr/colorPrimary"
+                                app:strokeWidth="0dp"
+                                android:layout_weight="1">
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="18dp"
-                                    android:layout_height="18dp"
-                                    android:src="@drawable/ic_refresh"
-                                    android:tint="@color/white" />
+                                <LinearLayout
+                                    android:id="@+id/llReset"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="?selectableItemBackground"
+                                    android:gravity="center"
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="horizontal">
 
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="6dp"
-                                    android:fontFamily="@font/proza_libre_medium"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/btnReset"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/text_size_12" />
-                            </LinearLayout>
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/ic_refresh"
+                                        android:tint="@color/white" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/btnReset"
+                                        android:textColor="@color/white"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
                         </LinearLayout>
 
                     </LinearLayout>
@@ -860,38 +895,51 @@
 
 
                 <!-- Recent Transactions row -->
-                <LinearLayout
-                    android:id="@+id/llRecentTransactions"
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cvRecentTransactions"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    app:cardElevation="0dp"
                     android:layout_marginStart="@dimen/page_margin_horizontal"
                     android:layout_marginTop="@dimen/margin_large"
                     android:layout_marginEnd="@dimen/page_margin_horizontal"
-                    android:background="@drawable/bg_white_rounded"
+                    app:cardCornerRadius="10dp"
+                    app:cardBackgroundColor="@color/recent_transaction_bg"
                     android:gravity="center_vertical"
-                    android:onClickListener="@{onClickListener}"
                     android:orientation="horizontal"
-                    android:padding="@dimen/margin_large"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/flCard">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:id="@+id/llRecentTransactions"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/proza_libre_bold"
-                        android:includeFontPadding="false"
-                        android:text="@string/titleRecentTransactions"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/text_size_14" />
+                        android:gravity="center_vertical"
+                        android:foreground="?selectableItemBackground"
+                        android:onClickListener="@{onClickListener}"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/margin_large">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_right_arrow"
-                        android:tint="@color/primary" />
-                </LinearLayout>
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/proza_libre_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/titleRecentTransactions"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_14" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_right_arrow"
+                            android:tint="@color/primary" />
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

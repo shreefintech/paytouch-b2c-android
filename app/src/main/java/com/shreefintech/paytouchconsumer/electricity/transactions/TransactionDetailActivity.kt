@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -61,6 +62,7 @@ class TransactionDetailActivity : BaseActivity() {
 
         populateData()
         binding.onClickListener = onClickListener()
+        onBack()
     }
 
     private fun populateData() {
@@ -74,10 +76,8 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvPlatformFee.text   = item.platformFee
         binding.tvTotalPayable.text  = item.totalPayable
         binding.tvTransactionId.text = item.transactionId
-        binding.tvReferenceId.text   = item.referenceId
-        binding.tvUserId.text        = item.userId
 
-        val (bgColor, textColor) = when (item.status ?: "") {
+        val (bgColor, textColor) = when (item.status.lowercase()) {
             "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
             "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.orange)
@@ -86,10 +86,13 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvStatus.setTextColor(ContextCompat.getColor(mActivity, textColor))
     }
 
-    private fun openSmsReceipt() {
-        SmsReceiptActivity.start(
-            context = mActivity,
-        )
+
+    private fun onBack() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
     }
 
     private fun onClickListener(): View.OnClickListener {
@@ -98,10 +101,6 @@ class TransactionDetailActivity : BaseActivity() {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
-                }
-                binding.cvSmsReceipt -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    openSmsReceipt()
                 }
             }
         }

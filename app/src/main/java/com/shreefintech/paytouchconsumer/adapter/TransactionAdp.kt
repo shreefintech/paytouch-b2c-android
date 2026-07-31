@@ -35,7 +35,7 @@ class TransactionAdp(
             tvAmount.text = item.amount
             tvStatus.text = item.status
 
-            val (bgRes, textColor) = when (item.status) {
+            val (bgRes, textColor) = when (item.status.lowercase()) {
                 "success" -> Pair(
                     R.drawable.bg_status_success,
                     ContextCompat.getColor(mContext, R.color.toast_text_success)

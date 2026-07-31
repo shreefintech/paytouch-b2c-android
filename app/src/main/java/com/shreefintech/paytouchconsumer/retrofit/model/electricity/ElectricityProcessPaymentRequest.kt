@@ -8,5 +8,6 @@ data class ElectricityProcessPaymentRequest(
     @field:SerializedName("circle_id")         val circleId: String,
     @field:SerializedName("amount")            val amount: Double,
     @field:SerializedName("platform_fee")      val platformFee: Double,
-    @field:SerializedName("total_payable")     val totalPayable: Double
+    @field:SerializedName("total_payable")     val totalPayable: Double,
+    @field:SerializedName("transaction_id")    val transactionId: String
 )

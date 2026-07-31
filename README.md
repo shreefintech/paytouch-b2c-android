@@ -81,7 +81,7 @@ SplashActivity  (2s logo -> GET /api/user)
             \-- all flags clear -----------------------------> HomeActivity
 ```
 
-> `requires_mpin = true` is not yet routed -- no MpinActivity exists. Falls through to HomeActivity.
+> `requires_mpin = true` routes to `ResetMpinActivity` as a placeholder. A dedicated CreateMpinActivity should replace this once built.
 
 ---
 
@@ -93,7 +93,7 @@ Server-driven via flags on the login / session response. Users cannot skip any s
 Register / Login
     |
     +-- requires_kyc = true             --> UploadKycActivity
-    +-- requires_mpin = true            --> (MpinActivity -- not yet built)
+    +-- requires_mpin = true            --> ResetMpinActivity (placeholder -- CreateMpinActivity not yet built)
     \-- requires_virtual_account = true --> CreateVirtualAccountActivity
                                                 |
                                                 \-- all done --> HomeActivity
@@ -235,6 +235,7 @@ Never use `Toast.makeText()`. Always use `ToastUtil`:
 | `Utility.stopClick()` | 800ms debounce guard -- call at the top of every click handler |
 | `Utility.hideKeyboard(activity)` | Dismisses soft keyboard |
 | `Utility.calculatePlatformFee(amount)` | Returns platform fee for the amount (see Business Rules) |
+| `Utility.generateTransactionId()` | Generates a `PYTCH[DDMMyyyyHHmmss]M` transaction ID -- call before every process-payment API call |
 | `Utility.EmojiExcludeFilter()` | InputFilter that strips emoji |
 | `Utility.digitFilter()` | InputFilter that allows digits only |
 | `Utility.alphaSpaceFilter()` | InputFilter that allows letters and spaces only |
@@ -347,6 +348,7 @@ Generated client-side before the API call. Links local records to server records
 | Module | README |
 |---|---|
 | Auth | `app/src/main/java/.../auth/README.md` |
+| Electricity | `app/src/main/java/.../electricity/README.md` |
 
 ---
 

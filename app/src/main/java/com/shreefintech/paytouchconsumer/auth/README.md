@@ -33,7 +33,7 @@ SplashActivity (2s logo delay)
             └── (none) ──────────────────────────────► HomeActivity
 ```
 
-> `requires_mpin = true` routing is not yet handled — no MpinActivity exists. Falls through to HomeActivity until that screen is built.
+> `requires_mpin = true` routes to `ResetMpinActivity` as a placeholder. A dedicated CreateMpinActivity should replace this once built.
 
 ---
 
@@ -49,7 +49,7 @@ LoginActivity
                             └── onSuccess ─► navigateAfterLogin()
 ```
 
-`navigateAfterLogin()` applies the same `requires_kyc / requires_virtual_account` routing as SplashActivity.
+`navigateAfterLogin()` applies the same `requires_kyc / requires_mpin / requires_virtual_account` routing as SplashActivity.
 
 After a successful login, `LoginViewModel` also fires a **non-blocking** VPS registration call to `ApiAdminClient` (separate base URL). Failure is logged but never shown to the user.
 

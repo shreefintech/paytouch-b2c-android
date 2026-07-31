@@ -1,7 +1,6 @@
 package com.shreefintech.paytouchconsumer.electricity.viewmodel
 
 import android.app.Application
-import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
@@ -18,6 +17,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityP
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -133,6 +134,7 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
         onSufficient: () -> Unit,
         onFallback: () -> Unit
     ) {
+        if (!Utility.isInternetAvailable(getApplication())) { onFallback(); return }
         ApiAdminClient.apiService.getVpsBalance(userId)
             .enqueue(object : Callback<VpsBalanceItem> {
                 override fun onResponse(call: Call<VpsBalanceItem>, response: Response<VpsBalanceItem>) {
@@ -194,6 +196,7 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
             onError(getString(R.string.msgNoInternet))
             return
         }
+        val transactionId = Utility.generateTransactionId()
         ApiClient.apiService.processElectricityPayment(
             bearerToken(),
             ElectricityProcessPaymentRequest(
@@ -202,7 +205,8 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
                 circleId = "00",
                 amount = amount,
                 platformFee = fee,
-                totalPayable = total
+                totalPayable = total,
+                transactionId = transactionId
             )
         ).enqueue(object : Callback<ElectricityPaymentItem> {
             override fun onResponse(
@@ -227,12 +231,4 @@ class ElectricityViewModel(application: Application) : AndroidViewModel(applicat
         })
     }
 
-    private fun bearerToken(): String {
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            getApplication(), Constant.KEY_TOKEN, ""
-        ) ?: ""
-        return "Bearer $token"
-    }
-
-    private fun getString(@StringRes resId: Int): String = getApplication<Application>().getString(resId)
 }

@@ -102,6 +102,7 @@
                 android:layout_width="@dimen/icon_small"
                 android:layout_height="@dimen/icon_small"
                 android:src="@drawable/ic_down_arrow"
+                android:background="?selectableItemBackgroundBorderless"
                 android:tint="@color/primary" />
         </LinearLayout>
 
@@ -117,7 +118,7 @@
             <!-- Dashed separator (requires software layer for dash rendering) -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="2dp"
                 android:layout_marginTop="@dimen/margin_small_medium"
                 android:layout_marginBottom="@dimen/margin_small"
                 android:background="@drawable/bg_dashed_line"
