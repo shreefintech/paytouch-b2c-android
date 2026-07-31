@@ -54,9 +54,7 @@ class GasTransactionStatusViewModel(application: Application) : BaseBillViewMode
         onLoading()
         ApiClient.apiService.getGasTransactionStatus(
             bearerToken(),
-            GasTransactionStatusRequest(transactionId = query),
-            page,
-            PER_PAGE
+            GasTransactionStatusRequest(transactionId = query, page = page, perPage = PER_PAGE)
         ).enqueue(object : Callback<General<List<GasTransactionReportDataItem>>> {
             override fun onResponse(
                 call: Call<General<List<GasTransactionReportDataItem>>>,

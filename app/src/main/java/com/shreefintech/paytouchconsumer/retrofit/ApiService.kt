@@ -13,6 +13,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
@@ -183,20 +184,13 @@ interface ApiService {
     @POST("${AUTH}gas/transaction-status")
     fun getGasTransactionStatus(
         @Header("Authorization") authorization: String,
-        @Body request: GasTransactionStatusRequest,
-        @Query("page")     page:    Int?,
-        @Query("per_page") perPage: Int?
+        @Body request: GasTransactionStatusRequest
     ): Call<General<List<GasTransactionReportDataItem>>>
 
-    @GET("${AUTH}gas/payment-report")
+    @POST("${AUTH}gas/payment-report")
     fun getGasPaymentReport(
         @Header("Authorization") authorization: String,
-        @Query("from_date")   fromDate:   String?,
-        @Query("to_date")     toDate:     String?,
-        @Query("status")      status:     String?,
-        @Query("consumer_no") consumerNo: String?,
-        @Query("page")        page:       Int?,
-        @Query("per_page")    perPage:    Int?
+        @Body request: GasTransactionReportRequest
     ): Call<General<List<GasTransactionReportDataItem>>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
