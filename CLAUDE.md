@@ -204,17 +204,30 @@ Response structure depends on the actual API contract — there is no single man
 
 **Rule:** Always check `docs/api_reference.md` first to confirm the actual response shape before choosing a wrapper. Never guess or assume `General<T>` — use whatever the real API returns.
 
-**All model/DTO fields must be nullable.** Every field in every `*Item` class that maps to an API response must be declared with `?`. This is a hard rule — no exceptions for numeric types (`Int?`, `Double?`, `Long?`) or primitives. Gson defaults missing fields to `null` rather than crashing, which prevents API shape changes from causing `NullPointerException` at runtime. Use `?: fallback` at the call site, not at the model definition.
+**Nullability rules differ by DTO type:**
+
+- **API response DTOs — every field must be nullable (`?`), no exceptions.** Gson silently sets any missing field to `null`; a non-nullable field crashes at runtime when the API omits it. Declare every field with `?` and apply `?: fallback` at the call site, never at the model definition. This covers numeric types too (`Int?`, `Double?`, `Long?`).
+
+- **Local DTOs (activity-to-activity passing) — make a field nullable only if it can genuinely be absent.** There is no Gson parsing risk for local DTOs; the sender and receiver share the same compiled class. Declare fields as non-nullable (`val name: String`) when the value is always provided, and nullable (`val name: String?`) only when the field is legitimately optional.
+
+**`@field:SerializedName` is required on API response DTOs only.** Every field in an `*Item` class that is parsed directly from a Retrofit/Gson API response must carry `@field:SerializedName("snake_case_key")` — this protects against ProGuard/R8 field-name obfuscation in release builds. **Local DTOs** used solely for activity-to-activity data passing (serialised with `Gson().toJson()` / `Gson().fromJson()` inside the app, never crossing a network boundary) do **not** require `@field:SerializedName`; plain field names are sufficient since both sender and receiver share the same compiled class.
 
 ```kotlin
-// Correct — all fields nullable
+// API response DTO — all fields nullable + @field:SerializedName required
 data class SomeItem(
     @field:SerializedName("id")     val id: Int?,
     @field:SerializedName("amount") val amount: Double?,
     @field:SerializedName("name")   val name: String?
 )
 
-// Wrong — non-nullable primitives crash when the API omits the field
+// Local activity-to-activity DTO — no annotation; nullable only where genuinely optional
+data class SomeLocalItem(
+    val id: Int,           // always present — non-nullable is correct
+    val amount: Double,    // always present — non-nullable is correct
+    val note: String?      // optional field — nullable is correct
+)
+
+// Wrong — non-nullable fields on an API response DTO crash when the server omits the field
 data class SomeItem(
     @field:SerializedName("id")     val id: Int,
     @field:SerializedName("amount") val amount: Double

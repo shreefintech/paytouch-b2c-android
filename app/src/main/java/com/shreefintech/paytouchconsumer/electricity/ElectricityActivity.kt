@@ -23,7 +23,6 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
-import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.ElectricityTransactionStatusActivity
@@ -32,15 +31,10 @@ import com.shreefintech.paytouchconsumer.electricity.viewmodel.ElectricityViewMo
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ElectricityActivity : BaseActivity() {
 
@@ -51,7 +45,7 @@ class ElectricityActivity : BaseActivity() {
     private var selectedOperatorId: String? = null
     private var selectedOperatorName: String? = null
     private var fetchedBillItem: ElectricityBillItem? = null
-    private var billFetched = false
+    private var isBillFetched = false
 
     private val showProgressFetch = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -126,8 +120,8 @@ class ElectricityActivity : BaseActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                if (billFetched) {
-                    billFetched = false
+                if (isBillFetched) {
+                    isBillFetched = false
                     fetchedBillItem = null
                     binding.cvBillDetails.visibility = View.GONE
                 }
@@ -188,7 +182,7 @@ class ElectricityActivity : BaseActivity() {
             onSuccess = { bill ->
                 showProgressFetch.set(false)
                 fetchedBillItem = bill
-                billFetched = true
+                isBillFetched = true
                 showBillDetails()
             },
             onError = { msg ->
@@ -210,35 +204,14 @@ class ElectricityActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { paymentItem ->
+            onSuccess = { _ ->
                 showProgressPay.set(false)
-                navigateToReceipt(amount, fee, paymentItem)
+                SmsReceiptActivity.start(mActivity, fromPayment = true)
             },
             onError = { msg ->
                 showProgressPay.set(false)
                 ToastUtil.showDelete(mActivity, msg)
             }
-        )
-    }
-
-    private fun navigateToReceipt(amount: Double, fee: Double, paymentItem: ElectricityPaymentItem) {
-        val mobile = SharedPreferenceHelper.getSharedPreferenceString(
-            mActivity, Constant.KEY_MOBILE, ""
-        ) ?: ""
-        val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
-        SmsReceiptActivity.start(
-            context = mActivity,
-            item = SmsReceiptItem(mobile = mobile,
-            txnId = paymentItem.transactionId ?: "",
-            amount = "₹%.2f".format(paymentItem.amount ?: amount),
-            status = paymentItem.status ?: "Pending",
-            username = fetchedBillItem?.userName ?: "",
-            date = date,
-            platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
-            refId = paymentItem.reqId ?: "",
-            accountNo = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
-            companyName = selectedOperatorName ?: ""),
-            fromPayment = true
         )
     }
 
@@ -262,8 +235,8 @@ class ElectricityActivity : BaseActivity() {
             selectedOperatorId = operatorItems.getOrNull(index)?.id
             selectedOperatorName = selected
             binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-            if (billFetched) {
-                billFetched = false
+            if (isBillFetched) {
+                isBillFetched = false
                 fetchedBillItem = null
                 binding.cvBillDetails.visibility = View.GONE
             }
@@ -291,7 +264,7 @@ class ElectricityActivity : BaseActivity() {
     }
 
     private fun onClearBill() {
-        billFetched = false
+        isBillFetched = false
         fetchedBillItem = null
         binding.cvBillDetails.visibility = View.GONE
         binding.etAmount.setText("")
@@ -343,7 +316,7 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
             return
         }
-        if (!billFetched) {
+        if (!isBillFetched) {
             Utility.hideKeyboard(mActivity)
             fetchBill(connectionNumber)
             return
@@ -370,7 +343,7 @@ class ElectricityActivity : BaseActivity() {
         binding.cbTerms.isChecked = false
         selectedOperatorId = null
         selectedOperatorName = null
-        billFetched = false
+        isBillFetched = false
         fetchedBillItem = null
         binding.cvBillDetails.visibility = View.GONE
         resetFeeDisplay()

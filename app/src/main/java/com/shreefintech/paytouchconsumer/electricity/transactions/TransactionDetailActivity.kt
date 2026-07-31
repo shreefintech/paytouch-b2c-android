@@ -14,7 +14,6 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
-import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -72,14 +71,13 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvUsername.text      = getString(R.string.labelUsernameFmt, item.username)
         binding.tvInfoAmount.text    = item.amount
         binding.tvStatus.text        = item.status
-        binding.tvDate.text          = formatDate(item.date)
+        binding.tvDate.text          = item.date
         binding.tvPaymentAmount.text = item.amount
         binding.tvPlatformFee.text   = item.platformFee
         binding.tvTotalPayable.text  = item.totalPayable
         binding.tvTransactionId.text = item.transactionId
 
-
-        val (bgColor, textColor) = when (item.status) {
+        val (bgColor, textColor) = when (item.status.lowercase()) {
             "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
             "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.orange)
@@ -88,34 +86,6 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvStatus.setTextColor(ContextCompat.getColor(mActivity, textColor))
     }
 
-    private fun formatDate(raw: String?): String {
-        if (raw.isNullOrBlank()) return "--"
-        return try {
-            val parts = raw.substringBefore("T").split("-")
-            "${parts[2]}/${parts[1]}/${parts[0]}"
-        } catch (e: Exception) {
-            raw
-        }
-    }
-
-    private fun openSmsReceipt() {
-        val item = transactionItem ?: return
-        SmsReceiptActivity.start(
-            context = mActivity,
-            item    = SmsReceiptItem(
-                mobile      = item.mobileNumber,
-                txnId       = item.transactionId,
-                amount      = item.amount,
-                status      = item.status,
-                username    = item.username,
-                date        = item.date,
-                platformFee = item.platformFee,
-                refId       = item.referenceId,
-                accountNo   = item.accountNumber,
-                companyName = item.companyName
-            )
-        )
-    }
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -131,10 +101,6 @@ class TransactionDetailActivity : BaseActivity() {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
-                }
-                binding.cvSmsReceipt -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    openSmsReceipt()
                 }
             }
         }

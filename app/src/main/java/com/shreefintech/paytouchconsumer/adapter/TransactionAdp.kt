@@ -30,13 +30,7 @@ class TransactionAdp(
         val item = mArrayList[position]
         holder.binding.apply {
             ivCategoryIcon.setImageResource(item.categoryIconRes)
-            val accountNo = item.accountNumber ?: "--"
-
-            tvMobile.text = if (accountNo.length > 5) {
-                "${accountNo.take(4)}*****${accountNo.takeLast(1)}"
-            } else {
-                accountNo
-            }
+            tvMobile.text = item.username
             tvTransactionId.text = item.transactionId
             tvAmount.text = item.amount
             tvStatus.text = item.status
@@ -59,7 +53,7 @@ class TransactionAdp(
             tvStatus.setTextColor(textColor)
         }
 
-        holder.binding.llContainer.setOnClickListener {
+        holder.binding.root.setOnClickListener {
             val pos = holder.bindingAdapterPosition
             if (pos != RecyclerView.NO_POSITION) {
                 onClickItem?.invoke(mArrayList[pos])

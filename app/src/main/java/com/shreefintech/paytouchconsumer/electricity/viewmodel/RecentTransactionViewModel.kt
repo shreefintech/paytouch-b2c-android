@@ -1,9 +1,7 @@
 package com.shreefintech.paytouchconsumer.electricity.viewmodel
 
 import android.app.Application
-import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.electricity.model.RecentTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
@@ -11,8 +9,9 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,7 +27,7 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
         private set
     var hasMore = false
         private set
-    var loading = false
+    var isLoading = false
         private set
 
     companion object {
@@ -46,7 +45,7 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
             onError(getString(R.string.msgNoInternet))
             return
         }
-        loading = true
+        isLoading = true
         currentPage = 1
         hasMore = false
         operatorMap.clear()
@@ -85,8 +84,8 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
             onError(getString(R.string.msgNoInternet))
             return
         }
-        if (!hasMore || loading) return
-        loading = true
+        if (!hasMore || isLoading) return
+        isLoading = true
         currentPage++
         onLoading()
         fetchTransactions(onSuccess, onError)
@@ -104,7 +103,7 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
                     call: Call<General<List<UnifiedTransactionItem>>>,
                     response: Response<General<List<UnifiedTransactionItem>>>
                 ) {
-                    loading = false
+                    isLoading = false
                     if (response.isSuccessful && response.body()?.data != null) {
                         val data = response.body()!!.data!!
                         hasMore = data.size == PAGE_SIZE
@@ -123,9 +122,9 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
                     call: Call<General<List<UnifiedTransactionItem>>>,
                     t: Throwable
                 ) {
-                    loading = false
+                    isLoading = false
                     hasMore = false
-                    onError(t.localizedMessage ?: getString(R.string.err_generic))
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
@@ -177,13 +176,4 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
         }
     }
 
-    private fun bearerToken(): String {
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            getApplication(), Constant.KEY_TOKEN, ""
-        ) ?: ""
-        return "Bearer $token"
-    }
-
-    private fun getString(@StringRes resId: Int): String =
-        getApplication<Application>().getString(resId)
 }
