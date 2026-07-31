@@ -45,7 +45,7 @@ class ElectricityActivity : BaseActivity() {
     private var selectedOperatorId: String? = null
     private var selectedOperatorName: String? = null
     private var fetchedBillItem: ElectricityBillItem? = null
-    private var billFetched = false
+    private var isBillFetched = false
 
     private val showProgressFetch = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -120,8 +120,8 @@ class ElectricityActivity : BaseActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                if (billFetched) {
-                    billFetched = false
+                if (isBillFetched) {
+                    isBillFetched = false
                     fetchedBillItem = null
                     binding.cvBillDetails.visibility = View.GONE
                 }
@@ -182,7 +182,7 @@ class ElectricityActivity : BaseActivity() {
             onSuccess = { bill ->
                 showProgressFetch.set(false)
                 fetchedBillItem = bill
-                billFetched = true
+                isBillFetched = true
                 showBillDetails()
             },
             onError = { msg ->
@@ -235,8 +235,8 @@ class ElectricityActivity : BaseActivity() {
             selectedOperatorId = operatorItems.getOrNull(index)?.id
             selectedOperatorName = selected
             binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-            if (billFetched) {
-                billFetched = false
+            if (isBillFetched) {
+                isBillFetched = false
                 fetchedBillItem = null
                 binding.cvBillDetails.visibility = View.GONE
             }
@@ -264,7 +264,7 @@ class ElectricityActivity : BaseActivity() {
     }
 
     private fun onClearBill() {
-        billFetched = false
+        isBillFetched = false
         fetchedBillItem = null
         binding.cvBillDetails.visibility = View.GONE
         binding.etAmount.setText("")
@@ -316,7 +316,7 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
             return
         }
-        if (!billFetched) {
+        if (!isBillFetched) {
             Utility.hideKeyboard(mActivity)
             fetchBill(connectionNumber)
             return
@@ -343,7 +343,7 @@ class ElectricityActivity : BaseActivity() {
         binding.cbTerms.isChecked = false
         selectedOperatorId = null
         selectedOperatorName = null
-        billFetched = false
+        isBillFetched = false
         fetchedBillItem = null
         binding.cvBillDetails.visibility = View.GONE
         resetFeeDisplay()

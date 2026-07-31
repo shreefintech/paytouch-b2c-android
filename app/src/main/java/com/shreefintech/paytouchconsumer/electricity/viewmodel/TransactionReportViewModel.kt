@@ -1,9 +1,7 @@
 package com.shreefintech.paytouchconsumer.electricity.viewmodel
 
 import android.app.Application
-import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
@@ -11,8 +9,9 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportRequest
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -83,12 +82,4 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
         )
     }
 
-    private fun bearerToken(): String {
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            getApplication(), Constant.KEY_TOKEN, ""
-        ) ?: ""
-        return "Bearer $token"
-    }
-
-    private fun getString(@StringRes resId: Int): String = getApplication<Application>().getString(resId)
 }

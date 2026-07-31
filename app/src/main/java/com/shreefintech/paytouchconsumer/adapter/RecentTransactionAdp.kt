@@ -50,7 +50,7 @@ class RecentTransactionAdp(
                 "failed"  -> ContextCompat.getColor(context, R.color.form_wizard_reject)
                 else      -> ContextCompat.getColor(context, R.color.orange)
             }
-            tvStatus.text = "● $statusText"
+            tvStatus.text = context.getString(R.string.labelStatusBullet, statusText)
             tvStatus.setTextColor(textColor)
 
             tvDetailAmount.text = context.getString(R.string.labelDetailAmount, item.amount)

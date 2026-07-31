@@ -169,7 +169,7 @@ class SmsReceiptActivity : BaseActivity() {
     }
 
     private fun applyStatusStyle(status: String?) {
-        val (bgColor, textColor) = when (status) {
+        val (bgColor, textColor) = when (status?.lowercase()) {
             "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
             "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.toast_text_warning)

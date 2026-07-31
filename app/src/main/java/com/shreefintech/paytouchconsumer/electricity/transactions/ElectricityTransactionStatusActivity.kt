@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -69,6 +70,7 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
         }
 
         setupRecyclerView()
+        onBack()
 
         prefillTransactionId?.let { txnId ->
             binding.etSearch.setText(txnId)
@@ -135,6 +137,12 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
             binding.shimmerLayout.visibility  = View.GONE
             binding.rvTransactions.visibility = View.VISIBLE
         }
+    }
+
+    private fun onBack() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() { finish() }
+        })
     }
 
     private fun onClickListener(): View.OnClickListener {
