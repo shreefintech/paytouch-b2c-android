@@ -6,6 +6,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
+import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,6 +18,10 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
         onSuccess: (UserProfileItem?) -> Unit,
         onError: (String) -> Unit
     ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getApplication<Application>().getString(R.string.msgNoInternet))
+            return
+        }
         ApiClient.apiService.getUser(authorization)
             .enqueue(object : Callback<UserProfileItem> {
                 override fun onResponse(call: Call<UserProfileItem>, response: Response<UserProfileItem>) {

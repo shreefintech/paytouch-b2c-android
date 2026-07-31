@@ -54,6 +54,10 @@ class TransactionFilterHelper(
             }
         })
 
+        // bgOverlay is purely a visual dim layer. Dismissal is handled exclusively via the
+        // close button (ivClose) and the reset button so the user must make an explicit choice
+        // rather than accidentally closing the sheet by tapping outside.
+
         sheetBinding.ivClose.setOnClickListener {
             hide()
         }

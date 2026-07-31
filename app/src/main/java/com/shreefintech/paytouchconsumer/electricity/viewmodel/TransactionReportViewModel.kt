@@ -43,7 +43,7 @@ class TransactionReportViewModel(application: Application) : AndroidViewModel(ap
             ) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     val list = ArrayList<TransactionItem>()
-                    response.body()!!.data!!.forEachIndexed { index, item ->
+                    response.body()!!.data!!.forEach { item ->
                         list.add(mapToTransactionItem(item))
                     }
                     onSuccess(list)

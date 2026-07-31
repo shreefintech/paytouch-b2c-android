@@ -113,9 +113,7 @@ class SmsReceiptActivity : BaseActivity() {
         onBack()
 
         // Always fetch the latest completed payment from the API — both the Receipt tab and the
-        // SMS Display tab need server-side fields (operatorName, ccf, createdAt) that are not
-        // available in the local SmsReceiptItem passed via intent. populateData() pre-fills the
-        // views instantly so there is no blank flash before the API responds.
+        // SMS Display tab need server-side fields (operatorName, ccf, createdAt).
         loadLatestPayments()
     }
 

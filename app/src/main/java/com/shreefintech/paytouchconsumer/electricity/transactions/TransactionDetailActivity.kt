@@ -14,7 +14,6 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
-import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -77,8 +76,6 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvPlatformFee.text   = item.platformFee
         binding.tvTotalPayable.text  = item.totalPayable
         binding.tvTransactionId.text = item.transactionId
-        binding.tvReferenceId.text   = item.referenceId
-        binding.tvUserId.text        = item.userId
 
         val (bgColor, textColor) = when (item.status) {
             "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
@@ -89,24 +86,6 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvStatus.setTextColor(ContextCompat.getColor(mActivity, textColor))
     }
 
-    private fun openSmsReceipt() {
-        val item = transactionItem ?: return
-        SmsReceiptActivity.start(
-            context = mActivity,
-            item    = SmsReceiptItem(
-                mobile      = item.mobileNumber,
-                txnId       = item.transactionId,
-                amount      = item.amount,
-                status      = item.status,
-                username    = item.username,
-                date        = item.date,
-                platformFee = item.platformFee,
-                refId       = item.referenceId,
-                accountNo   = item.accountNumber,
-                companyName = item.companyName
-            )
-        )
-    }
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -122,10 +101,6 @@ class TransactionDetailActivity : BaseActivity() {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
-                }
-                binding.cvSmsReceipt -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    openSmsReceipt()
                 }
             }
         }
