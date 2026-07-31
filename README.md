@@ -182,7 +182,7 @@ ApiClient.apiService.doThing(param).enqueue(object : Callback<SomeItem> {
         else onError(ApiHelper.parseErrorMessage(context, response.code(), response.errorBody()?.string()))
     }
     override fun onFailure(call: Call<SomeItem>, t: Throwable) {
-        onError(t.localizedMessage ?: context.getString(R.string.err_generic))
+        onError(t.localizedMessage ?: context.getString(R.string.errGeneric))
     }
 })
 ```

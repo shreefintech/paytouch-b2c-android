@@ -50,7 +50,7 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
                 }
 
                 override fun onFailure(call: Call<General<List<GasOperatorItem>>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.err_generic))
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
@@ -82,7 +82,7 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     val bill = response.body()!!.data!!.firstOrNull()
                     if (bill != null) onSuccess(bill)
-                    else onError(getString(R.string.err_generic))
+                    else onError(getString(R.string.errGeneric))
                 } else {
                     onError(
                         ApiHelper.parseErrorMessage(
@@ -93,7 +93,7 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
             }
 
             override fun onFailure(call: Call<General<List<GasBillItem>>>, t: Throwable) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }
@@ -166,7 +166,7 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
             }
 
             override fun onFailure(call: Call<GasPaymentItem>, t: Throwable) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }

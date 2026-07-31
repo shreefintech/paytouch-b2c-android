@@ -157,12 +157,6 @@ interface ApiService {
         @Body request: ElectricityTransactionStatusRequest
     ): Call<General<List<ElectricityTransactionReportDataItem>>>
 
-    @POST("${AUTH}electricity/verify-payment")
-    fun verifyElectricityPayment(
-        @Header("Authorization") authorization: String,
-        @Body request: ElectricityVerifyPaymentRequest
-    ): Call<General<ElectricityVerifyPaymentDataItem>>
-
     @GET("${AUTH}electricity/latest-payment")
     fun getElectricityLatestPayment(
         @Header("Authorization") authorization: String
