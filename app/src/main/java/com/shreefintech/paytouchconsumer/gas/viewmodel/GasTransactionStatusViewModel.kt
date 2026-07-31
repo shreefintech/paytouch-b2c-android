@@ -1,9 +1,7 @@
 package com.shreefintech.paytouchconsumer.gas.viewmodel
 
 import android.app.Application
-import androidx.annotation.StringRes
-import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.Constant
+import com.shreefintech.paytouchconsumer.BaseBillViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
@@ -11,13 +9,12 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionStatusRequest
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class GasTransactionStatusViewModel(application: Application) : AndroidViewModel(application) {
+class GasTransactionStatusViewModel(application: Application) : BaseBillViewModel(application) {
 
     fun searchTransactionStatus(
         query: String?,
@@ -57,7 +54,7 @@ class GasTransactionStatusViewModel(application: Application) : AndroidViewModel
                 call: Call<General<List<GasTransactionReportDataItem>>>,
                 t: Throwable
             ) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }
@@ -76,16 +73,8 @@ class GasTransactionStatusViewModel(application: Application) : AndroidViewModel
             referenceId     = item.transactionId ?: "--",
             userId          = (index + 1).toString(),
             accountNumber   = item.connectionNumber ?: "--",
-            companyName     = item.operatorId ?: "--"
+            companyName     = item.operatorName?.takeIf { it.isNotEmpty() } ?: item.subservice ?: "--"
         )
     }
 
-    private fun bearerToken(): String {
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            getApplication(), Constant.KEY_TOKEN, ""
-        ) ?: ""
-        return "Bearer $token"
-    }
-
-    private fun getString(@StringRes resId: Int): String = getApplication<Application>().getString(resId)
 }

@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -62,7 +64,12 @@ class GasTransactionStatusActivity : BaseActivity() {
         binding.showProgressSearch = showProgressSearch
         binding.onClickListener    = onClickListener()
 
+        binding.etSearch.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) { searchStatus(); true } else false
+        }
+
         setupRecyclerView()
+        onBack()
 
         prefillTransactionId?.let { txnId ->
             binding.etSearch.setText(txnId)
@@ -79,7 +86,9 @@ class GasTransactionStatusActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(mActivity)
             adapter       = transactionAdp
         }
-        getTransactionStatusList()
+        if (prefillTransactionId == null) {
+            getTransactionStatusList()
+        }
     }
 
     private fun searchStatus() {
@@ -127,12 +136,18 @@ class GasTransactionStatusActivity : BaseActivity() {
         }
     }
 
+    private fun onBack() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() { finish() }
+        })
+    }
+
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->
             when (view) {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    finish()
+                    onBackPressedDispatcher.onBackPressed()
                 }
                 binding.llSearch -> {
                     if (Utility.stopClick()) return@OnClickListener
