@@ -23,7 +23,6 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
-import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.ElectricityTransactionStatusActivity
@@ -32,15 +31,10 @@ import com.shreefintech.paytouchconsumer.electricity.viewmodel.ElectricityViewMo
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ElectricityActivity : BaseActivity() {
 
@@ -63,7 +57,7 @@ class ElectricityActivity : BaseActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(
                 systemBars.left,
                 systemBars.top,
@@ -74,11 +68,11 @@ class ElectricityActivity : BaseActivity() {
         }
 
         LiquidGlassEffect.attach(
-            targetView   = binding.flCard,
-            rootView     = binding.clRoot as ViewGroup,
+            targetView = binding.flCard,
+            rootView = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion   = 0f,
-            blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
+            distortion = 0f,
+            blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
         binding.onClickListener = onClickListener()
@@ -210,36 +204,14 @@ class ElectricityActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { paymentItem ->
+            onSuccess = { _ ->
                 showProgressPay.set(false)
-                navigateToReceipt(amount, fee, paymentItem)
+                SmsReceiptActivity.start(mActivity, fromPayment = true)
             },
             onError = { msg ->
                 showProgressPay.set(false)
                 ToastUtil.showDelete(mActivity, msg)
             }
-        )
-    }
-
-    private fun navigateToReceipt(amount: Double, fee: Double, paymentItem: ElectricityPaymentItem) {
-        val mobile = SharedPreferenceHelper.getSharedPreferenceString(
-            mActivity, Constant.KEY_MOBILE, ""
-        ) ?: ""
-        val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
-        SmsReceiptActivity.start(
-            context = mActivity,
-            item = SmsReceiptItem(
-                mobile = mobile,
-                txnId = paymentItem.transactionId ?: "",
-                amount = "₹%.2f".format(paymentItem.amount ?: amount),
-                status = paymentItem.status ?: "Pending",
-                username = fetchedBillItem?.userName ?: "",
-                date = date,
-                platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
-                refId = paymentItem.reqId ?: "",
-                accountNo = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
-                companyName = selectedOperatorName ?: ""
-            )
         )
     }
 
@@ -254,11 +226,11 @@ class ElectricityActivity : BaseActivity() {
         }
         val names = operatorItems.map { it.name ?: "" }
         CustomDropdown.showDropdown(
-            activity   = mActivity,
+            activity = mActivity,
             anchorView = binding.flCompanyAnchor,
-            arrowView  = binding.ivCompanyArrow,
-            textView   = binding.tvCompany,
-            items      = names
+            arrowView = binding.ivCompanyArrow,
+            textView = binding.tvCompany,
+            items = names
         ) { selected, index ->
             selectedOperatorId = operatorItems.getOrNull(index)?.id
             selectedOperatorName = selected
@@ -273,7 +245,7 @@ class ElectricityActivity : BaseActivity() {
 
     private fun setOperatorLoading(loading: Boolean) {
         binding.pbCompanyLoading.visibility = if (loading) View.VISIBLE else View.GONE
-        binding.ivCompanyArrow.visibility   = if (loading) View.GONE else View.VISIBLE
+        binding.ivCompanyArrow.visibility = if (loading) View.GONE else View.VISIBLE
         binding.flCompanyAnchor.isClickable = !loading
         binding.flCompanyAnchor.isFocusable = !loading
     }
@@ -401,22 +373,7 @@ class ElectricityActivity : BaseActivity() {
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-546): Pass real transaction data once API is wired
-                    SmsReceiptActivity.start(
-                        context = mActivity,
-                        SmsReceiptItem(
-                            mobile = "9876543210",
-                            txnId = "BC88213045",
-                            amount = "₹149.00",
-                            status = "Success",
-                            username = "Ravi Kumar",
-                            date = "18-07-2026, 09:15 am",
-                            platformFee = "₹3.00",
-                            refId = "TXN10235",
-                            accountNo = "30723111936",
-                            companyName = "Paschim Gujarat Vij Company Ltd"
-                        )
-                    )
+                    SmsReceiptActivity.start(mActivity)
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener

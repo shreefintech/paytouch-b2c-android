@@ -260,6 +260,7 @@
     <string name="labelBConnectTxnId">B-connect Txn ID</string>
     <string name="labelCcf">CCF</string>
     <string name="labelStatus">Status</string>
+    <string name="labelStatusBullet">● %1$s</string>
     <string name="titleElectricityPaymentConfirmation">Electricity Payment Confirmation</string>
     <string name="labelPaytouchSmsNotification">Paytouch SMS Notification</string>
     <string name="labelBConnectTxnColon">B-Connect Txn ID:</string>

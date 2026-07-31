@@ -100,6 +100,8 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
         getTransactionStatusList(query)
     }
 
+    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { getTransactionStatusList() }
+    //  once the no-internet placeholder design is finalised.
     private fun getTransactionStatusList(query : String? = null){
         viewModel.searchTransactionStatus(
             query = query,

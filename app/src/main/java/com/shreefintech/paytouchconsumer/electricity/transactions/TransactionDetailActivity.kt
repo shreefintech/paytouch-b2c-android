@@ -13,7 +13,6 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
-import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -79,8 +78,8 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvUserId.text        = item.userId
 
         val (bgColor, textColor) = when (item.status ?: "") {
-            "Success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
-            "Failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
+            "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
+            "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.orange)
         }
         binding.cvStatus.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
@@ -88,21 +87,8 @@ class TransactionDetailActivity : BaseActivity() {
     }
 
     private fun openSmsReceipt() {
-        val item = transactionItem ?: return
         SmsReceiptActivity.start(
             context = mActivity,
-            item    = SmsReceiptItem(
-                mobile      = item.mobileNumber,
-                txnId       = item.transactionId,
-                amount      = item.amount,
-                status      = item.status,
-                username    = item.username,
-                date        = item.date,
-                platformFee = item.platformFee,
-                refId       = item.referenceId,
-                accountNo   = item.accountNumber,
-                companyName = item.companyName
-            )
         )
     }
 
