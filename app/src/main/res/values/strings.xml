@@ -194,6 +194,7 @@
     <string name="hintPlatformFee">Platform Fee</string>
     <string name="labelTotalPayable">Total Payable</string>
     <string name="hintTotalPayable">Payable Amount</string>
+    <string name="fmtCurrencyAmount">₹%.2f</string>
     <string name="msgTermsAgreement">I agree to the platform fee terms &amp; conditions.</string>
     <string name="btnProceedToPay">Proceed to pay</string>
     <string name="btnReset">Reset</string>
