@@ -23,7 +23,6 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityGasBinding
-import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.gas.transactions.GasRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.gas.transactions.GasSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionReportActivity
@@ -212,35 +211,12 @@ class GasActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { paymentItem ->
                 showProgressPay.set(false)
-                navigateToReceipt(amount, fee, paymentItem)
+                GasSmsReceiptActivity.start(mActivity)
             },
             onError = { msg ->
                 showProgressPay.set(false)
                 ToastUtil.showDelete(mActivity, msg)
             }
-        )
-    }
-
-    private fun navigateToReceipt(amount: Double, fee: Double, paymentItem: GasPaymentItem) {
-        val mobile = SharedPreferenceHelper.getSharedPreferenceString(
-            mActivity, Constant.KEY_MOBILE, ""
-        ) ?: ""
-        val date = SimpleDateFormat("dd-MM-yyyy, hh:mm a", Locale.getDefault()).format(Date())
-        GasSmsReceiptActivity.start(
-            context = mActivity,
-            item = SmsReceiptItem(
-                mobile = mobile,
-                txnId = paymentItem.transactionId ?: "",
-                amount = "₹%.2f".format(paymentItem.amount ?: amount),
-                status = paymentItem.status ?: getString(R.string.statusPending),
-                username = fetchedBillItem?.customerName ?: "",
-                date = date,
-                platformFee = "₹%.2f".format(paymentItem.platformFee ?: fee),
-                refId = paymentItem.reqId ?: "",
-                accountNo = binding.etConsumerNumber.text?.toString()?.trim() ?: "",
-                companyName = selectedOperatorName ?: ""
-            ),
-            fromPayment = true
         )
     }
 

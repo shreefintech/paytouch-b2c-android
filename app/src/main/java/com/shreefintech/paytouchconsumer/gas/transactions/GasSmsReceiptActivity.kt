@@ -1,51 +1,38 @@
 package com.shreefintech.paytouchconsumer.gas.transactions
 
 import android.Manifest
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Path
-import android.graphics.RectF
 import android.graphics.Typeface
-import com.google.android.material.card.MaterialCardView
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityGasSmsReceiptBinding
-import com.shreefintech.paytouchconsumer.electricity.model.SmsReceiptItem
 import com.shreefintech.paytouchconsumer.gas.viewmodel.GasSmsReceiptViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
-import java.io.File
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class GasSmsReceiptActivity : BaseActivity() {
 
@@ -61,10 +48,6 @@ class GasSmsReceiptActivity : BaseActivity() {
         else ToastUtil.showDelete(mActivity, getString(R.string.msgStoragePermissionRequired))
     }
 
-    private val receiptItem: SmsReceiptItem? by lazy {
-        intent.getStringExtra(EXTRA_ITEM)?.let { Gson().fromJson(it, SmsReceiptItem::class.java) }
-    }
-
     private val isFromPayment: Boolean by lazy {
         intent.getBooleanExtra(EXTRA_FROM_PAYMENT, false)
     }
@@ -75,10 +58,9 @@ class GasSmsReceiptActivity : BaseActivity() {
         private const val TAB_RECEIPT = 0
         private const val TAB_DISPLAY = 1
 
-        fun start(context: Context, item: SmsReceiptItem? = null, fromPayment: Boolean = false) {
+        fun start(context: Context, fromPayment: Boolean = false) {
             context.startActivity(
                 Intent(context, GasSmsReceiptActivity::class.java).apply {
-                    item?.let { putExtra(EXTRA_ITEM, Gson().toJson(it)) }
                     putExtra(EXTRA_FROM_PAYMENT, fromPayment)
                 }
             )
@@ -118,8 +100,6 @@ class GasSmsReceiptActivity : BaseActivity() {
         }
         binding.onClickListener = onClickListener()
         onBack()
-
-        populateData()
         loadLatestPayments()
     }
 
@@ -141,25 +121,11 @@ class GasSmsReceiptActivity : BaseActivity() {
 
     // ── Populate ──────────────────────────────────────────────
 
-    private fun populateData() {
-        val item = receiptItem ?: return
-        binding.tvConsumerNo.text = item.accountNo ?: "--"
-        binding.tvCustomerName.text = item.username ?: "--"
-        binding.tvCompanyName.text = item.companyName ?: "--"
-        binding.tvReceiptDate.text = item.date ?: "--"
-        binding.tvAmountPaid.text = item.amount ?: "--"
-        binding.tvPaytouchTxnId.text = item.txnId ?: "--"
-        binding.tvBConnectTxnId.text = item.refId ?: "--"
-        binding.tvCcf.text = item.platformFee ?: "--"
-        binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, item.status ?: "--")
-        applyStatusStyle(item.status)
-    }
-
     private fun populateReceiptFromApi(item: GasVerifyPaymentDataItem) {
         val amount = "₹${item.billAmount ?: "--"}"
         val consumerNo = item.connectionNumber ?: "--"
         val txnId = item.transactionId ?: "--"
-        val date = formatDate(item.createdAt)
+        val date = Constant.formatDate(item.createdAt)
         val status = item.status ?: "Pending"
 
         binding.tvConsumerNo.text = consumerNo
@@ -171,7 +137,7 @@ class GasSmsReceiptActivity : BaseActivity() {
         binding.tvBConnectTxnId.text = item.ccf ?: "--"
         binding.tvCcf.text = item.platformFee ?: "--"
         binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, status)
-        applyStatusStyle(status)
+        ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
 
         val smsBodyText = getString(R.string.msgGasSmsBody, amount, consumerNo)
         val spannable = SpannableString(smsBodyText)
@@ -184,29 +150,6 @@ class GasSmsReceiptActivity : BaseActivity() {
         binding.tvSmsBody.text = spannable
         binding.tvSmsBConnectTxn.text = txnId
         binding.tvSmsDate.text = date
-    }
-
-    private fun applyStatusStyle(status: String?) {
-        val (bgColor, textColor) = when (status) {
-            "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
-            "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
-            else      -> Pair(R.color.toast_bg_warning, R.color.toast_text_warning)
-        }
-        binding.cvReceiptStatusBadge.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
-        binding.tvReceiptStatus.setTextColor(ContextCompat.getColor(mActivity, textColor))
-    }
-
-    private fun formatDate(createdAt: String?): String {
-        if (createdAt.isNullOrBlank()) return "--"
-        return try {
-            val input = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            val output = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
-            // Handle both ".000000Z" and "+05:30" timezone formats
-            val date = input.parse(createdAt.substringBefore(".").substringBefore("+"))
-            if (date != null) output.format(date) else createdAt
-        } catch (e: Exception) {
-            createdAt
-        }
     }
 
     // ── Tab Switching ─────────────────────────────────────────
@@ -250,8 +193,7 @@ class GasSmsReceiptActivity : BaseActivity() {
     }
 
     private fun performDownload() {
-        val bitmap = captureViewAsBitmap(binding.cvReceiptCard)
-        val uri = saveBitmapAndGetUri(bitmap)
+        val uri = ReceiptHelper.performDownload(mActivity, binding.cvReceiptCard)
         if (uri != null) {
             savedImageUri = uri
             ToastUtil.showInActivityWithAction(
@@ -259,7 +201,7 @@ class GasSmsReceiptActivity : BaseActivity() {
                 message = getString(R.string.msgReceiptDownloaded),
                 type = ToastType.SUCCESS,
                 actionLabel = getString(R.string.btnOpen),
-                onAction = { openImageInGallery(uri) }
+                onAction = { ReceiptHelper.openImageInGallery(mActivity, uri) }
             )
         } else {
             ToastUtil.showDelete(mActivity, getString(R.string.msgReceiptDownloadFailed))
@@ -267,97 +209,12 @@ class GasSmsReceiptActivity : BaseActivity() {
     }
 
     private fun shareReceipt() {
-        val bitmap = captureViewAsBitmap(binding.cvReceiptCard)
-        try {
-            val dir = File(cacheDir, "receipts").also { it.mkdirs() }
-            val file = File(dir, "receipt_${System.currentTimeMillis()}.png")
-            FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-            val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "image/png"
-                putExtra(Intent.EXTRA_STREAM, uri)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            startActivity(Intent.createChooser(intent, getString(R.string.titleShareReceipt)))
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgReceiptShareFailed))
-        }
-    }
-
-    private fun captureViewAsBitmap(view: View): Bitmap {
-        val scale = 2f
-        val bitmap = Bitmap.createBitmap(
-            (view.width * scale).toInt().coerceAtLeast(1),
-            (view.height * scale).toInt().coerceAtLeast(1),
-            Bitmap.Config.ARGB_8888
+        ReceiptHelper.shareReceipt(
+            activity = mActivity,
+            view = binding.cvReceiptCard,
+            title = getString(R.string.titleShareReceipt),
+            onFailure = { ToastUtil.showDelete(mActivity, getString(R.string.msgReceiptShareFailed)) }
         )
-        val canvas = Canvas(bitmap)
-        canvas.scale(scale, scale)
-        val cornerRadius = (view as? MaterialCardView)?.radius ?: 0f
-        if (cornerRadius > 0f) {
-            val path = Path().apply {
-                addRoundRect(
-                    RectF(0f, 0f, view.width.toFloat(), view.height.toFloat()),
-                    cornerRadius, cornerRadius,
-                    Path.Direction.CW
-                )
-            }
-            canvas.clipPath(path)
-        }
-        view.draw(canvas)
-        return bitmap
-    }
-
-    private fun saveBitmapAndGetUri(bitmap: Bitmap): Uri? {
-        val filename = "PayTouch_Receipt_${System.currentTimeMillis()}.png"
-        return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val values = ContentValues().apply {
-                    put(MediaStore.Images.Media.DISPLAY_NAME, filename)
-                    put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-                    put(
-                        MediaStore.Images.Media.RELATIVE_PATH,
-                        "${Environment.DIRECTORY_PICTURES}/PayTouch"
-                    )
-                    put(MediaStore.Images.Media.IS_PENDING, 1)
-                }
-                val uri = contentResolver.insert(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values
-                ) ?: return null
-                contentResolver.openOutputStream(uri)
-                    ?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-                values.clear()
-                values.put(MediaStore.Images.Media.IS_PENDING, 0)
-                contentResolver.update(uri, values, null, null)
-                uri
-            } else {
-                val dir = File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                    "PayTouch"
-                ).also { it.mkdirs() }
-                val file = File(dir, filename)
-                FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-                android.media.MediaScannerConnection.scanFile(
-                    mActivity, arrayOf(file.absolutePath), null, null
-                )
-                FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    private fun openImageInGallery(uri: Uri) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "image/png")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        try {
-            startActivity(intent)
-        } catch (e: Exception) {
-            startActivity(Intent.createChooser(intent, getString(R.string.btnOpen)))
-        }
     }
 
     // ── Lifecycle ─────────────────────────────────────────────
