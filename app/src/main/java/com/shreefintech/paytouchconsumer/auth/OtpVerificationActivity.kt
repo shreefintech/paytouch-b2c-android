@@ -98,8 +98,9 @@ class OtpVerificationActivity : BaseActivity() {
             context = mActivity,
             mobile = mobile,
             flowType = flowType,
-            onSuccess = {},
-            onError = { msg -> ToastUtil.showDelete(mActivity, msg) }
+            onLoading = { showProgress.set(true) },
+            onSuccess = { showProgress.set(false) },
+            onError = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
         )
     }
 

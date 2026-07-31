@@ -103,8 +103,6 @@ class TransactionReportActivity : BaseActivity() {
                 callReport(fromDate, toDate, status, consumerNo)
             },
             onClear      = {
-                mAllList.clear()
-                mDisplayList.clear()
                 binding.etSearch.setText("")
                 callReport(null, null, null, null)
             }
@@ -112,6 +110,8 @@ class TransactionReportActivity : BaseActivity() {
         filterHelper.setup()
     }
 
+    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { callReport(null, null, null, null) }
+    //  once the no-internet placeholder design is finalised.
     private fun callReport(
         fromDate: String?,
         toDate: String?,

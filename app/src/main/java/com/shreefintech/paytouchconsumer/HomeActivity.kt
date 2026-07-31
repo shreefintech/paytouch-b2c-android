@@ -38,6 +38,8 @@ class HomeActivity : BaseActivity() {
         )
 
         binding.onClickListener = onClickListener()
+        // TODO(PAYTOUCH-585): Fetch shreefintech token from api/shreefintech-token and store in SharedPreferences
+        // TODO(PAYTOUCH-585): Fetch and display wallet balance from api/wallet/balance
         onBack()
     }
 

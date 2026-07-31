@@ -14,6 +14,5 @@ data class ElectricityTransactionReportDataItem(
     @field:SerializedName("total_payable")  val totalPayable: Double?,
     @field:SerializedName("transaction_id") val transactionId: String?,
     @field:SerializedName("status")         val status: String?,
-    @field:SerializedName("created_at")     val createdAt: String?,
-    @field:SerializedName("ccf")            val ccf: String?
+    @field:SerializedName("created_at")     val createdAt: String?
 )

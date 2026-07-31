@@ -102,8 +102,8 @@ Back press is handled by `onBack()` — closes the sheet before finishing the ac
 
 | Mode | `fromPayment` | Title row | Data source |
 |---|---|---|---|
-| From payment | `true` | Hidden | Intent-passed `SmsReceiptItem` + server confirmation via `getLatestPayments()` |
-| From transaction detail | `false` | Visible (tab bar) | `SmsReceiptItem` from intent (Receipt tab) + `GET /api/electricity/latest-payment` (Display tab) |
+| From payment | `true` | Hidden | Server confirmation via `getLatestPayments()` |
+| From transaction detail | `false` | Visible (tab bar) | `GET /api/electricity/latest-payment` |
 
 The receipt card (`cvReceiptCard`) is captured as a `Bitmap` for download and share. Download uses `MediaStore` on API 29+, `FileProvider` on older. Share always uses `FileProvider` via cache dir.
 
@@ -111,13 +111,13 @@ The receipt card (`cvReceiptCard`) is captured as a `Bitmap` for download and sh
 
 ## Intent Data Passing
 
-`SmsReceiptItem` is the canonical data object passed between payment result and receipt screens:
+`SmsReceiptActivity` is started with only `context` and `fromPayment`:
 
 ```kotlin
-SmsReceiptActivity.start(context, item = SmsReceiptItem(...), fromPayment = true)
+SmsReceiptActivity.start(context, fromPayment = true)
 ```
 
-`TransactionDetailActivity` uses a generic `TransactionItem`. Both serialize to JSON via `Gson().toJson()` in the companion `start()` function and deserialize lazily in the receiving activity.
+`TransactionDetailActivity` uses a generic `TransactionItem`. It serializes to JSON via `Gson().toJson()` in the companion `start()` function and deserializes lazily in the receiving activity.
 
 ---
 
@@ -140,7 +140,6 @@ Status color in both adapters uses `.lowercase()` comparison — API may return 
 |---|---|
 | `RecentTransactionItem` | `RecentTransactionAdp` |
 | `TransactionItem` | `TransactionAdp`, `TransactionDetailActivity` |
-| `SmsReceiptItem` | `SmsReceiptActivity` intent contract |
 
 **Retrofit request/response models (`retrofit/model/electricity/`):**
 

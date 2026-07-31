@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -62,7 +64,14 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
         binding.showProgressSearch = showProgressSearch
         binding.onClickListener    = onClickListener()
 
+        binding.etSearch.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                searchStatus(); true
+            } else false
+        }
+
         setupRecyclerView()
+        onBack()
 
         prefillTransactionId?.let { txnId ->
             binding.etSearch.setText(txnId)
@@ -79,7 +88,9 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(mActivity)
             adapter       = transactionAdp
         }
-        getTransactionStatusList()
+        if (prefillTransactionId == null) {
+            getTransactionStatusList()
+        }
     }
 
     private fun searchStatus() {
@@ -92,6 +103,8 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
         getTransactionStatusList(query)
     }
 
+    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { getTransactionStatusList() }
+    //  once the no-internet placeholder design is finalised.
     private fun getTransactionStatusList(query : String? = null){
         viewModel.searchTransactionStatus(
             query = query,
@@ -125,6 +138,12 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
             binding.shimmerLayout.visibility  = View.GONE
             binding.rvTransactions.visibility = View.VISIBLE
         }
+    }
+
+    private fun onBack() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() { finish() }
+        })
     }
 
     private fun onClickListener(): View.OnClickListener {
