@@ -122,10 +122,10 @@ class GasSmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: GasVerifyPaymentDataItem) {
-        val amount = "₹${item.billAmount ?: "--"}"
+        val amount = "₹${item.totalPayable ?: "--"}"
         val consumerNo = item.connectionNumber ?: "--"
         val txnId = item.transactionId ?: "--"
-        val date = Constant.formatDate(item.createdAt)
+        val date = Utility.formatDate(item.createdAt)
         val status = item.status ?: "Pending"
 
         binding.tvConsumerNo.text = consumerNo

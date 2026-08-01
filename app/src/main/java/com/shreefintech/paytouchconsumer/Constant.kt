@@ -5,18 +5,6 @@ import java.util.Locale
 
 object Constant {
 
-    fun formatDate(createdAt: String?): String {
-        if (createdAt.isNullOrBlank()) return "--"
-        return try {
-            val input = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            val output = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
-            val date = input.parse(createdAt.substringBefore(".").substringBefore("+"))
-            if (date != null) output.format(date) else createdAt
-        } catch (e: Exception) {
-            createdAt
-        }
-    }
-
     // API Base URLs
     const val BASE_URL = "https://www.paytouch.in/"
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"

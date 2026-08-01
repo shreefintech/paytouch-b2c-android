@@ -49,7 +49,7 @@ class GasSmsReceiptViewModel(application: Application) : AndroidViewModel(applic
                 call: Call<General<GasVerifyPaymentDataItem>>,
                 t: Throwable
             ) {
-                onError(t.localizedMessage ?: getString(R.string.err_generic))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }

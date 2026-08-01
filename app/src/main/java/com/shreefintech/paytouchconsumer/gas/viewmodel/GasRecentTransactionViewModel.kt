@@ -120,7 +120,7 @@ class GasRecentTransactionViewModel(application: Application) : AndroidViewModel
                 ) {
                     loading = false
                     hasMore = false
-                    onError(t.localizedMessage ?: getString(R.string.err_generic))
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
