@@ -23,6 +23,8 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidBinding
+import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
+import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
@@ -392,6 +394,14 @@ class PrepaidActivity : BaseActivity() {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
+                }
+                binding.llTabReport -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, TransactionReportActivity::class.java))
+                }
+                binding.llRecentTransactions -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener

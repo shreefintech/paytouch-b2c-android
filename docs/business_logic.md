@@ -272,14 +272,31 @@ amount > 40000           → fee = ₹30
 ### API Endpoints
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `api/prepaid/operators` | Get prepaid operators |
-| POST | `api/prepaid/recharge` | Process recharge |
-| POST | `api/prepaid/transaction-status` | Check status |
-| GET | `api/prepaid/payment-reports` | Reports |
+| GET | `api/recharge/operators` | Get prepaid operators |
+| GET | `api/recharge/plans/{operatorId}/{circleId}` | Get plans for selected operator + circle |
+| POST | `api/recharge/process-direct` | Process recharge |
 
-### Additional Request Fields
-- `circle` (String, required)
-- `plan` (String, optional)
+> `transaction-status` and `payment-reports` for Prepaid are not implemented yet — planned as a follow-up ticket, same sequencing as Gas (pay module first, transaction status/report second).
+
+### Response Fields (Operators — `General<T>` wrapped)
+- `data[].id` (String), `data[].name` (String), `data[].code` (String)
+
+### Response Fields (Plans — flat)
+- `success` (Boolean)
+- `plans[].plan_type` (Int), `plans[].amount` (Int), `plans[].description` (String), `plans[].validity` (String), `plans[].talktime` (Double), `plans[].data` (String)
+- `operator_id` (String), `circle_id` (String)
+
+### Request Fields (Process Recharge)
+- `mobile_no` (String, required)
+- `operator_code` (String, required)
+- `circle_code` (String, required) — circle value from the fixed circle list, not a server-fetched dropdown
+- `amount` (Decimal, required)
+- `platform_fee` (Decimal, required)
+- `total_payable` (Decimal, required)
+- `transaction_id` (String, PYTCH-format, generated client-side)
+
+### Response Fields (Process Recharge — flat)
+- `success` (Boolean), `message` (String), `req_id` (String), `amount` (Decimal), `platform_fee` (Decimal), `total_payable` (Decimal), `status` (String), `transaction_id` (String)
 
 ---
 

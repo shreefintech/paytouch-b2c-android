@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -100,7 +99,6 @@ class PrepaidPlanSelectionActivity : BaseActivity() {
                 }
             },
             onError = { msg ->
-                Log.e("test124", msg)
                 binding.shimmerLayout.stopShimmer()
                 binding.shimmerLayout.visibility = View.GONE
                 binding.tvEmpty.visibility = View.VISIBLE
