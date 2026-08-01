@@ -26,6 +26,10 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityT
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
+import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlansListItem
+import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidProcessDirectRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -33,6 +37,7 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -198,6 +203,26 @@ interface ApiService {
     fun getGasLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<GasVerifyPaymentDataItem>>
+
+    // ── Mobile Prepaid ────────────────────────────────────────────────────────
+
+    @GET("${AUTH}recharge/operators")
+    fun getPrepaidOperators(
+        @Header("Authorization") authorization: String
+    ): Call<General<List<PrepaidOperatorItem>>>
+
+    @GET("${AUTH}recharge/plans/{operatorId}/{circleId}")
+    fun getPrepaidPlans(
+        @Header("Authorization") authorization: String,
+        @Path("operatorId") operatorId: String,
+        @Path("circleId") circleId: String
+    ): Call<PrepaidPlansListItem>
+
+    @POST("${AUTH}recharge/process-direct")
+    fun processPrepaidPayment(
+        @Header("Authorization") authorization: String,
+        @Body request: PrepaidProcessDirectRequest
+    ): Call<PrepaidPaymentItem>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

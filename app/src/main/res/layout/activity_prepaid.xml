@@ -1,0 +1,925 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="showProgressBrowse"
+            type="androidx.databinding.ObservableBoolean" />
+
+        <variable
+            name="showProgressPay"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg"
+        tools:context=".prepaid.PrepaidActivity">
+
+        <!-- Toolbar -->
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <!-- Title row: "Prepaid Recharge" + BharatConnect logo -->
+        <LinearLayout
+            android:id="@+id/llTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:text="@string/titleMobilePrepaid"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_20" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/img_bharat_connect" />
+        </LinearLayout>
+
+        <!-- Tab bar card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvTabs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_small_medium"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llTitle"
+            app:strokeColor="?attr/colorPrimary"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Tab: PayBill (always active on this screen) -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_toggle_selected"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingStart="@dimen/margin_extra_small"
+                    android:paddingTop="@dimen/margin_small"
+                    android:paddingEnd="@dimen/margin_extra_small"
+                    android:paddingBottom="@dimen/margin_small">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_paybill"
+                        android:tint="@color/white" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/tabPayBill"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_10" />
+                </LinearLayout>
+
+                <!-- Tab: Report -->
+                <LinearLayout
+                    android:id="@+id/llTabReport"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:onClickListener="@{onClickListener}"
+                    android:background="?selectableItemBackground"
+                    android:orientation="vertical"
+                    android:paddingStart="@dimen/margin_extra_small"
+                    android:paddingTop="@dimen/margin_small"
+                    android:paddingEnd="@dimen/margin_extra_small"
+                    android:paddingBottom="@dimen/margin_small">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_report"
+                        android:tint="@color/primary" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/tabReport"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10" />
+                </LinearLayout>
+
+                <!-- Tab: Status -->
+                <LinearLayout
+                    android:id="@+id/llTabStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:onClickListener="@{onClickListener}"
+                    android:orientation="vertical"
+                    android:background="?selectableItemBackground"
+                    android:paddingStart="@dimen/margin_extra_small"
+                    android:paddingTop="@dimen/margin_small"
+                    android:paddingEnd="@dimen/margin_extra_small"
+                    android:paddingBottom="@dimen/margin_small">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_clock"
+                        android:tint="@color/primary" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/tabStatus"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10" />
+                </LinearLayout>
+
+                <!-- Tab: SMS Receipt -->
+                <LinearLayout
+                    android:id="@+id/llTabSmsReceipt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:onClickListener="@{onClickListener}"
+                    android:orientation="vertical"
+                    android:background="?selectableItemBackground"
+                    android:paddingStart="@dimen/margin_extra_small"
+                    android:paddingTop="@dimen/margin_small"
+                    android:paddingEnd="@dimen/margin_extra_small"
+                    android:paddingBottom="@dimen/margin_small">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_sms"
+                        android:tint="@color/primary" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/tabSmsReceipt"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvTabs"
+            app:layout_constraintVertical_bias="0.0">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/margin_extra_large">
+
+                <!-- Glass form card -->
+                <FrameLayout
+                    android:id="@+id/flCard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/page_margin_horizontal"
+                    android:layout_marginEnd="@dimen/page_margin_horizontal"
+                    android:layout_marginBottom="@dimen/margin_small_medium"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin_large">
+
+                        <!-- Company (Operator) row -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelCompany"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <FrameLayout
+                            android:id="@+id/flCompanyAnchor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/bg_form_field"
+                            android:foreground="?selectableItemBackground"
+                            android:onClickListener="@{onClickListener}"
+                            android:padding="@dimen/margin_small_medium">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvCompany"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:text="@string/hintSelectCompany"
+                                    android:textColor="?attr/colorTextHint"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <FrameLayout
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivCompanyArrow"
+                                        android:layout_width="14dp"
+                                        android:layout_height="14dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_down_arrow"
+                                        android:tint="@color/primary" />
+
+                                    <ProgressBar
+                                        android:id="@+id/pbCompanyLoading"
+                                        style="?android:attr/progressBarStyleSmall"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:indeterminateTint="@color/primary"
+                                        android:visibility="gone" />
+                                </FrameLayout>
+                            </LinearLayout>
+                        </FrameLayout>
+
+                        <!-- Select State row -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelSelectState"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <FrameLayout
+                            android:id="@+id/flStateAnchor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/bg_form_field"
+                            android:foreground="?selectableItemBackground"
+                            android:onClickListener="@{onClickListener}"
+                            android:padding="@dimen/margin_small_medium">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvState"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:text="@string/labelSelectState"
+                                    android:textColor="?attr/colorTextHint"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivStateArrow"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_down_arrow"
+                                    android:tint="@color/primary" />
+                            </LinearLayout>
+                        </FrameLayout>
+
+                        <!-- Mobile Number -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="bottom"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:text="@string/labelMobileNumber"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <androidx.appcompat.widget.AppCompatEditText
+                                    android:id="@+id/etMobileNumber"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:background="@drawable/bg_form_field"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:hint="@string/hintMobileNumber"
+                                    android:inputType="number"
+                                    android:maxLength="10"
+                                    android:padding="@dimen/margin_small_medium"
+                                    android:textColor="@color/black"
+                                    android:textColorHint="?attr/colorTextHint"
+                                    android:textSize="@dimen/text_size_13" />
+                            </LinearLayout>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="100dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_small"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="?attr/colorPrimary"
+                                app:strokeWidth="0dp">
+
+                                <LinearLayout
+                                    android:id="@+id/llBrowsePlan"
+                                    android:layout_width="100dp"
+                                    android:layout_height="wrap_content"
+                                    android:background="?selectableItemBackground"
+                                    android:gravity="center"
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="horizontal"
+                                    android:padding="@dimen/margin_small_medium">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:ellipsize="end"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:maxLines="1"
+                                        android:text="@string/btnBrowsePlan"
+                                        android:textColor="@color/white"
+                                        android:textSize="@dimen/text_size_13"
+                                        android:visibility="@{showProgressBrowse ? View.GONE : View.VISIBLE}" />
+
+                                    <ProgressBar
+                                        style="?android:attr/progressBarStyleSmall"
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:indeterminateTint="@color/white"
+                                        android:visibility="@{showProgressBrowse ? View.VISIBLE : View.GONE}"
+                                        tools:visibility="gone" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                        </LinearLayout>
+
+                        <!-- Plan Selected Card -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvPlanDetails"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:visibility="gone"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/fetch_bill_stroke"
+                            app:strokeWidth="1.5dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="@dimen/margin_medium">
+
+                                <!-- Header: check icon + title -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:layout_width="28dp"
+                                        android:layout_height="28dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_procced_to_pay_1" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/titlePrepaidPlanSelected"
+                                        android:textColor="@color/fetch_bill_stroke"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:layout_marginBottom="@dimen/margin_small"
+                                    android:background="#1A000000" />
+
+                                <!-- Truncated description -->
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvSelectedPlanDescription"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="2"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_12"
+                                    tools:text="Data: 1.5 GB/day | Voice: Unlimited Calls |…" />
+
+                                <!-- Validity -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelValidity"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvSelectedValidity"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                                <!-- Talktime -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelTalktime"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvSelectedTalktime"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                                <!-- Data -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelDataBenefit"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvSelectedData"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                                <!-- Change Plan -->
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cvChangePlan"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_medium"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:onClickListener="@{onClickListener}"
+                                    app:cardBackgroundColor="?attr/colorPrimary"
+                                    app:cardCornerRadius="10dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:orientation="horizontal"
+                                        android:padding="@dimen/margin_small_medium">
+
+                                        <ImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:src="@drawable/ic_refresh"
+                                            app:tint="@color/white" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="8dp"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/btnChangePlan"
+                                            android:textColor="@color/white"
+                                            android:textSize="@dimen/text_size_13" />
+                                    </LinearLayout>
+                                </com.google.android.material.card.MaterialCardView>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Amount -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelAmount"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etAmount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/bg_form_field"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:hint="@string/hintAmount"
+                            android:inputType="numberDecimal"
+                            android:padding="@dimen/margin_small_medium"
+                            android:textColor="@color/black"
+                            android:textColorHint="?attr/colorTextHint"
+                            android:textSize="@dimen/text_size_13" />
+
+                        <!-- Platform Fee | Total Payable -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelPlatformFee"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:background="@drawable/bg_form_field"
+                                    android:padding="@dimen/margin_small_medium">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvPlatformFee"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/hintPlatformFee"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+                                </FrameLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelTotalPayable"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:background="@drawable/bg_form_field"
+                                    android:padding="@dimen/margin_small_medium">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvTotalPayable"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/hintTotalPayable"
+                                        android:textColor="?attr/colorTextHint"
+                                        android:textSize="@dimen/text_size_12" />
+                                </FrameLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Terms checkbox row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.checkbox.MaterialCheckBox
+                                android:id="@+id/cbTerms"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:buttonIconTint="@color/white"
+                                app:buttonTint="@color/primary" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvTerms"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:includeFontPadding="false"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/text_size_12" />
+                        </LinearLayout>
+
+
+                        <!-- Action buttons -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:orientation="horizontal">
+
+                            <!-- Proceed to pay -->
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="@dimen/btn_height"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
+                                android:layout_weight="1">
+
+                                <LinearLayout
+                                    android:id="@+id/llProceed"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="?selectableItemBackground"
+                                    android:gravity="center"
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/ic_procced_to_pay"
+                                        android:visibility="@{showProgressPay ? View.GONE : View.VISIBLE}" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/btnProceedToPay"
+                                        android:textColor="?attr/colorPrimary"
+                                        android:textSize="@dimen/text_size_12"
+                                        android:visibility="@{showProgressPay ? View.GONE : View.VISIBLE}" />
+
+                                    <ProgressBar
+                                        style="?android:attr/progressBarStyleSmall"
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:indeterminateTint="?attr/colorPrimary"
+                                        android:visibility="@{showProgressPay ? View.VISIBLE : View.GONE}"
+                                        tools:visibility="gone" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <!-- Reset -->
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="@dimen/btn_height"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="?attr/colorPrimary"
+                                app:strokeWidth="0dp"
+                                android:layout_weight="1">
+
+                                <LinearLayout
+                                    android:id="@+id/llReset"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="?selectableItemBackground"
+                                    android:gravity="center"
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/ic_refresh"
+                                        android:tint="@color/white" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/btnReset"
+                                        android:textColor="@color/white"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </FrameLayout>
+
+                <!-- Recent Transactions row -->
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cvRecentTransactions"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:cardElevation="0dp"
+                    android:layout_marginStart="@dimen/page_margin_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:layout_marginEnd="@dimen/page_margin_horizontal"
+                    app:cardCornerRadius="10dp"
+                    app:cardBackgroundColor="@color/recent_transaction_bg"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/flCard">
+
+                    <LinearLayout
+                        android:id="@+id/llRecentTransactions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:foreground="?selectableItemBackground"
+                        android:onClickListener="@{onClickListener}"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/margin_large">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/proza_libre_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/titleRecentTransactions"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_14" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_right_arrow"
+                            android:tint="@color/primary" />
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

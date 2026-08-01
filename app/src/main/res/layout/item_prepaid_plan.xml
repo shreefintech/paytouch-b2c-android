@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/flCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/margin_small_medium">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foreground="?selectableItemBackground"
+        android:orientation="vertical"
+        android:padding="@dimen/margin_medium">
+
+        <!-- Amount | Validity -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPlanAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_18"
+                tools:text="₹198" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPlanValidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/proza_libre_semi_bold"
+                android:includeFontPadding="false"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_13"
+                tools:text="14 days" />
+        </LinearLayout>
+
+        <!-- Full plan description -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPlanDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:fontFamily="@font/proza_libre_regular"
+            android:includeFontPadding="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_13"
+            tools:text="Data: 1.5 GB/day | Voice: Unlimited Calls | SMS: 100 SMS/day | Validity: 22 Days" />
+
+        <!-- Talktime | Data footer -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPlanFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:fontFamily="@font/proza_libre_medium"
+            android:includeFontPadding="false"
+            android:textColor="?attr/colorTextSubtitle"
+            android:textSize="@dimen/text_size_12"
+            tools:text="Talktime: -1    Data: 1.5 GB/day" />
+
+    </LinearLayout>
+
+</FrameLayout>
