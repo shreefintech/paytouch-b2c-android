@@ -23,8 +23,9 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidBinding
-import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidRecentTransactionActivity
+import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransactionReportActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidViewModel
@@ -218,8 +219,7 @@ class PrepaidActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.msgPrepaidPaymentSuccess, mobileNumber))
-                finish()
+                PrepaidSmsReceiptActivity.start(mActivity, fromPayment = true)
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -406,7 +406,11 @@ class PrepaidActivity : BaseActivity() {
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
+                    PrepaidRecentTransactionActivity.start(mActivity)
+                }
+                binding.llTabSmsReceipt -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    PrepaidSmsReceiptActivity.start(mActivity)
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
