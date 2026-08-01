@@ -75,6 +75,7 @@ object ReceiptHelper {
                 FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }
@@ -87,6 +88,7 @@ object ReceiptHelper {
         try {
             context.startActivity(intent)
         } catch (e: Exception) {
+            e.printStackTrace()
             context.startActivity(Intent.createChooser(intent, context.getString(R.string.btnOpen)))
         }
     }
@@ -116,7 +118,7 @@ object ReceiptHelper {
     }
 
     fun applyStatusStyle(context: Context, badge: MaterialCardView, textView: TextView, status: String?) {
-        val (bgColor, textColor) = when (status) {
+        val (bgColor, textColor) = when (status?.lowercase()) {
             "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
             "failed"  -> Pair(R.color.toast_bg_delete, R.color.form_wizard_reject)
             else      -> Pair(R.color.toast_bg_warning, R.color.toast_text_warning)

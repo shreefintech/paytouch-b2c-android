@@ -31,15 +31,10 @@ import com.shreefintech.paytouchconsumer.gas.viewmodel.GasViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
-import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasPaymentItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class GasActivity : BaseActivity() {
 
@@ -209,9 +204,9 @@ class GasActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { paymentItem ->
+            onSuccess = { _ ->
                 showProgressPay.set(false)
-                GasSmsReceiptActivity.start(mActivity)
+                GasSmsReceiptActivity.start(mActivity, fromPayment = true)
             },
             onError = { msg ->
                 showProgressPay.set(false)

@@ -17,7 +17,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
 import java.util.Locale
 
 class GasRecentTransactionViewModel(application: Application) : AndroidViewModel(application) {
@@ -135,27 +134,13 @@ class GasRecentTransactionViewModel(application: Application) : AndroidViewModel
         return RecentTransactionItem(
             categoryName      = service,
             accountHolderName = item.extra?.customerName ?: "-",
-            date              = formatDate(item.createdAt),
+            date              = if (item.createdAt.isNullOrBlank()) "-" else Utility.formatDate(item.createdAt),
             status            = item.status ?: "-",
             amount            = formatAmount(item.amount ?: "--"),
             accountNumber     = item.identifier ?: "-",
             reference         = item.referenceId ?: "-",
             categoryIconRes   = R.drawable.ic_gas
         )
-    }
-
-    private fun formatDate(raw: String?): String {
-        if (raw.isNullOrBlank()) return "-"
-        return try {
-            // Handle both "2026-07-25T14:32:10.000000Z" and "2026-07-25T14:32:10+05:30"
-            val truncated = raw.substringBefore(".").substringBefore("+")
-            val inputFmt  = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
-            val outputFmt = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.US)
-            val date = inputFmt.parse(truncated)
-            if (date != null) outputFmt.format(date) else raw
-        } catch (e: Exception) {
-            raw
-        }
     }
 
     private fun formatAmount(raw: String?): String {

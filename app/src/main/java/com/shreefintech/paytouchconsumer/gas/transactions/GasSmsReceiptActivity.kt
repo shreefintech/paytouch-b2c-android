@@ -53,7 +53,6 @@ class GasSmsReceiptActivity : BaseActivity() {
     }
 
     companion object {
-        private const val EXTRA_ITEM = "extra_item"
         private const val EXTRA_FROM_PAYMENT = "extra_from_payment"
         private const val TAB_RECEIPT = 0
         private const val TAB_DISPLAY = 1
@@ -134,8 +133,8 @@ class GasSmsReceiptActivity : BaseActivity() {
         binding.tvReceiptDate.text = date
         binding.tvAmountPaid.text = amount
         binding.tvPaytouchTxnId.text = txnId
-        binding.tvBConnectTxnId.text = item.ccf ?: "--"
-        binding.tvCcf.text = item.platformFee ?: "--"
+        binding.tvBConnectTxnId.text = txnId
+        binding.tvCcf.text = item.ccf ?: item.platformFee ?: "--"
         binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
 
@@ -161,7 +160,7 @@ class GasSmsReceiptActivity : BaseActivity() {
         binding.llBtnContainer.visibility = if (isReceipt) View.VISIBLE else View.GONE
 
         val activeColor = ContextCompat.getColor(mActivity, R.color.primary)
-        val inactiveColor = android.graphics.Color.TRANSPARENT
+        val inactiveColor = Color.TRANSPARENT
         val activeTextColor = ContextCompat.getColor(mActivity, R.color.white)
         val inactiveTextColor = ContextCompat.getColor(mActivity, R.color.primary)
 

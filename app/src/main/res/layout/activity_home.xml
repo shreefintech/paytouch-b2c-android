@@ -183,8 +183,7 @@
                                 app:cardBackgroundColor="@color/white"
                                 app:strokeColor="?attr/colorPrimary"
                                 app:strokeWidth="1dp"
-                                android:layout_marginStart="@dimen/margin_small"
-                                android:layout_marginEnd="@dimen/margin_small">
+                                android:layout_marginStart="@dimen/margin_small">
 
 
                                 <LinearLayout
@@ -329,8 +328,7 @@
                                 app:cardBackgroundColor="@color/white"
                                 app:strokeColor="?attr/colorPrimary"
                                 app:strokeWidth="1dp"
-                                android:layout_marginStart="@dimen/margin_small"
-                                android:layout_marginEnd="@dimen/margin_small">
+                                android:layout_marginStart="@dimen/margin_small">
 
                                 <LinearLayout
                                     android:id="@+id/llFastag"
@@ -473,8 +471,7 @@
                                 app:cardBackgroundColor="@color/white"
                                 app:strokeColor="?attr/colorPrimary"
                                 app:strokeWidth="1dp"
-                                android:layout_marginStart="@dimen/margin_small"
-                                android:layout_marginEnd="@dimen/margin_small">
+                                android:layout_marginStart="@dimen/margin_small">
 
                                 <LinearLayout
                                     android:id="@+id/llTax"

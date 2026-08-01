@@ -1,8 +1,5 @@
 package com.shreefintech.paytouchconsumer
 
-import java.text.SimpleDateFormat
-import java.util.Locale
-
 object Constant {
 
     // API Base URLs
