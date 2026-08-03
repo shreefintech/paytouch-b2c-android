@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.gas.viewmodel
 
 import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.BaseBillViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
@@ -10,11 +11,13 @@ import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReport
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportRequest
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class GasTransactionReportViewModel(application: Application) : BaseBillViewModel(application) {
+class GasTransactionReportViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private const val PER_PAGE = 20

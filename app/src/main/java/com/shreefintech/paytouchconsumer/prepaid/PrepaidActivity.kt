@@ -65,7 +65,6 @@ class PrepaidActivity : BaseActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPrepaidBinding.inflate(layoutInflater)

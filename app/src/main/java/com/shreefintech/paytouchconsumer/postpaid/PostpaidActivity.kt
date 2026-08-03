@@ -62,8 +62,6 @@ class PostpaidActivity : BaseActivity() {
         }
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPostpaidBinding.inflate(layoutInflater)

@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.prepaid.viewmodel
 
 import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.BaseBillViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
@@ -13,8 +14,10 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
 
-class PrepaidTransactionStatusViewModel(application: Application) : BaseBillViewModel(application) {
+class PrepaidTransactionStatusViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private const val PER_PAGE = 20

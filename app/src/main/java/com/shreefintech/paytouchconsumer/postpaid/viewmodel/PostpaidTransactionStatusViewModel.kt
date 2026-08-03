@@ -1,7 +1,7 @@
 package com.shreefintech.paytouchconsumer.postpaid.viewmodel
 
 import android.app.Application
-import com.shreefintech.paytouchconsumer.BaseBillViewModel
+import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -10,11 +10,13 @@ import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransac
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PostpaidTransactionStatusViewModel(application: Application) : BaseBillViewModel(application) {
+class PostpaidTransactionStatusViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private const val PER_PAGE = 20
@@ -90,13 +92,13 @@ class PostpaidTransactionStatusViewModel(application: Application) : BaseBillVie
         return TransactionItem(
             mobileNumber    = item.connectionNumber ?: "--",
             transactionId   = item.transactionId ?: "--",
-            amount          = "₹${item.billAmount ?: item.totalPayable ?: "0.00"}",
+            amount          = Utility.formatAmount(item.billAmount ?: item.totalPayable),
             status          = item.status ?: "--",
             categoryIconRes = R.drawable.ic_postpaid,
             username        = item.customerName ?: item.connectionNumber ?: "--",
             date            = item.createdAt ?: "--",
-            platformFee     = "₹${item.platformFee ?: "0.00"}",
-            totalPayable    = "₹${item.totalPayable ?: "0.00"}",
+            platformFee     = Utility.formatAmount(item.platformFee),
+            totalPayable    = Utility.formatAmount(item.totalPayable),
             referenceId     = item.transactionId ?: "--",
             userId          = item.id?.toString() ?: "--",
             accountNumber   = item.connectionNumber ?: "--",
