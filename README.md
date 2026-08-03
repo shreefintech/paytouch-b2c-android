@@ -249,7 +249,6 @@ Never use `Toast.makeText()`. Always use `ToastUtil`:
 | `Utility.stopClick()` | 800ms debounce guard -- call at the top of every click handler |
 | `Utility.hideKeyboard(activity)` | Dismisses soft keyboard |
 | `Utility.calculatePlatformFee(amount)` | Returns platform fee for the amount (see Business Rules) |
-| `Utility.generateTransactionId()` | Generates a `PYTCH[DDMMyyyyHHmmss]M` transaction ID -- call before every process-payment API call |
 | `Utility.EmojiExcludeFilter()` | InputFilter that strips emoji |
 | `Utility.digitFilter()` | InputFilter that allows digits only |
 | `Utility.alphaSpaceFilter()` | InputFilter that allows letters and spaces only |
@@ -314,15 +313,6 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | Rs.1,000 - Rs.5,000 | Rs.8 |
 | Rs.5,001 - Rs.40,000 | Rs.20 |
 | > Rs.40,000 | Rs.30 |
-
-### Transaction ID Format
-
-```
-PYTCH[DDMMYYYYHHMMSS]M
-Example: PYTCH19012026091530M
-```
-
-Generated client-side before the API call. Links local records to server records.
 
 ### Field Validation
 
