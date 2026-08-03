@@ -83,6 +83,7 @@ com.shreefintech.paytouchconsumer/
 8. Adapters must not contain business logic or network calls.
 9. ViewModels must not store Activity/Context references.
 10. **All API endpoints must be declared in `ApiService` or `ApiAdminService`** — never construct `OkHttpClient` or `Retrofit` directly inside a ViewModel or Activity. Each backend URL has exactly one registered client: `ApiClient` for `paytouch.in`, `ApiAdminClient` for `admin.paytouch.in`. Add a new endpoint to the appropriate service interface; do not bypass it with a raw HTTP call.
+11. **`mapToTransactionItem()` must use `item.id?.toString() ?: "--"` for `userId`** — never use `(index + 1).toString()` or any iteration index. The API response DTO always carries an `id` field; using the loop index produces duplicate `userId` values on paginated appends (page 2+ resets index to 0) and loses the server-side identity of the record.
 
 ---
 
