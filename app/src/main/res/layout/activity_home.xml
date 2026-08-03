@@ -242,7 +242,7 @@
                                 android:layout_marginEnd="@dimen/margin_small">
 
                                 <LinearLayout
-                                    android:id="@+id/llTvCable"
+                                    android:id="@+id/llPostpaid"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:background="?selectableItemBackground"
@@ -259,7 +259,7 @@
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
                                         android:background="@drawable/bg_toggle_selected"
-                                        android:src="@drawable/ic_tv"/>
+                                        android:src="@drawable/ic_postpaid"/>
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="wrap_content"
@@ -268,7 +268,7 @@
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:gravity="center"
                                         android:includeFontPadding="false"
-                                        android:text="@string/categoryTvCable"
+                                        android:text="@string/categoryPostpaid"
                                         android:textColor="@color/black"
                                         android:textSize="@dimen/text_size_11" />
                                 </LinearLayout>

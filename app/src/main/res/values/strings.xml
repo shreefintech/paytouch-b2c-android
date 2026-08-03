@@ -176,8 +176,9 @@
     <!-- Gas screen -->
     <string name="titleGasBill">Gas Bill</string>
 
-    <!-- Mobile Prepaid screen -->
+    <!-- Mobile Prepaid / Postpaid screens -->
     <string name="titleMobilePrepaid">Prepaid Recharge</string>
+    <string name="titleMobilePostpaid">Postpaid Recharge</string>
     <string name="labelMobileNumber">Mobile Number</string>
     <string name="hintMobileNumber">Enter Mobile Number</string>
     <string name="msgMobileNumberEmpty">Please enter mobile number</string>
@@ -350,5 +351,6 @@
     <string name="textFilter">Filter</string>
 
     <string name="msgInsufficientBalance">Insufficient balance. Please add funds to your wallet.</string>
+    <string name="categoryPostpaid">Postpaid</string>
 
 </resources>
