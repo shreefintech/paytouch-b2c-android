@@ -139,7 +139,7 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
         ApiClient.apiService.processGasPayment(
             bearerToken(),
             GasProcessPaymentRequest(
-                consumerNumber = consumerNumber,
+                connectionNumber = consumerNumber,
                 operatorId = operatorId,
                 circleId = "0",
                 amount = amount,
