@@ -3,7 +3,7 @@ package com.shreefintech.paytouchconsumer.electricity.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.electricity.model.RecentTransactionItem
+import com.shreefintech.paytouchconsumer.transactions.model.RecentTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -15,9 +15,6 @@ import com.shreefintech.paytouchconsumer.utill.getString
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class RecentTransactionViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -139,41 +136,13 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
         return RecentTransactionItem(
             categoryName      = service,
             accountHolderName = item.extra?.customerName ?: "-",
-            date              = formatDate(item.createdAt),
+            date              = Utility.formatDate(item.createdAt),
             status            = item.status ?: "-",
-            amount            = formatAmount(item.amount ?: "--"),
+            amount            = Utility.formatAmount(item.amount ?: "--"),
             accountNumber     = item.identifier ?: "-",
             reference         = item.referenceId ?: "-",
             categoryIconRes   = R.drawable.ic_electricity
         )
-    }
-
-    private fun formatDate(raw: String?): String {
-        if (raw.isNullOrBlank()) return "-"
-        return try {
-            // Truncate microseconds: "2026-07-25T14:32:10.000000Z" → "2026-07-25T14:32:10"
-            val truncated = raw.substringBefore(".")
-            val inputFmt  = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
-            val outputFmt = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.US)
-            val date = inputFmt.parse(truncated)
-            if (date != null) outputFmt.format(date) else raw
-        } catch (e: Exception) {
-            raw
-        }
-    }
-
-    private fun formatAmount(raw: String?): String {
-        if (raw.isNullOrBlank()) return "-"
-        return try {
-            val number = raw.toDouble()
-            val fmt = NumberFormat.getNumberInstance(Locale("en", "IN")).apply {
-                maximumFractionDigits = 2
-                minimumFractionDigits = 2
-            }
-            "₹${fmt.format(number)}"
-        } catch (e: Exception) {
-            "₹$raw"
-        }
     }
 
 }

@@ -146,7 +146,7 @@ Unlike Electricity, the Gas module has **no `gas/model/` package**. It reuses th
 
 | Class | Declared in | Used by |
 |---|---|---|
-| `RecentTransactionItem` | `electricity/model/RecentTransactionItem.kt` | `GasRecentTransactionViewModel` (imported directly — not copied) |
+| `RecentTransactionItem` | `transactions/model/RecentTransactionItem.kt` | `RecentTransactionAdp`, `RecentTransactionViewModel`, `GasRecentTransactionViewModel` |
 | `TransactionItem` | `transactions/model/TransactionItem.kt` | `GasTransactionReportViewModel`, `GasTransactionStatusViewModel`, `TransactionDetailActivity` |
 
 **Do not create a Gas-local copy of either class.** If a field is missing for Gas, add it to the existing shared model (nullable, with a sensible default at the call site) rather than forking it.

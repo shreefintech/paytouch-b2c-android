@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
@@ -21,8 +20,8 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityGasSmsReceiptBinding
 import com.shreefintech.paytouchconsumer.gas.viewmodel.GasSmsReceiptViewModel
@@ -37,7 +36,7 @@ import com.shreefintech.paytouchconsumer.utill.Utility.visible
 class GasSmsReceiptActivity : BaseActivity() {
 
     private lateinit var binding: ActivityGasSmsReceiptBinding
-    private var savedImageUri: Uri? = null
+    private val showProgressReceipt = ObservableBoolean(false)
 
     private val viewModel: GasSmsReceiptViewModel by viewModels()
 
@@ -97,6 +96,7 @@ class GasSmsReceiptActivity : BaseActivity() {
             binding.llTitleRow.visibility = View.VISIBLE
             selectTab(TAB_RECEIPT)
         }
+        binding.showProgressReceipt = showProgressReceipt
         binding.onClickListener = onClickListener()
         onBack()
         loadLatestPayments()
@@ -104,6 +104,8 @@ class GasSmsReceiptActivity : BaseActivity() {
 
     // ── API Call ──────────────────────────────────────────────
 
+    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadLatestPayments() }
+    //  once the no-internet placeholder design is finalised.
     private fun loadLatestPayments() {
         viewModel.getLatestPayments(
             onLoading = { showReceiptLoading(true) },
@@ -173,9 +175,7 @@ class GasSmsReceiptActivity : BaseActivity() {
     // ── Loading State ─────────────────────────────────────────
 
     private fun showReceiptLoading(show: Boolean) {
-        val visibility = if (show) View.VISIBLE else View.GONE
-        binding.pbReceiptLoading.visibility = visibility
-        binding.pbDisplayLoading.visibility = visibility
+        showProgressReceipt.set(show)
     }
 
     // ── Download & Share ──────────────────────────────────────
@@ -194,7 +194,6 @@ class GasSmsReceiptActivity : BaseActivity() {
     private fun performDownload() {
         val uri = ReceiptHelper.performDownload(mActivity, binding.cvReceiptCard)
         if (uri != null) {
-            savedImageUri = uri
             ToastUtil.showInActivityWithAction(
                 activity = mActivity,
                 message = getString(R.string.msgReceiptDownloaded),
