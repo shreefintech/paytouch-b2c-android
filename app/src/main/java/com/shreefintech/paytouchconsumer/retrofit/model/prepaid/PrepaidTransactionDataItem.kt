@@ -2,7 +2,7 @@ package com.shreefintech.paytouchconsumer.retrofit.model.prepaid
 
 import com.google.gson.annotations.SerializedName
 
-data class PrepaidTransactionReportDataItem(
+data class PrepaidTransactionDataItem(
     @field:SerializedName("id")         val id: Int?,
     @field:SerializedName("mobile_no")  val mobileNo: String?,
     @field:SerializedName("operator")   val operator: String?,

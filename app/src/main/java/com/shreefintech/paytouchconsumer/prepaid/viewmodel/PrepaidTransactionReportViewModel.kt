@@ -6,7 +6,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionReportRequest
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -58,10 +58,10 @@ class PrepaidTransactionReportViewModel(application: Application) : BaseBillView
         ApiClient.apiService.getPrepaidPaymentReport(
             bearerToken(),
             PrepaidTransactionReportRequest(fromDate, toDate, status, mobileNo, page, PER_PAGE)
-        ).enqueue(object : Callback<General<List<PrepaidTransactionReportDataItem>>> {
+        ).enqueue(object : Callback<General<List<PrepaidTransactionDataItem>>> {
             override fun onResponse(
-                call: Call<General<List<PrepaidTransactionReportDataItem>>>,
-                response: Response<General<List<PrepaidTransactionReportDataItem>>>
+                call: Call<General<List<PrepaidTransactionDataItem>>>,
+                response: Response<General<List<PrepaidTransactionDataItem>>>
             ) {
                 isLoading = false
                 if (response.isSuccessful && response.body()?.data != null) {
@@ -69,7 +69,7 @@ class PrepaidTransactionReportViewModel(application: Application) : BaseBillView
                     isLastPage  = rawList.size < PER_PAGE
                     currentPage = page
                     val list = ArrayList<TransactionItem>()
-                    rawList.forEachIndexed { index, item -> list.add(mapToTransactionItem(index, item)) }
+                    rawList.forEach { item -> list.add(mapToTransactionItem(item)) }
                     onSuccess(list)
                 } else {
                     onError(
@@ -81,7 +81,7 @@ class PrepaidTransactionReportViewModel(application: Application) : BaseBillView
             }
 
             override fun onFailure(
-                call: Call<General<List<PrepaidTransactionReportDataItem>>>,
+                call: Call<General<List<PrepaidTransactionDataItem>>>,
                 t: Throwable
             ) {
                 isLoading = false
@@ -90,7 +90,7 @@ class PrepaidTransactionReportViewModel(application: Application) : BaseBillView
         })
     }
 
-    private fun mapToTransactionItem(index: Int, item: PrepaidTransactionReportDataItem): TransactionItem {
+    private fun mapToTransactionItem(item: PrepaidTransactionDataItem): TransactionItem {
         return TransactionItem(
             mobileNumber    = item.mobileNo ?: "--",
             transactionId   = item.txnId ?: "--",
@@ -102,7 +102,7 @@ class PrepaidTransactionReportViewModel(application: Application) : BaseBillView
             platformFee     = "₹0.00",
             totalPayable    = "₹${item.amount ?: "0.00"}",
             referenceId     = item.txnId ?: "--",
-            userId          = (index + 1).toString(),
+            userId          = item.id?.toString() ?: "--",
             accountNumber   = item.mobileNo ?: "--",
             companyName     = item.operator?.takeIf { it.isNotEmpty() } ?: item.service ?: "--"
         )
