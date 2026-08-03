@@ -29,6 +29,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTrans
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlansListItem
@@ -260,6 +263,18 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: PostpaidProcessPaymentRequest
     ): Call<PostpaidPaymentItem>
+
+    @POST("${AUTH}mobile-postpaid/transaction-status")
+    fun getPostpaidTransactionStatus(
+        @Header("Authorization") authorization: String,
+        @Body request: PostpaidTransactionStatusRequest
+    ): Call<General<List<PostpaidTransactionReportDataItem>>>
+
+    @POST("${AUTH}mobile-postpaid/payment-report")
+    fun getPostpaidPaymentReport(
+        @Header("Authorization") authorization: String,
+        @Body request: PostpaidTransactionReportRequest
+    ): Call<General<List<PostpaidTransactionReportDataItem>>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 
