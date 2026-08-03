@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
@@ -21,6 +20,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidSmsReceiptBinding
@@ -36,7 +36,7 @@ import com.shreefintech.paytouchconsumer.utill.Utility.visible
 class PrepaidSmsReceiptActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPrepaidSmsReceiptBinding
-    private var savedImageUri: Uri? = null
+    private val showProgressReceipt = ObservableBoolean(false)
 
     private val viewModel: PrepaidSmsReceiptViewModel by viewModels()
 
@@ -96,6 +96,7 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
             binding.llTitleRow.visibility = View.VISIBLE
             selectTab(TAB_RECEIPT)
         }
+        binding.showProgressReceipt = showProgressReceipt
         binding.onClickListener = onClickListener()
         onBack()
         loadLatestPayments()
@@ -172,9 +173,7 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
     // ── Loading State ─────────────────────────────────────────
 
     private fun showReceiptLoading(show: Boolean) {
-        val visibility = if (show) View.VISIBLE else View.GONE
-        binding.pbReceiptLoading.visibility = visibility
-        binding.pbDisplayLoading.visibility = visibility
+        showProgressReceipt.set(show)
     }
 
     // ── Download & Share ──────────────────────────────────────
@@ -193,7 +192,6 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
     private fun performDownload() {
         val uri = ReceiptHelper.performDownload(mActivity, binding.cvReceiptCard)
         if (uri != null) {
-            savedImageUri = uri
             ToastUtil.showInActivityWithAction(
                 activity = mActivity,
                 message = getString(R.string.msgReceiptDownloaded),

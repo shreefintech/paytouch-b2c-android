@@ -20,8 +20,6 @@ import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidRecentTransact
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import kotlin.collections.isNotEmpty
-
 class PrepaidRecentTransactionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPrepaidRecentTransactionBinding

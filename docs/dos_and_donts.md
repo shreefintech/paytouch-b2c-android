@@ -157,3 +157,147 @@ VPS sync calls are non-blocking, but failures must be logged so issues can be de
 
 **DON'T use a full-screen progress dialog, overlay, or pure alpha dimming for button-triggered API calls.**
 Full-screen loaders block the entire UI unnecessarily. Alpha-only dimming gives no clear feedback that a network call is in flight. Always show a `ProgressBar` inside the specific button that was tapped. For field-level list loading (dropdown, selector), show a localized spinner inside that field only — never a full-screen indicator. One `ObservableBoolean` per button; never a single shared `isLoading` flag driving multiple buttons' states.
+
+---
+
+## Category Module Output Rules
+
+**All bill payment modules share the same design. When generating code for any new module (Water, Broadband, DTH, Cable, FASTag, Loans, Taxes, etc.) apply every rule in this section without exception.**
+
+---
+
+### Files to Generate Per Module
+
+Create exactly these files — no more, no less:
+
+| File | Copy From |
+|---|---|
+| `{Category}Activity` + `activity_{category}.xml` | `ElectricityActivity` / `activity_electricity.xml` |
+| `{Category}ViewModel` | `ElectricityViewModel` (extends `BaseBillViewModel`) |
+| `{Category}RecentTransactionActivity` + `activity_{category}_recent_transaction.xml` | Electricity equivalent |
+| `{Category}RecentTransactionViewModel` | Electricity equivalent |
+| `{Category}TransactionReportActivity` + `activity_{category}_transaction_report.xml` | Electricity equivalent |
+| `{Category}TransactionReportViewModel` | Electricity equivalent |
+| `{Category}TransactionStatusActivity` + `activity_{category}_transaction_status.xml` | Electricity equivalent |
+| `{Category}TransactionStatusViewModel` | Electricity equivalent |
+| `{Category}SmsReceiptActivity` + `activity_{category}_sms_receipt.xml` | Electricity equivalent |
+| `{Category}SmsReceiptViewModel` | Electricity equivalent (standalone `AndroidViewModel`) |
+| `retrofit/model/{category}/` DTOs | Match actual API contract — never guess field names |
+| `ApiService.kt` entries under `// ── {Category} ──` block | One declaration per endpoint |
+
+Electricity is the canonical template. Copy it; swap names and endpoints only. Do not redesign.
+
+---
+
+### What Is Shared — Never Duplicate Per Module
+
+| Component | Location |
+|---|---|
+| `TransactionDetailActivity` | `transactions/TransactionDetailActivity.kt` |
+| `TransactionAdp` | `adapter/TransactionAdp.kt` |
+| `RecentTransactionAdp` | `adapter/RecentTransactionAdp.kt` |
+| `TransactionItem` | `transactions/model/TransactionItem.kt` |
+| `RecentTransactionItem` | `transactions/model/RecentTransactionItem.kt` |
+| `TransactionFilterHelper` | `utill/TransactionFilterHelper.kt` |
+| `ReceiptHelper` | `utill/ReceiptHelper.kt` |
+| `item_transaction.xml` | `res/layout/item_transaction.xml` |
+| `lyt_shimmer_transaction_item.xml` | `res/layout/lyt_shimmer_transaction_item.xml` |
+| `sheet_filter.xml` | `res/layout/sheet_filter.xml` |
+
+If one of these is missing a field required by a new module, add it to the existing shared class (nullable, with a sensible default at the call site). Never fork a separate copy.
+
+---
+
+### ViewModel Base Class
+
+| ViewModel | Base Class |
+|---|---|
+| `{Category}ViewModel` (main payment screen) | `BaseBillViewModel` |
+| `{Category}RecentTransactionViewModel` | `AndroidViewModel` |
+| `{Category}TransactionReportViewModel` | `AndroidViewModel` |
+| `{Category}TransactionStatusViewModel` | `AndroidViewModel` |
+| `{Category}SmsReceiptViewModel` | `AndroidViewModel` — **not** `BaseBillViewModel`; receipt only needs `bearerToken()`, not balance checks |
+
+---
+
+### Extension Functions — Never Re-implement
+
+| Function | Declared In | Replaces |
+|---|---|---|
+| `bearerToken()` | `utill/ViewModelExt.kt` | Any local `"Bearer $token"` construction |
+| `getString(@StringRes id)` | `utill/ViewModelExt.kt` | Any local string-resource lookup |
+| `Utility.formatAmount(value)` | `utill/Utility.kt` | Any local `NumberFormat` / currency formatting |
+| `Utility.formatDate(raw)` | `utill/Utility.kt` | Any local `SimpleDateFormat` date parsing |
+| `Utility.formatDate(raw, "dd/MM/yyyy")` | `utill/Utility.kt` | Date-only display (e.g. `TransactionDetailActivity`) |
+
+`Utility.formatDate(raw, format)` accepts an optional `format` parameter (default `"dd/MM/yyyy hh:mm a"`). Pass `"dd/MM/yyyy"` when only the date is needed — `TransactionDetailActivity` always uses this shorter format.
+
+If a ViewModel declares a private copy of any of the above, delete it and use the shared function.
+
+---
+
+### `mapToTransactionItem()` Rules
+
+Apply to every `mapToRecentTransactionItem()` and `mapToTransactionItem()` in every module's ViewModel:
+
+| Field | Value |
+|---|---|
+| `userId` | `item.id?.toString() ?: "--"` — **never** use loop index or `(index + 1).toString()` |
+| `date` | `item.createdAt ?: "--"` — raw ISO string; **do not pre-format** here |
+| `amount` | `Utility.formatAmount(item.amount ?: "--")` |
+| `categoryIconRes` | `R.drawable.ic_{category}` — the only visual difference between modules |
+
+---
+
+### Progress State Pattern
+
+Every module must follow the project-wide `ObservableBoolean` + DataBinding pattern. Per-module checklist:
+
+- Main payment screen: one `ObservableBoolean` per button (`showProgressFetch`, `showProgressPay`)
+- Operator/field loading: spinner inside the field slot (`pbCompanyLoading` + `ivCompanyArrow` swap)
+- SMS receipt download/share: `ObservableBoolean showProgressReceipt`, wired to both `pbReceiptLoading` and `pbDisplayLoading` via DataBinding
+- All `ObservableBoolean` variables set `false` in **both** `onResponse` and `onFailure` — no exceptions
+- Click guard: `if (showProgressXxx.get()) return@OnClickListener` before every API call
+
+---
+
+### Layout Rules
+
+- Transaction status/report/recent layouts: copy the electricity equivalent XML, change only the `<string>` title and the toolbar title string resource. Do not alter the view hierarchy.
+- SMS receipt layout: copy `activity_electricity_sms_receipt.xml` or `activity_gas_sms_receipt.xml`, change only the title. Do not add or remove views.
+- All transaction list layouts must include `lyt_shimmer_transaction_item.xml` as the loading placeholder.
+- Operator dropdown field must include the `pbCompanyLoading` + `ivCompanyArrow` inside a `FrameLayout` slot — matching `activity_electricity.xml` exactly.
+
+---
+
+### ApiService Declaration
+
+- Add all endpoints for a module under a single comment block: `// ── {Category} ──`
+- Never scatter a module's endpoints across other modules' sections
+- Never add an endpoint inside a ViewModel, Activity, or anywhere other than `ApiService.kt` (or `ApiAdminService.kt` for `admin.paytouch.in` endpoints)
+
+---
+
+### Transaction Type Parameter
+
+The `type` query parameter for `GET /api/transactions` must match the server contract:
+
+| Module | `type` value |
+|---|---|
+| Electricity | `"electricity"` |
+| Gas | `"gas"` |
+| Prepaid / Mobile Recharge | `"mobile_recharge"` |
+| Any new module | Check the API contract — never guess |
+
+---
+
+### SMS Receipt Entry Modes
+
+Every `{Category}SmsReceiptActivity` has two modes, controlled by `EXTRA_FROM_PAYMENT: Boolean`:
+
+| Mode | `fromPayment` | Title row | Data |
+|---|---|---|---|
+| After payment | `true` | Hidden | `GET /api/{category}/latest-payment` |
+| From recent transactions | `false` | Visible (tab bar) | Same `GET /api/{category}/latest-payment` |
+
+Both modes call `getLatestPayments()` unconditionally in `onCreate()`. There is no separate per-transaction receipt endpoint — the latest-payment endpoint always returns the most recent record for the authenticated user.

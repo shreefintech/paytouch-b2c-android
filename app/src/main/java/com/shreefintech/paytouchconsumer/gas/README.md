@@ -15,7 +15,7 @@ Handles the full gas bill payment flow: operator selection, bill fetch, payment 
 | `GasTransactionReportActivity` | `GasTransactionReportViewModel` | Filtered report with date range / status / consumer number filter sheet |
 | `GasTransactionStatusActivity` | `GasTransactionStatusViewModel` | Search transactions by transaction ID |
 | `TransactionDetailActivity` | *(none)* | **Shared** — same activity used by every module, in `transactions/`, not duplicated here |
-| `GasSmsReceiptActivity` | `GasSmsReceiptViewModel` | Receipt display, image download, share — used from payment completion and from transaction detail |
+| `GasSmsReceiptActivity` | `GasSmsReceiptViewModel` | Receipt display, image download, share — used from payment completion and from recent transactions |
 
 All Activities live in `gas/` (root screen) and `gas/transactions/` (history screens). All ViewModels live in `gas/viewmodel/`.
 
@@ -26,25 +26,25 @@ All Activities live in `gas/` (root screen) and `gas/transactions/` (history scr
 ```
 GasActivity
     │
-    ├── onCreate ──────────────────────────────────► GET api/gas (operators)
+    ├── onCreate ──────────────────────────────────► GET /api/gas/operators
     │                                                 └── populates operator dropdown
     │
     ├── llFetchBill (consumer number entered)
-    │       └── POST api/gas fetch-bill
+    │       └── POST /api/gas/fetch-bill
     │               └── onSuccess ──────────────────► shows bill details card (cvBillDetails)
     │
     └── llProceed (bill fetched + terms checked)
-            └── verifyBalanceAndProcessPayment()
+            └── verifyAndPay()
                     │
                     ├── BaseBillViewModel.checkVpsBalance() (ApiAdminClient)
                     │       ├── balance sufficient ──► processPayment()
                     │       └── insufficient / fail ─► BaseBillViewModel.checkWalletBalance()
                     │
-                    ├── GET api/wallet/user-data
+                    ├── GET /api/wallet/user-data
                     │       ├── balance sufficient ──► processPayment()
                     │       └── insufficient ────────► onError (msgInsufficientBalance)
                     │
-                    └── POST api/gas process-payment
+                    └── POST /api/gas/process-payment
                             └── onSuccess ──────────► GasSmsReceiptActivity (fromPayment=true)
 ```
 
@@ -70,13 +70,13 @@ Three separate entry points, launched from the tab bar at the top of `GasActivit
 
 | Tab | Screen | Data source |
 |---|---|---|
-| Recent | `GasRecentTransactionActivity` | `GET api/transactions?type=gas` (paginated 20/page) |
-| Report | `GasTransactionReportActivity` | `POST api/gas payment-report` (filtered) |
-| Status | `GasTransactionStatusActivity` | `POST api/gas transaction-status` (by transaction ID) |
+| Recent | `GasRecentTransactionActivity` | `GET /api/transactions?type=gas` (paginated 20/page) |
+| Report | `GasTransactionReportActivity` | `POST /api/gas/payment-report` (filtered) |
+| Status | `GasTransactionStatusActivity` | `POST /api/gas/transaction-status` (by transaction ID) |
 
-`GasRecentTransactionActivity` / `GasRecentTransactionViewModel.loadOperatorsThenData()` loads gas operators first (to resolve operator IDs to names via an in-memory `operatorMap`), then fetches transactions via the shared `GET api/transactions` endpoint with `type = "gas"`. Operator fetch failure is non-fatal — `fetchTransactions()` still runs and transactions load with raw operator IDs as the fallback name.
+`GasRecentTransactionActivity` / `GasRecentTransactionViewModel.loadOperatorsThenData()` loads gas operators first (to resolve operator IDs to names via an in-memory `operatorMap`), then fetches transactions via the shared `GET /api/transactions` endpoint with `type = "gas"`. Operator fetch failure is non-fatal — `fetchTransactions()` still runs and transactions load with raw operator IDs as the fallback name.
 
-Pagination in `GasRecentTransactionActivity` is scroll-triggered: fires `loadNextPage()` when the last visible item is within 3 of the end. `GasRecentTransactionViewModel` tracks `currentPage`, `hasMore`, and `loading` to prevent duplicate calls (same pattern as Electricity's `RecentTransactionViewModel`).
+Pagination in `GasRecentTransactionActivity` is scroll-triggered: fires `loadNextPage()` when the last visible item is within 3 of the end. `GasRecentTransactionViewModel` tracks `currentPage`, `hasMore`, and `isLoading` to prevent duplicate calls (same pattern as Electricity's `RecentTransactionViewModel`).
 
 `GasTransactionReportActivity` and `GasTransactionStatusActivity` instead track pagination via `currentPage` / `isLastPage` / `isLoading` on their respective ViewModels, exposed through `canLoadMore()` / `nextPage()` — a slightly different but equivalent pattern to the Recent screen. Follow whichever of the two your new screen most resembles.
 
@@ -109,8 +109,8 @@ Back press is handled by `onBack()` — closes the filter sheet before finishing
 
 | Mode | `fromPayment` | Title row | Data source |
 |---|---|---|---|
-| From payment | `true` | Hidden | `GET api/gas latest-payment` via `getLatestPayments()`, called unconditionally in `onCreate()` |
-| From transaction detail | `false` | Visible (tab bar) | Same `getLatestPayments()` call — Gas has no separate per-transaction receipt endpoint |
+| From payment | `true` | Hidden | `GET /api/gas/latest-payment` via `getLatestPayments()`, called unconditionally in `onCreate()` |
+| From recent transactions | `false` | Visible (tab bar) | Same `getLatestPayments()` call — Gas has no separate per-transaction receipt endpoint |
 
 The receipt card (`cvReceiptCard`) is captured via the shared `ReceiptHelper` (in `utill/`) for download and share — no gas-specific receipt rendering code. Download uses `MediaStore` on API 29+, `FileProvider` on older (behind a runtime storage-permission check on API < 29). Share always uses `FileProvider` via cache dir.
 
@@ -134,14 +134,14 @@ TransactionDetailActivity.start(mActivity, item)
 
 ---
 
-## Shared Models — Gas Does Not Define Its Own UI Models
+## Shared Models — Gas Does Not Define Its Own UI Display Models
 
-Unlike Electricity, the Gas module has **no `gas/model/` package**. It reuses the same category-agnostic display models Electricity introduced:
+Display models live in the shared `transactions/model/` package, not in `gas/`:
 
 | Class | Declared in | Used by |
 |---|---|---|
-| `RecentTransactionItem` | `transactions/model/RecentTransactionItem.kt` | `RecentTransactionAdp`, `RecentTransactionViewModel`, `GasRecentTransactionViewModel` |
-| `TransactionItem` | `transactions/model/TransactionItem.kt` | `GasTransactionReportViewModel`, `GasTransactionStatusViewModel`, `TransactionDetailActivity` |
+| `RecentTransactionItem` | `transactions/model/RecentTransactionItem.kt` | `RecentTransactionAdp`, `GasRecentTransactionViewModel` |
+| `TransactionItem` | `transactions/model/TransactionItem.kt` | `TransactionAdp`, `GasTransactionReportViewModel`, `GasTransactionStatusViewModel`, `TransactionDetailActivity` |
 
 **Do not create a Gas-local copy of either class.** If a field is missing for Gas, add it to the existing shared model (nullable, with a sensible default at the call site) rather than forking it.
 
@@ -156,16 +156,16 @@ Shared adapters (also not duplicated):
 
 ## API Models (`retrofit/model/gas/`)
 
-Gas-specific Retrofit request/response DTOs — these *are* per-module, unlike the UI models above:
+Gas-specific Retrofit request/response DTOs — these *are* per-module, unlike the UI display models above:
 
 | Class | Endpoint |
 |---|---|
-| `GasOperatorItem` | GET api/gas (operators) |
-| `GasFetchBillRequest` / `GasBillItem` | POST api/gas fetch-bill |
-| `GasProcessPaymentRequest` / `GasPaymentItem` | POST api/gas process-payment |
-| `GasTransactionReportRequest` / `GasTransactionReportDataItem` | POST api/gas payment-report |
-| `GasTransactionStatusRequest` | POST api/gas transaction-status (reuses `GasTransactionReportDataItem` as the response row) |
-| `GasVerifyPaymentDataItem` | GET api/gas latest-payment |
+| `GasOperatorItem` | GET /api/gas/operators |
+| `GasFetchBillRequest` / `GasBillItem` | POST /api/gas/fetch-bill |
+| `GasProcessPaymentRequest` / `GasPaymentItem` | POST /api/gas/process-payment |
+| `GasTransactionReportRequest` / `GasTransactionReportDataItem` | POST /api/gas/payment-report |
+| `GasTransactionStatusRequest` | POST /api/gas/transaction-status (reuses `GasTransactionReportDataItem` as the response row) |
+| `GasVerifyPaymentDataItem` | GET /api/gas/latest-payment |
 
 `GasPaymentItem` is a flat (unwrapped) response — success check is `response.isSuccessful && body?.success == true`.
 Every other Gas endpoint uses the `General<T>` wrapper — success check is `response.isSuccessful && response.body()?.data != null`.
@@ -197,9 +197,9 @@ Gas is itself a copy of Electricity with names swapped — use either as the tem
 
 1. `{Category}Activity` + `activity_{category}.xml` — copy `GasActivity` / `activity_gas.xml`, rename fields/strings only.
 2. `{Category}ViewModel` extending `BaseBillViewModel` — copy `GasViewModel`, swap endpoint names and request/response DTOs.
-3. `retrofit/model/{category}/` — new DTOs matching the new endpoint's actual field names (check `docs/api_reference.md` first, never guess).
+3. `retrofit/model/{category}/` — new DTOs matching the new endpoint's actual field names (check the API contract first, never guess).
 4. Add the new endpoints to `ApiService.kt` under a new `// ── {Category} ──` section.
 5. `{Category}RecentTransactionActivity` + `ViewModel`, `{Category}TransactionReportActivity` + `ViewModel`, `{Category}TransactionStatusActivity` + `ViewModel`, `{Category}SmsReceiptActivity` + `ViewModel` — copy the Gas transaction screens verbatim, reusing the shared `RecentTransactionItem`, `TransactionItem`, `RecentTransactionAdp`, `TransactionAdp`, `TransactionDetailActivity`, `TransactionFilterHelper`, and `ReceiptHelper`. **Never fork these.**
 6. Pass `R.drawable.ic_{category}` as `categoryIconRes` in the new ViewModel's mapping functions — that's the only visual difference between modules' transaction rows.
 
-This list matches the "Transaction Screens — Shared Structure Across All Modules" rule in the project's `CLAUDE.md` — read that first if anything here is ambiguous.
+This list matches the "Transaction Screens — Shared Structure Across All Modules" rule in the project's `CLAUDE.md`.
