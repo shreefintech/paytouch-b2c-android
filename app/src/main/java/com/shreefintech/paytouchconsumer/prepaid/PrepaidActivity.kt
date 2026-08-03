@@ -322,7 +322,9 @@ class PrepaidActivity : BaseActivity() {
         }
         Utility.hideKeyboard(mActivity)
         PrepaidPlanSelectionActivity.start(
-            mActivity, planSelectionLauncher, selectedOperatorId!!, selectedCircleId!!
+            mActivity, planSelectionLauncher,
+            selectedOperatorId ?: return,
+            selectedCircleId ?: return
         )
     }
 

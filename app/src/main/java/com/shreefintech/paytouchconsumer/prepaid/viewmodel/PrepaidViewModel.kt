@@ -93,7 +93,6 @@ class PrepaidViewModel(application: Application) : BaseBillViewModel(application
             onError(getString(R.string.msgNoInternet))
             return
         }
-        val transactionId = Utility.generateTransactionId()
         ApiClient.apiService.processPrepaidPayment(
             bearerToken(),
             PrepaidProcessDirectRequest(
@@ -102,8 +101,7 @@ class PrepaidViewModel(application: Application) : BaseBillViewModel(application
                 circleCode = circleCode,
                 amount = amount,
                 platformFee = fee,
-                totalPayable = total,
-                transactionId = transactionId
+                totalPayable = total
             )
         ).enqueue(object : Callback<PrepaidPaymentItem> {
             override fun onResponse(
@@ -115,7 +113,7 @@ class PrepaidViewModel(application: Application) : BaseBillViewModel(application
                     onSuccess(body)
                 } else {
                     onError(
-                        body?.message ?: ApiHelper.parseErrorMessage(
+                        ApiHelper.parseErrorMessage(
                             getApplication(), response.code(), response.errorBody()?.string()
                         )
                     )

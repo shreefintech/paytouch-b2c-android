@@ -41,7 +41,7 @@ class PrepaidPlanAdp(
         val item = mArrayList[position]
 
         holder.binding.apply {
-            tvPlanAmount.text = "₹${item.amount ?: 0}"
+            tvPlanAmount.text = mContext.getString(R.string.fmtCurrencyAmount).format((item.amount ?: 0).toDouble())
             tvPlanValidity.text = item.validity ?: "--"
             tvPlanDescription.text = item.description ?: "--"
             tvPlanFooter.text = mContext.getString(
