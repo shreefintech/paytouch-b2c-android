@@ -12,10 +12,6 @@
             type="android.view.View.OnClickListener" />
 
         <variable
-            name="showProgressBrowse"
-            type="androidx.databinding.ObservableBoolean" />
-
-        <variable
             name="showProgressPay"
             type="androidx.databinding.ObservableBoolean" />
     </data>
@@ -437,16 +433,7 @@
                                         android:maxLines="1"
                                         android:text="@string/btnBrowsePlan"
                                         android:textColor="@color/white"
-                                        android:textSize="@dimen/text_size_13"
-                                        android:visibility="@{showProgressBrowse ? View.GONE : View.VISIBLE}" />
-
-                                    <ProgressBar
-                                        style="?android:attr/progressBarStyleSmall"
-                                        android:layout_width="20dp"
-                                        android:layout_height="20dp"
-                                        android:indeterminateTint="@color/white"
-                                        android:visibility="@{showProgressBrowse ? View.VISIBLE : View.GONE}"
-                                        tools:visibility="gone" />
+                                        android:textSize="@dimen/text_size_13" />
                                 </LinearLayout>
 
                             </com.google.android.material.card.MaterialCardView>

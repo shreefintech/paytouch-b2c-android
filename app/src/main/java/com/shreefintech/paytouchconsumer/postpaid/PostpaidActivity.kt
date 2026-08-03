@@ -48,7 +48,6 @@ class PostpaidActivity : BaseActivity() {
     private var selectedPlan: PrepaidPlanItem? = null
     private var isPlanSelected = false
 
-    private val showProgressBrowse = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
 
     private val planSelectionLauncher = registerForActivityResult(
@@ -116,7 +115,6 @@ class PostpaidActivity : BaseActivity() {
         )
 
         binding.onClickListener = onClickListener()
-        binding.showProgressBrowse = showProgressBrowse
         binding.showProgressPay = showProgressPay
         setupInputFilters()
         setupAmountWatcher()
@@ -414,7 +412,6 @@ class PostpaidActivity : BaseActivity() {
                 }
                 binding.llBrowsePlan -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (showProgressBrowse.get()) return@OnClickListener
                     onBrowsePlan()
                 }
                 binding.cvChangePlan -> {
