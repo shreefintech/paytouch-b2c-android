@@ -1,12 +1,9 @@
 package com.shreefintech.paytouchconsumer.prepaid
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
@@ -18,7 +15,6 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.PrepaidPlanAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidPlanSelectionBinding
-import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidPlanSelectionViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlanItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -29,8 +25,6 @@ class PrepaidPlanSelectionActivity : BaseActivity() {
     private lateinit var binding: ActivityPrepaidPlanSelectionBinding
     private val viewModel: PrepaidPlanSelectionViewModel by viewModels()
     private lateinit var plansAdp: PrepaidPlanAdp
-
-    private val mPlanList = ArrayList<PrepaidPlanItem>()
 
     private val operatorId: String by lazy { intent.getStringExtra(EXTRA_OPERATOR_ID) ?: "" }
     private val circleId: String by lazy { intent.getStringExtra(EXTRA_CIRCLE_ID) ?: "" }
@@ -68,7 +62,7 @@ class PrepaidPlanSelectionActivity : BaseActivity() {
     }
 
     private fun setupRecyclerView() {
-        plansAdp = PrepaidPlanAdp(mActivity, mPlanList)
+        plansAdp = PrepaidPlanAdp(mActivity, ArrayList())
         plansAdp.onClickItem = { plan -> onPlanSelected(plan) }
         binding.rvPlans.apply {
             layoutManager = LinearLayoutManager(mActivity)
@@ -93,9 +87,7 @@ class PrepaidPlanSelectionActivity : BaseActivity() {
                     binding.tvEmpty.visibility = View.VISIBLE
                 } else {
                     binding.rvPlans.visibility = View.VISIBLE
-                    mPlanList.clear()
-                    mPlanList.addAll(plans)
-                    plansAdp.notifyDataSetChanged()
+                    plansAdp.updateList(plans)
                 }
             },
             onError = { msg ->

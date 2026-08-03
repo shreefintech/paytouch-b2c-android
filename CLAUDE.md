@@ -83,6 +83,8 @@ com.shreefintech.paytouchconsumer/
 8. Adapters must not contain business logic or network calls.
 9. ViewModels must not store Activity/Context references.
 10. **All API endpoints must be declared in `ApiService` or `ApiAdminService`** — never construct `OkHttpClient` or `Retrofit` directly inside a ViewModel or Activity. Each backend URL has exactly one registered client: `ApiClient` for `paytouch.in`, `ApiAdminClient` for `admin.paytouch.in`. Add a new endpoint to the appropriate service interface; do not bypass it with a raw HTTP call.
+11. **`mapToTransactionItem()` must use `item.id?.toString() ?: "--"` for `userId`** — never use `(index + 1).toString()` or any iteration index. The API response DTO always carries an `id` field; using the loop index produces duplicate `userId` values on paginated appends (page 2+ resets index to 0) and loses the server-side identity of the record.
+12. **Never generate `transaction_id` client-side** — the backend owns transaction ID generation. Do not call `Utility.generateTransactionId()` or any equivalent before a payment API call. Do not include a `transaction_id` field in any process-payment request DTO (`ElectricityProcessPaymentRequest`, `GasProcessPaymentRequest`, or any future module). The server returns the transaction ID in the response; read it from there. (`Utility.generateTransactionId()` was removed in review — flagged as incorrect ownership of ID generation.)
 
 ---
 
@@ -153,11 +155,9 @@ This applies to **every** `LiquidGlassButton` — upload triggers (`flUpload1`, 
 
 After every task show:
 
-1. Assumptions
-2. Files Changed
-3. Functions Changed
-4. Reason For Each Change
-5. Diff Summary
+1. Files Changed
+2. Reason For Each Change
+3. Diff Summary
 
 Always follow existing project patterns and minimize code changes.
 
@@ -202,7 +202,7 @@ Response structure depends on the actual API contract — there is no single man
 | `POST /api/register` | `RegisterItem` | `response.isSuccessful` |
 | `POST /api/*/send-otp`, `verify-otp`, `reset` | `MessageItem` | `response.isSuccessful && body?.success == true` |
 
-**Rule:** Always check `docs/api_reference.md` first to confirm the actual response shape before choosing a wrapper. Never guess or assume `General<T>` — use whatever the real API returns.
+**Rule:** Never guess or assume `General<T>` — use whatever the real API returns.
 
 **Nullability rules differ by DTO type:**
 
@@ -681,13 +681,5 @@ All project docs live in `docs/`. **Read the relevant files before starting any 
 | `docs/business_logic.md` | Domain rules: fee tiers, onboarding sequence, routing flags, validation rules | Before any feature, flow, or data-related code |
 | `docs/dos_and_donts.md` | Explicit DOs and DON'Ts for architecture, API, naming, RecyclerView, UI patterns | Before any structural or architectural decision |
 | `docs/screens_and_navigation.md` | Screen list, navigation graph, back-stack rules, intent extras | Before implementing a new screen or navigation flow |
-| `docs/api_reference.md` | All endpoint signatures, request fields, response shapes, auth headers | Before wiring any API call |
-| `docs/api_call_guide.md` | Code patterns for making Retrofit calls, OkHttp setup, error parsing | Before writing any networking code |
 
-### Rules
-
-- **Always read `caveman.md` first** — it provides the mental model everything else depends on.
-- **`business_logic.md` is the source of truth** — never override it with assumptions; if code contradicts it, flag it.
-- **`dos_and_donts.md` is non-negotiable** — treat every rule there as a hard constraint, not a suggestion.
-- **`api_reference.md` before any API call** — never guess endpoint paths, field names, or response shapes.
-- If a task touches something not covered by any doc, **ask before proceeding**.
+If a task touches something not covered by any doc, **ask before proceeding**.
