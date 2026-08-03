@@ -149,9 +149,9 @@ class PrepaidActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = "₹%.2f".format(fee)
+                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = "₹%.2f".format(total)
+                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
@@ -282,7 +282,7 @@ class PrepaidActivity : BaseActivity() {
         binding.tvSelectedPlanDescription.text = plan.description ?: "-"
         binding.tvSelectedValidity.text = plan.validity ?: "-"
         binding.tvSelectedTalktime.text =
-            if (plan.talktime == null || plan.talktime < 0) "-" else "₹%.2f".format(plan.talktime)
+            if (plan.talktime == null || plan.talktime < 0) "-" else getString(R.string.fmtCurrencyAmount).format(plan.talktime)
         binding.tvSelectedData.text = if(plan.data.isNullOrEmpty()) "--" else plan.data
         binding.etAmount.setText(plan.amount?.toString() ?: "")
         binding.cvPlanDetails.visibility = View.VISIBLE
@@ -397,10 +397,12 @@ class PrepaidActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // TODO(B2C-54): replace with prepaid-specific TransactionReportActivity once implemented
                     startActivity(Intent(mActivity, TransactionReportActivity::class.java))
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // TODO(B2C-54): replace with prepaid-specific RecentTransactionActivity once implemented
                     startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
                 }
                 binding.flCompanyAnchor -> {

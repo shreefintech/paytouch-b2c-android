@@ -12,7 +12,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlanItem
 
 class PrepaidPlanAdp(
     private val mContext: Context,
-    private val mArrayList: List<PrepaidPlanItem>
+    private val mArrayList: ArrayList<PrepaidPlanItem>
 ) : RecyclerView.Adapter<PrepaidPlanAdp.ViewHolder>() {
 
     var onClickItem: ((PrepaidPlanItem) -> Unit)? = null
@@ -24,22 +24,21 @@ class PrepaidPlanAdp(
         val binding = ItemPrepaidPlanBinding.inflate(
             LayoutInflater.from(mContext), parent, false
         )
+        LiquidGlassEffect.attach(
+            targetView   = binding.flCard,
+            rootView     = binding.root as ViewGroup,
+            cornerRadius = binding.root.resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
+            distortion   = 0f,
+            blur         = binding.root.resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
+            strokeColor  = Color.argb(180, 213, 38, 98),
+            strokeWidth  = 1,
+            solidStroke  = true,
+        )
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
-
-        LiquidGlassEffect.attach(
-            targetView   = holder.binding.flCard,
-            rootView     = holder.binding.root as ViewGroup,
-            cornerRadius = holder.binding.root.resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion   = 0f,
-            blur         = holder.binding.root.resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-            strokeColor  = Color.argb(180, 213, 38, 98),
-            strokeWidth  = 1,
-            solidStroke  = true,
-        )
 
         holder.binding.apply {
             tvPlanAmount.text = "₹${item.amount ?: 0}"
@@ -60,10 +59,16 @@ class PrepaidPlanAdp(
         }
     }
 
+    fun updateList(items: List<PrepaidPlanItem>) {
+        mArrayList.clear()
+        mArrayList.addAll(items)
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int = mArrayList.size
 
     private fun formatTalktime(talktime: Double?): String {
         if (talktime == null || talktime < 0) return "-"
-        return "₹%.2f".format(talktime)
+        return mContext.getString(R.string.fmtCurrencyAmount).format(talktime)
     }
 }
