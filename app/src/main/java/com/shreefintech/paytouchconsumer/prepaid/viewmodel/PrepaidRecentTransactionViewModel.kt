@@ -5,12 +5,12 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.electricity.model.RecentTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
+import com.shreefintech.paytouchconsumer.transactions.model.RecentTransactionItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
