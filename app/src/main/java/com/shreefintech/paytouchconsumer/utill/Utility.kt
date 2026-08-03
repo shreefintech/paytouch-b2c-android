@@ -12,8 +12,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 object Utility {
@@ -56,9 +56,18 @@ object Utility {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    fun generateTransactionId(): String {
-        val dateTime = SimpleDateFormat("ddMMyyyyHHmmss", Locale.getDefault()).format(Date())
-        return "PYTCH${dateTime}M"
+    fun formatAmount(raw: String?): String {
+        if (raw.isNullOrBlank()) return "-"
+        return try {
+            val number = raw.toDouble()
+            val fmt = NumberFormat.getNumberInstance(Locale("en", "IN")).apply {
+                maximumFractionDigits = 2
+                minimumFractionDigits = 2
+            }
+            "₹${fmt.format(number)}"
+        } catch (e: Exception) {
+            "₹$raw"
+        }
     }
 
     fun calculatePlatformFee(amount: Double): Double {

@@ -1,23 +1,20 @@
 package com.shreefintech.paytouchconsumer.gas.viewmodel
 
 import android.app.Application
-import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.electricity.model.RecentTransactionItem
+import com.shreefintech.paytouchconsumer.transactions.model.RecentTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.NumberFormat
-import java.util.Locale
 
 class GasRecentTransactionViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -27,7 +24,7 @@ class GasRecentTransactionViewModel(application: Application) : AndroidViewModel
         private set
     var hasMore = false
         private set
-    var loading = false
+    var isLoading = false
         private set
 
     companion object {
@@ -43,7 +40,7 @@ class GasRecentTransactionViewModel(application: Application) : AndroidViewModel
             onError(getString(R.string.msgNoInternet))
             return
         }
-        loading = true
+        isLoading = true
         currentPage = 1
         hasMore = false
         operatorMap.clear()
@@ -81,8 +78,8 @@ class GasRecentTransactionViewModel(application: Application) : AndroidViewModel
             onError(getString(R.string.msgNoInternet))
             return
         }
-        if (!hasMore || loading) return
-        loading = true
+        if (!hasMore || isLoading) return
+        isLoading = true
         currentPage++
         onLoading()
         fetchTransactions(onSuccess, onError)
@@ -98,7 +95,7 @@ class GasRecentTransactionViewModel(application: Application) : AndroidViewModel
                     call: Call<General<List<UnifiedTransactionItem>>>,
                     response: Response<General<List<UnifiedTransactionItem>>>
                 ) {
-                    loading = false
+                    isLoading = false
                     if (response.isSuccessful && response.body()?.data != null) {
                         val data = response.body()!!.data!!
                         hasMore = data.size == PAGE_SIZE
@@ -117,7 +114,7 @@ class GasRecentTransactionViewModel(application: Application) : AndroidViewModel
                     call: Call<General<List<UnifiedTransactionItem>>>,
                     t: Throwable
                 ) {
-                    loading = false
+                    isLoading = false
                     hasMore = false
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
@@ -136,34 +133,11 @@ class GasRecentTransactionViewModel(application: Application) : AndroidViewModel
             accountHolderName = item.extra?.customerName ?: "-",
             date              = if (item.createdAt.isNullOrBlank()) "-" else Utility.formatDate(item.createdAt),
             status            = item.status ?: "-",
-            amount            = formatAmount(item.amount ?: "--"),
+            amount            = Utility.formatAmount(item.amount ?: "--"),
             accountNumber     = item.identifier ?: "-",
             reference         = item.referenceId ?: "-",
             categoryIconRes   = R.drawable.ic_gas
         )
     }
 
-    private fun formatAmount(raw: String?): String {
-        if (raw.isNullOrBlank()) return "-"
-        return try {
-            val number = raw.toDouble()
-            val fmt = NumberFormat.getNumberInstance(Locale("en", "IN")).apply {
-                maximumFractionDigits = 2
-                minimumFractionDigits = 2
-            }
-            "₹${fmt.format(number)}"
-        } catch (e: Exception) {
-            "₹$raw"
-        }
-    }
-
-    private fun bearerToken(): String {
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            getApplication(), Constant.KEY_TOKEN, ""
-        ) ?: ""
-        return "Bearer $token"
-    }
-
-    private fun getString(@StringRes resId: Int): String =
-        getApplication<Application>().getString(resId)
 }

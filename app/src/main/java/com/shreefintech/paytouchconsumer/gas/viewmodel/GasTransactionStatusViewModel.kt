@@ -66,7 +66,7 @@ class GasTransactionStatusViewModel(application: Application) : BaseBillViewMode
                     isLastPage  = rawList.size < PER_PAGE
                     currentPage = page
                     val list = ArrayList<TransactionItem>()
-                    rawList.forEachIndexed { index, item -> list.add(mapToTransactionItem(index, item)) }
+                    rawList.forEach { item -> list.add(mapToTransactionItem(item)) }
                     onSuccess(list)
                 } else {
                     onError(
@@ -87,7 +87,7 @@ class GasTransactionStatusViewModel(application: Application) : BaseBillViewMode
         })
     }
 
-    private fun mapToTransactionItem(index: Int, item: GasTransactionReportDataItem): TransactionItem {
+    private fun mapToTransactionItem(item: GasTransactionReportDataItem): TransactionItem {
         return TransactionItem(
             mobileNumber    = item.connectionNumber ?: "--",
             transactionId   = item.transactionId ?: "--",
@@ -99,7 +99,7 @@ class GasTransactionStatusViewModel(application: Application) : BaseBillViewMode
             platformFee     = "₹${item.platformFee ?: "0.00"}",
             totalPayable    = "₹${item.totalPayable ?: "0.00"}",
             referenceId     = item.transactionId ?: "--",
-            userId          = (index + 1).toString(),
+            userId          = item.id?.toString() ?: "--",
             accountNumber   = item.connectionNumber ?: "--",
             companyName     = item.operatorName?.takeIf { it.isNotEmpty() } ?: item.subservice ?: "--"
         )

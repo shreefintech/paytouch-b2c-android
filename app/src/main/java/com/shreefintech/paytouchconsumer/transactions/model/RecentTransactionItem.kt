@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity.model
+package com.shreefintech.paytouchconsumer.transactions.model
 
 import androidx.annotation.DrawableRes
 
