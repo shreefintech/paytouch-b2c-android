@@ -1,21 +1,18 @@
 package com.shreefintech.paytouchconsumer.prepaid.viewmodel
 
 import android.app.Application
-import androidx.annotation.StringRes
-import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.Constant
+import com.shreefintech.paytouchconsumer.BaseBillViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlanItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlansListItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PrepaidPlanSelectionViewModel(application: Application) : AndroidViewModel(application) {
+class PrepaidPlanSelectionViewModel(application: Application) : BaseBillViewModel(application) {
 
     fun loadPlans(
         operatorId: String,
@@ -52,13 +49,4 @@ class PrepaidPlanSelectionViewModel(application: Application) : AndroidViewModel
                 }
             })
     }
-
-    private fun bearerToken(): String {
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            getApplication(), Constant.KEY_TOKEN, ""
-        ) ?: ""
-        return "Bearer $token"
-    }
-
-    private fun getString(@StringRes resId: Int): String = getApplication<Application>().getString(resId)
 }

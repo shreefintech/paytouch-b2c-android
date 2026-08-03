@@ -30,18 +30,28 @@ com.shreefintech.paytouchconsumer/
 +-- onboarding/         KYC upload, Virtual Account creation (post-login gates)
 |   \-- viewmodel/
 |
-+-- electricity/        Electricity bill payment + transaction history
++-- electricity/        Electricity bill payment + transaction history (canonical module template)
+|   +-- model/          RecentTransactionItem -- reused by other modules, not electricity-only
+|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|
++-- gas/                Gas bill payment + transaction history (mirrors electricity/ exactly)
+|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|
++-- transactions/       Shared across ALL bill-payment modules -- never duplicate per module
 |   +-- model/
-|   \-- transactions/   RecentTransaction, TransactionReport, TransactionDetail, SmsReceipt
+|   |   \-- TransactionItem.kt         Category-agnostic report/status row model
+|   \-- TransactionDetailActivity.kt   Single detail screen reused by every module
 |
 +-- home/               (planned -- HomeActivity currently lives at root)
 |
-+-- adapter/            Shared adapters used across modules
++-- adapter/            Shared adapters used across modules (TransactionAdp, RecentTransactionAdp)
 |
 +-- retrofit/           All networking
 |   +-- model/
 |   |   +-- General.kt            Universal response wrapper for most endpoints
 |   |   +-- UserProfileItem.kt    GET /api/user response
+|   |   +-- electricity/          Electricity request/response DTOs
+|   |   +-- gas/                  Gas request/response DTOs
 |   |   \-- auth/
 |   |       +-- LoginItem.kt
 |   |       +-- RegisterItem.kt
@@ -58,10 +68,12 @@ com.shreefintech.paytouchconsumer/
 +-- widget/             Reusable custom views (LiquidGlassButton, CustomDropdown, OutlineTextView)
 +-- enums/              LoginMode
 +-- utill/              Shared utilities -- double-l spelling is intentional, never rename
+|                       (TransactionFilterHelper, ReceiptHelper, ToastUtil, Utility, SharedPreferenceHelper)
 |
-+-- BaseActivity.kt     All Activities extend this -- never AppCompatActivity
-+-- HomeActivity.kt     Main dashboard (will move to home/ package)
-\-- Constant.kt         All URLs, keys, and intent extra names
++-- BaseActivity.kt        All Activities extend this -- never AppCompatActivity
++-- BaseBillViewModel.kt   Shared VPS/wallet balance-check logic -- every bill-payment ViewModel extends this
++-- HomeActivity.kt        Main dashboard (will move to home/ package)
+\-- Constant.kt            All URLs, keys, and intent extra names
 ```
 
 ---
@@ -110,13 +122,13 @@ Register / Login
 | Auth | `SplashActivity` -> `LoginActivity` | `CreateAccountActivity`, `OtpVerificationActivity`, `ResetPasswordActivity`, `ResetMpinActivity` |
 | Onboarding | `UploadKycActivity` | `CreateVirtualAccountActivity` |
 | Home | `HomeActivity` | Category grid -- routes to bill payment screens |
-| Electricity | `ElectricityActivity` | `RecentTransactionActivity`, `TransactionReportActivity`, `TransactionDetailActivity`, `SmsReceiptActivity` |
+| Electricity | `ElectricityActivity` | `RecentTransactionActivity`, `TransactionReportActivity`, `ElectricityTransactionStatusActivity`, `TransactionDetailActivity`, `SmsReceiptActivity` |
+| Gas | `GasActivity` | `GasRecentTransactionActivity`, `GasTransactionReportActivity`, `GasTransactionStatusActivity`, `TransactionDetailActivity` (shared), `GasSmsReceiptActivity` |
 
 ### Planned (stubs in HomeActivity)
 
 | Module | Status |
 |---|---|
-| Gas bill payment | Not started |
 | Mobile prepaid recharge | Not started |
 | DTH recharge | Not started |
 | TV Cable payment | Not started |
@@ -143,6 +155,8 @@ Register / Login
 | No Context in ViewModel field | Pass context as a lambda parameter -- never store it as a field |
 | No network in Adapters | All API calls belong in a ViewModel |
 | `Utility.stopClick()` guard | Every click that triggers navigation, API call, or form submit must call this first |
+| Extend `BaseBillViewModel` | Every bill-payment ViewModel (Electricity, Gas, ...) extends this for shared `checkVpsBalance()` / `checkWalletBalance()` / `bearerToken()` -- never reimplement balance checks per module |
+| Reuse `transactions/` package | `TransactionItem`, `TransactionDetailActivity`, `TransactionAdp`, `RecentTransactionAdp` are category-agnostic and shared by every module -- never fork per module |
 
 ---
 
@@ -235,7 +249,6 @@ Never use `Toast.makeText()`. Always use `ToastUtil`:
 | `Utility.stopClick()` | 800ms debounce guard -- call at the top of every click handler |
 | `Utility.hideKeyboard(activity)` | Dismisses soft keyboard |
 | `Utility.calculatePlatformFee(amount)` | Returns platform fee for the amount (see Business Rules) |
-| `Utility.generateTransactionId()` | Generates a `PYTCH[DDMMyyyyHHmmss]M` transaction ID -- call before every process-payment API call |
 | `Utility.EmojiExcludeFilter()` | InputFilter that strips emoji |
 | `Utility.digitFilter()` | InputFilter that allows digits only |
 | `Utility.alphaSpaceFilter()` | InputFilter that allows letters and spaces only |
@@ -301,15 +314,6 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | Rs.5,001 - Rs.40,000 | Rs.20 |
 | > Rs.40,000 | Rs.30 |
 
-### Transaction ID Format
-
-```
-PYTCH[DDMMYYYYHHMMSS]M
-Example: PYTCH19012026091530M
-```
-
-Generated client-side before the API call. Links local records to server records.
-
 ### Field Validation
 
 | Field | Rule |
@@ -348,7 +352,8 @@ Generated client-side before the API call. Links local records to server records
 | Module | README |
 |---|---|
 | Auth | `app/src/main/java/.../auth/README.md` |
-| Electricity | `app/src/main/java/.../electricity/README.md` |
+| Electricity | `app/src/main/java/.../electricity/README.md` (canonical bill-payment module reference) |
+| Gas | `app/src/main/java/.../gas/README.md` (mirrors Electricity -- read Electricity's README first) |
 
 ---
 

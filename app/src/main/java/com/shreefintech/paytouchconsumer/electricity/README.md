@@ -55,12 +55,6 @@ ElectricityActivity
 
 ---
 
-## Transaction ID
-
-Generated client-side via `Utility.generateTransactionId()` immediately before `processElectricityPayment` is called. Format: `PYTCH[DDMMyyyyHHmmss]M`. Sent as `transaction_id` in the request body.
-
----
-
 ## Transaction History Screens
 
 Three separate entry points, all launched from the tab bar at the top of `ElectricityActivity`:

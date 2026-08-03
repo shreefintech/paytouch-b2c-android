@@ -191,7 +191,7 @@ class GasTransactionStatusActivity : BaseActivity() {
                 }
                 binding.llSearch -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (viewModel.isLoading) return@OnClickListener
+                    if (showProgressSearch.get()) return@OnClickListener
                     onSearch()
                 }
             }

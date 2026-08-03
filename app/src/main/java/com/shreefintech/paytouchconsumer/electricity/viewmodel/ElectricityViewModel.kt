@@ -136,7 +136,6 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
             onError(getString(R.string.msgNoInternet))
             return
         }
-        val transactionId = Utility.generateTransactionId()
         ApiClient.apiService.processElectricityPayment(
             bearerToken(),
             ElectricityProcessPaymentRequest(
@@ -145,8 +144,7 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
                 circleId = "00",
                 amount = amount,
                 platformFee = fee,
-                totalPayable = total,
-                transactionId = transactionId
+                totalPayable = total
             )
         ).enqueue(object : Callback<ElectricityPaymentItem> {
             override fun onResponse(

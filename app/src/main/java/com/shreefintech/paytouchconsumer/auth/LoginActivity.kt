@@ -185,7 +185,7 @@ class LoginActivity : BaseActivity() {
                 binding.tvBtnPassword.setBackgroundResource(R.drawable.bg_toggle_selected)
                 binding.tvBtnMpin.setBackgroundResource(R.drawable.bg_toggle_unselected)
                 binding.tvBtnPassword.setTextColor(ContextCompat.getColor(this, R.color.white))
-                binding.tvBtnMpin.setTextColor(getThemeColor(com.bumptech.glide.R.attr.colorPrimary))
+                binding.tvBtnMpin.setTextColor(getThemeColor(R.attr.colorPrimary))
                 binding.tvCredentialLabel.text = getString(R.string.label_password)
                 binding.tvForgotPassword.text = getString(R.string.forgot_password)
                 binding.etCredential.inputType =
@@ -199,7 +199,7 @@ class LoginActivity : BaseActivity() {
             LoginMode.MPIN -> {
                 binding.tvBtnPassword.setBackgroundResource(R.drawable.bg_toggle_unselected)
                 binding.tvBtnMpin.setBackgroundResource(R.drawable.bg_toggle_selected)
-                binding.tvBtnPassword.setTextColor(getThemeColor(com.bumptech.glide.R.attr.colorPrimary))
+                binding.tvBtnPassword.setTextColor(getThemeColor(R.attr.colorPrimary))
                 binding.tvBtnMpin.setTextColor(ContextCompat.getColor(this, R.color.white))
                 binding.tvCredentialLabel.text = getString(R.string.label_mpin)
                 binding.tvForgotPassword.text = getString(R.string.labelForgotMpin)

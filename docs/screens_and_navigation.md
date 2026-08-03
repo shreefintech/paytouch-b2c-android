@@ -209,7 +209,6 @@ One per category, following the same standard flow:
 - `[Category]RecentTransactionActivity` — Recent payments from local Room DB
 - `[Category]TransactionReportActivity` — Filtered report (date range, status, consumer number)
 - `[Category]TransactionStatusActivity` — Look up a specific transaction by ID
-- `[Category]SMSReceiptActivity` — View the confirmation receipt for a completed payment
 
 ---
 

@@ -80,6 +80,8 @@ class GasRecentTransactionActivity : BaseActivity() {
         })
     }
 
+    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadInitialData() }
+    //  once the no-internet placeholder design is finalised.
     private fun loadInitialData() {
         viewModel.loadOperatorsThenData(
             onLoading = {
