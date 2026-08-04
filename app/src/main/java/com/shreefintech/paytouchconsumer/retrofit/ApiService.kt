@@ -26,6 +26,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityT
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidProcessPaymentRequest
@@ -275,6 +276,11 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: PostpaidTransactionReportRequest
     ): Call<General<List<PostpaidTransactionReportDataItem>>>
+
+    @GET("${AUTH}mobile-postpaid/latest-payment")
+    fun getPostpaidLatestPayment(
+        @Header("Authorization") authorization: String
+    ): Call<General<PostpaidLatestPaymentDataItem>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

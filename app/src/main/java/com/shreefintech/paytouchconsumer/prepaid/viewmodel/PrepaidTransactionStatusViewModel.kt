@@ -91,19 +91,20 @@ class PrepaidTransactionStatusViewModel(application: Application) : AndroidViewM
 
     private fun mapToTransactionItem(item: PrepaidTransactionDataItem): TransactionItem {
         return TransactionItem(
-            mobileNumber    = item.mobileNo ?: "--",
-            transactionId   = item.txnId ?: "--",
-            amount          = Utility.formatAmount(item.amount),
-            status          = item.status ?: "--",
-            categoryIconRes = R.drawable.ic_prepaid,
-            username        = item.mobileNo ?: "--",
-            date            = item.createdAt ?: "--",
-            platformFee     = "₹0.00",
-            totalPayable    = Utility.formatAmount(item.amount),
-            referenceId     = item.txnId ?: "--",
-            userId          = item.id?.toString() ?: "--",
-            accountNumber   = item.mobileNo ?: "--",
-            companyName     = item.operator?.takeIf { it.isNotEmpty() } ?: item.service ?: "--"
+            mobileNumber     = item.mobileNo ?: "--",
+            transactionId    = item.txnId ?: "--",
+            amount           = Utility.formatAmount(item.amount),
+            status           = item.status ?: "--",
+            categoryIconRes  = R.drawable.ic_prepaid,
+            username         = item.mobileNo ?: "--",
+            date             = item.createdAt ?: "--",
+            platformFee      = "₹0.00",
+            totalPayable     = Utility.formatAmount(item.amount),
+            referenceId      = item.txnId ?: "--",
+            userId           = item.id?.toString() ?: "--",
+            accountNumber    = item.mobileNo ?: "--",
+            companyName      = item.operator?.takeIf { it.isNotEmpty() } ?: item.service ?: "--",
+            isMobileCategory = true
         )
     }
 }

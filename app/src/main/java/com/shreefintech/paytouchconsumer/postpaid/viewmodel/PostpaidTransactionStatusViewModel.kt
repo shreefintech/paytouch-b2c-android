@@ -90,19 +90,20 @@ class PostpaidTransactionStatusViewModel(application: Application) : AndroidView
 
     private fun mapToTransactionItem(item: PostpaidTransactionReportDataItem): TransactionItem {
         return TransactionItem(
-            mobileNumber    = item.connectionNumber ?: "--",
-            transactionId   = item.transactionId ?: "--",
-            amount          = Utility.formatAmount(item.billAmount ?: item.totalPayable),
-            status          = item.status ?: "--",
-            categoryIconRes = R.drawable.ic_postpaid,
-            username        = item.customerName ?: item.connectionNumber ?: "--",
-            date            = item.createdAt ?: "--",
-            platformFee     = Utility.formatAmount(item.platformFee),
-            totalPayable    = Utility.formatAmount(item.totalPayable),
-            referenceId     = item.transactionId ?: "--",
-            userId          = item.id?.toString() ?: "--",
-            accountNumber   = item.connectionNumber ?: "--",
-            companyName     = item.serviceType ?: "--"
+            mobileNumber     = item.connectionNumber ?: "--",
+            transactionId    = item.transactionId ?: "--",
+            amount           = Utility.formatAmount(item.billAmount ?: item.totalPayable),
+            status           = item.status ?: "--",
+            categoryIconRes  = R.drawable.ic_postpaid,
+            username         = item.customerName ?: item.connectionNumber ?: "--",
+            date             = item.createdAt ?: "--",
+            platformFee      = Utility.formatAmount(item.platformFee),
+            totalPayable     = Utility.formatAmount(item.totalPayable),
+            referenceId      = item.transactionId ?: "--",
+            userId           = item.id?.toString() ?: "--",
+            accountNumber    = item.connectionNumber ?: "--",
+            companyName      = item.serviceType ?: "--",
+            isMobileCategory = true
         )
     }
 }

@@ -97,6 +97,13 @@ object Utility {
         }
     }
 
+    fun formatAmount(raw: Double?): String = formatAmount(raw?.toString())
+
+    fun maskNumber(number: String): String {
+        if (number.length < 5) return number
+        return "${number.take(4)}*****${number.takeLast(1)}"
+    }
+
     fun calculatePlatformFee(amount: Double): Double {
         return when {
             amount < 1000  -> 4.0

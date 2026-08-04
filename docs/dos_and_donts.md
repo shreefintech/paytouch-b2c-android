@@ -227,9 +227,11 @@ If one of these is missing a field required by a new module, add it to the exist
 | `bearerToken()` | `utill/ViewModelExt.kt` | Any local `"Bearer $token"` construction |
 | `getString(@StringRes id)` | `utill/ViewModelExt.kt` | Any local string-resource lookup |
 | `Utility.formatAmount(value)` | `utill/Utility.kt` | Any local `NumberFormat` / currency formatting — never use raw string template `"₹${item.amount}"` |
+| `Utility.formatAmount(raw: Double?)` | `utill/Utility.kt` | Electricity DTOs use `Double?` for amount fields — use this overload; all other modules use `String?` and the standard overload |
 | `Utility.formatDate(raw, "dd MMM yyyy")` | `utill/Utility.kt` | Recent transaction list date display |
 | `Utility.formatDate(raw, "dd/MM/yyyy")` | `utill/Utility.kt` | Transaction detail date-only display |
 | `Utility.formatDate(raw)` | `utill/Utility.kt` | Full datetime display (default `"dd/MM/yyyy hh:mm a"`) |
+| `Utility.maskNumber(number)` | `utill/Utility.kt` | Masked account/mobile display in list rows — format `9876*****0` (first 4 + `*****` + last 1) |
 
 If a ViewModel declares a private copy of any of the above, delete it and use the shared function.
 
@@ -271,13 +273,36 @@ Apply to every `mapToTransactionItem()` in every module's report/status ViewMode
 | `platformFee` | `Utility.formatAmount(item.platformFee)` — or `"₹0.00"` if the DTO has no fee field |
 | `totalPayable` | `Utility.formatAmount(item.totalPayable)` |
 | `categoryIconRes` | `R.drawable.ic_{category}` — the only visual difference between modules |
+| `isMobileCategory` | `true` for Mobile Prepaid, Postpaid, DTH; `false` for all others (Electricity, Gas, etc.) — **never omit this field** |
 
 Apply to every `mapToDisplayItem()` in every module's recent transaction ViewModel:
 
 | Field | Value |
 |---|---|
 | `date` | `Utility.formatDate(item.createdAt, "dd MMM yyyy")` — **pre-format here**; the list card displays it directly, there is no detail formatter for recent items |
-| `amount` | `Utility.formatAmount(item.amount ?: "--")` |
+| `amount` | `Utility.formatAmount(item.totalPayable ?: item.amount)` — prefer `totalPayable`; fall back to `amount` only if `totalPayable` is absent |
+| `isMobileCategory` | Same rule as `mapToTransactionItem()` above |
+
+**`isMobileCategory` drives two UI behaviours:**
+- **Adapter label** (`RecentTransactionAdp`, `TransactionDetailActivity`): `true` → "Mobile No - %s", `false` → "Consumer No - %s"
+- **Masked display** (`TransactionAdp.tvMobile`): shows `Utility.maskNumber(item.mobileNumber)` — the `mobileNumber` field holds either the mobile number or the consumer/connection number depending on the module
+
+**SMS Receipt label** — set `tvConsumerNoLabel` dynamically in `populateReceiptFromApi()`, never rely on the static XML default alone:
+
+| Module | Label string |
+|---|---|
+| Electricity, Gas (and any future consumer-number category) | `R.string.labelConsumerNo` — "Consumer No" |
+| Prepaid, Postpaid, DTH (and any future mobile-number category) | `R.string.labelMobileNo` — "Mobile No." |
+
+```kotlin
+// In populateReceiptFromApi() — consumer-number category
+binding.tvConsumerNoLabel.text = getString(R.string.labelConsumerNo)
+
+// In populateReceiptFromApi() — mobile-number category
+binding.tvConsumerNoLabel.text = getString(R.string.labelMobileNo)
+```
+
+The XML default (`android:text="@string/labelConsumerNo"`) is a layout-editor placeholder only; every Activity must set the label explicitly at runtime so the correct string is guaranteed regardless of the XML default.
 
 ---
 

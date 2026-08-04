@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.prepaid.transactions
+package com.shreefintech.paytouchconsumer.postpaid.transactions
 
 import android.Manifest
 import android.content.Context
@@ -23,22 +23,22 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidSmsReceiptBinding
-import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidSmsReceiptViewModel
+import com.shreefintech.paytouchconsumer.databinding.ActivityPostpaidSmsReceiptBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidSmsReceiptViewModel
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
 
-class PrepaidSmsReceiptActivity : BaseActivity() {
+class PostpaidSmsReceiptActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityPrepaidSmsReceiptBinding
+    private lateinit var binding: ActivityPostpaidSmsReceiptBinding
     private val showProgressReceipt = ObservableBoolean(false)
 
-    private val viewModel: PrepaidSmsReceiptViewModel by viewModels()
+    private val viewModel: PostpaidSmsReceiptViewModel by viewModels()
 
     private val writePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -58,7 +58,7 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
 
         fun start(context: Context, fromPayment: Boolean = false) {
             context.startActivity(
-                Intent(context, PrepaidSmsReceiptActivity::class.java).apply {
+                Intent(context, PostpaidSmsReceiptActivity::class.java).apply {
                     putExtra(EXTRA_FROM_PAYMENT, fromPayment)
                 }
             )
@@ -67,7 +67,7 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPrepaidSmsReceiptBinding.inflate(layoutInflater)
+        binding = ActivityPostpaidSmsReceiptBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
@@ -100,6 +100,7 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         onBack()
         loadLatestPayments()
+        // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadLatestPayments() }
     }
 
     // ── API Call ──────────────────────────────────────────────
@@ -120,36 +121,36 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
 
     // ── Populate ──────────────────────────────────────────────
 
-    private fun populateReceiptFromApi(item: PrepaidVerifyPaymentDataItem) {
-        val amount = "₹${item.totalPayable ?: "--"}"
-        val mobileNo = item.mobileNo ?: item.subscriberNo ?: "--"
-        val txnId = item.transactionId ?: item.txnId ?: "--"
-        val date = Utility.formatDate(item.createdAt)
-        val status = item.status ?: "Pending"
+    private fun populateReceiptFromApi(item: PostpaidLatestPaymentDataItem) {
+        val amount   = Utility.formatAmount(item.totalPayable)
+        val mobileNo = item.connectionNumber ?: item.subscriberNo ?: "--"
+        val txnId    = item.transactionId ?: "--"
+        val date     = Utility.formatDate(item.createdAt)
+        val status   = item.status ?: "Pending"
 
         binding.tvConsumerNoLabel.text = getString(R.string.labelMobileNo)
-        binding.tvConsumerNo.text = mobileNo
-        binding.tvCustomerName.text = "--"
-        binding.tvCompanyName.text = item.operator ?: item.subservice ?: "--"
-        binding.tvReceiptDate.text = date
-        binding.tvAmountPaid.text = amount
-        binding.tvPaytouchTxnId.text = txnId
-        binding.tvBConnectTxnId.text = txnId
-        binding.tvCcf.text = item.platformFee ?: "--"
-        binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, status)
+        binding.tvConsumerNo.text     = mobileNo
+        binding.tvCustomerName.text   = item.customerName ?: "--"
+        binding.tvCompanyName.text    = item.operatorName ?: item.subservice ?: "--"
+        binding.tvReceiptDate.text    = date
+        binding.tvAmountPaid.text     = amount
+        binding.tvPaytouchTxnId.text  = txnId
+        binding.tvBConnectTxnId.text  = txnId
+        binding.tvCcf.text            = Utility.formatAmount(item.platformFee)
+        binding.tvReceiptStatus.text  = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
 
-        val smsBodyText = getString(R.string.msgPrepaidSmsBody, amount, mobileNo)
-        val spannable = SpannableString(smsBodyText)
+        val smsBodyText = getString(R.string.msgPostpaidSmsBody, amount, mobileNo)
+        val spannable   = SpannableString(smsBodyText)
         val amountStart = smsBodyText.indexOf(amount)
         if (amountStart >= 0) {
             val amountEnd = amountStart + amount.length
             spannable.setSpan(ForegroundColorSpan(ContextCompat.getColor(mActivity, R.color.primary)), amountStart, amountEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             spannable.setSpan(StyleSpan(Typeface.BOLD), amountStart, amountEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
-        binding.tvSmsBody.text = spannable
+        binding.tvSmsBody.text        = spannable
         binding.tvSmsBConnectTxn.text = txnId
-        binding.tvSmsDate.text = date
+        binding.tvSmsDate.text        = date
     }
 
     // ── Tab Switching ─────────────────────────────────────────
@@ -158,11 +159,11 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
         val isReceipt = tab == TAB_RECEIPT
         binding.llReceiptContent.visibility = if (isReceipt) View.VISIBLE else View.GONE
         binding.llDisplayContent.visibility = if (isReceipt) View.GONE else View.VISIBLE
-        binding.llBtnContainer.visibility = if (isReceipt) View.VISIBLE else View.GONE
+        binding.llBtnContainer.visibility   = if (isReceipt) View.VISIBLE else View.GONE
 
-        val activeColor = ContextCompat.getColor(mActivity, R.color.primary)
-        val inactiveColor = Color.TRANSPARENT
-        val activeTextColor = ContextCompat.getColor(mActivity, R.color.white)
+        val activeColor      = ContextCompat.getColor(mActivity, R.color.primary)
+        val inactiveColor    = Color.TRANSPARENT
+        val activeTextColor  = ContextCompat.getColor(mActivity, R.color.white)
         val inactiveTextColor = ContextCompat.getColor(mActivity, R.color.primary)
 
         binding.cvTabReceipt.setCardBackgroundColor(if (isReceipt) activeColor else inactiveColor)
@@ -194,11 +195,11 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
         val uri = ReceiptHelper.performDownload(mActivity, binding.cvReceiptCard)
         if (uri != null) {
             ToastUtil.showInActivityWithAction(
-                activity = mActivity,
-                message = getString(R.string.msgReceiptDownloaded),
-                type = ToastType.SUCCESS,
+                activity    = mActivity,
+                message     = getString(R.string.msgReceiptDownloaded),
+                type        = ToastType.SUCCESS,
                 actionLabel = getString(R.string.btnOpen),
-                onAction = { ReceiptHelper.openImageInGallery(mActivity, uri) }
+                onAction    = { ReceiptHelper.openImageInGallery(mActivity, uri) }
             )
         } else {
             ToastUtil.showDelete(mActivity, getString(R.string.msgReceiptDownloadFailed))
@@ -207,9 +208,9 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
 
     private fun shareReceipt() {
         ReceiptHelper.shareReceipt(
-            activity = mActivity,
-            view = binding.cvReceiptCard,
-            title = getString(R.string.titleShareReceipt),
+            activity  = mActivity,
+            view      = binding.cvReceiptCard,
+            title     = getString(R.string.titleShareReceipt),
             onFailure = { ToastUtil.showDelete(mActivity, getString(R.string.msgReceiptShareFailed)) }
         )
     }

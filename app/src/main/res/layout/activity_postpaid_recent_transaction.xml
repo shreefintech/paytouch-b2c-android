@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg"
+        tools:context=".postpaid.transactions.PostpaidRecentTransactionActivity">
+
+        <!-- Toolbar -->
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <!-- Screen title -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:fontFamily="@font/proza_libre_bold"
+            android:includeFontPadding="false"
+            android:text="@string/titleRecentTransactions"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_20"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar" />
+
+        <!-- Glass card — fills remaining space -->
+        <FrameLayout
+            android:id="@+id/flCard"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/page_margin_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTransactions"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingVertical="@dimen/margin_large"
+                android:paddingHorizontal="@dimen/margin_small_medium"
+                android:scrollbars="none"
+                android:visibility="gone"
+                tools:listitem="@layout/item_recent_transaction" />
+
+            <!-- Initial load shimmer -->
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="@dimen/margin_small_medium"
+                android:paddingVertical="@dimen/margin_large"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                </LinearLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <!-- Empty state -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/proza_libre_regular"
+                android:includeFontPadding="false"
+                android:text="@string/msgNoTransactionsFound"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_14"
+                android:visibility="gone" />
+
+            <!-- Pagination load-more spinner -->
+            <ProgressBar
+                android:id="@+id/pbLoadMore"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="@dimen/margin_small_medium"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

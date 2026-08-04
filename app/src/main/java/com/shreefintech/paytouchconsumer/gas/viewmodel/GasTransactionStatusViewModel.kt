@@ -91,19 +91,20 @@ class GasTransactionStatusViewModel(application: Application) : AndroidViewModel
 
     private fun mapToTransactionItem(item: GasTransactionReportDataItem): TransactionItem {
         return TransactionItem(
-            mobileNumber    = item.connectionNumber ?: "--",
-            transactionId   = item.transactionId ?: "--",
-            amount          = Utility.formatAmount(item.billAmount),
-            status          = item.status ?: "--",
-            categoryIconRes = R.drawable.ic_gas,
-            username        = item.customerName ?: "--",
-            date            = item.createdAt ?: "--",
-            platformFee     = Utility.formatAmount(item.platformFee),
-            totalPayable    = Utility.formatAmount(item.totalPayable),
-            referenceId     = item.transactionId ?: "--",
-            userId          = item.id?.toString() ?: "--",
-            accountNumber   = item.connectionNumber ?: "--",
-            companyName     = item.operatorName?.takeIf { it.isNotEmpty() } ?: item.subservice ?: "--"
+            mobileNumber     = item.connectionNumber ?: "--",
+            transactionId    = item.transactionId ?: "--",
+            amount           = Utility.formatAmount(item.billAmount),
+            status           = item.status ?: "--",
+            categoryIconRes  = R.drawable.ic_gas,
+            username         = item.customerName ?: "--",
+            date             = item.createdAt ?: "--",
+            platformFee      = Utility.formatAmount(item.platformFee),
+            totalPayable     = Utility.formatAmount(item.totalPayable),
+            referenceId      = item.transactionId ?: "--",
+            userId           = item.id?.toString() ?: "--",
+            accountNumber    = item.connectionNumber ?: "--",
+            companyName      = item.operatorName?.takeIf { it.isNotEmpty() } ?: item.subservice ?: "--",
+            isMobileCategory = false
         )
     }
 }

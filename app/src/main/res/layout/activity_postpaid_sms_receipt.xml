@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/img_screen_bg"
-        tools:context=".prepaid.transactions.PrepaidSmsReceiptActivity">
+        tools:context=".postpaid.transactions.PostpaidSmsReceiptActivity">
 
         <!-- Toolbar -->
         <include
@@ -61,7 +61,6 @@
                     android:orientation="horizontal"
                     android:padding="3dp">
 
-                    <!-- Tab 1: white pill when active, transparent when inactive -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cvTabReceipt"
                         android:layout_width="wrap_content"
@@ -86,7 +85,6 @@
                             android:textSize="@dimen/text_size_13" />
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Tab 2: white pill when active, transparent when inactive -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cvTabDisplay"
                         android:layout_width="wrap_content"
@@ -114,13 +112,11 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Flexible spacer so BharatConnect logo stays right-aligned -->
             <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
-            <!-- BharatConnect logo -->
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
@@ -199,7 +195,6 @@
                                     <View
                                         android:layout_width="match_parent"
                                         android:layout_height="10dp"
-                                        android:padding="-10dp"
                                         android:background="@color/primary"/>
 
                                     <!-- PayTouch logo + BharatConnect icon -->
@@ -256,7 +251,7 @@
                                             android:includeFontPadding="false"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/text_size_13"
-                                            tools:text="9054093877" />
+                                            tools:text="9876543210" />
                                     </LinearLayout>
 
                                     <!-- Customer Name -->
@@ -321,7 +316,7 @@
                                             android:maxLines="2"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/text_size_13"
-                                            tools:text="Airtel" />
+                                            tools:text="Airtel Postpaid" />
                                     </LinearLayout>
 
                                     <!-- Dashed separator 1 -->
@@ -362,7 +357,7 @@
                                             android:includeFontPadding="false"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/text_size_13"
-                                            tools:text="08/04/2026, 18:56:41" />
+                                            tools:text="01/08/2026, 04:52 PM" />
                                     </LinearLayout>
 
                                     <!-- Amount Paid (pill badge) -->
@@ -414,7 +409,8 @@
                                         android:layout_height="2dp"
                                         android:layout_marginTop="@dimen/margin_small_medium"
                                         android:layout_marginBottom="@dimen/margin_medium"
-                                        android:background="@drawable/bg_dashed_line"/>
+                                        android:background="@drawable/bg_dashed_line"
+                                        android:layerType="software" />
 
                                     <!-- Paytouch Transaction ID -->
                                     <LinearLayout
@@ -445,7 +441,7 @@
                                             android:includeFontPadding="false"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/text_size_13"
-                                            tools:text="PYTCH08042026185641P" />
+                                            tools:text="PYTCH01082026165244P" />
                                     </LinearLayout>
 
                                     <!-- B-connect Txn ID -->
@@ -478,7 +474,7 @@
                                             android:textAlignment="viewEnd"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/text_size_13"
-                                            tools:text="PYTCH08042026185641P" />
+                                            tools:text="PYTCH01082026165244P" />
                                     </LinearLayout>
 
                                     <!-- CCF -->
@@ -510,7 +506,7 @@
                                             android:textAlignment="viewEnd"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/text_size_13"
-                                            tools:text="4.00" />
+                                            tools:text="₹4.00" />
                                     </LinearLayout>
 
                                     <!-- Status -->
@@ -551,7 +547,7 @@
                                                 android:paddingEnd="10dp"
                                                 android:paddingBottom="3dp"
                                                 android:textSize="@dimen/text_size_10"
-                                                tools:text="● Success" />
+                                                tools:text="● Failed" />
                                         </com.google.android.material.card.MaterialCardView>
                                     </LinearLayout>
 
@@ -567,7 +563,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
-                            android:visibility="visible"
+                            android:visibility="gone"
                             android:orientation="vertical">
 
                             <ProgressBar
@@ -579,7 +575,7 @@
                                 android:visibility="@{showProgressReceipt ? View.VISIBLE : View.GONE}"
                                 android:layout_marginBottom="@dimen/margin_medium" />
 
-                            <!-- Header: prepaid icon + title -->
+                            <!-- Header: postpaid icon + title -->
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -599,7 +595,7 @@
                                     android:layout_marginStart="@dimen/margin_extra_small"
                                     android:fontFamily="@font/proza_libre_bold"
                                     android:includeFontPadding="false"
-                                    android:text="@string/titlePrepaidPaymentConfirmation"
+                                    android:text="@string/titlePostpaidPaymentConfirmation"
                                     android:textColor="@color/primary"
                                     android:textSize="@dimen/text_size_13" />
                             </LinearLayout>
@@ -673,7 +669,7 @@
                                         android:includeFontPadding="false"
                                         android:textColor="?attr/colorTextSubtitle"
                                         android:textSize="@dimen/text_size_13"
-                                        tools:text="Dear Customer, Your mobile prepaid recharge of ₹983.00 for Mobile Number 9054093877 has been successfully processed" />
+                                        tools:text="Dear Customer, Your mobile postpaid bill payment of ₹983.00 for Mobile Number 9876543210 has been successfully processed" />
 
                                     <View
                                         android:layout_width="match_parent"
@@ -722,7 +718,7 @@
                                                 android:includeFontPadding="false"
                                                 android:textColor="?attr/colorTextSubtitle"
                                                 android:textSize="@dimen/text_size_12"
-                                                tools:text="PYTCH08042026185641P" />
+                                                tools:text="PYTCH01082026165244P" />
                                         </LinearLayout>
                                     </LinearLayout>
 
@@ -772,7 +768,7 @@
                                                 android:includeFontPadding="false"
                                                 android:textColor="?attr/colorTextSubtitle"
                                                 android:textSize="@dimen/text_size_12"
-                                                tools:text="08/04/2026, 18:56" />
+                                                tools:text="01/08/2026, 04:52 PM" />
                                         </LinearLayout>
                                     </LinearLayout>
 

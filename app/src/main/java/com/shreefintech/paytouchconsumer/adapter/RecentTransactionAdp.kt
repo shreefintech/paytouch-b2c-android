@@ -54,7 +54,8 @@ class RecentTransactionAdp(
             tvStatus.setTextColor(textColor)
 
             tvDetailAmount.text = context.getString(R.string.labelDetailAmount, item.amount)
-            tvDetailAccountNumber.text = context.getString(R.string.labelDetailAccountNumber, item.accountNumber)
+            val accountLabelRes = if (item.isMobileCategory) R.string.labelDetailMobileNo else R.string.labelDetailConsumerNo
+            tvDetailAccountNumber.text = context.getString(accountLabelRes, item.accountNumber)
             tvDetailReference.text = context.getString(R.string.labelDetailReference, item.reference)
 
             if (item.isExpanded) {

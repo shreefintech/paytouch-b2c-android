@@ -24,6 +24,8 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPostpaidBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidRecentTransactionActivity
+import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionReportActivity
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidViewModel
@@ -185,7 +187,7 @@ class PostpaidActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
-                // TODO(PAYTOUCH-59): navigate to PostpaidSmsReceiptActivity
+                PostpaidSmsReceiptActivity.start(mActivity, true)
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -369,11 +371,11 @@ class PostpaidActivity : BaseActivity() {
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-59): PostpaidSmsReceiptActivity.start(mActivity)
+                    PostpaidSmsReceiptActivity.start(mActivity)
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-59): PostpaidRecentTransactionActivity.start(mActivity)
+                    startActivity(Intent(mActivity, PostpaidRecentTransactionActivity::class.java))
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener

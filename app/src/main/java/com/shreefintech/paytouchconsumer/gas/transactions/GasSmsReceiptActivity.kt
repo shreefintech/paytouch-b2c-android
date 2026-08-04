@@ -129,6 +129,7 @@ class GasSmsReceiptActivity : BaseActivity() {
         val date = Utility.formatDate(item.createdAt)
         val status = item.status ?: "Pending"
 
+        binding.tvConsumerNoLabel.text = getString(R.string.labelConsumerNo)
         binding.tvConsumerNo.text = consumerNo
         binding.tvCustomerName.text = item.customerName ?: "--"
         binding.tvCompanyName.text = item.operatorName ?: "--"
