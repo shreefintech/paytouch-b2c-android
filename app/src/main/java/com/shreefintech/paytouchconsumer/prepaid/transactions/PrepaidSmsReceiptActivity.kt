@@ -104,6 +104,8 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
 
     // ── API Call ──────────────────────────────────────────────
 
+    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadLatestPayments() }
+    //  once the no-internet placeholder design is finalised.
     private fun loadLatestPayments() {
         viewModel.getLatestPayments(
             onLoading = { showReceiptLoading(true) },
@@ -121,7 +123,7 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: PrepaidVerifyPaymentDataItem) {
-        val amount = "₹${item.totalPayable ?: "--"}"
+        val amount = Utility.formatAmount(item.totalPayable)
         val mobileNo = item.mobileNo ?: item.subscriberNo ?: "--"
         val txnId = item.transactionId ?: item.txnId ?: "--"
         val date = Utility.formatDate(item.createdAt)

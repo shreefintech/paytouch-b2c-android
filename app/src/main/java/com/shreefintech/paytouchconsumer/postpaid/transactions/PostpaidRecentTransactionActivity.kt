@@ -23,6 +23,12 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 
 class PostpaidRecentTransactionActivity : BaseActivity() {
 
+    companion object {
+        fun start(context: Context) {
+            context.startActivity(Intent(context, PostpaidRecentTransactionActivity::class.java))
+        }
+    }
+
     private lateinit var binding: ActivityPostpaidRecentTransactionBinding
     private lateinit var recentTransactionAdp: RecentTransactionAdp
     private val viewModel: PostpaidRecentTransactionViewModel by viewModels()
@@ -76,6 +82,8 @@ class PostpaidRecentTransactionActivity : BaseActivity() {
         })
     }
 
+    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadInitialData() }
+    //  once the no-internet placeholder design is finalised.
     private fun loadInitialData() {
         viewModel.loadOperatorsThenData(
             onLoading = {

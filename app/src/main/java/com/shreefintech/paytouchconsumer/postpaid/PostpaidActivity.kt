@@ -375,7 +375,7 @@ class PostpaidActivity : BaseActivity() {
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, PostpaidRecentTransactionActivity::class.java))
+                    PostpaidRecentTransactionActivity.start(mActivity)
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener

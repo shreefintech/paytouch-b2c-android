@@ -100,11 +100,12 @@ class PostpaidSmsReceiptActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         onBack()
         loadLatestPayments()
-        // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadLatestPayments() }
     }
 
     // ── API Call ──────────────────────────────────────────────
 
+    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadLatestPayments() }
+    //  once the no-internet placeholder design is finalised.
     private fun loadLatestPayments() {
         viewModel.getLatestPayments(
             onLoading = { showReceiptLoading(true) },

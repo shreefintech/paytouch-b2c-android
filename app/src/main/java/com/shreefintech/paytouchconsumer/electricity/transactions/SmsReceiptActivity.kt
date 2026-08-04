@@ -125,7 +125,7 @@ class SmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: ElectricityVerifyPaymentDataItem) {
-        val amount = "₹${item.totalPayable ?: "--"}"
+        val amount = Utility.formatAmount(item.totalPayable)
         val consumerNo = item.subscriberNo ?: "--"
         val txnId = item.transactionId ?: "--"
         val date = Utility.formatDate(item.createdAt)
@@ -139,7 +139,7 @@ class SmsReceiptActivity : BaseActivity() {
         binding.tvAmountPaid.text = amount
         binding.tvPaytouchTxnId.text = txnId
         binding.tvBConnectTxnId.text = item.transactionId ?: "--"
-        binding.tvCcf.text = item.ccf ?: item.platformFee ?: "--"
+        binding.tvCcf.text = Utility.formatAmount(item.ccf ?: item.platformFee)
         binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
 
