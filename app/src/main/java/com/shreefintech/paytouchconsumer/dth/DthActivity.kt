@@ -23,6 +23,8 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDthBinding
+import com.shreefintech.paytouchconsumer.dth.transactions.DthTransactionReportActivity
+import com.shreefintech.paytouchconsumer.dth.transactions.DthTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.dth.viewmodel.DthViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
@@ -348,6 +350,14 @@ class DthActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
                     onReset()
+                }
+                binding.llTabReport -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, DthTransactionReportActivity::class.java))
+                }
+                binding.llTabStatus -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, DthTransactionStatusActivity::class.java))
                 }
             }
         }

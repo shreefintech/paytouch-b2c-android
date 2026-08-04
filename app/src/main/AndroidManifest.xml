@@ -168,6 +168,18 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".dth.transactions.DthTransactionStatusActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".dth.transactions.DthTransactionReportActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".postpaid.transactions.PostpaidTransactionStatusActivity"
             android:exported="false"
             android:screenOrientation="portrait"

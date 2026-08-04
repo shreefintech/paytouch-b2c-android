@@ -37,6 +37,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPlansListItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlansListItem
@@ -304,6 +307,18 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: DthProcessPaymentRequest
     ): Call<DthPaymentItem>
+
+    @POST("${AUTH}dth/transaction/status")
+    fun getDthTransactionStatus(
+        @Header("Authorization") authorization: String,
+        @Body request: DthTransactionStatusRequest
+    ): Call<General<List<DthTransactionReportDataItem>>>
+
+    @POST("${AUTH}dth/payment-report")
+    fun getDthPaymentReport(
+        @Header("Authorization") authorization: String,
+        @Body request: DthTransactionReportRequest
+    ): Call<General<List<DthTransactionReportDataItem>>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 
