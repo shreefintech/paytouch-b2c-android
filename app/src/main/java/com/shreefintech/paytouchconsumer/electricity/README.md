@@ -188,7 +188,7 @@ If the user taps the dropdown while it is empty (load failed), `loadOperators()`
 
 ## What to Copy When Adding the Next Module (e.g. Water, Broadband)
 
-Electricity is the canonical reference for all bill-payment modules. In order of what you'll touch:
+Electricity is the canonical reference for bill-payment modules with a bill-fetch step. For modules with plan selection (no bill-fetch), use Prepaid or Postpaid as the template instead. In order of what you'll touch:
 
 1. `{Category}Activity` + `activity_{category}.xml` — copy `ElectricityActivity` / `activity_electricity.xml`, rename fields/strings only.
 2. `{Category}ViewModel` extending `BaseBillViewModel` — copy `ElectricityViewModel`, swap endpoint names and request/response DTOs.

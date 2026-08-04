@@ -193,7 +193,7 @@ If the user taps the dropdown while it is empty (load failed), `loadOperators()`
 
 ## What to Copy When Adding the Next Module (e.g. Water, Broadband)
 
-Gas is itself a copy of Electricity with names swapped — use either as the template. In order of what you'll touch:
+Gas is itself a copy of Electricity with names swapped — use either as the template for modules with a bill-fetch step. For modules with plan selection (no bill-fetch), use Prepaid or Postpaid instead. In order of what you'll touch:
 
 1. `{Category}Activity` + `activity_{category}.xml` — copy `GasActivity` / `activity_gas.xml`, rename fields/strings only.
 2. `{Category}ViewModel` extending `BaseBillViewModel` — copy `GasViewModel`, swap endpoint names and request/response DTOs.
