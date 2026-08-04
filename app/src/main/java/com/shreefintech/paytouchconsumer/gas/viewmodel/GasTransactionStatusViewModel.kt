@@ -2,7 +2,6 @@ package com.shreefintech.paytouchconsumer.gas.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.BaseBillViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -94,13 +93,13 @@ class GasTransactionStatusViewModel(application: Application) : AndroidViewModel
         return TransactionItem(
             mobileNumber    = item.connectionNumber ?: "--",
             transactionId   = item.transactionId ?: "--",
-            amount          = "₹${item.billAmount ?: "0.00"}",
+            amount          = Utility.formatAmount(item.billAmount),
             status          = item.status ?: "--",
             categoryIconRes = R.drawable.ic_gas,
             username        = item.customerName ?: "--",
             date            = item.createdAt ?: "--",
-            platformFee     = "₹${item.platformFee ?: "0.00"}",
-            totalPayable    = "₹${item.totalPayable ?: "0.00"}",
+            platformFee     = Utility.formatAmount(item.platformFee),
+            totalPayable    = Utility.formatAmount(item.totalPayable),
             referenceId     = item.transactionId ?: "--",
             userId          = item.id?.toString() ?: "--",
             accountNumber   = item.connectionNumber ?: "--",

@@ -131,7 +131,7 @@ class PrepaidRecentTransactionViewModel(application: Application) : AndroidViewM
         return RecentTransactionItem(
             categoryName      = service,
             accountHolderName = item.extra?.customerName ?: "-",
-            date              = if (item.createdAt.isNullOrBlank()) "-" else Utility.formatDate(item.createdAt),
+            date              = if (item.createdAt.isNullOrBlank()) "-" else Utility.formatDate(item.createdAt, "dd MMM yyyy"),
             status            = item.status ?: "-",
             amount            = Utility.formatAmount(item.amount ?: "--"),
             accountNumber     = item.identifier ?: "-",

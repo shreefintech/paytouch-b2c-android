@@ -2,7 +2,6 @@ package com.shreefintech.paytouchconsumer.prepaid.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.BaseBillViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -97,13 +96,13 @@ class PrepaidTransactionReportViewModel(application: Application) : AndroidViewM
         return TransactionItem(
             mobileNumber    = item.mobileNo ?: "--",
             transactionId   = item.txnId ?: "--",
-            amount          = "₹${item.amount ?: "0.00"}",
+            amount          = Utility.formatAmount(item.amount),
             status          = item.status ?: "--",
             categoryIconRes = R.drawable.ic_prepaid,
             username        = item.mobileNo ?: "--",
             date            = item.createdAt ?: "--",
             platformFee     = "₹0.00",
-            totalPayable    = "₹${item.amount ?: "0.00"}",
+            totalPayable    = Utility.formatAmount(item.amount),
             referenceId     = item.txnId ?: "--",
             userId          = item.id?.toString() ?: "--",
             accountNumber   = item.mobileNo ?: "--",

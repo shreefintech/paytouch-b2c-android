@@ -226,26 +226,58 @@ If one of these is missing a field required by a new module, add it to the exist
 |---|---|---|
 | `bearerToken()` | `utill/ViewModelExt.kt` | Any local `"Bearer $token"` construction |
 | `getString(@StringRes id)` | `utill/ViewModelExt.kt` | Any local string-resource lookup |
-| `Utility.formatAmount(value)` | `utill/Utility.kt` | Any local `NumberFormat` / currency formatting |
-| `Utility.formatDate(raw)` | `utill/Utility.kt` | Any local `SimpleDateFormat` date parsing |
-| `Utility.formatDate(raw, "dd/MM/yyyy")` | `utill/Utility.kt` | Date-only display (e.g. `TransactionDetailActivity`) |
-
-`Utility.formatDate(raw, format)` accepts an optional `format` parameter (default `"dd/MM/yyyy hh:mm a"`). Pass `"dd/MM/yyyy"` when only the date is needed — `TransactionDetailActivity` always uses this shorter format.
+| `Utility.formatAmount(value)` | `utill/Utility.kt` | Any local `NumberFormat` / currency formatting — never use raw string template `"₹${item.amount}"` |
+| `Utility.formatDate(raw, "dd MMM yyyy")` | `utill/Utility.kt` | Recent transaction list date display |
+| `Utility.formatDate(raw, "dd/MM/yyyy")` | `utill/Utility.kt` | Transaction detail date-only display |
+| `Utility.formatDate(raw)` | `utill/Utility.kt` | Full datetime display (default `"dd/MM/yyyy hh:mm a"`) |
 
 If a ViewModel declares a private copy of any of the above, delete it and use the shared function.
+
+#### Date format by screen — use exactly the format below, never the wrong one
+
+| Screen | Format string | Output example |
+|---|---|---|
+| Recent transaction list (`{Category}RecentTransactionViewModel`) | `"dd MMM yyyy"` | `11 Jul 2026` |
+| Transaction detail (`TransactionDetailActivity`) | `"dd/MM/yyyy"` | `11/07/2026` |
+| Any other full datetime display | `"dd/MM/yyyy hh:mm a"` | `11/07/2026 03:45 PM` |
+
+#### Amount formatting — never use raw string templates
+
+Always use `Utility.formatAmount(raw: String?)` for every currency field. It normalises decimal places, applies Indian number formatting, and prepends `₹`. Returning `"-"` on null/blank is intentional.
+
+```kotlin
+// Correct
+amount      = Utility.formatAmount(item.billAmount)
+platformFee = Utility.formatAmount(item.platformFee)
+totalPayable = Utility.formatAmount(item.totalPayable)
+
+// Wrong — raw string template bypasses normalisation; "100.0" displays as ₹100.0
+amount = "₹${item.billAmount ?: "0.00"}"
+```
+
+**Exception — platform fee is genuinely zero:** When the DTO has no `platformFee` field (e.g. Prepaid), hardcode `"₹0.00"` explicitly. Do **not** pass `null` to `Utility.formatAmount()` — it returns `"-"`, which is wrong for a zero fee.
 
 ---
 
 ### `mapToTransactionItem()` Rules
 
-Apply to every `mapToRecentTransactionItem()` and `mapToTransactionItem()` in every module's ViewModel:
+Apply to every `mapToTransactionItem()` in every module's report/status ViewModel:
 
 | Field | Value |
 |---|---|
 | `userId` | `item.id?.toString() ?: "--"` — **never** use loop index or `(index + 1).toString()` |
-| `date` | `item.createdAt ?: "--"` — raw ISO string; **do not pre-format** here |
-| `amount` | `Utility.formatAmount(item.amount ?: "--")` |
+| `date` | `item.createdAt ?: "--"` — **raw ISO string, do not pre-format here**; `TransactionDetailActivity` formats it with `"dd/MM/yyyy"` at display time |
+| `amount` | `Utility.formatAmount(item.amount)` — never a string template |
+| `platformFee` | `Utility.formatAmount(item.platformFee)` — or `"₹0.00"` if the DTO has no fee field |
+| `totalPayable` | `Utility.formatAmount(item.totalPayable)` |
 | `categoryIconRes` | `R.drawable.ic_{category}` — the only visual difference between modules |
+
+Apply to every `mapToDisplayItem()` in every module's recent transaction ViewModel:
+
+| Field | Value |
+|---|---|
+| `date` | `Utility.formatDate(item.createdAt, "dd MMM yyyy")` — **pre-format here**; the list card displays it directly, there is no detail formatter for recent items |
+| `amount` | `Utility.formatAmount(item.amount ?: "--")` |
 
 ---
 
@@ -258,6 +290,76 @@ Every module must follow the project-wide `ObservableBoolean` + DataBinding patt
 - SMS receipt download/share: `ObservableBoolean showProgressReceipt`, wired to both `pbReceiptLoading` and `pbDisplayLoading` via DataBinding
 - All `ObservableBoolean` variables set `false` in **both** `onResponse` and `onFailure` — no exceptions
 - Click guard: `if (showProgressXxx.get()) return@OnClickListener` before every API call
+
+#### Transaction Status Screen — Search Loading
+
+Every `{Category}TransactionStatusActivity` uses a single `ObservableBoolean showProgressSearch` for the search button:
+
+```kotlin
+private val showProgressSearch = ObservableBoolean(false)
+
+// in onCreate():
+binding.showProgressSearch = showProgressSearch
+
+// showShimmer() drives it — true on page-1 load, false when done:
+private fun showShimmer(show: Boolean) {
+    showProgressSearch.set(show)
+    // ... shimmer visibility toggle
+}
+
+// Click guard — always use showProgressSearch, never viewModel.isLoading:
+binding.llSearch -> {
+    if (Utility.stopClick()) return@OnClickListener
+    if (showProgressSearch.get()) return@OnClickListener
+    onSearch()
+}
+```
+
+**Do not guard the search button with `viewModel.isLoading` directly** — the `ObservableBoolean` is already kept in sync via `showShimmer()` and is the canonical guard.
+
+#### List Loading Pattern — Shimmer vs Footer
+
+| Situation | What to show |
+|---|---|
+| Page 1 initial load (or filter/search reset) | Hide `rvTransactions`, show `shimmerLayout` + `startShimmer()` |
+| Page 2+ pagination load | Keep `rvTransactions` visible, show `pbLoadMore` footer spinner |
+| Load complete (any page) | Stop/hide shimmer or `pbLoadMore`; show `tvEmpty` if list is empty |
+
+```kotlin
+// Page 1
+if (page == 1) showShimmer(true) else showFooterLoader(true)
+
+// onSuccess
+if (page == 1) {
+    showShimmer(false)
+    mArrayList.clear(); mArrayList.addAll(list)
+    adapter.notifyDataSetChanged()
+} else {
+    showFooterLoader(false)
+    val start = mArrayList.size
+    mArrayList.addAll(list)
+    adapter.notifyItemRangeInserted(start, list.size)
+}
+
+// onError — always hide the loader that was shown
+if (page == 1) showShimmer(false) else showFooterLoader(false)
+```
+
+Pagination trigger — attach once in `setupRecyclerView()`:
+
+```kotlin
+recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+        if (dy <= 0) return
+        val lm = recyclerView.layoutManager as LinearLayoutManager
+        if (lm.findLastVisibleItemPosition() >= lm.itemCount - 3 && viewModel.canLoadMore()) {
+            loadPage(viewModel.nextPage())
+        }
+    }
+})
+```
+
+**Never call `showShimmer(true)` for pagination pages** — it blanks the existing list. Footer spinner only.
 
 ---
 
