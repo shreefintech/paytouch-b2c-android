@@ -33,6 +33,10 @@ import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidProcess
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionStatusRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPlansListItem
+import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlansListItem
@@ -281,6 +285,25 @@ interface ApiService {
     fun getPostpaidLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<PostpaidLatestPaymentDataItem>>
+
+    // ── DTH ───────────────────────────────────────────────────────────────────
+
+    @GET("${AUTH}dth/operators")
+    fun getDthOperators(
+        @Header("Authorization") authorization: String
+    ): Call<General<List<DthOperatorItem>>>
+
+    @GET("${AUTH}dth/plans/{operatorId}")
+    fun getDthPlans(
+        @Header("Authorization") authorization: String,
+        @Path("operatorId") operatorId: String
+    ): Call<DthPlansListItem>
+
+    @POST("${AUTH}dth/process-direct")
+    fun processDthPayment(
+        @Header("Authorization") authorization: String,
+        @Body request: DthProcessPaymentRequest
+    ): Call<DthPaymentItem>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

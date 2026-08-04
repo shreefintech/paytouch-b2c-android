@@ -199,6 +199,17 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".dth.DthActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".dth.DthPlanSelectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
