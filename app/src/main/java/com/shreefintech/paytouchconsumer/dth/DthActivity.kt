@@ -180,6 +180,8 @@ class DthActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
+                // TODO(B2C-68): replace with DthSmsReceiptActivity.start(mActivity, fromPayment = true) once DTH transaction screens are built
+                ToastUtil.showSuccess(mActivity, getString(R.string.msgDthRechargeSuccess))
                 finish()
             },
             onError = { msg ->

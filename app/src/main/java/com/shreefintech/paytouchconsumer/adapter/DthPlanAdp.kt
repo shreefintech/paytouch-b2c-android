@@ -9,6 +9,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemPrepaidPlanBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPlanItem
+import com.shreefintech.paytouchconsumer.utill.Utility
 
 class DthPlanAdp(
     private val mContext: Context,
@@ -40,7 +41,7 @@ class DthPlanAdp(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         holder.binding.apply {
-            tvPlanAmount.text = mContext.getString(R.string.fmtCurrencyAmount).format((item.amount ?: 0).toDouble())
+            tvPlanAmount.text = Utility.formatAmount((item.amount ?: 0).toDouble())
             tvPlanValidity.text = item.validity ?: "--"
             tvPlanDescription.text = item.description ?: "--"
             tvPlanFooter.text = mContext.getString(
@@ -65,6 +66,6 @@ class DthPlanAdp(
 
     private fun formatTalktime(talktime: Double?): String {
         if (talktime == null || talktime < 0) return "-"
-        return mContext.getString(R.string.fmtCurrencyAmount).format(talktime)
+        return Utility.formatAmount(talktime)
     }
 }

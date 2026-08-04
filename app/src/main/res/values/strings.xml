@@ -220,6 +220,7 @@
     <string name="msgConsumerNumberEmpty">Please enter consumer number</string>
     <string name="msgSelectCompany">Please select a company</string>
     <string name="msgAmountEmpty">Please enter amount</string>
+    <string name="msgDthRechargeSuccess">DTH recharge successful</string>
     <string name="msgComingSoon">This section will be available soon</string>
     <string name="categoryElectricity">Electricity</string>
     <string name="categoryGas">Gas</string>
