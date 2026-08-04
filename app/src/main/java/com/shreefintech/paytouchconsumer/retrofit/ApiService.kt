@@ -33,10 +33,12 @@ import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidProcess
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionStatusRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPlansListItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthRecentTransactionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionStatusRequest
@@ -319,6 +321,11 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: DthTransactionReportRequest
     ): Call<General<List<DthTransactionReportDataItem>>>
+
+    @GET("${AUTH}dth/latest-payment")
+    fun getDthLatestPayment(
+        @Header("Authorization") authorization: String
+    ): Call<General<DthLatestPaymentDataItem>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 
