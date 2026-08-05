@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
+import com.shreefintech.paytouchconsumer.fastag.FastagActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
@@ -91,7 +92,7 @@ class HomeActivity : BaseActivity() {
 
                 binding.llFastag -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-520): Navigate to Fastag recharge screen
+                    startActivity(Intent(mActivity, FastagActivity::class.java))
                 }
 
                 binding.llLoan -> {
