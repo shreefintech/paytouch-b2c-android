@@ -27,6 +27,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTrans
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagTransactionPageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
@@ -340,6 +343,23 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: FastagProcessPaymentRequest
     ): Call<FastagPaymentItem>
+
+    @POST("${AUTH}fastag/transaction/status")
+    fun getFastagTransactionStatus(
+        @Header("Authorization") authorization: String,
+        @Body request: FastagTransactionStatusRequest
+    ): Call<General<List<FastagTransactionReportDataItem>>>
+
+    @GET("${AUTH}fastag")
+    fun getFastagPaymentReport(
+        @Header("Authorization") authorization: String,
+        @Query("from_date")      fromDate:      String?,
+        @Query("to_date")        toDate:        String?,
+        @Query("status")         status:        String?,
+        @Query("vehicle_number") vehicleNumber: String?,
+        @Query("page")           page:          Int,
+        @Query("per_page")       perPage:       Int
+    ): Call<General<FastagTransactionPageItem>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

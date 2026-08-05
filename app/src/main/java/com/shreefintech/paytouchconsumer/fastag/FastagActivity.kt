@@ -23,6 +23,8 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityFastagBinding
+import com.shreefintech.paytouchconsumer.fastag.transactions.FastagTransactionReportActivity
+import com.shreefintech.paytouchconsumer.fastag.transactions.FastagTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.fastag.viewmodel.FastagViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagOperatorItem
@@ -269,11 +271,11 @@ class FastagActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-69): startActivity(Intent(mActivity, FastagTransactionReportActivity::class.java))
+                    startActivity(Intent(mActivity, FastagTransactionReportActivity::class.java))
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-69): FastagTransactionStatusActivity.start(mActivity)
+                    startActivity(Intent(mActivity, FastagTransactionStatusActivity::class.java))
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
