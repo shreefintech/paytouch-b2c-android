@@ -655,6 +655,15 @@ private fun setOperatorLoading(loading: Boolean) {
 | Showing a spinner that covers the whole screen for a button tap | Show only inside that button |
 
 ---
+### Temporary Cross-Module Navigation Exception
+
+Cross-module Activity navigation is prohibited by default.
+
+Exception:
+- Temporary reuse is allowed only when Product explicitly requires an existing screen until the module-specific screen is implemented.
+- The code must include a `TODO(ticket-id)` referencing the follow-up work.
+- The temporary navigation must be removed before the module-specific Activity is released.
+---
 
 ## RecyclerView Update Rules
 
