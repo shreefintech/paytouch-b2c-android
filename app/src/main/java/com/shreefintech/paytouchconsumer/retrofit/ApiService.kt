@@ -34,6 +34,11 @@ import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagTransaction
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanBillItem
+import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanOperatorsDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportDataItem
@@ -366,6 +371,25 @@ interface ApiService {
     fun getFastagLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<FastagLatestPaymentDataItem>>
+
+    // ── Loan ──────────────────────────────────────────────────────────────────
+
+    @GET("${AUTH}loanrepayment/operators")
+    fun getLoanOperators(
+        @Header("Authorization") authorization: String
+    ): Call<General<LoanOperatorsDataItem>>
+
+    @POST("${AUTH}loanrepayment/fetch-bill")
+    fun fetchLoanBill(
+        @Header("Authorization") authorization: String,
+        @Body request: LoanFetchBillRequest
+    ): Call<General<List<LoanBillItem>>>
+
+    @POST("${AUTH}loanrepayment/process-payment")
+    fun processLoanPayment(
+        @Header("Authorization") authorization: String,
+        @Body request: LoanProcessPaymentRequest
+    ): Call<LoanPaymentItem>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

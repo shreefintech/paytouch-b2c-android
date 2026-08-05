@@ -13,6 +13,7 @@ import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
 import com.shreefintech.paytouchconsumer.fastag.FastagActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.loan.LoanActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -97,7 +98,7 @@ class HomeActivity : BaseActivity() {
 
                 binding.llLoan -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-520): Navigate to Loan payment screen
+                    startActivity(Intent(mActivity, LoanActivity::class.java))
                 }
 
                 binding.llMyAccount -> {

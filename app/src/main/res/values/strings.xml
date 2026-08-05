@@ -367,6 +367,11 @@
     <string name="msgInsufficientBalance">Insufficient balance. Please add funds to your wallet.</string>
     <string name="categoryPostpaid">Postpaid</string>
 
+    <!-- Loan screen -->
+    <string name="titleLoanRepayment">Loan Repayment</string>
+    <string name="titleLoanBillDetailsFetched">Loan Bill Details Fetched</string>
+    <string name="msgPaymentSuccess">Payment successful!</string>
+
     <!-- FASTag screen -->
     <string name="titleFastagRecharge">FASTag Recharge</string>
     <string name="labelVehicleNumber">Vehicle Number</string>

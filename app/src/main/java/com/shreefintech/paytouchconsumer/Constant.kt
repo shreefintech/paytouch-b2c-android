@@ -20,6 +20,9 @@ object Constant {
     // External URLs
     const val URL_PLATFORM_TERMS = "https://www.paytouch.in/terms/platform"
 
+    // Loan repayment
+    const val LOAN_CIRCLE_ID = "0"
+
     // Auth flow type extras
     const val EXTRA_FLOW_TYPE = "FLOW_TYPE"
     const val EXTRA_MOBILE = "EXTRA_MOBILE"
