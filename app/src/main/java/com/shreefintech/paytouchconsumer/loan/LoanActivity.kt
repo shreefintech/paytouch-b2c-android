@@ -24,6 +24,8 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoanBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.loan.transactions.LoanTransactionReportActivity
+import com.shreefintech.paytouchconsumer.loan.transactions.LoanTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.loan.viewmodel.LoanViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanOperatorItem
@@ -361,11 +363,11 @@ class LoanActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO: B2C-70 implement LoanTransactionReportActivity
+                    startActivity(Intent(mActivity, LoanTransactionReportActivity::class.java))
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO: B2C-70 implement LoanTransactionStatusActivity
+                    startActivity(Intent(mActivity, LoanTransactionStatusActivity::class.java))
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener

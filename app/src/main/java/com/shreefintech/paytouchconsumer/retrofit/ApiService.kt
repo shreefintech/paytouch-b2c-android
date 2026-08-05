@@ -39,6 +39,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanFetchBillReques
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanOperatorsDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportDataItem
@@ -356,19 +359,19 @@ interface ApiService {
         @Body request: FastagTransactionStatusRequest
     ): Call<General<List<FastagTransactionReportDataItem>>>
 
-    @GET("${AUTH}fastag")
-    fun getFastagPaymentReport(
-        @Header("Authorization") authorization: String,
-        @Query("from_date")      fromDate:      String?,
-        @Query("to_date")        toDate:        String?,
-        @Query("status")         status:        String?,
-        @Query("vehicle_number") vehicleNumber: String?,
-        @Query("page")           page:          Int,
-        @Query("per_page")       perPage:       Int
-    ): Call<General<FastagTransactionPageItem>>
+        @GET("${AUTH}fastag")
+        fun getFastagPaymentReport(
+            @Header("Authorization") authorization: String,
+            @Query("from_date")      fromDate:      String?,
+            @Query("to_date")        toDate:        String?,
+            @Query("status")         status:        String?,
+            @Query("vehicle_number") vehicleNumber: String?,
+            @Query("page")           page:          Int,
+            @Query("per_page")       perPage:       Int
+        ): Call<General<FastagTransactionPageItem>>
 
-    @GET("${AUTH}fastag/latest-payment")
-    fun getFastagLatestPayment(
+        @GET("${AUTH}fastag/latest-payment")
+        fun getFastagLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<FastagLatestPaymentDataItem>>
 
@@ -390,6 +393,18 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: LoanProcessPaymentRequest
     ): Call<LoanPaymentItem>
+
+    @POST("${AUTH}loanrepayment/transaction-status")
+    fun getLoanTransactionStatus(
+        @Header("Authorization") authorization: String,
+        @Body request: LoanTransactionStatusRequest
+    ): Call<General<List<LoanTransactionReportDataItem>>>
+
+    @POST("${AUTH}loanrepayment/payment-report")
+    fun getLoanPaymentReport(
+        @Header("Authorization") authorization: String,
+        @Body request: LoanTransactionReportRequest
+    ): Call<General<List<LoanTransactionReportDataItem>>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 
