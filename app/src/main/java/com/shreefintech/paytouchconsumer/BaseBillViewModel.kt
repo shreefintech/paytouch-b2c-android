@@ -33,6 +33,7 @@ abstract class BaseBillViewModel(application: Application) : AndroidViewModel(ap
                 }
 
                 override fun onFailure(call: Call<VpsBalanceItem>, t: Throwable) {
+                    t.printStackTrace()
                     onFallback()
                 }
             })

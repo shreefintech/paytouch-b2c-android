@@ -366,18 +366,15 @@ class GasActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-585): Replace with GasTransactionReportActivity once created — current screen calls electricity report API
-                    startActivity(Intent(mActivity, TransactionReportActivity::class.java))
+                    // TODO(PAYTOUCH-585): Replace with GasTransactionReportActivity once created
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-585): Replace with GasTransactionStatusActivity once created — current screen calls electricity status API
-                    ElectricityTransactionStatusActivity.start(mActivity)
+                    // TODO(PAYTOUCH-585): Replace with GasTransactionStatusActivity once created
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-585): Replace with GasSmsReceiptActivity once created — current screen title shows "Electricity Payment Confirmation"
-                    SmsReceiptActivity.start(mActivity)
+                    // TODO(PAYTOUCH-585): Replace with GasSmsReceiptActivity once created
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener
