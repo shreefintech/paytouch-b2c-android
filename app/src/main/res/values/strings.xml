@@ -312,6 +312,8 @@
     <string name="titlePostpaidPaymentConfirmation">Postpaid Payment Confirmation</string>
     <string name="msgDthSmsBody">Dear Customer, Your DTH recharge of %1$s for Mobile Number %2$s has been successfully processed</string>
     <string name="titleDthPaymentConfirmation">DTH Payment Confirmation</string>
+    <string name="titleFastagPaymentConfirmation">FASTag Payment Confirmation</string>
+    <string name="msgFastagSmsBody">Dear Customer, Your FASTag recharge of %1$s for Vehicle Number %2$s has been successfully processed</string>
     <string name="msgCustomerNumberEmpty">Please enter customer number</string>
     <string name="labelCustomerNumber">Customer Number</string>
     <string name="hintCustomerNumber">Enter Subscriber ID</string>
@@ -322,6 +324,7 @@
     <string name="labelDetailReference">Transaction ID - %s</string>
     <string name="labelDetailMobileNo">Mobile No - %s</string>
     <string name="labelDetailConsumerNo">Consumer No - %s</string>
+    <string name="labelDetailVehicleNo">Vehicle No - %s</string>
     <string name="labelMobileNoFmt">Mobile No. %s</string>
     <string name="labelConsumerNoFmt">Consumer No. %s</string>
     <string name="labelUsernameFmt">Username : %s</string>

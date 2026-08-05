@@ -24,6 +24,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityT
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
+import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagProcessPaymentRequest
@@ -360,6 +361,11 @@ interface ApiService {
         @Query("page")           page:          Int,
         @Query("per_page")       perPage:       Int
     ): Call<General<FastagTransactionPageItem>>
+
+    @GET("${AUTH}fastag/latest-payment")
+    fun getFastagLatestPayment(
+        @Header("Authorization") authorization: String
+    ): Call<General<FastagLatestPaymentDataItem>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

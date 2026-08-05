@@ -12,5 +12,6 @@ data class RecentTransactionItem(
     val reference: String,
     @DrawableRes val categoryIconRes: Int,
     val isMobileCategory: Boolean = false,
+    val isVehicleCategory: Boolean = false,
     var isExpanded: Boolean = false
 )
