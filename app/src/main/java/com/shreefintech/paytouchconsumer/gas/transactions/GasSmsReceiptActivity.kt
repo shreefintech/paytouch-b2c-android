@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity.transactions
+package com.shreefintech.paytouchconsumer.gas.transactions
 
 import android.Manifest
 import android.content.Context
@@ -6,12 +6,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
+import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.os.Build
-import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -23,21 +23,22 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.databinding.ActivitySmsReceiptBinding
-import com.shreefintech.paytouchconsumer.electricity.viewmodel.SmsReceiptViewModel
+import com.shreefintech.paytouchconsumer.databinding.ActivityGasSmsReceiptBinding
+import com.shreefintech.paytouchconsumer.gas.viewmodel.GasSmsReceiptViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
 
-class SmsReceiptActivity : BaseActivity() {
+class GasSmsReceiptActivity : BaseActivity() {
 
-    private lateinit var binding: ActivitySmsReceiptBinding
-    private val viewModel: SmsReceiptViewModel by viewModels()
+    private lateinit var binding: ActivityGasSmsReceiptBinding
     private val showProgressReceipt = ObservableBoolean(false)
+
+    private val viewModel: GasSmsReceiptViewModel by viewModels()
 
     private val writePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -57,7 +58,7 @@ class SmsReceiptActivity : BaseActivity() {
 
         fun start(context: Context, fromPayment: Boolean = false) {
             context.startActivity(
-                Intent(context, SmsReceiptActivity::class.java).apply {
+                Intent(context, GasSmsReceiptActivity::class.java).apply {
                     putExtra(EXTRA_FROM_PAYMENT, fromPayment)
                 }
             )
@@ -66,7 +67,7 @@ class SmsReceiptActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySmsReceiptBinding.inflate(layoutInflater)
+        binding = ActivityGasSmsReceiptBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
@@ -98,9 +99,6 @@ class SmsReceiptActivity : BaseActivity() {
         binding.showProgressReceipt = showProgressReceipt
         binding.onClickListener = onClickListener()
         onBack()
-
-        // Always fetch the latest completed payment from the API — both the Receipt tab and the
-        // SMS Display tab need server-side fields (operatorName, ccf, createdAt).
         loadLatestPayments()
     }
 
@@ -124,9 +122,9 @@ class SmsReceiptActivity : BaseActivity() {
 
     // ── Populate ──────────────────────────────────────────────
 
-    private fun populateReceiptFromApi(item: ElectricityVerifyPaymentDataItem) {
+    private fun populateReceiptFromApi(item: GasVerifyPaymentDataItem) {
         val amount = "₹${item.totalPayable ?: "--"}"
-        val consumerNo = item.subscriberNo ?: "--"
+        val consumerNo = item.connectionNumber ?: "--"
         val txnId = item.transactionId ?: "--"
         val date = Utility.formatDate(item.createdAt)
         val status = item.status ?: "Pending"
@@ -137,12 +135,12 @@ class SmsReceiptActivity : BaseActivity() {
         binding.tvReceiptDate.text = date
         binding.tvAmountPaid.text = amount
         binding.tvPaytouchTxnId.text = txnId
-        binding.tvBConnectTxnId.text = item.transactionId ?: "--"
+        binding.tvBConnectTxnId.text = txnId
         binding.tvCcf.text = item.ccf ?: item.platformFee ?: "--"
         binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
 
-        val smsBodyText = getString(R.string.msgSmsBody, amount, consumerNo)
+        val smsBodyText = getString(R.string.msgGasSmsBody, amount, consumerNo)
         val spannable = SpannableString(smsBodyText)
         val amountStart = smsBodyText.indexOf(amount)
         if (amountStart >= 0) {
@@ -164,7 +162,7 @@ class SmsReceiptActivity : BaseActivity() {
         binding.llBtnContainer.visibility = if (isReceipt) View.VISIBLE else View.GONE
 
         val activeColor = ContextCompat.getColor(mActivity, R.color.primary)
-        val inactiveColor = android.graphics.Color.TRANSPARENT
+        val inactiveColor = Color.TRANSPARENT
         val activeTextColor = ContextCompat.getColor(mActivity, R.color.white)
         val inactiveTextColor = ContextCompat.getColor(mActivity, R.color.primary)
 

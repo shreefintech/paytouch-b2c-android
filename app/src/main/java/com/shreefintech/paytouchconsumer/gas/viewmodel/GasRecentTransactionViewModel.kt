@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity.viewmodel
+package com.shreefintech.paytouchconsumer.gas.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -7,8 +7,8 @@ import com.shreefintech.paytouchconsumer.transactions.model.RecentTransactionIte
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -16,7 +16,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RecentTransactionViewModel(application: Application) : AndroidViewModel(application) {
+class GasRecentTransactionViewModel(application: Application) : AndroidViewModel(application) {
 
     private val operatorMap = HashMap<String, String>()
 
@@ -30,8 +30,6 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
     companion object {
         private const val PAGE_SIZE = 20
     }
-
-    // ── Public API ────────────────────────────────────────────────────────────
 
     fun loadOperatorsThenData(
         onLoading: () -> Unit,
@@ -48,11 +46,11 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
         operatorMap.clear()
         onLoading()
 
-        ApiClient.apiService.getElectricityOperators(bearerToken())
-            .enqueue(object : Callback<General<List<ElectricityOperatorItem>>> {
+        ApiClient.apiService.getGasOperators(bearerToken())
+            .enqueue(object : Callback<General<List<GasOperatorItem>>> {
                 override fun onResponse(
-                    call: Call<General<List<ElectricityOperatorItem>>>,
-                    response: Response<General<List<ElectricityOperatorItem>>>
+                    call: Call<General<List<GasOperatorItem>>>,
+                    response: Response<General<List<GasOperatorItem>>>
                 ) {
                     response.body()?.data?.forEach { op ->
                         val id   = op.id   ?: return@forEach
@@ -63,10 +61,9 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
                 }
 
                 override fun onFailure(
-                    call: Call<General<List<ElectricityOperatorItem>>>,
+                    call: Call<General<List<GasOperatorItem>>>,
                     t: Throwable
                 ) {
-                    // Operator fetch failed — proceed with empty map; transactions still load
                     fetchTransactions(onSuccess, onError)
                 }
             })
@@ -88,13 +85,11 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
         fetchTransactions(onSuccess, onError)
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────────
-
     private fun fetchTransactions(
         onSuccess: (List<RecentTransactionItem>) -> Unit,
         onError: (String) -> Unit
     ) {
-        ApiClient.apiService.getTransactions(bearerToken(), "electricity", currentPage, PAGE_SIZE)
+        ApiClient.apiService.getTransactions(bearerToken(), "gas", currentPage, PAGE_SIZE)
             .enqueue(object : Callback<General<List<UnifiedTransactionItem>>> {
                 override fun onResponse(
                     call: Call<General<List<UnifiedTransactionItem>>>,
@@ -131,17 +126,17 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
         val service = when {
             operatorId != null && operatorMap.containsKey(operatorId) -> operatorMap[operatorId]!!
             operatorId != null -> operatorId
-            else -> getString(R.string.categoryElectricity)
+            else -> getString(R.string.categoryGas)
         }
         return RecentTransactionItem(
             categoryName      = service,
             accountHolderName = item.extra?.customerName ?: "-",
-            date              = Utility.formatDate(item.createdAt),
+            date              = if (item.createdAt.isNullOrBlank()) "-" else Utility.formatDate(item.createdAt),
             status            = item.status ?: "-",
             amount            = Utility.formatAmount(item.amount ?: "--"),
             accountNumber     = item.identifier ?: "-",
             reference         = item.referenceId ?: "-",
-            categoryIconRes   = R.drawable.ic_electricity
+            categoryIconRes   = R.drawable.ic_gas
         )
     }
 

@@ -1,4 +1,5 @@
 package com.shreefintech.paytouchconsumer.gas
+
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -22,7 +23,8 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityGasBinding
-import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.gas.transactions.GasRecentTransactionActivity
+import com.shreefintech.paytouchconsumer.gas.transactions.GasSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionReportActivity
 import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.gas.viewmodel.GasViewModel
@@ -105,9 +107,9 @@ class GasActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
+                binding.tvPlatformFee.text = "₹%.2f".format(fee)
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
+                binding.tvTotalPayable.text = "₹%.2f".format(total)
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
@@ -202,9 +204,9 @@ class GasActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { paymentItem ->
+            onSuccess = { _ ->
                 showProgressPay.set(false)
-                SmsReceiptActivity.start(mActivity)
+                GasSmsReceiptActivity.start(mActivity, fromPayment = true)
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -212,7 +214,6 @@ class GasActivity : BaseActivity() {
             }
         )
     }
-
 
     // ── UI Helpers ────────────────────────────────────────────────────────────
 
@@ -372,7 +373,7 @@ class GasActivity : BaseActivity() {
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-585): Replace with GasSmsReceiptActivity once created
+                    GasSmsReceiptActivity.start(mActivity)
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener
@@ -399,7 +400,7 @@ class GasActivity : BaseActivity() {
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-585): Replace with GasRecentTransactionActivity once created
+                    GasRecentTransactionActivity.start(mActivity)
                 }
             }
         }

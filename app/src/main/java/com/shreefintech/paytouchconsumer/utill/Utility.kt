@@ -12,12 +12,24 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 object Utility {
 
+    fun formatDate(createdAt: String?): String {
+        if (createdAt.isNullOrBlank()) return "--"
+        return try {
+            val input = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val output = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
+            val date = input.parse(createdAt.substringBefore(".").substringBefore("+"))
+            if (date != null) output.format(date) else createdAt
+        } catch (e: Exception) {
+            createdAt
+        }
+    }
 
     fun isInternetAvailable(context: Context): Boolean {
         val connectivityManager =
@@ -48,6 +60,20 @@ object Utility {
     fun generateTransactionId(): String {
         val dateTime = SimpleDateFormat("ddMMyyyyHHmmss", Locale.getDefault()).format(Date())
         return "PYTCH${dateTime}M"
+    }
+
+    fun formatAmount(raw: String?): String {
+        if (raw.isNullOrBlank()) return "-"
+        return try {
+            val number = raw.toDouble()
+            val fmt = NumberFormat.getNumberInstance(Locale("en", "IN")).apply {
+                maximumFractionDigits = 2
+                minimumFractionDigits = 2
+            }
+            "₹${fmt.format(number)}"
+        } catch (e: Exception) {
+            "₹$raw"
+        }
     }
 
     fun calculatePlatformFee(amount: Double): Double {
