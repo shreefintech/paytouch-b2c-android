@@ -64,12 +64,6 @@ GasActivity
 
 ---
 
-## Transaction ID
-
-Generated client-side via `Utility.generateTransactionId()` immediately before `processGasPayment` is called (inside `GasViewModel.processPayment()`, mirroring Electricity). Format: `PYTCH[DDMMyyyyHHmmss]M`. Sent as `transaction_id` in the request body.
-
----
-
 ## Transaction History Screens
 
 Three separate entry points, launched from the tab bar at the top of `GasActivity`:

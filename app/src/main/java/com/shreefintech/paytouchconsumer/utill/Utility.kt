@@ -14,7 +14,6 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 object Utility {
@@ -55,11 +54,6 @@ object Utility {
         val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         imm.hideSoftInputFromWindow(view.windowToken, 0)
-    }
-
-    fun generateTransactionId(): String {
-        val dateTime = SimpleDateFormat("ddMMyyyyHHmmss", Locale.getDefault()).format(Date())
-        return "PYTCH${dateTime}M"
     }
 
     fun formatAmount(raw: String?): String {

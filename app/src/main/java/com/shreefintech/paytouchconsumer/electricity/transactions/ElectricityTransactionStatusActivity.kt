@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
@@ -30,8 +31,11 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
     private val viewModel: ElectricityTransactionStatusViewModel by viewModels()
     private lateinit var transactionAdp: TransactionAdp
 
-    private val mArrayList          = ArrayList<TransactionItem>()
-    private val showProgressSearch  = ObservableBoolean(false)
+    private val mArrayList         = ArrayList<TransactionItem>()
+    private val showProgressSearch = ObservableBoolean(false)
+
+    // Active query for the current paginated result set
+    private var activeQuery: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,19 +69,18 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
         binding.onClickListener    = onClickListener()
 
         binding.etSearch.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                searchStatus(); true
-            } else false
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) { onSearch(); true } else false
         }
 
         setupRecyclerView()
         onBack()
 
-        prefillTransactionId?.let { txnId ->
-            binding.etSearch.setText(txnId)
-            searchStatus()
-        }
+        // Pre-fill from caller and set as the initial query
+        prefillTransactionId?.let { binding.etSearch.setText(it); activeQuery = it }
+        loadPage(1)
     }
+
+    // ── Setup ─────────────────────────────────────────────────────────────────
 
     private fun setupRecyclerView() {
         transactionAdp = TransactionAdp(mActivity, mArrayList)
@@ -88,43 +91,72 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(mActivity)
             adapter       = transactionAdp
         }
-        if (prefillTransactionId == null) {
-            getTransactionStatusList()
-        }
+        binding.rvTransactions.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy <= 0) return
+                val lm          = recyclerView.layoutManager as LinearLayoutManager
+                val lastVisible = lm.findLastVisibleItemPosition()
+                val totalItems  = lm.itemCount
+                if (lastVisible >= totalItems - 3 && viewModel.canLoadMore()) {
+                    loadPage(viewModel.nextPage())
+                }
+            }
+        })
     }
 
-    private fun searchStatus() {
+    // ── Actions ───────────────────────────────────────────────────────────────
+
+    private fun onSearch() {
         val query = binding.etSearch.text?.toString()?.trim() ?: ""
         if (query.isEmpty()) {
             ToastUtil.showDelete(mActivity, getString(R.string.msgEnterSearchQuery))
             return
         }
         Utility.hideKeyboard(mActivity)
-        getTransactionStatusList(query)
+        activeQuery = query
+        loadPage(1)
     }
 
-    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { getTransactionStatusList() }
+    // ── Data Loading ──────────────────────────────────────────────────────────
+
+    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadPage(1) }
     //  once the no-internet placeholder design is finalised.
-    private fun getTransactionStatusList(query : String? = null){
+    private fun loadPage(page: Int) {
         viewModel.searchTransactionStatus(
-            query = query,
-            onLoading = { showShimmer(true) },
+            query     = activeQuery,
+            page      = page,
+            onLoading = {
+                if (page == 1) showShimmer(true) else showFooterLoader(true)
+            },
             onSuccess = { list ->
-                showShimmer(false)
-                mArrayList.clear()
-                mArrayList.addAll(list)
-                transactionAdp.notifyDataSetChanged()
+                if (page == 1) {
+                    showShimmer(false)
+                    mArrayList.clear()
+                    mArrayList.addAll(list)
+                    transactionAdp.notifyDataSetChanged()
+                } else {
+                    showFooterLoader(false)
+                    val insertStart = mArrayList.size
+                    mArrayList.addAll(list)
+                    transactionAdp.notifyItemRangeInserted(insertStart, list.size)
+                }
                 binding.tvEmpty.visibility = if (mArrayList.isEmpty()) View.VISIBLE else View.GONE
             },
-            onError = { msg ->
-                showShimmer(false)
-                mArrayList.clear()
-                transactionAdp.notifyDataSetChanged()
-                binding.tvEmpty.visibility = View.VISIBLE
+            onError   = { msg ->
+                if (page == 1) {
+                    showShimmer(false)
+                    mArrayList.clear()
+                    transactionAdp.notifyDataSetChanged()
+                    binding.tvEmpty.visibility = View.VISIBLE
+                } else {
+                    showFooterLoader(false)
+                }
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )
     }
+
+    // ── UI Helpers ────────────────────────────────────────────────────────────
 
     private fun showShimmer(show: Boolean) {
         showProgressSearch.set(show)
@@ -139,6 +171,12 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
             binding.rvTransactions.visibility = View.VISIBLE
         }
     }
+
+    private fun showFooterLoader(show: Boolean) {
+        binding.pbLoadMore.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    // ── Navigation ────────────────────────────────────────────────────────────
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -156,11 +194,13 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
                 binding.llSearch -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressSearch.get()) return@OnClickListener
-                    searchStatus()
+                    onSearch()
                 }
             }
         }
     }
+
+    // ── Intent / Companion ────────────────────────────────────────────────────
 
     private val prefillTransactionId: String? by lazy {
         intent.getStringExtra(EXTRA_TRANSACTION_ID)
