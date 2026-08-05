@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity
+package com.shreefintech.paytouchconsumer.gas
 
 import android.content.Intent
 import android.graphics.Color
@@ -22,29 +22,26 @@ import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
-import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
+import com.shreefintech.paytouchconsumer.databinding.ActivityGasBinding
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
-import com.shreefintech.paytouchconsumer.electricity.transactions.ElectricityTransactionStatusActivity
-import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
-import com.shreefintech.paytouchconsumer.electricity.viewmodel.ElectricityViewModel
+import com.shreefintech.paytouchconsumer.gas.viewmodel.GasViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasBillItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 
-class ElectricityActivity : BaseActivity() {
+class GasActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityElectricityBinding
-    private val viewModel: ElectricityViewModel by viewModels()
+    private lateinit var binding: ActivityGasBinding
+    private val viewModel: GasViewModel by viewModels()
 
-    private var operatorItems: List<ElectricityOperatorItem> = emptyList()
+    private var operatorItems: List<GasOperatorItem> = emptyList()
     private var selectedOperatorId: String? = null
     private var selectedOperatorName: String? = null
-    private var fetchedBillItem: ElectricityBillItem? = null
+    private var fetchedBillItem: GasBillItem? = null
     private var isBillFetched = false
 
     private val showProgressFetch = ObservableBoolean(false)
@@ -52,7 +49,7 @@ class ElectricityActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityElectricityBinding.inflate(layoutInflater)
+        binding = ActivityGasBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
@@ -174,9 +171,9 @@ class ElectricityActivity : BaseActivity() {
         )
     }
 
-    private fun fetchBill(connectionNumber: String) {
+    private fun fetchBill(consumerNumber: String) {
         viewModel.fetchBill(
-            connectionNumber = connectionNumber,
+            consumerNumber = consumerNumber,
             operatorId = selectedOperatorId ?: "",
             onLoading = { showProgressFetch.set(true) },
             onSuccess = { bill ->
@@ -196,17 +193,17 @@ class ElectricityActivity : BaseActivity() {
         val amount = binding.etAmount.text?.toString()?.trim()?.toDoubleOrNull() ?: 0.0
         val fee = Utility.calculatePlatformFee(amount)
         val total = amount + fee
-        val connectionNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
+        val consumerNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
         viewModel.verifyAndPay(
-            connectionNumber = connectionNumber,
+            consumerNumber = consumerNumber,
             operatorId = selectedOperatorId ?: "",
             amount = amount,
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { paymentItem ->
                 showProgressPay.set(false)
-                SmsReceiptActivity.start(mActivity, fromPayment = true)
+                SmsReceiptActivity.start(mActivity)
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -214,6 +211,7 @@ class ElectricityActivity : BaseActivity() {
             }
         )
     }
+
 
     // ── UI Helpers ────────────────────────────────────────────────────────────
 
@@ -252,7 +250,7 @@ class ElectricityActivity : BaseActivity() {
 
     private fun showBillDetails() {
         val bill = fetchedBillItem ?: return
-        binding.tvBillCustomerName.text = bill.userName ?: "-"
+        binding.tvBillCustomerName.text = bill.customerName ?: "-"
         binding.tvBillDueDate.text = bill.dueDate ?: "-"
         binding.tvBillDate.text = bill.billDate ?: "-"
         binding.tvBillAmount.text = bill.billAmount ?: "-"
@@ -285,29 +283,29 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
             return
         }
-        val connectionNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
-        if (connectionNumber.isEmpty()) {
+        val consumerNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
+        if (consumerNumber.isEmpty()) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
-        if (connectionNumber.length < 10) {
+        if (consumerNumber.length < 10) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
             return
         }
         Utility.hideKeyboard(mActivity)
-        fetchBill(connectionNumber)
+        fetchBill(consumerNumber)
     }
 
     private fun onProceedToPay() {
-        val connectionNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
-        if (connectionNumber.isEmpty()) {
+        val consumerNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
+        if (consumerNumber.isEmpty()) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
-        if (connectionNumber.length < 10) {
+        if (consumerNumber.length < 10) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
             return
@@ -318,7 +316,7 @@ class ElectricityActivity : BaseActivity() {
         }
         if (!isBillFetched) {
             Utility.hideKeyboard(mActivity)
-            fetchBill(connectionNumber)
+            fetchBill(consumerNumber)
             return
         }
         if (!binding.cbTerms.isChecked) {
@@ -365,15 +363,15 @@ class ElectricityActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, TransactionReportActivity::class.java))
+                    // TODO(PAYTOUCH-585): Replace with GasTransactionReportActivity once created
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    ElectricityTransactionStatusActivity.start(mActivity)
+                    // TODO(PAYTOUCH-585): Replace with GasTransactionStatusActivity once created
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    SmsReceiptActivity.start(mActivity)
+                    // TODO(PAYTOUCH-585): Replace with GasSmsReceiptActivity once created
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener
@@ -400,7 +398,7 @@ class ElectricityActivity : BaseActivity() {
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
+                    // TODO(PAYTOUCH-585): Replace with GasRecentTransactionActivity once created
                 }
             }
         }

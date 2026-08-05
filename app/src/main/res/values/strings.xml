@@ -173,6 +173,9 @@
     <!-- Home screen -->
     <string name="titleCategories">Categories</string>
 
+    <!-- Gas screen -->
+    <string name="titleGasBill">Gas Bill</string>
+
     <!-- Electricity screen -->
     <string name="titleElectricityBill">Electricity Bill</string>
     <string name="categoryElectricityBill">Electricity Bill</string>
@@ -191,6 +194,7 @@
     <string name="hintPlatformFee">Platform Fee</string>
     <string name="labelTotalPayable">Total Payable</string>
     <string name="hintTotalPayable">Payable Amount</string>
+    <string name="fmtCurrencyAmount">₹%.2f</string>
     <string name="msgTermsAgreement">I agree to the platform fee terms &amp; conditions.</string>
     <string name="btnProceedToPay">Proceed to pay</string>
     <string name="btnReset">Reset</string>
@@ -311,6 +315,7 @@
 
     <!-- Bill Details card -->
     <string name="titleBillDetailsFetched">Electricity Bill Details Fetched</string>
+    <string name="titleGasBillDetailsFetched">Gas Bill Details Fetched</string>
     <string name="labelDueDate">Due Date</string>
     <string name="labelBillDate">Bill Date</string>
     <string name="labelBillAmount">Bill Amount</string>

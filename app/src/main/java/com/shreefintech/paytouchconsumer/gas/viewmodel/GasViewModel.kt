@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity.viewmodel
+package com.shreefintech.paytouchconsumer.gas.viewmodel
 
 import android.app.Application
 import com.shreefintech.paytouchconsumer.BaseBillViewModel
@@ -7,24 +7,28 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasBillItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ElectricityViewModel(application: Application) : BaseBillViewModel(application) {
+class GasViewModel(application: Application) : BaseBillViewModel(application) {
+
+    companion object {
+        private const val CIRCLE_ID_DEFAULT = "0"
+    }
 
     // ── Public API ────────────────────────────────────────────────────────────
 
     fun loadOperators(
         onLoading: () -> Unit,
-        onSuccess: (List<ElectricityOperatorItem>) -> Unit,
+        onSuccess: (List<GasOperatorItem>) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -32,11 +36,11 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
             return
         }
         onLoading()
-        ApiClient.apiService.getElectricityOperators(bearerToken())
-            .enqueue(object : Callback<General<List<ElectricityOperatorItem>>> {
+        ApiClient.apiService.getGasOperators(bearerToken())
+            .enqueue(object : Callback<General<List<GasOperatorItem>>> {
                 override fun onResponse(
-                    call: Call<General<List<ElectricityOperatorItem>>>,
-                    response: Response<General<List<ElectricityOperatorItem>>>
+                    call: Call<General<List<GasOperatorItem>>>,
+                    response: Response<General<List<GasOperatorItem>>>
                 ) {
                     if (response.isSuccessful && response.body()?.data != null) {
                         onSuccess(response.body()!!.data!!)
@@ -49,17 +53,17 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
                     }
                 }
 
-                override fun onFailure(call: Call<General<List<ElectricityOperatorItem>>>, t: Throwable) {
+                override fun onFailure(call: Call<General<List<GasOperatorItem>>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
 
     fun fetchBill(
-        connectionNumber: String,
+        consumerNumber: String,
         operatorId: String,
         onLoading: () -> Unit,
-        onSuccess: (ElectricityBillItem) -> Unit,
+        onSuccess: (GasBillItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -67,17 +71,17 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
             return
         }
         onLoading()
-        ApiClient.apiService.fetchElectricityBill(
+        ApiClient.apiService.fetchGasBill(
             bearerToken(),
-            ElectricityFetchBillRequest(
-                connectionNumber = connectionNumber,
+            GasFetchBillRequest(
+                consumerNumber = consumerNumber,
                 operatorId = operatorId,
-                circleId = "00"
+                circleId = CIRCLE_ID_DEFAULT
             )
-        ).enqueue(object : Callback<General<List<ElectricityBillItem>>> {
+        ).enqueue(object : Callback<General<List<GasBillItem>>> {
             override fun onResponse(
-                call: Call<General<List<ElectricityBillItem>>>,
-                response: Response<General<List<ElectricityBillItem>>>
+                call: Call<General<List<GasBillItem>>>,
+                response: Response<General<List<GasBillItem>>>
             ) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     val bill = response.body()!!.data!!.firstOrNull()
@@ -92,20 +96,20 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
                 }
             }
 
-            override fun onFailure(call: Call<General<List<ElectricityBillItem>>>, t: Throwable) {
+            override fun onFailure(call: Call<General<List<GasBillItem>>>, t: Throwable) {
                 onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }
 
     fun verifyAndPay(
-        connectionNumber: String,
+        consumerNumber: String,
         operatorId: String,
         amount: Double,
         fee: Double,
         total: Double,
         onLoading: () -> Unit,
-        onSuccess: (ElectricityPaymentItem) -> Unit,
+        onSuccess: (GasPaymentItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -113,7 +117,7 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
             return
         }
         onLoading()
-        val proceed = { processPayment(connectionNumber, operatorId, amount, fee, total, onSuccess, onError) }
+        val proceed = { processPayment(consumerNumber, operatorId, amount, fee, total, onSuccess, onError) }
         val fallback = { checkWalletBalance(total, proceed, onError) }
         val userId = SharedPreferenceHelper.getSharedPreferenceString(
             getApplication(), Constant.KEY_USER_ID, ""
@@ -124,12 +128,12 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
     // ── Private helpers ───────────────────────────────────────────────────────
 
     private fun processPayment(
-        connectionNumber: String,
+        consumerNumber: String,
         operatorId: String,
         amount: Double,
         fee: Double,
         total: Double,
-        onSuccess: (ElectricityPaymentItem) -> Unit,
+        onSuccess: (GasPaymentItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -137,21 +141,21 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
             return
         }
         val transactionId = Utility.generateTransactionId()
-        ApiClient.apiService.processElectricityPayment(
+        ApiClient.apiService.processGasPayment(
             bearerToken(),
-            ElectricityProcessPaymentRequest(
-                connectionNumber = connectionNumber,
+            GasProcessPaymentRequest(
+                connectionNumber = consumerNumber,
                 operatorId = operatorId,
-                circleId = "00",
+                circleId = CIRCLE_ID_DEFAULT,
                 amount = amount,
                 platformFee = fee,
                 totalPayable = total,
                 transactionId = transactionId
             )
-        ).enqueue(object : Callback<ElectricityPaymentItem> {
+        ).enqueue(object : Callback<GasPaymentItem> {
             override fun onResponse(
-                call: Call<ElectricityPaymentItem>,
-                response: Response<ElectricityPaymentItem>
+                call: Call<GasPaymentItem>,
+                response: Response<GasPaymentItem>
             ) {
                 val body = response.body()
                 if (response.isSuccessful && body?.success == true) {
@@ -165,7 +169,7 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
                 }
             }
 
-            override fun onFailure(call: Call<ElectricityPaymentItem>, t: Throwable) {
+            override fun onFailure(call: Call<GasPaymentItem>, t: Throwable) {
                 onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
