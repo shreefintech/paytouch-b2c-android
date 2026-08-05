@@ -36,7 +36,7 @@ class RecentTransactionActivity : BaseActivity() {
             insets
         }
 
-        LiquidGlassEffect.Companion.attach(
+        LiquidGlassEffect.attach(
             targetView   = binding.flCard,
             rootView     = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
