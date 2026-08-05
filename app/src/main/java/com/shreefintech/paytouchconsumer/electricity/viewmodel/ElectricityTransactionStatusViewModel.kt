@@ -3,7 +3,7 @@ package com.shreefintech.paytouchconsumer.electricity.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
+import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -67,7 +67,7 @@ class ElectricityTransactionStatusViewModel(application: Application) : AndroidV
             // the status API returns it as subscriberNo, the report API returns it as consumerNo.
             mobileNumber    = item.subscriberNo ?: "--",
             transactionId   = item.transactionId ?: "--",
-            amount          = "₹%.2f".format(item.totalPayable ?: 0.0),
+            amount          = "₹%.2f".format(item.amount ?: 0.0),
             status          = item.status ?: "--",
             categoryIconRes = R.drawable.ic_electricity,
             username        = item.customerName ?: "--",

@@ -1,5 +1,4 @@
 package com.shreefintech.paytouchconsumer.gas
-
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -24,6 +23,8 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityGasBinding
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionReportActivity
+import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.gas.viewmodel.GasViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasBillItem
@@ -363,11 +364,11 @@ class GasActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-585): Replace with GasTransactionReportActivity once created
+                    startActivity(Intent(mActivity, GasTransactionReportActivity::class.java))
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-585): Replace with GasTransactionStatusActivity once created
+                    GasTransactionStatusActivity.start(mActivity)
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener

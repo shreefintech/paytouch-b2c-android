@@ -90,6 +90,18 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".gas.transactions.GasTransactionStatusActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".gas.transactions.GasTransactionReportActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".electricity.transactions.RecentTransactionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -100,7 +112,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".electricity.transactions.TransactionDetailActivity"
+            android:name=".transactions.TransactionDetailActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 

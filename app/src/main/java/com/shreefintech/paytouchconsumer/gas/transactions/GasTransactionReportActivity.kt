@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity.transactions
+package com.shreefintech.paytouchconsumer.gas.transactions
 
 import android.graphics.Color
 import android.os.Bundle
@@ -11,31 +11,38 @@ import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
-import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionReportBinding
-import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
-import com.shreefintech.paytouchconsumer.electricity.viewmodel.TransactionReportViewModel
+import com.shreefintech.paytouchconsumer.databinding.ActivityGasTransactionReportBinding
+import com.shreefintech.paytouchconsumer.gas.viewmodel.GasTransactionReportViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.transactions.TransactionDetailActivity
+import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.TransactionFilterHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
-class TransactionReportActivity : BaseActivity() {
+class GasTransactionReportActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityTransactionReportBinding
-    private val viewModel: TransactionReportViewModel by viewModels()
+    private lateinit var binding: ActivityGasTransactionReportBinding
+    private val viewModel: GasTransactionReportViewModel by viewModels()
     private lateinit var transactionAdp: TransactionAdp
     private lateinit var filterHelper: TransactionFilterHelper
 
     private val mAllList     = ArrayList<TransactionItem>()
     private val mDisplayList = ArrayList<TransactionItem>()
 
+    // Stored filter params — reused on each paginated page load
+    private var filterFromDate:   String? = null
+    private var filterToDate:     String? = null
+    private var filterStatus:     String? = null
+    private var filterConsumerNo: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityTransactionReportBinding.inflate(layoutInflater)
+        binding = ActivityGasTransactionReportBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
@@ -47,7 +54,6 @@ class TransactionReportActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
-
             binding.incFilterSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
             insets
         }
@@ -73,6 +79,8 @@ class TransactionReportActivity : BaseActivity() {
         callReport(null, null, null, null)
     }
 
+    // ── Setup ─────────────────────────────────────────────────────────────────
+
     private fun setupRecyclerView() {
         transactionAdp = TransactionAdp(mActivity, mDisplayList)
         transactionAdp.onClickItem = { item ->
@@ -82,6 +90,17 @@ class TransactionReportActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(mActivity)
             adapter       = transactionAdp
         }
+        binding.rvTransactions.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy <= 0) return
+                val lm          = recyclerView.layoutManager as LinearLayoutManager
+                val lastVisible = lm.findLastVisibleItemPosition()
+                val totalItems  = lm.itemCount
+                if (lastVisible >= totalItems - 3 && viewModel.canLoadMore()) {
+                    loadPage(viewModel.nextPage())
+                }
+            }
+        })
     }
 
     private fun setupSearch() {
@@ -110,34 +129,52 @@ class TransactionReportActivity : BaseActivity() {
         filterHelper.setup()
     }
 
-    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { callReport(null, null, null, null) }
-    //  once the no-internet placeholder design is finalised.
-    private fun callReport(
-        fromDate: String?,
-        toDate: String?,
-        status: String?,
-        consumerNo: String?
-    ) {
-        viewModel.getTransactionReport(
-            fromDate   = fromDate,
-            toDate     = toDate,
-            status     = status,
-            consumerNo = consumerNo,
-            onLoading  = { showShimmer(true) },
+    // ── Data Loading ──────────────────────────────────────────────────────────
+
+    private fun callReport(fromDate: String?, toDate: String?, status: String?, consumerNo: String?) {
+        filterFromDate   = fromDate
+        filterToDate     = toDate
+        filterStatus     = status
+        filterConsumerNo = consumerNo
+        loadPage(1)
+    }
+
+    private fun loadPage(page: Int) {
+        viewModel.loadReport(
+            fromDate   = filterFromDate,
+            toDate     = filterToDate,
+            status     = filterStatus,
+            consumerNo = filterConsumerNo,
+            page       = page,
+            onLoading  = {
+                if (page == 1) showShimmer(true) else showFooterLoader(true)
+            },
             onSuccess  = { list ->
-                showShimmer(false)
-                mAllList.clear()
-                mAllList.addAll(list)
-                filterList(binding.etSearch.text?.toString()?.trim() ?: "")
+                if (page == 1) {
+                    showShimmer(false)
+                    mAllList.clear()
+                    mAllList.addAll(list)
+                    filterList(currentQuery())
+                } else {
+                    showFooterLoader(false)
+                    mAllList.addAll(list)
+                    appendToDisplayList(list)
+                }
             },
             onError    = { msg ->
-                showShimmer(false)
-                mAllList.clear()
-                filterList(binding.etSearch.text?.toString()?.trim() ?: "")
+                if (page == 1) {
+                    showShimmer(false)
+                    mAllList.clear()
+                    filterList(currentQuery())
+                } else {
+                    showFooterLoader(false)
+                }
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )
     }
+
+    // ── UI Helpers ────────────────────────────────────────────────────────────
 
     private fun showShimmer(show: Boolean) {
         if (show) {
@@ -150,6 +187,10 @@ class TransactionReportActivity : BaseActivity() {
             binding.shimmerLayout.visibility  = View.GONE
             binding.rvTransactions.visibility = View.VISIBLE
         }
+    }
+
+    private fun showFooterLoader(show: Boolean) {
+        binding.pbLoadMore.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun filterList(query: String) {
@@ -167,14 +208,34 @@ class TransactionReportActivity : BaseActivity() {
         binding.tvEmpty.visibility = if (mDisplayList.isEmpty()) View.VISIBLE else View.GONE
     }
 
+    private fun appendToDisplayList(newItems: ArrayList<TransactionItem>) {
+        val query       = currentQuery()
+        val insertStart = mDisplayList.size
+        val toAdd: List<TransactionItem> = if (query.isEmpty()) {
+            newItems
+        } else {
+            val lower = query.lowercase()
+            newItems.filter {
+                it.mobileNumber.lowercase().contains(lower) ||
+                        it.transactionId.lowercase().contains(lower)
+            }
+        }
+        if (toAdd.isNotEmpty()) {
+            mDisplayList.addAll(toAdd)
+            transactionAdp.notifyItemRangeInserted(insertStart, toAdd.size)
+        }
+        binding.tvEmpty.visibility = if (mDisplayList.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun currentQuery() = binding.etSearch.text?.toString()?.trim() ?: ""
+
+    // ── Navigation ────────────────────────────────────────────────────────────
+
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (filterHelper.isVisible()) {
-                    filterHelper.hide()
-                } else {
-                    finish()
-                }
+                if (filterHelper.isVisible()) filterHelper.hide()
+                else finish()
             }
         })
     }

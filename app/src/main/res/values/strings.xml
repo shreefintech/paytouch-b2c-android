@@ -229,6 +229,10 @@
     <string name="hintEnterUserId">Enter User Id</string>
     <string name="textStatus">Status</string>
     <string name="hintStatus">Select Status</string>
+    <string name="filterStatusAll">All</string>
+    <string name="filterStatusSuccess">Success</string>
+    <string name="filterStatusFailed">Failed</string>
+    <string name="filterStatusPending">Pending</string>
     <string name="textApply">Apply</string>
     <string name="textReset">Reset</string>
     <string name="titleFilterTransactions">Filter Transactions</string>

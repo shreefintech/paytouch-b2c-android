@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.electricity.transactions
+package com.shreefintech.paytouchconsumer.transactions
 
 import android.content.Context
 import android.content.Intent
@@ -14,8 +14,8 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
-import com.shreefintech.paytouchconsumer.electricity.model.TransactionItem
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 class TransactionDetailActivity : BaseActivity() {
@@ -71,7 +71,7 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvUsername.text      = getString(R.string.labelUsernameFmt, item.username)
         binding.tvInfoAmount.text    = item.amount
         binding.tvStatus.text        = item.status
-        binding.tvDate.text          = item.date
+        binding.tvDate.text          = formatDate(item.date)
         binding.tvPaymentAmount.text = item.amount
         binding.tvPlatformFee.text   = item.platformFee
         binding.tvTotalPayable.text  = item.totalPayable
@@ -86,6 +86,15 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvStatus.setTextColor(ContextCompat.getColor(mActivity, textColor))
     }
 
+    private fun formatDate(raw: String?): String {
+        if (raw.isNullOrBlank()) return "--"
+        return try {
+            val parts = raw.substringBefore("T").split("-")
+            "${parts[2]}/${parts[1]}/${parts[0]}"
+        } catch (e: Exception) {
+            raw
+        }
+    }
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {

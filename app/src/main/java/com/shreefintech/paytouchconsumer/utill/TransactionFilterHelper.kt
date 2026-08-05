@@ -4,12 +4,13 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.card.MaterialCardView
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.SheetFilterBinding
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
-import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import java.util.Calendar
 
 class TransactionFilterHelper(
@@ -26,8 +27,12 @@ class TransactionFilterHelper(
     private var selectedToDate: String? = null
     private var selectedStatus: String? = null
 
+    private var appliedFromDate: String? = null
+    private var appliedToDate: String? = null
+    private var appliedStatus: String? = null
+    private var appliedConsumerNo: String? = null
+
     companion object {
-        private const val STATUS_ALL = "All Status"
         private const val STATUS_SUCCESS = "Success"
         private const val STATUS_FAILED = "Failed"
         private const val STATUS_PENDING = "Pending"
@@ -54,10 +59,6 @@ class TransactionFilterHelper(
             }
         })
 
-        // bgOverlay is purely a visual dim layer. Dismissal is handled exclusively via the
-        // close button (ivClose) and the reset button so the user must make an explicit choice
-        // rather than accidentally closing the sheet by tapping outside.
-
         sheetBinding.ivClose.setOnClickListener {
             hide()
         }
@@ -82,10 +83,24 @@ class TransactionFilterHelper(
                 maxCal          = Calendar.getInstance()
             ) { date -> selectedToDate = date }
         }
-        sheetBinding.cvSelectEntries.setOnClickListener {
-            Utility.hideKeyboard(activity)
-            showStatusDropdown()
+        sheetBinding.cvStatusAll.setOnClickListener {
+            selectedStatus = null
+            updateStatusTabs()
         }
+        sheetBinding.cvStatusSuccess.setOnClickListener {
+            selectedStatus = STATUS_SUCCESS
+            updateStatusTabs()
+        }
+        sheetBinding.cvStatusFailed.setOnClickListener {
+            selectedStatus = STATUS_FAILED
+            updateStatusTabs()
+        }
+        sheetBinding.cvStatusPending.setOnClickListener {
+            selectedStatus = STATUS_PENDING
+            updateStatusTabs()
+        }
+
+        updateStatusTabs()
 
         sheetBinding.btnReset.setOnClickListener {
             clearFilter()
@@ -98,6 +113,13 @@ class TransactionFilterHelper(
     // ─── Show / Hide ─────────────────────────────────────────────────────────
 
     fun show() {
+        selectedFromDate = appliedFromDate
+        selectedToDate   = appliedToDate
+        selectedStatus   = appliedStatus
+        sheetBinding.tvFromDate.text = appliedFromDate ?: ""
+        sheetBinding.tvToDate.text   = appliedToDate ?: ""
+        sheetBinding.etSearch.setText(appliedConsumerNo ?: "")
+        updateStatusTabs()
         bgOverlay.visible()
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
@@ -149,17 +171,24 @@ class TransactionFilterHelper(
         }
     }
 
-    // ─── Status dropdown ─────────────────────────────────────────────────────
+    // ─── Status tabs ─────────────────────────────────────────────────────────
 
-    private fun showStatusDropdown() {
-        CustomDropdown.showDropdown(
-            activity = activity,
-            anchorView = sheetBinding.cvSelectEntries,
-            arrowView = sheetBinding.ivEntriesArrow,
-            textView = sheetBinding.tvEntries,
-            items = listOf(STATUS_ALL, STATUS_SUCCESS, STATUS_FAILED, STATUS_PENDING)
-        ) { selected, _ ->
-            selectedStatus = if (selected == STATUS_ALL) null else selected
+    private fun updateStatusTabs() {
+        data class TabEntry(val card: MaterialCardView, val text: androidx.appcompat.widget.AppCompatTextView, val status: String?)
+        listOf(
+            TabEntry(sheetBinding.cvStatusAll,     sheetBinding.tvStatusAll,     null),
+            TabEntry(sheetBinding.cvStatusSuccess, sheetBinding.tvStatusSuccess, STATUS_SUCCESS),
+            TabEntry(sheetBinding.cvStatusFailed,  sheetBinding.tvStatusFailed,  STATUS_FAILED),
+            TabEntry(sheetBinding.cvStatusPending, sheetBinding.tvStatusPending, STATUS_PENDING),
+        ).forEach { tab ->
+            val selected = selectedStatus == tab.status
+            tab.card.setCardBackgroundColor(
+                ContextCompat.getColor(activity, if (selected) R.color.primary else R.color.filter_status_bg)
+            )
+            tab.card.strokeColor = ContextCompat.getColor(activity, R.color.primary)
+            tab.text.setTextColor(
+                ContextCompat.getColor(activity, if (selected) R.color.white else R.color.primary)
+            )
         }
     }
 
@@ -176,23 +205,31 @@ class TransactionFilterHelper(
             return
         }
 
+        appliedFromDate   = selectedFromDate
+        appliedToDate     = selectedToDate
+        appliedStatus     = selectedStatus
+        appliedConsumerNo = consumerNo.ifEmpty { null }
         onApply(
             selectedFromDate,
             selectedToDate,
             selectedStatus,
-            consumerNo.ifEmpty { null }
+            appliedConsumerNo
         )
         hide()
     }
 
     private fun clearFilter() {
-        selectedFromDate = null
-        selectedToDate = null
-        selectedStatus = null
+        selectedFromDate  = null
+        selectedToDate    = null
+        selectedStatus    = null
+        appliedFromDate   = null
+        appliedToDate     = null
+        appliedStatus     = null
+        appliedConsumerNo = null
         sheetBinding.tvFromDate.text = ""
-        sheetBinding.tvToDate.text = ""
-        sheetBinding.tvEntries.text = ""
+        sheetBinding.tvToDate.text   = ""
         sheetBinding.etSearch.setText("")
+        updateStatusTabs()
         onClear()
         hide()
     }

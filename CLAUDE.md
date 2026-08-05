@@ -84,6 +84,7 @@ com.shreefintech.paytouchconsumer/
 8. Adapters must not contain business logic or network calls.
 9. ViewModels must not store Activity/Context references.
 10. **All API endpoints must be declared in `ApiService` or `ApiAdminService`** — never construct `OkHttpClient` or `Retrofit` directly inside a ViewModel or Activity. Each backend URL has exactly one registered client: `ApiClient` for `paytouch.in`, `ApiAdminClient` for `admin.paytouch.in`. Add a new endpoint to the appropriate service interface; do not bypass it with a raw HTTP call.
+11. **`mapToTransactionItem()` must use `item.id?.toString() ?: "--"` for `userId`** — never use `(index + 1).toString()` or any iteration index. The API response DTO always carries an `id` field; using the loop index produces duplicate `userId` values on paginated appends (page 2+ resets index to 0) and loses the server-side identity of the record.
 
 ---
 
@@ -295,6 +296,44 @@ binding.cardGas -> {
     ElectricityActivity.start(mActivity) // never do this for a different module
 }
 ```
+
+---
+
+## Transaction Screens — Shared Structure Across All Modules
+
+Every bill payment module (Electricity, Gas, Water, DTH, Mobile, etc.) has three transaction screens: **Status**, **Report**, and **Detail**. The UI is identical across all modules — only the API endpoint and category icon differ.
+
+### What is shared (never duplicate)
+
+| Component | Location | Shared By |
+|---|---|---|
+| `TransactionAdp` | `adapter/TransactionAdp.kt` | All modules — category-agnostic, icon driven by `item.categoryIconRes` |
+| `TransactionItem` | `transactions/model/TransactionItem.kt` | All modules — UI model, no API fields |
+| `TransactionDetailActivity` | `transactions/TransactionDetailActivity.kt` | All modules — reused as-is |
+| `TransactionFilterHelper` | `utill/TransactionFilterHelper.kt` | All report screens |
+| `item_transaction.xml` | `res/layout/item_transaction.xml` | All modules via `TransactionAdp` |
+| `lyt_shimmer_transaction_item.xml` | `res/layout/` | All transaction activity layouts |
+| `sheet_filter.xml` | `res/layout/sheet_filter.xml` | All report screens |
+
+### What is created per module
+
+Each new module (e.g. Gas) needs only:
+- `{Category}TransactionStatusActivity` + `activity_{category}_transaction_status.xml`
+- `{Category}TransactionReportActivity` + `activity_{category}_transaction_report.xml`
+- `{Category}TransactionStatusViewModel` — calls `api/{category}/transaction-status`
+- `{Category}TransactionReportViewModel` — calls `api/{category}/payment-report`
+- `{Category}TransactionReportDataItem` — response DTO
+- `{Category}TransactionStatusRequest` + `{Category}TransactionReportRequest` — request bodies
+- 2 `ApiService` entries
+
+### Rules
+
+- **Never create a new `TransactionDetailActivity` per module** — all modules share the one in `transactions/`.
+- **Never create a new adapter or item layout per module** — `TransactionAdp` and `item_transaction.xml` are category-agnostic.
+- **`TransactionDetailActivity` has no SMS Receipt button** — it was removed. Do not add it back.
+- The activity layouts for status and report are **copied from the electricity versions** with only the title string changed. Do not redesign them.
+- The category icon is set in the ViewModel's `mapToTransactionItem()` — pass `R.drawable.ic_{category}` there.
+- Electricity is the canonical reference — when implementing any module's transaction screens, mirror `ElectricityTransactionStatusActivity` and `TransactionReportActivity` exactly.
 
 ---
 
