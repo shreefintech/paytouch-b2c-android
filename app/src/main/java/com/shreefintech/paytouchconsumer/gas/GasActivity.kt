@@ -23,10 +23,7 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityGasBinding
-import com.shreefintech.paytouchconsumer.electricity.transactions.ElectricityTransactionStatusActivity
-import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
-import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.gas.viewmodel.GasViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasBillItem
@@ -401,8 +398,7 @@ class GasActivity : BaseActivity() {
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-585): Replace with GasRecentTransactionActivity once created — current screen calls electricity operators API
-                    startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
+                    // TODO(PAYTOUCH-585): Replace with GasRecentTransactionActivity once created
                 }
             }
         }

@@ -20,6 +20,10 @@ import retrofit2.Response
 
 class GasViewModel(application: Application) : BaseBillViewModel(application) {
 
+    companion object {
+        private const val CIRCLE_ID_DEFAULT = "0"
+    }
+
     // ── Public API ────────────────────────────────────────────────────────────
 
     fun loadOperators(
@@ -72,7 +76,7 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
             GasFetchBillRequest(
                 consumerNumber = consumerNumber,
                 operatorId = operatorId,
-                circleId = "0"
+                circleId = CIRCLE_ID_DEFAULT
             )
         ).enqueue(object : Callback<General<List<GasBillItem>>> {
             override fun onResponse(
@@ -142,7 +146,7 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
             GasProcessPaymentRequest(
                 consumerNumber = consumerNumber,
                 operatorId = operatorId,
-                circleId = "0",
+                circleId = CIRCLE_ID_DEFAULT,
                 amount = amount,
                 platformFee = fee,
                 totalPayable = total,

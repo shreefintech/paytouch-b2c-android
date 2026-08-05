@@ -59,6 +59,7 @@ com.shreefintech.paytouchconsumer/
 ├── onboarding/     # KYC upload (UploadKycActivity), Virtual Account creation (CreateVirtualAccountActivity)
 ├── home/           # Home/Dashboard screen (HomeActivity — currently at root level, will move here)
 ├── electricity/    # Electricity bill payment screen
+├── gas/            # Gas bill payment screen
 ├── enums/          # Project-wide enums (LoginMode, etc.)
 ├── glass/          # LiquidGlassEffect custom blur UI components
 ├── retrofit/       # All networking (ApiService, ApiClient, ApiHelper, models) — wiring pending
