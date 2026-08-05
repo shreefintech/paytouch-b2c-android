@@ -72,7 +72,7 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
             GasFetchBillRequest(
                 consumerNumber = consumerNumber,
                 operatorId = operatorId,
-                circleId = "0"
+                circleId = Constant.GAS_CIRCLE_ID
             )
         ).enqueue(object : Callback<General<List<GasBillItem>>> {
             override fun onResponse(
@@ -141,7 +141,7 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
             GasProcessPaymentRequest(
                 connectionNumber = consumerNumber,
                 operatorId = operatorId,
-                circleId = "0",
+                circleId = Constant.GAS_CIRCLE_ID,
                 amount = amount,
                 platformFee = fee,
                 totalPayable = total
