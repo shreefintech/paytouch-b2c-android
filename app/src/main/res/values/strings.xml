@@ -176,6 +176,24 @@
     <!-- Gas screen -->
     <string name="titleGasBill">Gas Bill</string>
 
+    <!-- Mobile Prepaid screen -->
+    <string name="titleMobilePrepaid">Prepaid Recharge</string>
+    <string name="labelMobileNumber">Mobile Number</string>
+    <string name="hintMobileNumber">Enter Mobile Number</string>
+    <string name="msgMobileNumberEmpty">Please enter mobile number</string>
+    <string name="msgMobileNumberInvalid">Please enter a valid 10-digit mobile number</string>
+    <string name="labelSelectState">Select State</string>
+    <string name="btnBrowsePlan">Browse Plan</string>
+    <string name="btnChangePlan">Change Plan</string>
+    <string name="titleSelectPlan">Select a Plan</string>
+    <string name="msgNoPlansAvailable">No plans available for this operator</string>
+    <string name="titlePrepaidPlanSelected">Plan Selected</string>
+    <string name="labelValidity">Validity</string>
+    <string name="labelDataBenefit">Data</string>
+    <string name="labelTalktime">Talktime</string>
+    <string name="fmtPlanTalktimeData">Talktime: %1$s    Data: %2$s</string>
+    <string name="msgPrepaidPaymentSuccess">Recharge successful for %1$s</string>
+
     <!-- Electricity screen -->
     <string name="titleElectricityBill">Electricity Bill</string>
     <string name="categoryElectricityBill">Electricity Bill</string>
