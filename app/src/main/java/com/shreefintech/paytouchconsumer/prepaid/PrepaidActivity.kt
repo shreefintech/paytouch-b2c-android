@@ -399,12 +399,11 @@ class PrepaidActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-54): replace with prepaid-specific TransactionReportActivity once implemented
-                    startActivity(Intent(mActivity, TransactionReportActivity::class.java))
+                    // TODO(B2C-54): Replace with PrepaidTransactionReportActivity once created
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-54): replace with prepaid-specific RecentTransactionActivity once implemented
+                    // TODO(B2C-54): Replace with PrepaidRecentTransactionActivity once created
                     startActivity(Intent(mActivity, RecentTransactionActivity::class.java))
                 }
                 binding.flCompanyAnchor -> {
