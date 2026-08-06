@@ -4,9 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" />
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgressRefresh"
+            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -462,7 +466,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:visibility="visible">
+                            android:visibility="gone">
 
                             <!-- Referral code card -->
 
@@ -489,7 +493,7 @@
                                         android:gravity="center"
                                         android:includeFontPadding="false"
                                         android:letterSpacing="0.2"
-                                        android:text="PBWD9FHB"
+                                        tools:text="DCP9FHB"
                                         android:layout_marginStart="@dimen/margin_large"
                                         android:textColor="@color/white"
                                         android:textSize="@dimen/text_size_18" />
@@ -1015,21 +1019,36 @@
                         android:gravity="center"
                         android:orientation="horizontal">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_refresh"
-                            android:tint="@color/white" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/margin_small"
-                            android:fontFamily="@font/proza_libre_semi_bold"
-                            android:includeFontPadding="false"
-                            android:text="@string/btnRefresh"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/text_size_16" />
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:visibility="@{showProgressRefresh ? View.GONE : View.VISIBLE}">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_refresh"
+                                android:tint="@color/white" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:fontFamily="@font/proza_libre_semi_bold"
+                                android:includeFontPadding="false"
+                                android:text="@string/btnRefresh"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/text_size_16" />
+                        </LinearLayout>
+
+                        <ProgressBar
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:indeterminateTint="@color/white"
+                            android:visibility="@{showProgressRefresh ? View.VISIBLE : View.GONE}" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
