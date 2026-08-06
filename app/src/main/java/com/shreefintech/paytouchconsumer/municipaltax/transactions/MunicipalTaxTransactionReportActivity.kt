@@ -1,6 +1,5 @@
 ﻿package com.shreefintech.paytouchconsumer.municipaltax.transactions
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher

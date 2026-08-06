@@ -1,6 +1,5 @@
 ﻿package com.shreefintech.paytouchconsumer.municipaltax.transactions
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup

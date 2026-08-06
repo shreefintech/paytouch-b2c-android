@@ -1,7 +1,6 @@
 ﻿package com.shreefintech.paytouchconsumer.adapter
 
 import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -42,7 +41,7 @@ class DthPlanAdp(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         holder.binding.apply {
-            tvPlanAmount.text = Utility.formatAmount((item.amount ?: 0).toDouble())
+            tvPlanAmount.text = Utility.formatAmount(item.amount?.toString())
             tvPlanValidity.text = item.validity ?: "--"
             tvPlanDescription.text = item.description ?: "--"
             tvPlanFooter.text = mContext.getString(
@@ -67,6 +66,6 @@ class DthPlanAdp(
 
     private fun formatTalktime(talktime: Double?): String {
         if (talktime == null || talktime < 0) return "-"
-        return Utility.formatAmount(talktime)
+        return Utility.formatAmount(talktime.toString())
     }
 }
