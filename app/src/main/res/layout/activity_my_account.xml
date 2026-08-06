@@ -1,0 +1,1040 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg"
+        tools:context=".myaccount.MyAccountActivity">
+
+        <!-- Toolbar -->
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <!-- Title row -->
+        <LinearLayout
+            android:id="@+id/llTitleRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:text="@string/titleMyAccount"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_18" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/img_bharat_connect" />
+        </LinearLayout>
+
+        <!-- Tab segment -->
+        <LinearLayout
+            android:id="@+id/llTabRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llTitleRow">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorPrimary"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="3dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cvTabAccountInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClickListener="@{onClickListener}"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvTabAccountInfo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?selectableItemBackground"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:paddingStart="14dp"
+                            android:paddingTop="6dp"
+                            android:paddingEnd="14dp"
+                            android:paddingBottom="6dp"
+                            android:text="@string/tabAccountInfo"
+                            android:textSize="@dimen/text_size_13" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cvTabReferEarn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="2dp"
+                        android:onClickListener="@{onClickListener}"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvTabReferEarn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?selectableItemBackground"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:paddingStart="14dp"
+                            android:paddingTop="6dp"
+                            android:paddingEnd="14dp"
+                            android:paddingBottom="6dp"
+                            android:text="@string/tabReferEarn"
+                            android:textSize="@dimen/text_size_13" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- Glass card: fills rest of screen -->
+        <FrameLayout
+            android:id="@+id/flCard"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:layout_marginBottom="@dimen/margin_extra_large"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llTabRow">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/margin_large"
+                        android:paddingTop="@dimen/margin_extra_large"
+                        android:paddingBottom="@dimen/margin_medium">
+
+                        <!-- ════════ ACCOUNT INFO SHIMMER ════════ -->
+                        <com.facebook.shimmer.ShimmerFrameLayout
+                            android:id="@+id/shimmerAccountInfo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone">
+
+                            <include layout="@layout/lyt_shimmer_account_info" />
+                        </com.facebook.shimmer.ShimmerFrameLayout>
+
+                        <!-- ════════ ACCOUNT INFO TAB ════════ -->
+                        <LinearLayout
+                            android:id="@+id/llAccountInfoContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+
+                            <!-- Expand chevron (decorative, right-aligned) -->
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="end"
+                                android:src="@drawable/ic_down_arrow"
+                                android:tint="@color/orange" />
+
+                            <!-- Member ID | Member No -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_medium"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="@dimen/margin_extra_small"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        style="@style/FieldLabel"
+                                        android:text="@string/labelMemberId" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvMemberId"
+                                        style="@style/FieldValue" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_extra_small"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        style="@style/FieldLabel"
+                                        android:text="@string/labelMemberNo" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvMemberNo"
+                                        style="@style/FieldValue" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Member Code | Member Name -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="@dimen/margin_extra_small"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        style="@style/FieldLabel"
+                                        android:text="@string/labelMemberCode" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvMemberCode"
+                                        style="@style/FieldValue" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_extra_small"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        style="@style/FieldLabel"
+                                        android:text="@string/labelMemberName" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvMemberName"
+                                        style="@style/FieldValue" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Mobile No | Email -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="@dimen/margin_extra_small"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        style="@style/FieldLabel"
+                                        android:text="@string/labelMobileNo" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvMobileNo"
+                                        style="@style/FieldValue" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_extra_small"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        style="@style/FieldLabel"
+                                        android:text="@string/labelEmail" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvEmail"
+                                        style="@style/FieldValue" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Status | City -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="@dimen/margin_extra_small"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        style="@style/FieldLabel"
+                                        android:text="@string/labelStatus" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvStatus"
+                                        style="@style/FieldValue" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_extra_small"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        style="@style/FieldLabel"
+                                        android:text="@string/labelCity" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvCity"
+                                        style="@style/FieldValue" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Home Address (full width) -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    style="@style/FieldLabel"
+                                    android:text="@string/labelHomeAddress" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvHomeAddress"
+                                    style="@style/FieldValue"
+                                    android:minLines="2" />
+                            </LinearLayout>
+
+                            <!-- Registration Date | Activation Date -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="@dimen/margin_extra_small"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        style="@style/FieldLabel"
+                                        android:text="@string/labelRegistrationDate" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvRegistrationDate"
+                                        style="@style/FieldValue" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_extra_small"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        style="@style/FieldLabel"
+                                        android:text="@string/labelActivationDate" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvActivationDate"
+                                        style="@style/FieldValue" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Balance (full width) -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    style="@style/FieldLabel"
+                                    android:text="@string/labelBalance" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvBalance"
+                                    style="@style/FieldValue" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvBalanceWords"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/hint_color"
+                                    android:textSize="@dimen/text_size_12"
+                                    android:visibility="gone" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <!-- ════════ REFER & EARN SHIMMER ════════ -->
+                        <com.facebook.shimmer.ShimmerFrameLayout
+                            android:id="@+id/shimmerReferEarn"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone">
+
+                            <include layout="@layout/lyt_shimmer_refer_earn" />
+                        </com.facebook.shimmer.ShimmerFrameLayout>
+
+                        <!-- ════════ REFER & EARN TAB ════════ -->
+                        <LinearLayout
+                            android:id="@+id/llReferEarnContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="visible">
+
+                            <!-- Referral code card -->
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="135dp"
+                                android:background="@drawable/img_refer_code_bg">
+
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_referral_code"
+                                    android:gravity="center"
+                                    android:layout_gravity="center"
+                                    android:orientation="horizontal"
+                                    android:padding="@dimen/margin_extra_large">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvReferralCode"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_bold"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:letterSpacing="0.2"
+                                        android:text="PBWD9FHB"
+                                        android:layout_marginStart="@dimen/margin_large"
+                                        android:textColor="@color/white"
+                                        android:textSize="@dimen/text_size_18" />
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivCopyReferralCode"
+                                        android:layout_width="28dp"
+                                        android:layout_height="28dp"
+                                        android:background="?selectableItemBackgroundBorderless"
+                                        android:onClickListener="@{onClickListener}"
+                                        android:padding="4dp"
+                                        android:layout_marginStart="@dimen/margin_extra_large"
+                                        android:layout_marginEnd="@dimen/margin_large"
+                                        android:src="@drawable/ic_copy"
+                                        android:tint="@color/white" />
+                                </LinearLayout>
+
+                            </FrameLayout>
+
+                            <!-- Earnings Row 1: Green -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_medium"
+                                app:cardBackgroundColor="@color/toast_bg_success"
+                                app:cardCornerRadius="@dimen/card_corner_radius"
+                                android:visibility="gone"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="@dimen/margin_medium"
+                                    android:paddingVertical="@dimen/margin_small_medium">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelTotalEarnings"
+                                            android:textColor="@color/toast_text_success"
+                                            android:textSize="@dimen/text_size_13" />
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:src="@drawable/ic_ruppes"
+                                            android:tint="@color/toast_text_success" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_bold"
+                                            android:includeFontPadding="false"
+                                            android:text="₹0.00"
+                                            android:textColor="@color/toast_text_success"
+                                            android:textSize="@dimen/text_size_14" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="@dimen/margin_small"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:gravity="end"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/msgEarnPerReferral"
+                                            android:textColor="@color/toast_text_success"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <!-- Earnings Row 2: Teal -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                app:cardBackgroundColor="@color/earn_row_teal_bg"
+                                app:cardCornerRadius="@dimen/card_corner_radius"
+                                android:visibility="gone"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="@dimen/margin_medium"
+                                    android:paddingVertical="@dimen/margin_small_medium">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelTotalEarnings"
+                                            android:textColor="@color/earn_row_teal_text"
+                                            android:textSize="@dimen/text_size_13" />
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:src="@drawable/ic_refresh"
+                                            android:tint="@color/earn_row_teal_text" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_bold"
+                                            android:includeFontPadding="false"
+                                            android:text="₹0.00"
+                                            android:textColor="@color/earn_row_teal_text"
+                                            android:textSize="@dimen/text_size_14" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="@dimen/margin_small"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:gravity="end"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/msgEarnPerReferral"
+                                            android:textColor="@color/earn_row_teal_text"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <!-- Earnings Row 3: Orange -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                app:cardBackgroundColor="@color/toast_bg_warning"
+                                app:cardCornerRadius="@dimen/card_corner_radius"
+                                android:visibility="gone"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="@dimen/margin_medium"
+                                    android:paddingVertical="@dimen/margin_small_medium">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelTotalEarnings"
+                                            android:textColor="@color/toast_text_warning"
+                                            android:textSize="@dimen/text_size_13" />
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:src="@drawable/ic_ruppes"
+                                            android:tint="@color/toast_text_warning" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_bold"
+                                            android:includeFontPadding="false"
+                                            android:text="₹0.00"
+                                            android:textColor="@color/toast_text_warning"
+                                            android:textSize="@dimen/text_size_14" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="@dimen/margin_small"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:gravity="end"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/msgEarnPerReferral"
+                                            android:textColor="@color/toast_text_warning"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <!-- Info row -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_extra_large"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    app:cardBackgroundColor="@color/primary"
+                                    app:cardCornerRadius="9dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:fontFamily="@font/proza_libre_bold"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/latterI"
+                                        android:textColor="@color/white"
+                                        android:textSize="@dimen/text_size_10" />
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_small"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/msgShareReferralInfo"
+                                    android:textColor="@color/hint_color"
+                                    android:textSize="@dimen/text_size_11" />
+                            </LinearLayout>
+
+                            <!-- Invite Friends card -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_medium"
+                                app:cardBackgroundColor="@color/white"
+                                app:cardCornerRadius="@dimen/card_corner_radius"
+                                app:cardElevation="0dp"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_bold"
+                                        android:includeFontPadding="false"
+                                        android:paddingHorizontal="@dimen/margin_medium"
+                                        android:paddingVertical="@dimen/margin_small"
+                                        android:text="@string/labelInviteFriends"
+                                        android:textColor="@color/white"
+                                        android:background="?attr/colorPrimary"
+                                        android:textSize="@dimen/text_size_14" />
+
+                                    <!-- Referral link row -->
+                                    <com.google.android.material.card.MaterialCardView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="@dimen/input_height"
+                                        android:layout_marginTop="@dimen/margin_extra_large"
+                                        app:cardBackgroundColor="@android:color/transparent"
+                                        app:cardCornerRadius="@dimen/card_corner_radius"
+                                        app:cardElevation="0dp"
+                                        android:layout_marginHorizontal="@dimen/margin_medium"
+                                        app:strokeColor="?attr/colorPrimary"
+                                        app:strokeWidth="1dp">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:id="@+id/tvReferralLink"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:ellipsize="end"
+                                                android:fontFamily="@font/proza_libre_medium"
+                                                android:includeFontPadding="false"
+                                                android:paddingStart="@dimen/margin_small_medium"
+                                                android:singleLine="true"
+                                                android:text="--"
+                                                android:textColor="@color/hint_color"
+                                                android:textSize="@dimen/text_size_11" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/cvCopyReferralLink"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="match_parent"
+                                                android:onClickListener="@{onClickListener}"
+                                                app:cardBackgroundColor="@color/primary"
+                                                app:cardCornerRadius="0dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeWidth="0dp">
+
+                                                <LinearLayout
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="match_parent"
+                                                    android:background="?selectableItemBackground"
+                                                    android:gravity="center"
+                                                    android:paddingHorizontal="@dimen/margin_small"
+                                                    android:orientation="horizontal">
+
+                                                    <androidx.appcompat.widget.AppCompatImageView
+                                                        android:layout_width="18dp"
+                                                        android:layout_height="18dp"
+                                                        android:layout_marginEnd="@dimen/margin_small"
+                                                        android:src="@drawable/ic_copy"
+                                                        android:tint="@color/white" />
+
+                                                    <androidx.appcompat.widget.AppCompatTextView
+                                                        android:layout_width="wrap_content"
+                                                        android:layout_height="match_parent"
+                                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                                        android:gravity="center"
+                                                        android:includeFontPadding="false"
+                                                        android:text="@string/btnCopy"
+                                                        android:textColor="@color/white"
+                                                        android:textSize="@dimen/text_size_13" />
+
+                                                </LinearLayout>
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+                                    </com.google.android.material.card.MaterialCardView>
+
+                                    <!-- Share buttons row -->
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginVertical="@dimen/margin_medium"
+                                        android:layout_marginHorizontal="@dimen/margin_medium"
+                                        android:orientation="horizontal">
+
+                                        <com.google.android.material.card.MaterialCardView
+                                            android:id="@+id/cvShareWhatsapp"
+                                            android:layout_width="0dp"
+                                            android:layout_height="@dimen/share_btn_height"
+                                            android:layout_marginEnd="@dimen/margin_extra_small"
+                                            android:layout_weight="1"
+                                            android:onClickListener="@{onClickListener}"
+                                            app:cardCornerRadius="@dimen/card_corner_radius"
+                                            app:cardElevation="0dp"
+                                            app:cardBackgroundColor="@color/white"
+                                            app:strokeColor="@color/whatsapp_green"
+                                            app:strokeWidth="1dp">
+
+                                            <LinearLayout
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent"
+                                                android:background="?selectableItemBackground"
+                                                android:gravity="center"
+                                                android:orientation="horizontal">
+
+                                                <androidx.appcompat.widget.AppCompatImageView
+                                                    android:layout_width="14dp"
+                                                    android:layout_height="14dp"
+                                                    android:src="@drawable/ic_whatsapp" />
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginStart="4dp"
+                                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:text="@string/btnWhatsapp"
+                                                    android:textColor="@color/black"
+                                                    android:textSize="@dimen/text_size_11" />
+                                            </LinearLayout>
+                                        </com.google.android.material.card.MaterialCardView>
+
+                                        <com.google.android.material.card.MaterialCardView
+                                            android:id="@+id/cvShareFacebook"
+                                            android:layout_width="0dp"
+                                            android:layout_height="@dimen/share_btn_height"
+                                            android:layout_marginStart="@dimen/margin_extra_small"
+                                            android:layout_marginEnd="@dimen/margin_extra_small"
+                                            android:layout_weight="1"
+                                            android:onClickListener="@{onClickListener}"
+                                            app:cardCornerRadius="@dimen/card_corner_radius"
+                                            app:cardElevation="0dp"
+                                            app:cardBackgroundColor="@color/white"
+                                            app:strokeColor="@color/facebook_blue"
+                                            app:strokeWidth="1dp">
+
+                                            <LinearLayout
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent"
+                                                android:background="?selectableItemBackground"
+                                                android:gravity="center"
+                                                android:orientation="horizontal">
+
+                                                <androidx.appcompat.widget.AppCompatImageView
+                                                    android:layout_width="14dp"
+                                                    android:layout_height="14dp"
+                                                    android:src="@drawable/ic_facebook" />
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginStart="4dp"
+                                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:text="@string/btnFacebook"
+                                                    android:textColor="@color/black"
+                                                    android:textSize="@dimen/text_size_11" />
+                                            </LinearLayout>
+                                        </com.google.android.material.card.MaterialCardView>
+
+                                        <com.google.android.material.card.MaterialCardView
+                                            android:id="@+id/cvShareEmail"
+                                            android:layout_width="0dp"
+                                            android:layout_height="@dimen/share_btn_height"
+                                            android:layout_marginStart="@dimen/margin_extra_small"
+                                            android:layout_weight="1"
+                                            android:onClickListener="@{onClickListener}"
+                                            app:cardCornerRadius="@dimen/card_corner_radius"
+                                            app:cardElevation="0dp"
+                                            app:cardBackgroundColor="@color/white"
+                                            app:strokeColor="@color/email_orange"
+                                            app:strokeWidth="1dp">
+
+                                            <LinearLayout
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent"
+                                                android:background="?selectableItemBackground"
+                                                android:gravity="center"
+                                                android:orientation="horizontal">
+
+                                                <androidx.appcompat.widget.AppCompatImageView
+                                                    android:layout_width="14dp"
+                                                    android:layout_height="14dp"
+                                                    android:src="@drawable/ic_email" />
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_marginStart="4dp"
+                                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:text="@string/btnEmail"
+                                                    android:textColor="@color/black"
+                                                    android:textSize="@dimen/text_size_11" />
+                                            </LinearLayout>
+                                        </com.google.android.material.card.MaterialCardView>
+
+                                    </LinearLayout>
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </ScrollView>
+
+                <!-- Refresh button (Account Info tab only) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvRefresh"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/btn_height"
+                    android:layout_marginStart="@dimen/margin_large"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginEnd="@dimen/margin_large"
+                    android:layout_marginBottom="@dimen/margin_medium"
+                    android:onClickListener="@{onClickListener}"
+                    app:cardBackgroundColor="@color/primary"
+                    app:cardCornerRadius="@dimen/submit_btn_radius"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="?selectableItemBackground"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_refresh"
+                            android:tint="@color/white" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_small"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/btnRefresh"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_16" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
