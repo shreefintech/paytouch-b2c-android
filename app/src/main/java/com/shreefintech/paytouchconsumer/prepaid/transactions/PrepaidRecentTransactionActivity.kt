@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.prepaid.transactions
+﻿package com.shreefintech.paytouchconsumer.prepaid.transactions
 
 import android.content.Context
 import android.content.Intent
@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -49,7 +50,7 @@ class PrepaidRecentTransactionActivity : BaseActivity() {
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion   = 0f,
             blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-            strokeColor  = Color.argb(180, 213, 38, 98),
+            strokeColor  = ContextCompat.getColor(mActivity, R.color.glass_stroke_primary),
             strokeWidth  = 1,
             solidStroke  = true,
         )

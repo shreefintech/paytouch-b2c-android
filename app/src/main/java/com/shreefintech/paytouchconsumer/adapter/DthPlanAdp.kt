@@ -1,9 +1,10 @@
-package com.shreefintech.paytouchconsumer.adapter
+﻿package com.shreefintech.paytouchconsumer.adapter
 
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemPrepaidPlanBinding
@@ -31,7 +32,7 @@ class DthPlanAdp(
             cornerRadius = binding.root.resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion   = 0f,
             blur         = binding.root.resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-            strokeColor  = Color.argb(180, 213, 38, 98),
+            strokeColor  = ContextCompat.getColor(mContext, R.color.glass_stroke_primary),
             strokeWidth  = 1,
             solidStroke  = true,
         )

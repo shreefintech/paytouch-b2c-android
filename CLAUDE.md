@@ -114,6 +114,13 @@ com.shreefintech.paytouchconsumer/
     - `Utility.formatDate(raw)` (default `"dd/MM/yyyy hh:mm a"`) for full datetime fields
     - In `mapToTransactionItem()` pass `item.createdAt ?: "--"` raw — do not pre-format; `TransactionDetailActivity` formats it at display time
 
+18. **Confirmed backend quirks — do NOT "fix" these:**
+
+    | Location | Apparent anomaly | Confirmed behaviour |
+    |---|---|---|
+    | `ApiService.kt` — `getMunicipalTaxTransactionStatus` | Uses `@POST("${AUTH}mobile-recharge/transaction-status")` (not `municipal-taxes/...`) | **Backend-side intentional routing.** The mobile-recharge transaction-status endpoint serves municipal tax queries too. Do not change this URL. |
+    | `MunicipalTaxLatestPaymentDataItem.subService` | `@field:SerializedName("subservice")` has no underscore (unlike every other field) | **Confirmed from API contract.** The backend sends the key as `subservice`, not `sub_service`. Do not rename. |
+
 ---
 
 ## Naming Conventions (quick ref)

@@ -64,7 +64,7 @@ class MunicipalTaxRecentTransactionViewModel(application: Application) : Android
         onSuccess: (List<RecentTransactionItem>) -> Unit,
         onError: (String) -> Unit
     ) {
-        ApiClient.apiService.getMunicipalTaxRecentTransactions(bearerToken(), PAGE_SIZE)
+        ApiClient.apiService.getMunicipalTaxRecentTransactions(bearerToken(), currentPage, PAGE_SIZE)
             .enqueue(object : Callback<MunicipalTaxRecentPageItem> {
                 override fun onResponse(
                     call: Call<MunicipalTaxRecentPageItem>,

@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.transactions
+﻿package com.shreefintech.paytouchconsumer.transactions
 
 import android.content.Context
 import android.content.Intent
@@ -55,7 +55,7 @@ class TransactionDetailActivity : BaseActivity() {
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion   = 0f,
             blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-            strokeColor  = Color.argb(180, 213, 38, 98),
+            strokeColor  = ContextCompat.getColor(mActivity, R.color.glass_stroke_primary),
             strokeWidth  = 1,
             solidStroke  = true,
         )

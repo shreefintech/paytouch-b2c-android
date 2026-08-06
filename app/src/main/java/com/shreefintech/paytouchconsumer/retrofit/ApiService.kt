@@ -462,6 +462,7 @@ interface ApiService {
     @GET("${AUTH}municipal-taxes/recent-transactions")
     fun getMunicipalTaxRecentTransactions(
         @Header("Authorization") authorization: String,
+        @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Call<MunicipalTaxRecentPageItem>
 

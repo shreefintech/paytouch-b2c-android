@@ -292,45 +292,36 @@ class MunicipalTaxActivity : BaseActivity() {
 
     // ── Actions ───────────────────────────────────────────────────────────────
 
-    private fun onFetchBill() {
-        if (selectedOperatorId.isNullOrEmpty()) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
-            return
-        }
+    private fun validateInputs(): Boolean {
         val consumerNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
         if (consumerNumber.isEmpty()) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
-            return
+            return false
         }
         if (consumerNumber.length < 10) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
-            return
+            return false
         }
+        if (selectedOperatorId.isNullOrEmpty()) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
+            return false
+        }
+        return true
+    }
+
+    private fun onFetchBill() {
+        if (!validateInputs()) return
         Utility.hideKeyboard(mActivity)
-        fetchBill(consumerNumber)
+        fetchBill(binding.etConsumerNumber.text?.toString()?.trim() ?: "")
     }
 
     private fun onProceedToPay() {
-        val consumerNumber = binding.etConsumerNumber.text?.toString()?.trim() ?: ""
-        if (consumerNumber.isEmpty()) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
-            return
-        }
-        if (consumerNumber.length < 10) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
-            return
-        }
-        if (selectedOperatorId.isNullOrEmpty()) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
-            return
-        }
+        if (!validateInputs()) return
         if (!isBillFetched) {
             Utility.hideKeyboard(mActivity)
-            fetchBill(consumerNumber)
+            fetchBill(binding.etConsumerNumber.text?.toString()?.trim() ?: "")
             return
         }
         if (!binding.cbTerms.isChecked) {

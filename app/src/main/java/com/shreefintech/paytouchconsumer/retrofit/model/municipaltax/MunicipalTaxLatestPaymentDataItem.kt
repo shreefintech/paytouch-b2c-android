@@ -18,5 +18,6 @@ data class MunicipalTaxLatestPaymentDataItem(
     @field:SerializedName("service")        val service:       String?,
     @field:SerializedName("amount")         val amount:        String?,
     @field:SerializedName("due_date")       val dueDate:       String?,
-    @field:SerializedName("updated_at")     val updatedAt:     String?
+    @field:SerializedName("updated_at")     val updatedAt:     String?,
+    @field:SerializedName("subservice")       val subService:       String?,
 )

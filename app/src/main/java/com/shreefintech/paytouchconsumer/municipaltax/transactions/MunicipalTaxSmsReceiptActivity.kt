@@ -1,4 +1,5 @@
-package com.shreefintech.paytouchconsumer.municipaltax.transactions
+﻿package com.shreefintech.paytouchconsumer.municipaltax.transactions
+
 
 import android.Manifest
 import android.content.Context
@@ -81,7 +82,7 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion   = 0f,
             blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-            strokeColor  = Color.argb(180, 213, 38, 98),
+            strokeColor  = ContextCompat.getColor(mActivity, R.color.glass_stroke_primary),
             strokeWidth  = 1,
             solidStroke  = true,
         )
@@ -129,7 +130,7 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
         binding.tvConsumerNoLabel.text = getString(R.string.labelConsumerNo)
         binding.tvConsumerNo.text      = consumerNo
         binding.tvCustomerName.text    = item.customerName ?: "--"
-        binding.tvCompanyName.text     = item.operatorName ?: item.service ?: "--"
+        binding.tvCompanyName.text     = item.subService ?: "--"
         binding.tvReceiptDate.text     = date
         binding.tvAmountPaid.text      = amount
         binding.tvPaytouchTxnId.text   = txnId
