@@ -14,6 +14,7 @@ import com.shreefintech.paytouchconsumer.fastag.FastagActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loan.LoanActivity
+import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -101,14 +102,14 @@ class HomeActivity : BaseActivity() {
                     startActivity(Intent(mActivity, LoanActivity::class.java))
                 }
 
+                binding.llTax -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, MunicipalTaxActivity::class.java))
+                }
+
                 binding.llMyAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-520): Navigate to My Account screen
-                }
-
-                binding.llTax -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-520): Navigate to Tax payment screen
                 }
 
                 binding.cvLoadWallet -> {

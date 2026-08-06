@@ -231,7 +231,7 @@
     <string name="categoryMyAccount">My Account</string>
     <string name="btnLoadWallet">Load Wallet</string>
     <string name="categoryLoan">Loan</string>
-    <string name="categoryTax">Tax</string>
+    <string name="categoryMunicipalTax">Municipal Tax</string>
 
     <!-- Transaction Report screen -->
     <string name="titleTransactionReport">Transaction Report</string>
@@ -382,5 +382,11 @@
     <string name="labelCurrentFastagBalance">Current FASTag Balance</string>
     <string name="titleFastagDetailsFetched">FASTag Details Fetched</string>
     <string name="msgLoanSmsBody">Dear Customer, Your loan repayment of %1$s for Loan Account %2$s has been successfully processed.</string>
+
+    <string name="titleMunicipalTax">Municipal Tax</string>
+    <string name="titleMunicipalTaxBillDetailsFetched">Municipal Tax Bill Details Fetched</string>
+    <string name="titleMunicipalTaxPaymentConfirmation">Municipal Tax Payment Confirmation</string>
+    <string name="labelPropertyNo">Property No.</string>
+    <string name="msgMunicipalTaxSmsBody">Dear Customer, Your municipal tax payment of %1$s for Property No %2$s has been successfully processed.</string>
 
 </resources>
