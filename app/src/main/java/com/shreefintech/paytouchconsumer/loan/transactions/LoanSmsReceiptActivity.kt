@@ -104,6 +104,8 @@ class LoanSmsReceiptActivity : BaseActivity() {
 
     // ── API Call ──────────────────────────────────────────────
 
+    // TODO(PAYTOUCH-XXX): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadLatestPayment() }
+    //  once the no-internet placeholder design is finalised.
     private fun loadLatestPayment() {
         viewModel.getLatestPayment(
             onLoading = { showReceiptLoading(true) },

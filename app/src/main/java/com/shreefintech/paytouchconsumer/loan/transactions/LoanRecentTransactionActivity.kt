@@ -80,6 +80,8 @@ class LoanRecentTransactionActivity : BaseActivity() {
         })
     }
 
+    // TODO(PAYTOUCH-XXX): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadInitialData() }
+    //  once the no-internet placeholder design is finalised.
     private fun loadInitialData() {
         viewModel.loadOperatorsThenData(
             onLoading = {
