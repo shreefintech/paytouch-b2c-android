@@ -418,4 +418,22 @@
     <string name="btnRefresh">Refresh</string>
     <string name="latterI">i</string>
 
+    <!-- Load Wallet screen -->
+    <string name="titleMyWallet">My Wallet</string>
+    <string name="tabTotalBalance">Total Balance</string>
+    <string name="tabReferralWallet">Referral Wallet</string>
+    <string name="tabMyWallet">My Wallet</string>
+    <string name="tabEarn">Earn</string>
+    <string name="labelWalletBalance">Wallet Balance</string>
+    <string name="labelSuccessTransactions">Success</string>
+    <string name="labelPendingTransactions">Pending</string>
+    <string name="labelTransactionsZero">Transactions: 0</string>
+    <string name="labelVirtualAccountNumber">Virtual Account Number</string>
+    <string name="labelActiveStatus">Active</string>
+    <string name="labelAccountHolder">Account Holder</string>
+    <string name="labelQrInvoice">QR Invoice</string>
+    <string name="labelPoweredByPartners">Powered by • Bharat Connect • Indusind • PayTouch • ICICI</string>
+    <string name="btnMakePayment">Make Payment</string>
+    <string name="labelViewAll">View All</string>
+
 </resources>

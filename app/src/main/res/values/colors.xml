@@ -69,4 +69,8 @@
     <color name="whatsapp_green">#128C7E</color>
     <color name="facebook_blue">#0C44AE</color>
     <color name="email_orange">#C4720A</color>
+    <color name="wallet_success_bg">#EAF7EE</color>
+    <color name="wallet_success_stroke">#076E3C</color>
+    <color name="wallet_pending_stroke">#B87513</color>
+    <color name="wallet_pending_bg">#FFF8EB</color>
 </resources>
