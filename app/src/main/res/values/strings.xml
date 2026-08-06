@@ -370,6 +370,7 @@
     <!-- Loan screen -->
     <string name="titleLoanRepayment">Loan Repayment</string>
     <string name="titleLoanBillDetailsFetched">Loan Bill Details Fetched</string>
+    <string name="titleLoanPaymentConfirmation">Loan Payment Confirmation</string>
     <string name="msgPaymentSuccess">Payment successful!</string>
 
     <!-- FASTag screen -->
@@ -380,5 +381,6 @@
     <string name="msgVehicleNumberEmpty">Please enter vehicle number</string>
     <string name="labelCurrentFastagBalance">Current FASTag Balance</string>
     <string name="titleFastagDetailsFetched">FASTag Details Fetched</string>
+    <string name="msgLoanSmsBody">Dear Customer, Your loan repayment of %1$s for Loan Account %2$s has been successfully processed.</string>
 
 </resources>

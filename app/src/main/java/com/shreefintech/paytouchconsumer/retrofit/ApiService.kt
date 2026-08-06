@@ -36,6 +36,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanOperatorsDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanProcessPaymentRequest
@@ -405,6 +406,11 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: LoanTransactionReportRequest
     ): Call<General<List<LoanTransactionReportDataItem>>>
+
+    @GET("${AUTH}loanrepayment/latest-payment")
+    fun getLoanLatestPayment(
+        @Header("Authorization") authorization: String
+    ): Call<General<LoanLatestPaymentDataItem>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 
