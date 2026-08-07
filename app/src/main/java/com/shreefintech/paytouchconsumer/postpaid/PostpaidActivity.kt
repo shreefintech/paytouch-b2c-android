@@ -144,9 +144,9 @@ class PostpaidActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = "₹%.2f".format(fee)
+                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = "₹%.2f".format(total)
+                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
@@ -212,7 +212,7 @@ class PostpaidActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
-                // TODO(PAYTOUCH-59): navigate to PostpaidSmsReceiptActivity
+                // TODO(B2C-59): navigate to PostpaidSmsReceiptActivity
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -274,7 +274,7 @@ class PostpaidActivity : BaseActivity() {
         binding.tvSelectedPlanDescription.text = plan.description ?: "-"
         binding.tvSelectedValidity.text = plan.validity ?: "-"
         binding.tvSelectedTalktime.text =
-            if (plan.talktime == null || plan.talktime < 0) "-" else "₹%.2f".format(plan.talktime)
+            if (plan.talktime == null || plan.talktime < 0) "-" else getString(R.string.fmtCurrencyAmount).format(plan.talktime)
         binding.tvSelectedData.text = if (plan.data.isNullOrEmpty()) "--" else plan.data
         binding.etAmount.setText(plan.amount?.toString() ?: "")
         binding.cvPlanDetails.visibility = View.VISIBLE
@@ -313,6 +313,9 @@ class PostpaidActivity : BaseActivity() {
             return
         }
         Utility.hideKeyboard(mActivity)
+        // TODO(B2C-59): Postpaid plan API is under construction. Temporarily reusing PrepaidPlanSelectionActivity
+        //  as a stand-in. Replace with PostpaidPlanSelectionActivity once mobile-postpaid/plans API is available.
+        // selectedOperatorId and selectedCircleId are non-null here — guarded by isNullOrEmpty() checks above.
         PrepaidPlanSelectionActivity.start(
             mActivity, planSelectionLauncher, selectedOperatorId!!, selectedCircleId!!
         )
@@ -388,19 +391,19 @@ class PostpaidActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-59): startActivity(Intent(mActivity, PostpaidTransactionReportActivity::class.java))
+                    // TODO(B2C-59): startActivity(Intent(mActivity, PostpaidTransactionReportActivity::class.java))
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-59): startActivity(Intent(mActivity, PostpaidTransactionStatusActivity::class.java))
+                    // TODO(B2C-59): startActivity(Intent(mActivity, PostpaidTransactionStatusActivity::class.java))
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-59): PostpaidSmsReceiptActivity.start(mActivity)
+                    // TODO(B2C-59): PostpaidSmsReceiptActivity.start(mActivity)
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-59): PostpaidRecentTransactionActivity.start(mActivity)
+                    // TODO(B2C-59): PostpaidRecentTransactionActivity.start(mActivity)
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
