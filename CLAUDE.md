@@ -59,6 +59,7 @@ com.shreefintech.paytouchconsumer/
 ├── onboarding/     # KYC upload (UploadKycActivity), Virtual Account creation (CreateVirtualAccountActivity)
 ├── home/           # Home/Dashboard screen (HomeActivity — currently at root level, will move here)
 ├── electricity/    # Electricity bill payment screen
+├── gas/            # Gas bill payment screen
 ├── enums/          # Project-wide enums (LoginMode, etc.)
 ├── glass/          # LiquidGlassEffect custom blur UI components
 ├── retrofit/       # All networking (ApiService, ApiClient, ApiHelper, models) — wiring pending
@@ -279,6 +280,22 @@ The **Electricity Bill Payment** screen is the canonical design reference for al
 
 **In short:** different Activity + same item layouts. Never copy-paste XML from one module's item file into another — always `include` or reuse the existing layout.
 
+**No cross-module Activity navigation — ever.** Never start one module's Activity from another module, even as a temporary stand-in. If the target module's Activity is not yet built, leave the click handler empty and add a `TODO(PAYTOUCH-xxx): navigate to XxxActivity when implemented` comment at that call site. Starting `ElectricityActivity` from the Gas module, for example, is a review blocker.
+
+```kotlin
+// ✅ Correct — pending module, placeholder with TODO
+binding.cardGas -> {
+    if (Utility.stopClick()) return@OnClickListener
+    // TODO(PAYTOUCH-585): navigate to GasActivity when implemented
+}
+
+// ❌ Wrong — cross-module reuse
+binding.cardGas -> {
+    if (Utility.stopClick()) return@OnClickListener
+    ElectricityActivity.start(mActivity) // never do this for a different module
+}
+```
+
 ---
 
 ## Transaction Screens — Shared Structure Across All Modules
@@ -320,6 +337,33 @@ Each new module (e.g. Gas) needs only:
 ---
 
 ## Android Activity Guidelines
+
+### Hub / Dashboard Tap Handling
+
+Every tappable entry on a hub screen (Home, Dashboard, category grid) must have an **explicit, intentional outcome** — never a silent no-op.
+
+- **Module implemented** → navigate to its Activity.
+- **Module pending** → leave the handler body empty and add a `TODO(PAYTOUCH-xxx): navigate to XxxActivity when implemented` comment. The TODO must name the ticket number and the target Activity class.
+
+```kotlin
+// ✅ Correct — pending module
+binding.cardPrepaid -> {
+    if (Utility.stopClick()) return@OnClickListener
+    // TODO(PAYTOUCH-520): navigate to PrepaidActivity when implemented
+}
+
+binding.cardDth -> {
+    if (Utility.stopClick()) return@OnClickListener
+    // TODO(PAYTOUCH-521): navigate to DthActivity when implemented
+}
+
+// ❌ Wrong — silent no-op with no TODO
+binding.cardPrepaid -> { }
+```
+
+A missing branch or a silent empty handler with no TODO is a review blocker.
+
+---
 
 ### Click Handling
 
