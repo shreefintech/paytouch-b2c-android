@@ -11,7 +11,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderResponseItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -72,7 +71,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     if (response.isSuccessful && response.body()?.data != null) {
                         val rawList = response.body()!!.data!!.data ?: emptyList()
                         val list = ArrayList<WalletTransactionItem>()
-                        rawList.forEach { list.add(mapToWalletTransactionItem(it)) }
+                        rawList.forEach { list.add(WalletTransactionItem.from(it)) }
                         onSuccess(list)
                     } else {
                         onError(
@@ -160,12 +159,4 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             })
     }
 
-    private fun mapToWalletTransactionItem(item: WalletHistoryItem): WalletTransactionItem {
-        return WalletTransactionItem(
-            title = item.serviceName ?: "--",
-            date = Utility.formatDate(item.createdAt),
-            amount = Utility.formatAmount(item.amount),
-            isCredit = item.type?.uppercase() == "CREDIT"
-        )
-    }
 }

@@ -5,6 +5,9 @@
     <data>
         <import type="android.view.View" />
         <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
             name="showProgressPay"
             type="androidx.databinding.ObservableBoolean" />
     </data>
@@ -50,6 +53,7 @@
             android:layout_width="@dimen/icon_medium"
             android:layout_height="@dimen/icon_medium"
             android:background="?selectableItemBackgroundBorderless"
+            android:onClickListener="@{onClickListener}"
             android:src="@drawable/ic_close"
             app:layout_constraintBottom_toBottomOf="@id/tvTitle"
             app:layout_constraintEnd_toEndOf="@id/dummyView"
@@ -157,6 +161,7 @@
             android:layout_height="@dimen/btn_height"
             android:layout_marginTop="@dimen/margin_large"
             android:layout_marginBottom="30dp"
+            android:onClickListener="@{onClickListener}"
             app:cardBackgroundColor="@color/primary"
             app:cardCornerRadius="@dimen/card_corner_radius"
             app:cardElevation="0dp"

@@ -76,4 +76,11 @@
 
 
     <color name="wallet_card_bg">#4DFFFFFF</color>
+
+    <!-- Payment status screen -->
+    <color name="colorPaymentSuccess">#00C853</color>
+    <color name="colorPaymentInitiated">#0A66FF</color>
+    <color name="colorPaymentProcessing">#FF8F00</color>
+    <color name="colorPaymentFailed">#D32F2F</color>
+    <color name="colorPaymentRefunded">#7A63FF</color>
 </resources>

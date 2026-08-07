@@ -2,36 +2,33 @@ package com.shreefintech.paytouchconsumer.loadwallet
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPaymentStatusBinding
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
-import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderResponseItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
+import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.PaymentStatusViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class PaymentStatusActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPaymentStatusBinding
+    private val viewModel: PaymentStatusViewModel by viewModels()
 
     private val orderId: String by lazy { intent.getStringExtra(EXTRA_ORDER_ID) ?: "" }
     private val amount: String by lazy { intent.getStringExtra(EXTRA_AMOUNT) ?: "" }
     private val statusStr: String by lazy { intent.getStringExtra(EXTRA_STATUS) ?: "" }
-    private val payLink: String by lazy { intent.getStringExtra(EXTRA_PAY_LINK) ?: "" }
 
     private val showProgressCheck = ObservableBoolean(false)
 
@@ -43,7 +40,7 @@ class PaymentStatusActivity : BaseActivity() {
         override fun run() {
             if (countdownCancelled) return
             if (countdownSeconds > 0) {
-                binding.tvContinue.text = getString(R.string.btnContinue) + " ($countdownSeconds)"
+                binding.tvContinue.text = getString(R.string.btnContinueCountdown, countdownSeconds)
                 countdownSeconds--
                 countdownHandler.postDelayed(this, 1000L)
             } else {
@@ -108,31 +105,41 @@ class PaymentStatusActivity : BaseActivity() {
     }
 
     private fun populateStatus(status: String) {
-        val (label, color, iconRes) = resolveStatus(status)
+        val (label, colorRes, iconRes) = resolveStatus(status)
         binding.tvStatusLabel.text = label
 
         val drawable = binding.flStatusIcon.background.mutate() as GradientDrawable
-        drawable.setColor(Color.parseColor(color))
+        drawable.setColor(ContextCompat.getColor(mActivity, colorRes))
 
         binding.ivStatusIcon.setImageResource(iconRes)
         binding.tvOrderId.text = orderId
         binding.tvAmount.text = Utility.formatAmount(amount)
     }
 
-    private fun resolveStatus(status: String): Triple<String, String, Int> {
+    private data class StatusDisplay(
+        val label: String,
+        @ColorRes val colorRes: Int,
+        @DrawableRes val iconRes: Int
+    )
+
+    private operator fun StatusDisplay.component1() = label
+    private operator fun StatusDisplay.component2() = colorRes
+    private operator fun StatusDisplay.component3() = iconRes
+
+    private fun resolveStatus(status: String): StatusDisplay {
         return when (status.uppercase()) {
             STATUS_CHARGED, STATUS_AUTHORIZED ->
-                Triple(getString(R.string.msgPaymentSuccessful), "#00C853", R.drawable.ic_success)
+                StatusDisplay(getString(R.string.msgPaymentSuccessful), R.color.colorPaymentSuccess, R.drawable.ic_success)
             STATUS_NEW ->
-                Triple(getString(R.string.msgPaymentInitiated), "#0A66FF", R.drawable.ic_pending)
+                StatusDisplay(getString(R.string.msgPaymentInitiated), R.color.colorPaymentInitiated, R.drawable.ic_pending)
             STATUS_PENDING_VBV, STATUS_AUTHORIZING, STATUS_STARTED ->
-                Triple(getString(R.string.msgPaymentProcessing), "#FF8F00", R.drawable.ic_pending)
+                StatusDisplay(getString(R.string.msgPaymentProcessing), R.color.colorPaymentProcessing, R.drawable.ic_pending)
             STATUS_JUSPAY_DECLINED, STATUS_AUTHENTICATION_FAILED, STATUS_AUTHORIZATION_FAILED ->
-                Triple(getString(R.string.msgPaymentFailed), "#D32F2F", R.drawable.ic_cross)
+                StatusDisplay(getString(R.string.msgPaymentFailed), R.color.colorPaymentFailed, R.drawable.ic_cross)
             STATUS_AUTO_REFUNDED ->
-                Triple(getString(R.string.msgAmountRefunded), "#7A63FF", R.drawable.ic_success)
+                StatusDisplay(getString(R.string.msgAmountRefunded), R.color.colorPaymentRefunded, R.drawable.ic_success)
             else ->
-                Triple(getString(R.string.msgPaymentPending), "#FF8F00", R.drawable.ic_pending)
+                StatusDisplay(getString(R.string.msgPaymentPending), R.color.colorPaymentProcessing, R.drawable.ic_pending)
         }
     }
 
@@ -145,7 +152,7 @@ class PaymentStatusActivity : BaseActivity() {
     private fun goToWallet() {
         val intent = Intent(this, LoadWalletActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra("from_payment", true)
+            putExtra(Constant.EXTRA_FROM_PAYMENT, true)
         }
         startActivity(intent)
         finish()
@@ -153,39 +160,18 @@ class PaymentStatusActivity : BaseActivity() {
 
     private fun recheckStatus() {
         if (showProgressCheck.get()) return
-        if (!Utility.isInternetAvailable(mActivity)) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
-            return
-        }
-        val token = "Bearer " + (SharedPreferenceHelper.getSharedPreferenceString(
-            mActivity, Constant.KEY_TOKEN, ""
-        ) ?: "")
-        showProgressCheck.set(true)
-        ApiClient.apiService.getHdfcOrderStatus(token, orderId)
-            .enqueue(object : Callback<HdfcOrderResponseItem> {
-                override fun onResponse(
-                    call: Call<HdfcOrderResponseItem>,
-                    response: Response<HdfcOrderResponseItem>
-                ) {
-                    showProgressCheck.set(false)
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        val newStatus = response.body()!!.data!!.status ?: statusStr
-                        populateStatus(newStatus)
-                    } else {
-                        ToastUtil.showDelete(
-                            mActivity,
-                            ApiHelper.parseErrorMessage(
-                                mActivity, response.code(), response.errorBody()?.string()
-                            )
-                        )
-                    }
-                }
-
-                override fun onFailure(call: Call<HdfcOrderResponseItem>, t: Throwable) {
-                    showProgressCheck.set(false)
-                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.errGeneric))
-                }
-            })
+        viewModel.recheckStatus(
+            orderId   = orderId,
+            onLoading = { showProgressCheck.set(true) },
+            onSuccess = { orderItem ->
+                showProgressCheck.set(false)
+                populateStatus(orderItem.status ?: statusStr)
+            },
+            onError   = { msg ->
+                showProgressCheck.set(false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
     }
 
     private fun onBack() {

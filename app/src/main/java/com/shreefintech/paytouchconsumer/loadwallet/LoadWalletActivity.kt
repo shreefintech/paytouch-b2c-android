@@ -15,6 +15,7 @@ import androidx.databinding.ObservableBoolean
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoadWalletBinding
@@ -108,7 +109,8 @@ class LoadWalletActivity : BaseActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (intent.getBooleanExtra("from_payment", false)) {
+        if (intent.getBooleanExtra(Constant.EXTRA_FROM_PAYMENT, false)) {
+            if (isPaymentSheetVisible()) hidePaymentSheet()
             sheetBinding.etAmount.setText("")
             sheetBinding.etDescription.setText("")
             fetchWalletData()
@@ -119,6 +121,7 @@ class LoadWalletActivity : BaseActivity() {
     private fun setupPaymentSheet() {
         sheetBinding = binding.incPaymentSheet
         sheetBinding.showProgressPay = showProgressPay
+        sheetBinding.onClickListener = onClickListener()
         sheetBehavior = BottomSheetBehavior.from(sheetBinding.root)
         sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
@@ -136,44 +139,41 @@ class LoadWalletActivity : BaseActivity() {
                 binding.viewBg.alpha = slideOffset.coerceIn(0f, 1f)
             }
         })
+    }
 
-        sheetBinding.ivClose.setOnClickListener { hidePaymentSheet() }
-
-        sheetBinding.btnProceedPayment.setOnClickListener {
-            if (Utility.stopClick()) return@setOnClickListener
-            if (showProgressPay.get()) return@setOnClickListener
-            val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
-            val description = sheetBinding.etDescription.text?.toString()?.trim() ?: ""
-            if (amountStr.isEmpty()) {
-                ToastUtil.showDelete(mActivity, getString(R.string.hintEnterAmount))
-                return@setOnClickListener
-            }
-            val amount = amountStr.toDoubleOrNull()
-            if (amount == null || amount <= 0) {
-                ToastUtil.showDelete(mActivity, getString(R.string.hintEnterAmount))
-                return@setOnClickListener
-            }
-            Utility.hideKeyboard(mActivity)
-            viewModel.createHdfcOrder(
-                amount = amount,
-                description = description,
-                onLoading = { showProgressPay.set(true) },
-                onSuccess = { orderItem ->
-                    showProgressPay.set(false)
-                    pendingOrderId = orderItem.orderId
-                    val payUrl = orderItem.paymentLinks?.web ?: ""
-                    val returnUrl = orderItem.returnUrl ?: ""
-                    hidePaymentSheet()
-                    hdfcLauncher.launch(
-                        HdfcWebViewActivity.newIntent(mActivity, payUrl, returnUrl)
-                    )
-                },
-                onError = { msg ->
-                    showProgressPay.set(false)
-                    ToastUtil.showDelete(mActivity, msg)
-                }
-            )
+    private fun onProceedPayment() {
+        if (showProgressPay.get()) return
+        val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
+        val description = sheetBinding.etDescription.text?.toString()?.trim() ?: ""
+        if (amountStr.isEmpty()) {
+            ToastUtil.showDelete(mActivity, getString(R.string.hintEnterAmount))
+            return
         }
+        val amount = amountStr.toDoubleOrNull()
+        if (amount == null || amount <= 0) {
+            ToastUtil.showDelete(mActivity, getString(R.string.hintEnterAmount))
+            return
+        }
+        Utility.hideKeyboard(mActivity)
+        viewModel.createHdfcOrder(
+            amount = amount,
+            description = description,
+            onLoading = { showProgressPay.set(true) },
+            onSuccess = { orderItem ->
+                showProgressPay.set(false)
+                pendingOrderId = orderItem.orderId
+                val payUrl = orderItem.paymentLinks?.web ?: ""
+                val returnUrl = orderItem.returnUrl ?: ""
+                hidePaymentSheet()
+                hdfcLauncher.launch(
+                    HdfcWebViewActivity.newIntent(mActivity, payUrl, returnUrl)
+                )
+            },
+            onError = { msg ->
+                showProgressPay.set(false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
     }
 
     private fun checkOrderStatus(orderId: String) {
@@ -314,6 +314,16 @@ class LoadWalletActivity : BaseActivity() {
                 binding.llTransactionReport -> {
                     if (Utility.stopClick()) return@OnClickListener
                     WalletTransactionsActivity.start(mActivity)
+                }
+
+                sheetBinding.ivClose -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    hidePaymentSheet()
+                }
+
+                sheetBinding.btnProceedPayment -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    onProceedPayment()
                 }
             }
         }

@@ -454,6 +454,7 @@
     <string name="msgAmountRefunded">Amount Refunded</string>
     <string name="msgPaymentPending">Payment Pending</string>
     <string name="btnContinue">Continue</string>
+    <string name="btnContinueCountdown">Continue (%d)</string>
     <string name="btnCheckPaymentStatus">Check Payment Status</string>
     <string name="msgLeavePaymentTitle">Leave Payment?</string>
     <string name="msgLeavePaymentBody">Are you sure you want to leave the payment page?</string>

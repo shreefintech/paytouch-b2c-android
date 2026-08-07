@@ -7,7 +7,6 @@ import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -60,10 +59,10 @@ class WalletTransactionsViewModel(application: Application) : AndroidViewModel(a
                     if (response.isSuccessful && response.body()?.data != null) {
                         val pageData = response.body()!!.data!!
                         val rawList  = pageData.data ?: emptyList()
-                        isLastPage  = page >= (pageData.lastPage ?: 1)
+                        isLastPage  = pageData.lastPage?.let { page >= it } ?: false
                         currentPage = page
                         val list = ArrayList<WalletTransactionItem>()
-                        rawList.forEach { list.add(mapToWalletTransactionItem(it)) }
+                        rawList.forEach { list.add(WalletTransactionItem.from(it)) }
                         onSuccess(list)
                     } else {
                         onError(
@@ -79,14 +78,5 @@ class WalletTransactionsViewModel(application: Application) : AndroidViewModel(a
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
-    }
-
-    private fun mapToWalletTransactionItem(item: WalletHistoryItem): WalletTransactionItem {
-        return WalletTransactionItem(
-            title = item.serviceName ?: "--",
-            date = Utility.formatDate(item.createdAt),
-            amount = Utility.formatAmount(item.amount),
-            isCredit = item.type?.uppercase() == "CREDIT"
-        )
     }
 }

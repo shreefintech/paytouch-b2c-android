@@ -3,7 +3,6 @@ package com.shreefintech.paytouchconsumer.loadwallet
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.webkit.WebChromeClient
@@ -26,9 +25,6 @@ class HdfcWebViewActivity : BaseActivity() {
     private val returnUrl: String by lazy {
         intent.getStringExtra(EXTRA_RETURN_URL) ?: ""
     }
-
-    // Detected from the first URL loaded — used as the gateway host
-    private var gatewayHost: String? = null
 
     companion object {
         private const val EXTRA_URL = "hdfc_payment_url"
@@ -68,10 +64,6 @@ class HdfcWebViewActivity : BaseActivity() {
         binding.webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
-                // Record the gateway host from the first URL
-                if (gatewayHost == null && url.isNotEmpty()) {
-                    gatewayHost = Uri.parse(url).host
-                }
                 binding.pbPageLoad.visibility = View.VISIBLE
             }
 
@@ -85,21 +77,10 @@ class HdfcWebViewActivity : BaseActivity() {
                 request: WebResourceRequest
             ): Boolean {
                 val url = request.url.toString()
-
-                // Strategy 1: exact prefix match on returnUrl
                 if (returnUrl.isNotEmpty() && url.startsWith(returnUrl)) {
                     finish()
                     return true
                 }
-
-                // Strategy 2: host differs from the initial gateway host
-                val host = request.url.host
-                val gateway = gatewayHost
-                if (gateway != null && host != null && host != gateway) {
-                    finish()
-                    return true
-                }
-
                 return false
             }
         }

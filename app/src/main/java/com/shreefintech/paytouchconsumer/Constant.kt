@@ -30,4 +30,7 @@ object Constant {
     const val FLOW_RESET_PASSWORD = "RESET_PASSWORD"
     const val FLOW_RESET_MPIN = "RESET_MPIN"
 
+    // Load Wallet / Payment status extras
+    const val EXTRA_FROM_PAYMENT = "from_payment"
+
 }
