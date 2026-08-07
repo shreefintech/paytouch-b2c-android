@@ -13,10 +13,12 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
+import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPaymentStatusBinding
+import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.PaymentStatusViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -26,19 +28,22 @@ class PaymentStatusActivity : BaseActivity() {
     private lateinit var binding: ActivityPaymentStatusBinding
     private val viewModel: PaymentStatusViewModel by viewModels()
 
-    private val orderId: String by lazy { intent.getStringExtra(EXTRA_ORDER_ID) ?: "" }
-    private val amount: String by lazy { intent.getStringExtra(EXTRA_AMOUNT) ?: "" }
-    private val statusStr: String by lazy { intent.getStringExtra(EXTRA_STATUS) ?: "" }
+    private val passItem: PaymentStatusItem? by lazy {
+        intent.getStringExtra(EXTRA_ITEM)?.let { Gson().fromJson(it, PaymentStatusItem::class.java) }
+    }
+    private val orderId: String by lazy { passItem?.orderId ?: "" }
+    private val amount: String by lazy { passItem?.amount ?: "" }
+    private val statusStr: String by lazy { passItem?.status ?: "" }
 
     private val showProgressCheck = ObservableBoolean(false)
 
     private val countdownHandler = Handler(Looper.getMainLooper())
     private var countdownSeconds = COUNTDOWN_START
-    private var countdownCancelled = false
+    private var isCountdownCancelled = false
 
     private val countdownRunnable = object : Runnable {
         override fun run() {
-            if (countdownCancelled) return
+            if (isCountdownCancelled) return
             if (countdownSeconds > 0) {
                 binding.tvContinue.text = getString(R.string.btnContinueCountdown, countdownSeconds)
                 countdownSeconds--
@@ -50,10 +55,7 @@ class PaymentStatusActivity : BaseActivity() {
     }
 
     companion object {
-        private const val EXTRA_ORDER_ID = "extra_order_id"
-        private const val EXTRA_AMOUNT = "extra_amount"
-        private const val EXTRA_STATUS = "extra_status"
-        private const val EXTRA_PAY_LINK = "extra_pay_link"
+        private const val EXTRA_ITEM = "extra_item"
         private const val COUNTDOWN_START = 5
 
         private const val STATUS_CHARGED = "CHARGED"
@@ -67,19 +69,10 @@ class PaymentStatusActivity : BaseActivity() {
         private const val STATUS_AUTHORIZATION_FAILED = "AUTHORIZATION_FAILED"
         private const val STATUS_AUTO_REFUNDED = "AUTO_REFUNDED"
 
-        fun start(
-            context: Context,
-            orderId: String,
-            amount: String,
-            status: String,
-            payLink: String
-        ) {
+        fun start(context: Context, item: PaymentStatusItem) {
             context.startActivity(
                 Intent(context, PaymentStatusActivity::class.java).apply {
-                    putExtra(EXTRA_ORDER_ID, orderId)
-                    putExtra(EXTRA_AMOUNT, amount)
-                    putExtra(EXTRA_STATUS, status)
-                    putExtra(EXTRA_PAY_LINK, payLink)
+                    putExtra(EXTRA_ITEM, Gson().toJson(item))
                 }
             )
         }
@@ -100,7 +93,7 @@ class PaymentStatusActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        countdownCancelled = true
+        isCountdownCancelled = true
         countdownHandler.removeCallbacks(countdownRunnable)
     }
 
@@ -108,6 +101,7 @@ class PaymentStatusActivity : BaseActivity() {
         val (label, colorRes, iconRes) = resolveStatus(status)
         binding.tvStatusLabel.text = label
 
+        // bg_payment_status_icon.xml is a <shape> drawable — GradientDrawable at runtime
         val drawable = binding.flStatusIcon.background.mutate() as GradientDrawable
         drawable.setColor(ContextCompat.getColor(mActivity, colorRes))
 
@@ -121,10 +115,6 @@ class PaymentStatusActivity : BaseActivity() {
         @ColorRes val colorRes: Int,
         @DrawableRes val iconRes: Int
     )
-
-    private operator fun StatusDisplay.component1() = label
-    private operator fun StatusDisplay.component2() = colorRes
-    private operator fun StatusDisplay.component3() = iconRes
 
     private fun resolveStatus(status: String): StatusDisplay {
         return when (status.uppercase()) {
@@ -145,7 +135,7 @@ class PaymentStatusActivity : BaseActivity() {
 
     private fun startCountdown() {
         countdownSeconds = COUNTDOWN_START
-        countdownCancelled = false
+        isCountdownCancelled = false
         countdownHandler.post(countdownRunnable)
     }
 
@@ -159,7 +149,6 @@ class PaymentStatusActivity : BaseActivity() {
     }
 
     private fun recheckStatus() {
-        if (showProgressCheck.get()) return
         viewModel.recheckStatus(
             orderId   = orderId,
             onLoading = { showProgressCheck.set(true) },
@@ -187,12 +176,13 @@ class PaymentStatusActivity : BaseActivity() {
             when (view) {
                 binding.btnContinue -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    countdownCancelled = true
+                    isCountdownCancelled = true
                     countdownHandler.removeCallbacks(countdownRunnable)
                     goToWallet()
                 }
                 binding.btnCheckStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressCheck.get()) return@OnClickListener
                     recheckStatus()
                 }
             }

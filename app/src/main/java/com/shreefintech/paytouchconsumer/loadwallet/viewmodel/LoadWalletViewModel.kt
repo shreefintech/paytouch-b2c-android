@@ -142,6 +142,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     call: Call<HdfcOrderResponseItem>,
                     response: Response<HdfcOrderResponseItem>
                 ) {
+                    // success flag intentionally not checked: the status endpoint may return
+                    // success:false for declined/refunded states while still providing valid
+                    // order data needed for display. data != null is the correct gate here.
                     if (response.isSuccessful && response.body()?.data != null) {
                         onSuccess(response.body()!!.data!!)
                     } else {

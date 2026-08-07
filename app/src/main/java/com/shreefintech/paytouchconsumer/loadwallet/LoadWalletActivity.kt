@@ -21,6 +21,7 @@ import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoadWalletBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetMakePaymentBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
@@ -142,7 +143,6 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun onProceedPayment() {
-        if (showProgressPay.get()) return
         val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
         val description = sheetBinding.etDescription.text?.toString()?.trim() ?: ""
         if (amountStr.isEmpty()) {
@@ -186,10 +186,11 @@ class LoadWalletActivity : BaseActivity() {
                 pendingOrderId = null
                 PaymentStatusActivity.start(
                     context = mActivity,
-                    orderId = orderItem.orderId ?: orderId,
-                    amount = orderItem.amount ?: "",
-                    status = orderItem.status ?: "",
-                    payLink = orderItem.paymentLinks?.web ?: ""
+                    item = PaymentStatusItem(
+                        orderId = orderItem.orderId ?: orderId,
+                        amount  = orderItem.amount ?: "",
+                        status  = orderItem.status ?: ""
+                    )
                 )
             },
             onError = { msg ->
@@ -236,7 +237,11 @@ class LoadWalletActivity : BaseActivity() {
                 transactionAdp.notifyDataSetChanged()
                 updateEmptyState()
             },
-            onError = { /* silent — wallet data already shows its own error */ }
+            onError = {
+                // Intentionally silent: fetchUserWalletData always runs first and shows its own
+                // error toast. Recent history is supplementary display only.
+                // TODO(B2C-82): show history error independently if the two calls are ever decoupled
+            }
         )
     }
 
@@ -323,6 +328,7 @@ class LoadWalletActivity : BaseActivity() {
 
                 sheetBinding.btnProceedPayment -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressPay.get()) return@OnClickListener
                     onProceedPayment()
                 }
             }
