@@ -3,6 +3,7 @@ package com.shreefintech.paytouchconsumer.retrofit
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
@@ -77,6 +78,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTa
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
+import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderResponseItem
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -178,6 +181,13 @@ interface ApiService {
     fun getUserWalletData(
         @Header("Authorization") authorization: String
     ): Call<General<WalletDataItem>>
+
+    @GET("${AUTH}wallet/combined-wallet-history")
+    fun getWalletHistory(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): Call<General<WalletHistoryPageItem>>
 
     // ── Electricity ───────────────────────────────────────────────────────────
 
@@ -480,6 +490,20 @@ interface ApiService {
     fun getReferralInfo(
         @Header("Authorization") authorization: String
     ): Call<ReferralInfoItem>
+
+    // ── HDFC Payment Gateway ──────────────────────────────────────────────────
+
+    @POST("${AUTH}hdfc/orders")
+    fun createHdfcOrder(
+        @Header("Authorization") authorization: String,
+        @Body request: HdfcCreateOrderRequest
+    ): Call<HdfcOrderResponseItem>
+
+    @GET("${AUTH}hdfc/orders/{order_id}/status")
+    fun getHdfcOrderStatus(
+        @Header("Authorization") authorization: String,
+        @Path("order_id") orderId: String
+    ): Call<HdfcOrderResponseItem>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

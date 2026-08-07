@@ -69,4 +69,18 @@
     <color name="whatsapp_green">#128C7E</color>
     <color name="facebook_blue">#0C44AE</color>
     <color name="email_orange">#C4720A</color>
+    <color name="wallet_success_bg">#EAF7EE</color>
+    <color name="wallet_success_stroke">#076E3C</color>
+    <color name="wallet_pending_stroke">#B87513</color>
+    <color name="wallet_pending_bg">#FFF8EB</color>
+
+
+    <color name="wallet_card_bg">#4DFFFFFF</color>
+
+    <!-- Payment status screen -->
+    <color name="colorPaymentSuccess">#00C853</color>
+    <color name="colorPaymentInitiated">#0A66FF</color>
+    <color name="colorPaymentProcessing">#FF8F00</color>
+    <color name="colorPaymentFailed">#D32F2F</color>
+    <color name="colorPaymentRefunded">#7A63FF</color>
 </resources>
