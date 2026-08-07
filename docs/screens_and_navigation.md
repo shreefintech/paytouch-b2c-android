@@ -1,6 +1,6 @@
 # PayTouch Consumer — Screens & Navigation
 
-> **Status legend:** ✅ Implemented (UI) | 🔧 UI pending | 📋 Planned (not started)
+> **Status legend:** ✅ Implemented (UI + API) | 🔧 UI pending | 📋 Planned (not started)
 
 ---
 
@@ -165,50 +165,106 @@
 
 ---
 
+---
+
+## Implemented Category Screens
+
+---
+
+### ✅ Electricity Module
+
+Full module implemented. See Electricity as the canonical reference for all other modules.
+
+| Screen | Class | Package |
+|---|---|---|
+| Pay Bill | `ElectricityActivity` | `electricity/` |
+| Recent Transactions | `RecentTransactionActivity` | `electricity/transactions/` |
+| Transaction Report | `TransactionReportActivity` | `electricity/transactions/` |
+| Transaction Status | `ElectricityTransactionStatusActivity` | `electricity/transactions/` |
+| SMS Receipt | `SmsReceiptActivity` | `electricity/transactions/` |
+
+---
+
+### ✅ Gas Module
+
+Full module implemented. Mirrors Electricity exactly.
+
+| Screen | Class | Package |
+|---|---|---|
+| Pay Bill | `GasActivity` | `gas/` |
+| Recent Transactions | `GasRecentTransactionActivity` | `gas/transactions/` |
+| Transaction Report | `GasTransactionReportActivity` | `gas/transactions/` |
+| Transaction Status | `GasTransactionStatusActivity` | `gas/transactions/` |
+| SMS Receipt | `GasSmsReceiptActivity` | `gas/transactions/` |
+
+---
+
+### ✅ DTH Module
+
+Full module implemented. DTH is a **plan-selection** module (`isMobileCategory = true`) — no fetch-bill step; user selects a plan before paying. See `docs/dth.md` for full detail.
+
+| Screen | Class | Package |
+|---|---|---|
+| Pay Bill | `DthActivity` | `dth/` |
+| Plan Selection | `DthPlanSelectionActivity` | `dth/` |
+| Recent Transactions | `DthRecentTransactionActivity` | `dth/transactions/` |
+| Transaction Report | `DthTransactionReportActivity` | `dth/transactions/` |
+| Transaction Status | `DthTransactionStatusActivity` | `dth/transactions/` |
+| SMS Receipt | `DthSmsReceiptActivity` | `dth/transactions/` |
+
+---
+
+### ✅ Mobile Prepaid Module
+
+Full module implemented. Prepaid is also a **plan-selection** module (`isMobileCategory = true`). Circle selection is required in addition to operator. No fetch-bill step.
+
+| Screen | Class | Package |
+|---|---|---|
+| Pay / Recharge | `PrepaidActivity` | `prepaid/` |
+| Plan Selection | `PrepaidPlanSelectionActivity` | `prepaid/` |
+| Recent Transactions | `PrepaidRecentTransactionActivity` | `prepaid/transactions/` |
+| Transaction Report | `PrepaidTransactionReportActivity` | `prepaid/transactions/` |
+| Transaction Status | `PrepaidTransactionStatusActivity` | `prepaid/transactions/` |
+| SMS Receipt | `PrepaidSmsReceiptActivity` | `prepaid/transactions/` |
+
+---
+
+### ✅ Mobile Postpaid Module
+
+Full module implemented. Standard bill-payment flow (`isMobileCategory = true`): fetch bill → confirm → pay.
+
+| Screen | Class | Package |
+|---|---|---|
+| Pay Bill | `PostpaidActivity` | `postpaid/` |
+| Recent Transactions | `PostpaidRecentTransactionActivity` | `postpaid/transactions/` |
+| Transaction Report | `PostpaidTransactionReportActivity` | `postpaid/transactions/` |
+| Transaction Status | `PostpaidTransactionStatusActivity` | `postpaid/transactions/` |
+| SMS Receipt | `PostpaidSmsReceiptActivity` | `postpaid/transactions/` |
+
+---
+
+### ✅ Shared Transaction Detail
+
+`TransactionDetailActivity` (`transactions/TransactionDetailActivity.kt`) — shared by all modules. Never duplicated per module.
+
+---
+
 ## Planned Screens
 
 The following screens are defined in the navigation plan but not yet implemented.
 
 ---
 
-### 📋 Category Home Screens (one per payment type)
-
-Each category has a home screen with sub-options: Pay Bill, Recent Transactions, Transaction Report, Transaction Status.
+### 📋 Category Home Screens (remaining)
 
 | Category | Home Activity | Status |
 |---|---|---|
-| Electricity | `ElectricityActivity` | Planned |
-| Gas | `GasActivity` | Planned |
-| Mobile Prepaid | `MobilePrepaidActivity` | Planned |
-| Mobile Postpaid | `PostpaidActivity` | Planned |
-| DTH | `DthActivity` | Planned |
+| Cable TV | `CableTvActivity` | Planned |
 | FASTag | `FasTagActivity` | Planned |
 | Loan Repayment | `LoanRepaymentActivity` | Planned |
 | Municipal Tax | `MunicipalTaxActivity` | Planned |
 
----
-
-### 📋 Pay Bill Screens
-
-One per category, following the same standard flow:
-1. Select operator (from API dropdown)
-2. Enter consumer/account number
-3. Fetch bill → display outstanding amount, due date
-4. Calculate and show platform fee
-5. User confirms → process payment
-6. Show transaction status / receipt
-
-**Key difference for Mobile Prepaid:** No fetch-bill step. User enters amount directly; optional plan selection from API.
-
-**Key difference for DTH:** Plan selection step added after operator selection.
-
----
-
-### 📋 Transaction Screens (per category)
-
-- `[Category]RecentTransactionActivity` — Recent payments from local Room DB
-- `[Category]TransactionReportActivity` — Filtered report (date range, status, consumer number)
-- `[Category]TransactionStatusActivity` — Look up a specific transaction by ID
+Each planned module also needs: Recent Transactions, Transaction Report, Transaction Status, SMS Receipt screens following the same pattern as implemented modules.
 
 ---
 
@@ -234,6 +290,8 @@ One per category, following the same standard flow:
 [App Launch]
      │
      ▼
+SplashActivity
+     │
 Session check (read SharedPreferences)
      │
      ├── No token ──────────────────────────────────────► LoginActivity ✅
@@ -262,15 +320,23 @@ Session check (read SharedPreferences)
                                                                                            ▼
                                                                                     HomeActivity ✅
                                                                                           │
-                                              ┌───────────────────────────────────────────┤
-                                              │                           │                │
-                                              ▼                           ▼                ▼
-                                    ElectricityActivity 📋         GasActivity 📋    ... (other categories)
-                                              │
-                                    ┌─────────┤
-                                    │         │
-                                   Pay      Recent      Report      Status      Receipt
-                                   Bill      Txns
+                           ┌──────────────────────────────┬──────────────────────────────┤
+                           ▼                              ▼                               ▼
+               ElectricityActivity ✅           GasActivity ✅                  DthActivity ✅
+                           │                              │                               │
+               ┌───────────┤               ┌─────────────┤               ┌───────────────┤
+              Pay  Recent Report Status   Pay  Recent Report Status      Pay  Plans Recent Report Status
+              Bill  Txns        Receipt  Bill  Txns        Receipt      Bill  Sel   Txns        Receipt
+               ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅   ✅    ✅    ✅   ✅
+
+                           │                              │
+               PrepaidActivity ✅              PostpaidActivity ✅       ... (Cable, FASTag, Loan, Tax 📋)
+                           │                              │
+               Plans  Recent Report Status   Recent Report Status Receipt
+                Sel    Txns        Receipt    Txns
+                ✅      ✅    ✅    ✅   ✅     ✅    ✅    ✅    ✅
+
+All detail taps → TransactionDetailActivity ✅ (shared by all modules)
 
 [401 at any point]
      └──────────────────────────────────────────────────────► LoginActivity (stack cleared)
@@ -290,7 +356,11 @@ Session check (read SharedPreferences)
 
 ## Intent Extras Reference
 
+All object passing between activities uses `Gson().toJson(item)` into a single `putExtra` key. See the Object Transfer Rule in `CLAUDE.md`.
+
 | From | To | Extra Key | Type | Purpose |
 |---|---|---|---|---|
-| PayBillActivity | TransactionStatusActivity | `transaction_id` | String | Pre-fill status lookup after payment |
-| PayBillActivity | SMSReceiptActivity | `transaction_id` | String | Load receipt for completed payment |
+| `DthActivity` | `DthPlanSelectionActivity` | `extra_operator_id` | String | Operator ID to fetch plans for |
+| `DthPlanSelectionActivity` | `DthActivity` (ActivityResult) | `extra_selected_plan` | String (JSON `DthPlanItem`) | Selected plan returned to caller |
+| `{Category}Activity` | `{Category}SmsReceiptActivity` | `extra_from_payment` | Boolean | `true` = after payment (hides title/tabs); `false` = from tab bar |
+| Any module | `TransactionDetailActivity` | `extra_item` | String (JSON `TransactionItem`) | Full transaction detail to display |
