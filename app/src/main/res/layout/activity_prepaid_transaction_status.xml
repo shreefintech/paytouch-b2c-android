@@ -101,7 +101,7 @@
                         android:layout_weight="1"
                         android:background="@null"
                         android:fontFamily="@font/proza_libre_medium"
-                        android:hint="@string/hintSearchTransaction"
+                        android:hint="@string/hintSearchPrepaidTransaction"
                         android:imeOptions="actionSearch"
                         android:inputType="text"
                         android:maxLines="1"

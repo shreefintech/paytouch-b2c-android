@@ -52,6 +52,10 @@ com.shreefintech.paytouchconsumer/
 |   +-- viewmodel/
 |   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
 |
++-- loan/               Loan repayment -- bill-fetch pattern, mirrors Gas; circleId = "0"
+|   +-- viewmodel/
+|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|
 +-- transactions/       Shared across ALL bill-payment modules -- never duplicate per module
 |   +-- model/
 |   |   \-- TransactionItem.kt         Category-agnostic report/status row model
@@ -71,6 +75,7 @@ com.shreefintech.paytouchconsumer/
 |   |   +-- postpaid/             Postpaid request/response DTOs
 |   |   +-- dth/                  DTH request/response DTOs
 |   |   +-- fastag/               FASTag request/response DTOs
+|   |   +-- loan/                 Loan request/response DTOs
 |   |   \-- auth/
 |   |       +-- LoginItem.kt
 |   |       +-- RegisterItem.kt
@@ -147,13 +152,13 @@ Register / Login
 | Mobile Postpaid | `PostpaidActivity` | `PrepaidPlanSelectionActivity` (shared from prepaid), `PostpaidRecentTransactionActivity`, `PostpaidTransactionReportActivity`, `PostpaidTransactionStatusActivity`, `TransactionDetailActivity` (shared), `PostpaidSmsReceiptActivity` |
 | DTH | `DthActivity` | `DthPlanSelectionActivity`, `DthRecentTransactionActivity`, `DthTransactionReportActivity`, `DthTransactionStatusActivity`, `TransactionDetailActivity` (shared), `DthSmsReceiptActivity` |
 | FASTag | `FastagActivity` | `FastagRecentTransactionActivity`, `FastagTransactionReportActivity`, `FastagTransactionStatusActivity`, `TransactionDetailActivity` (shared), `FastagSmsReceiptActivity` |
+| Loan Repayment | `LoanActivity` | `LoanRecentTransactionActivity`, `LoanTransactionReportActivity`, `LoanTransactionStatusActivity`, `TransactionDetailActivity` (shared), `LoanSmsReceiptActivity` |
 
 ### Planned (stubs in HomeActivity)
 
 | Module | Status |
 |---|---|
 | TV Cable payment | Not started |
-| Loan repayment | Not started |
 | Tax payment | Not started |
 | My Account | Not started |
 | Load Wallet | Not started |
@@ -378,6 +383,7 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | Mobile Prepaid | `app/src/main/java/.../prepaid/README.md` (adds plan selection + circle picker vs Gas/Electricity) |
 | Mobile Postpaid | `app/src/main/java/.../postpaid/README.md` (shares `PrepaidPlanSelectionActivity`; status searches by transaction ID) |
 | FASTag | `app/src/main/java/.../fastag/README.md` (no bill-fetch; vehicle number; real-time fee; no operator pre-load in recent transactions) |
+| Loan Repayment | `app/src/main/java/.../loan/README.md` (bill-fetch pattern like Gas; circleId = "0"; flat payment response; no ccf field) |
 
 ---
 

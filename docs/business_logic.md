@@ -254,8 +254,6 @@ amount > 40000           → fee = ₹30
 - `operator` (String, required)
 - `consumer_number` (String, required)
 - `amount` (Decimal, required)
-- `transaction_id` (String, PYTCH-format, generated client-side)
-
 ### Edge Cases
 - If `fetch-bill` fails, the Pay button stays disabled
 - If `process-payment` returns pending status, show "processing" state and allow re-check
@@ -293,7 +291,6 @@ amount > 40000           → fee = ₹30
 - `amount` (Decimal, required)
 - `platform_fee` (Decimal, required)
 - `total_payable` (Decimal, required)
-- `transaction_id` (String, PYTCH-format, generated client-side)
 
 ### Response Fields (Process Recharge — flat)
 - `success` (Boolean), `message` (String), `req_id` (String), `amount` (Decimal), `platform_fee` (Decimal), `total_payable` (Decimal), `status` (String), `transaction_id` (String)
