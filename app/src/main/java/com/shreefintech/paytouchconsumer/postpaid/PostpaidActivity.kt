@@ -24,6 +24,8 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPostpaidBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionReportActivity
+import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidViewModel
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidPlanSelectionActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
@@ -58,35 +60,6 @@ class PostpaidActivity : BaseActivity() {
             val plan = json?.let { Gson().fromJson(it, PrepaidPlanItem::class.java) }
             if (plan != null) onPlanSelected(plan)
         }
-    }
-
-    companion object {
-        private val STATE_LIST = listOf(
-            "01" to "Andhra Pradesh",
-            "02" to "Assam",
-            "03" to "Bihar & Jharkhand",
-            "04" to "Chennai",
-            "05" to "Delhi & NCR",
-            "06" to "Gujarat",
-            "07" to "Haryana",
-            "08" to "Himachal Pradesh",
-            "09" to "Jammu & Kashmir",
-            "10" to "Karnataka",
-            "11" to "Kerala",
-            "12" to "Kolkata",
-            "13" to "Maharashtra & Goa (except Mumbai)",
-            "14" to "MP & Chattisgarh",
-            "15" to "Mumbai",
-            "16" to "North East",
-            "17" to "Orissa",
-            "18" to "Punjab",
-            "19" to "Rajasthan",
-            "20" to "Tamilnadu",
-            "21" to "UP(EAST)",
-            "22" to "UP(WEST) & Uttarakhand",
-            "23" to "West Bengal",
-            "51" to "All India (except Delhi/Mumbai)"
-        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -247,7 +220,7 @@ class PostpaidActivity : BaseActivity() {
 
     private fun showStateDropdown() {
         Utility.hideKeyboard(binding.clRoot)
-        val names = STATE_LIST.map { it.second }
+        val names = Utility.STATE_LIST.map { it.second }
         CustomDropdown.showDropdown(
             activity = mActivity,
             anchorView = binding.flStateAnchor,
@@ -255,7 +228,7 @@ class PostpaidActivity : BaseActivity() {
             textView = binding.tvState,
             items = names
         ) { selected, index ->
-            selectedCircleId = STATE_LIST.getOrNull(index)?.first
+            selectedCircleId = Utility.STATE_LIST.getOrNull(index)?.first
             selectedCircleName = selected
             binding.tvState.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
             clearSelectedPlan()
@@ -313,9 +286,8 @@ class PostpaidActivity : BaseActivity() {
             return
         }
         Utility.hideKeyboard(mActivity)
-        // TODO(B2C-59): Postpaid plan API is under construction. Temporarily reusing PrepaidPlanSelectionActivity
-        //  as a stand-in. Replace with PostpaidPlanSelectionActivity once mobile-postpaid/plans API is available.
-        // selectedOperatorId and selectedCircleId are non-null here — guarded by isNullOrEmpty() checks above.
+        // TODO(B2C-59): temporary stand-in — replace with PostpaidPlanSelectionActivity once
+        // mobile-postpaid/plans API is ready; !! is safe — both IDs are checked non-null above
         PrepaidPlanSelectionActivity.start(
             mActivity, planSelectionLauncher, selectedOperatorId!!, selectedCircleId!!
         )
@@ -391,11 +363,11 @@ class PostpaidActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-59): startActivity(Intent(mActivity, PostpaidTransactionReportActivity::class.java))
+                    startActivity(Intent(mActivity, PostpaidTransactionReportActivity::class.java))
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-59): startActivity(Intent(mActivity, PostpaidTransactionStatusActivity::class.java))
+                    startActivity(Intent(mActivity, PostpaidTransactionStatusActivity::class.java))
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener

@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.prepaid.transactions
+package com.shreefintech.paytouchconsumer.postpaid.transactions
 
 import android.graphics.Color
 import android.os.Bundle
@@ -15,29 +15,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
-import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidTransactionStatusBinding
+import com.shreefintech.paytouchconsumer.databinding.ActivityPostpaidTransactionStatusBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidTransactionStatusViewModel
+import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidTransactionStatusViewModel
 import com.shreefintech.paytouchconsumer.transactions.TransactionDetailActivity
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 
-class PrepaidTransactionStatusActivity : BaseActivity() {
+class PostpaidTransactionStatusActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityPrepaidTransactionStatusBinding
-    private val viewModel: PrepaidTransactionStatusViewModel by viewModels()
+    private lateinit var binding: ActivityPostpaidTransactionStatusBinding
+    private val viewModel: PostpaidTransactionStatusViewModel by viewModels()
     private lateinit var transactionAdp: TransactionAdp
 
     private val mArrayList         = ArrayList<TransactionItem>()
     private val showProgressSearch = ObservableBoolean(false)
 
-    // Active query for the current paginated result set
     private var activeQuery: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPrepaidTransactionStatusBinding.inflate(layoutInflater)
+        binding = ActivityPostpaidTransactionStatusBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
@@ -72,11 +71,9 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
 
         setupRecyclerView()
         onBack()
-        
+
         loadPage(1)
     }
-
-    // ── Setup ─────────────────────────────────────────────────────────────────
 
     private fun setupRecyclerView() {
         transactionAdp = TransactionAdp(mActivity, mArrayList)
@@ -100,8 +97,6 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
         })
     }
 
-    // ── Actions ───────────────────────────────────────────────────────────────
-
     private fun onSearch() {
         val query = binding.etSearch.text?.toString()?.trim() ?: ""
         if (query.isEmpty()) {
@@ -112,8 +107,6 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
         activeQuery = query
         loadPage(1)
     }
-
-    // ── Data Loading ──────────────────────────────────────────────────────────
 
     private fun loadPage(page: Int) {
         viewModel.loadStatus(
@@ -150,8 +143,6 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
         )
     }
 
-    // ── UI Helpers ────────────────────────────────────────────────────────────
-
     private fun showShimmer(show: Boolean) {
         showProgressSearch.set(show)
         if (show) {
@@ -169,8 +160,6 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
     private fun showFooterLoader(show: Boolean) {
         binding.pbLoadMore.visibility = if (show) View.VISIBLE else View.GONE
     }
-
-    // ── Navigation ────────────────────────────────────────────────────────────
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -193,5 +182,4 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
             }
         }
     }
-
 }

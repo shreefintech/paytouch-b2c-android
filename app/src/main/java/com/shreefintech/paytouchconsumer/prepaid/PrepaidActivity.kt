@@ -65,36 +65,6 @@ class PrepaidActivity : BaseActivity() {
         }
     }
 
-    companion object {
-        // value -> display name, per the operator circle list used across recharge providers
-        private val STATE_LIST = listOf(
-            "01" to "Andhra Pradesh",
-            "02" to "Assam",
-            "03" to "Bihar & Jharkhand",
-            "04" to "Chennai",
-            "05" to "Delhi & NCR",
-            "06" to "Gujarat",
-            "07" to "Haryana",
-            "08" to "Himachal Pradesh",
-            "09" to "Jammu & Kashmir",
-            "10" to "Karnataka",
-            "11" to "Kerala",
-            "12" to "Kolkata",
-            "13" to "Maharashtra & Goa (except Mumbai)",
-            "14" to "MP & Chattisgarh",
-            "15" to "Mumbai",
-            "16" to "North East",
-            "17" to "Orissa",
-            "18" to "Punjab",
-            "19" to "Rajasthan",
-            "20" to "Tamilnadu",
-            "21" to "UP(EAST)",
-            "22" to "UP(WEST) & Uttarakhand",
-            "23" to "West Bengal",
-            "51" to "All India (except Delhi/Mumbai)"
-        )
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPrepaidBinding.inflate(layoutInflater)
@@ -151,9 +121,9 @@ class PrepaidActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = "₹%.2f".format(fee)
+                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = "₹%.2f".format(total)
+                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
@@ -256,7 +226,7 @@ class PrepaidActivity : BaseActivity() {
 
     private fun showStateDropdown() {
         Utility.hideKeyboard(binding.clRoot)
-        val names = STATE_LIST.map { it.second }
+        val names = Utility.STATE_LIST.map { it.second }
         CustomDropdown.showDropdown(
             activity = mActivity,
             anchorView = binding.flStateAnchor,
@@ -264,7 +234,7 @@ class PrepaidActivity : BaseActivity() {
             textView = binding.tvState,
             items = names
         ) { selected, index ->
-            selectedCircleId = STATE_LIST.getOrNull(index)?.first
+            selectedCircleId = Utility.STATE_LIST.getOrNull(index)?.first
             selectedCircleName = selected
             binding.tvState.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
             clearSelectedPlan()

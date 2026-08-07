@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.gas.viewmodel
+package com.shreefintech.paytouchconsumer.postpaid.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -6,8 +6,8 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidTransactionReportRequest
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -16,7 +16,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class GasTransactionReportViewModel(application: Application) : AndroidViewModel(application) {
+class PostpaidTransactionReportViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private const val PER_PAGE = 20
@@ -38,14 +38,13 @@ class GasTransactionReportViewModel(application: Application) : AndroidViewModel
         fromDate: String?,
         toDate: String?,
         status: String?,
-        consumerNo: String?,
+        mobileNo: String?,
         page: Int,
         onLoading: () -> Unit,
         onSuccess: (ArrayList<TransactionItem>) -> Unit,
         onError: (String) -> Unit
     ) {
         if (page == 1) {
-            // Fresh load: reset pagination state so a new filter/clear always goes through
             isLastPage  = false
             currentPage = 0
             isLoading   = false
@@ -57,13 +56,13 @@ class GasTransactionReportViewModel(application: Application) : AndroidViewModel
         }
         isLoading = true
         onLoading()
-        ApiClient.apiService.getGasPaymentReport(
+        ApiClient.apiService.getPostpaidPaymentReport(
             bearerToken(),
-            GasTransactionReportRequest(fromDate, toDate, status, consumerNo, page, PER_PAGE)
-        ).enqueue(object : Callback<General<List<GasTransactionReportDataItem>>> {
+            PostpaidTransactionReportRequest(fromDate, toDate, status, mobileNo, page, PER_PAGE)
+        ).enqueue(object : Callback<General<List<PostpaidTransactionReportDataItem>>> {
             override fun onResponse(
-                call: Call<General<List<GasTransactionReportDataItem>>>,
-                response: Response<General<List<GasTransactionReportDataItem>>>
+                call: Call<General<List<PostpaidTransactionReportDataItem>>>,
+                response: Response<General<List<PostpaidTransactionReportDataItem>>>
             ) {
                 isLoading = false
                 if (response.isSuccessful && response.body()?.data != null) {
@@ -83,7 +82,7 @@ class GasTransactionReportViewModel(application: Application) : AndroidViewModel
             }
 
             override fun onFailure(
-                call: Call<General<List<GasTransactionReportDataItem>>>,
+                call: Call<General<List<PostpaidTransactionReportDataItem>>>,
                 t: Throwable
             ) {
                 isLoading = false
@@ -92,21 +91,21 @@ class GasTransactionReportViewModel(application: Application) : AndroidViewModel
         })
     }
 
-    private fun mapToTransactionItem(item: GasTransactionReportDataItem): TransactionItem {
+    private fun mapToTransactionItem(item: PostpaidTransactionReportDataItem): TransactionItem {
         return TransactionItem(
             mobileNumber    = item.connectionNumber ?: "--",
             transactionId   = item.transactionId ?: "--",
-            amount          = Utility.formatAmount(item.billAmount),
+            amount          = Utility.formatAmount(item.billAmount ?: item.totalPayable),
             status          = item.status ?: "--",
-            categoryIconRes = R.drawable.ic_gas,
-            username        = item.customerName ?: "--",
+            categoryIconRes = R.drawable.ic_postpaid,
+            username        = item.customerName ?: item.connectionNumber ?: "--",
             date            = item.createdAt ?: "--",
             platformFee     = Utility.formatAmount(item.platformFee),
             totalPayable    = Utility.formatAmount(item.totalPayable),
             referenceId     = item.transactionId ?: "--",
             userId          = item.id?.toString() ?: "--",
             accountNumber   = item.connectionNumber ?: "--",
-            companyName     = item.operatorName?.takeIf { it.isNotEmpty() } ?: item.subservice ?: "--"
+            companyName     = item.serviceType ?: "--"
         )
     }
 }

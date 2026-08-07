@@ -1,7 +1,7 @@
 package com.shreefintech.paytouchconsumer.gas.viewmodel
 
 import android.app.Application
-import com.shreefintech.paytouchconsumer.BaseBillViewModel
+import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -13,8 +13,10 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
 
-class GasTransactionStatusViewModel(application: Application) : BaseBillViewModel(application) {
+class GasTransactionStatusViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private const val PER_PAGE = 20
@@ -91,13 +93,13 @@ class GasTransactionStatusViewModel(application: Application) : BaseBillViewMode
         return TransactionItem(
             mobileNumber    = item.connectionNumber ?: "--",
             transactionId   = item.transactionId ?: "--",
-            amount          = "₹${item.billAmount ?: "0.00"}",
+            amount          = Utility.formatAmount(item.billAmount),
             status          = item.status ?: "--",
             categoryIconRes = R.drawable.ic_gas,
             username        = item.customerName ?: "--",
             date            = item.createdAt ?: "--",
-            platformFee     = "₹${item.platformFee ?: "0.00"}",
-            totalPayable    = "₹${item.totalPayable ?: "0.00"}",
+            platformFee     = Utility.formatAmount(item.platformFee),
+            totalPayable    = Utility.formatAmount(item.totalPayable),
             referenceId     = item.transactionId ?: "--",
             userId          = item.id?.toString() ?: "--",
             accountNumber   = item.connectionNumber ?: "--",

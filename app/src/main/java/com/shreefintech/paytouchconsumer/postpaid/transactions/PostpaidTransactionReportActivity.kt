@@ -1,43 +1,47 @@
-package com.shreefintech.paytouchconsumer.prepaid.transactions
+package com.shreefintech.paytouchconsumer.postpaid.transactions
 
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.databinding.ObservableBoolean
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
-import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidTransactionStatusBinding
+import com.shreefintech.paytouchconsumer.databinding.ActivityPostpaidTransactionReportBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidTransactionStatusViewModel
+import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidTransactionReportViewModel
 import com.shreefintech.paytouchconsumer.transactions.TransactionDetailActivity
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
+import com.shreefintech.paytouchconsumer.utill.TransactionFilterHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
-class PrepaidTransactionStatusActivity : BaseActivity() {
+class PostpaidTransactionReportActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityPrepaidTransactionStatusBinding
-    private val viewModel: PrepaidTransactionStatusViewModel by viewModels()
+    private lateinit var binding: ActivityPostpaidTransactionReportBinding
+    private val viewModel: PostpaidTransactionReportViewModel by viewModels()
     private lateinit var transactionAdp: TransactionAdp
+    private lateinit var filterHelper: TransactionFilterHelper
 
-    private val mArrayList         = ArrayList<TransactionItem>()
-    private val showProgressSearch = ObservableBoolean(false)
+    private val mAllList     = ArrayList<TransactionItem>()
+    private val mDisplayList = ArrayList<TransactionItem>()
 
-    // Active query for the current paginated result set
-    private var activeQuery: String? = null
+    private var filterFromDate: String? = null
+    private var filterToDate:   String? = null
+    private var filterStatus:   String? = null
+    private var filterMobileNo: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPrepaidTransactionStatusBinding.inflate(layoutInflater)
+        binding = ActivityPostpaidTransactionReportBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
@@ -49,6 +53,7 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
+            binding.incFilterSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
             insets
         }
 
@@ -63,23 +68,18 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
             solidStroke  = true,
         )
 
-        binding.showProgressSearch = showProgressSearch
-        binding.onClickListener    = onClickListener()
-
-        binding.etSearch.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) { onSearch(); true } else false
-        }
-
         setupRecyclerView()
+        setupSearch()
+        setupFilterSheet()
+
+        binding.onClickListener = onClickListener()
         onBack()
-        
-        loadPage(1)
+
+        callReport(null, null, null, null)
     }
 
-    // ── Setup ─────────────────────────────────────────────────────────────────
-
     private fun setupRecyclerView() {
-        transactionAdp = TransactionAdp(mActivity, mArrayList)
+        transactionAdp = TransactionAdp(mActivity, mDisplayList)
         transactionAdp.onClickItem = { item ->
             TransactionDetailActivity.start(mActivity, item)
         }
@@ -100,24 +100,46 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
         })
     }
 
-    // ── Actions ───────────────────────────────────────────────────────────────
+    private fun setupSearch() {
+        binding.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                filterList(s?.toString()?.trim() ?: "")
+            }
+        })
+    }
 
-    private fun onSearch() {
-        val query = binding.etSearch.text?.toString()?.trim() ?: ""
-        if (query.isEmpty()) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgEnterSearchQuery))
-            return
-        }
-        Utility.hideKeyboard(mActivity)
-        activeQuery = query
+    private fun setupFilterSheet() {
+        filterHelper = TransactionFilterHelper(
+            activity     = mActivity,
+            sheetBinding = binding.incFilterSheet,
+            bgOverlay    = binding.viewBg,
+            onApply      = { fromDate, toDate, status, mobileNo ->
+                callReport(fromDate, toDate, status, mobileNo)
+            },
+            onClear      = {
+                binding.etSearch.setText("")
+                callReport(null, null, null, null)
+            }
+        )
+        filterHelper.setup()
+    }
+
+    private fun callReport(fromDate: String?, toDate: String?, status: String?, mobileNo: String?) {
+        filterFromDate = fromDate
+        filterToDate   = toDate
+        filterStatus   = status
+        filterMobileNo = mobileNo
         loadPage(1)
     }
 
-    // ── Data Loading ──────────────────────────────────────────────────────────
-
     private fun loadPage(page: Int) {
-        viewModel.loadStatus(
-            query     = activeQuery,
+        viewModel.loadReport(
+            fromDate  = filterFromDate,
+            toDate    = filterToDate,
+            status    = filterStatus,
+            mobileNo  = filterMobileNo,
             page      = page,
             onLoading = {
                 if (page == 1) showShimmer(true) else showFooterLoader(true)
@@ -125,23 +147,20 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
             onSuccess = { list ->
                 if (page == 1) {
                     showShimmer(false)
-                    mArrayList.clear()
-                    mArrayList.addAll(list)
-                    transactionAdp.notifyDataSetChanged()
+                    mAllList.clear()
+                    mAllList.addAll(list)
+                    filterList(currentQuery())
                 } else {
                     showFooterLoader(false)
-                    val insertStart = mArrayList.size
-                    mArrayList.addAll(list)
-                    transactionAdp.notifyItemRangeInserted(insertStart, list.size)
+                    mAllList.addAll(list)
+                    appendToDisplayList(list)
                 }
-                binding.tvEmpty.visibility = if (mArrayList.isEmpty()) View.VISIBLE else View.GONE
             },
             onError   = { msg ->
                 if (page == 1) {
                     showShimmer(false)
-                    mArrayList.clear()
-                    transactionAdp.notifyDataSetChanged()
-                    binding.tvEmpty.visibility = View.VISIBLE
+                    mAllList.clear()
+                    filterList(currentQuery())
                 } else {
                     showFooterLoader(false)
                 }
@@ -150,10 +169,7 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
         )
     }
 
-    // ── UI Helpers ────────────────────────────────────────────────────────────
-
     private fun showShimmer(show: Boolean) {
-        showProgressSearch.set(show)
         if (show) {
             binding.rvTransactions.visibility = View.GONE
             binding.tvEmpty.visibility        = View.GONE
@@ -170,11 +186,48 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
         binding.pbLoadMore.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    // ── Navigation ────────────────────────────────────────────────────────────
+    private fun filterList(query: String) {
+        mDisplayList.clear()
+        if (query.isEmpty()) {
+            mDisplayList.addAll(mAllList)
+        } else {
+            val lower = query.lowercase()
+            mAllList.filterTo(mDisplayList) {
+                it.mobileNumber.lowercase().contains(lower) ||
+                        it.transactionId.lowercase().contains(lower)
+            }
+        }
+        transactionAdp.notifyDataSetChanged()
+        binding.tvEmpty.visibility = if (mDisplayList.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun appendToDisplayList(newItems: ArrayList<TransactionItem>) {
+        val query       = currentQuery()
+        val insertStart = mDisplayList.size
+        val toAdd: List<TransactionItem> = if (query.isEmpty()) {
+            newItems
+        } else {
+            val lower = query.lowercase()
+            newItems.filter {
+                it.mobileNumber.lowercase().contains(lower) ||
+                        it.transactionId.lowercase().contains(lower)
+            }
+        }
+        if (toAdd.isNotEmpty()) {
+            mDisplayList.addAll(toAdd)
+            transactionAdp.notifyItemRangeInserted(insertStart, toAdd.size)
+        }
+        binding.tvEmpty.visibility = if (mDisplayList.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun currentQuery() = binding.etSearch.text?.toString()?.trim() ?: ""
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() { finish() }
+            override fun handleOnBackPressed() {
+                if (filterHelper.isVisible()) filterHelper.hide()
+                else finish()
+            }
         })
     }
 
@@ -185,13 +238,11 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
-                binding.llSearch -> {
+                binding.ivFilter -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (showProgressSearch.get()) return@OnClickListener
-                    onSearch()
+                    filterHelper.show()
                 }
             }
         }
     }
-
 }

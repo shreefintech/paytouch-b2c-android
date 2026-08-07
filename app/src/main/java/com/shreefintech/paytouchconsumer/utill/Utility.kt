@@ -18,6 +18,33 @@ import java.util.Locale
 
 object Utility {
 
+    val STATE_LIST = listOf(
+        "01" to "Andhra Pradesh",
+        "02" to "Assam",
+        "03" to "Bihar & Jharkhand",
+        "04" to "Chennai",
+        "05" to "Delhi & NCR",
+        "06" to "Gujarat",
+        "07" to "Haryana",
+        "08" to "Himachal Pradesh",
+        "09" to "Jammu & Kashmir",
+        "10" to "Karnataka",
+        "11" to "Kerala",
+        "12" to "Kolkata",
+        "13" to "Maharashtra & Goa (except Mumbai)",
+        "14" to "MP & Chattisgarh",
+        "15" to "Mumbai",
+        "16" to "North East",
+        "17" to "Orissa",
+        "18" to "Punjab",
+        "19" to "Rajasthan",
+        "20" to "Tamilnadu",
+        "21" to "UP(EAST)",
+        "22" to "UP(WEST) & Uttarakhand",
+        "23" to "West Bengal",
+        "51" to "All India (except Delhi/Mumbai)"
+    )
+
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
         return try {

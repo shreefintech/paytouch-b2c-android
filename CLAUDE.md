@@ -86,6 +86,17 @@ com.shreefintech.paytouchconsumer/
 10. **All API endpoints must be declared in `ApiService` or `ApiAdminService`** — never construct `OkHttpClient` or `Retrofit` directly inside a ViewModel or Activity. Each backend URL has exactly one registered client: `ApiClient` for `paytouch.in`, `ApiAdminClient` for `admin.paytouch.in`. Add a new endpoint to the appropriate service interface; do not bypass it with a raw HTTP call.
 11. **`mapToTransactionItem()` must use `item.id?.toString() ?: "--"` for `userId`** — never use `(index + 1).toString()` or any iteration index. The API response DTO always carries an `id` field; using the loop index produces duplicate `userId` values on paginated appends (page 2+ resets index to 0) and loses the server-side identity of the record.
 12. **Never generate `transaction_id` client-side** — the backend owns transaction ID generation. Do not call `Utility.generateTransactionId()` or any equivalent before a payment API call. Do not include a `transaction_id` field in any process-payment request DTO (`ElectricityProcessPaymentRequest`, `GasProcessPaymentRequest`, or any future module). The server returns the transaction ID in the response; read it from there. (`Utility.generateTransactionId()` was removed in review — flagged as incorrect ownership of ID generation.)
+13. **ViewModel base class is determined by role, not by module** — follow this table exactly; never use `BaseBillViewModel` for a ViewModel that does not need balance checks:
+
+| ViewModel role | Base class |
+|---|---|
+| Main payment screen (`{Category}ViewModel`) | `BaseBillViewModel` |
+| Recent transactions (`{Category}RecentTransactionViewModel`) | `AndroidViewModel` |
+| Transaction report (`{Category}TransactionReportViewModel`) | `AndroidViewModel` |
+| Transaction status (`{Category}TransactionStatusViewModel`) | `AndroidViewModel` |
+| SMS receipt (`{Category}SmsReceiptViewModel`) | `AndroidViewModel` |
+
+`BaseBillViewModel` provides `checkVpsBalance()` and `checkWalletBalance()` — methods only needed by payment-flow ViewModels. Report/status/receipt ViewModels use `bearerToken()` and `getString()` from `ViewModelExt.kt` instead. Do not flag the report/status ViewModels as inconsistent for extending `AndroidViewModel` directly.
 
 ---
 

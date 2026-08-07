@@ -136,7 +136,7 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
         return RecentTransactionItem(
             categoryName      = service,
             accountHolderName = item.extra?.customerName ?: "-",
-            date              = Utility.formatDate(item.createdAt),
+            date              = Utility.formatDate(item.createdAt, "dd MMM yyyy"),
             status            = item.status ?: "-",
             amount            = Utility.formatAmount(item.amount ?: "--"),
             accountNumber     = item.identifier ?: "-",
