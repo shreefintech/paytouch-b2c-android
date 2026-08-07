@@ -707,6 +707,9 @@ Exception:
 - Temporary reuse is allowed only when Product explicitly requires an existing screen until the module-specific screen is implemented.
 - The code must include a `TODO(ticket-id)` referencing the follow-up work.
 - The temporary navigation must be removed before the module-specific Activity is released.
+
+**Active exception — Postpaid plan selection (B2C-59):**
+`PostpaidActivity.onBrowsePlan()` currently launches `PrepaidPlanSelectionActivity` as a temporary stand-in because the `mobile-postpaid/plans` API is under construction. Once that API is ready, replace with a dedicated `PostpaidPlanSelectionActivity` + `PostpaidPlanSelectionViewModel` that calls the postpaid plans endpoint. The temporary call is marked with `TODO(B2C-59)` in `PostpaidActivity.kt`.
 ---
 
 ## RecyclerView Update Rules

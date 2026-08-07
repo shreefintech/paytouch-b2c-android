@@ -11,6 +11,7 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -76,9 +77,9 @@ class HomeActivity : BaseActivity() {
                     startActivity(Intent(mActivity, PrepaidActivity::class.java))
                 }
 
-                binding.llTvCable -> {
+                binding.llPostpaid -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-520): Navigate to TV Cable payment screen
+                    startActivity(Intent(mActivity, PostpaidActivity::class.java))
                 }
 
                 binding.llDth -> {

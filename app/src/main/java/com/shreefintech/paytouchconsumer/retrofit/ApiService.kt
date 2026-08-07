@@ -26,6 +26,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityT
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlansListItem
@@ -244,6 +247,19 @@ interface ApiService {
     fun getPrepaidLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<PrepaidVerifyPaymentDataItem>>
+
+    // ── Mobile Postpaid ───────────────────────────────────────────────────────
+
+    @GET("${AUTH}mobile-postpaid/operators")
+    fun getPostpaidOperators(
+        @Header("Authorization") authorization: String
+    ): Call<General<List<PostpaidOperatorItem>>>
+
+    @POST("${AUTH}mobile-postpaid/process-payment")
+    fun processPostpaidPayment(
+        @Header("Authorization") authorization: String,
+        @Body request: PostpaidProcessPaymentRequest
+    ): Call<PostpaidPaymentItem>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 
