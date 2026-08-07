@@ -185,7 +185,7 @@ class PostpaidActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
-                // TODO(PAYTOUCH-59): navigate to PostpaidSmsReceiptActivity
+                // TODO(B2C-59): navigate to PostpaidSmsReceiptActivity
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -247,7 +247,7 @@ class PostpaidActivity : BaseActivity() {
         binding.tvSelectedPlanDescription.text = plan.description ?: "-"
         binding.tvSelectedValidity.text = plan.validity ?: "-"
         binding.tvSelectedTalktime.text =
-            if (plan.talktime == null || plan.talktime < 0) "-" else "₹%.2f".format(plan.talktime)
+            if (plan.talktime == null || plan.talktime < 0) "-" else getString(R.string.fmtCurrencyAmount).format(plan.talktime)
         binding.tvSelectedData.text = if (plan.data.isNullOrEmpty()) "--" else plan.data
         binding.etAmount.setText(plan.amount?.toString() ?: "")
         binding.cvPlanDetails.visibility = View.VISIBLE
@@ -286,6 +286,8 @@ class PostpaidActivity : BaseActivity() {
             return
         }
         Utility.hideKeyboard(mActivity)
+        // TODO(B2C-59): temporary stand-in — replace with PostpaidPlanSelectionActivity once
+        // mobile-postpaid/plans API is ready; !! is safe — both IDs are checked non-null above
         PrepaidPlanSelectionActivity.start(
             mActivity, planSelectionLauncher, selectedOperatorId!!, selectedCircleId!!
         )
@@ -369,11 +371,11 @@ class PostpaidActivity : BaseActivity() {
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-59): PostpaidSmsReceiptActivity.start(mActivity)
+                    // TODO(B2C-59): PostpaidSmsReceiptActivity.start(mActivity)
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-59): PostpaidRecentTransactionActivity.start(mActivity)
+                    // TODO(B2C-59): PostpaidRecentTransactionActivity.start(mActivity)
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
