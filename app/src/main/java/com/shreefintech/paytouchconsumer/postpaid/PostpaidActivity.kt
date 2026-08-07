@@ -119,9 +119,9 @@ class PostpaidActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = "₹%.2f".format(fee)
+                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = "₹%.2f".format(total)
+                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
@@ -249,7 +249,7 @@ class PostpaidActivity : BaseActivity() {
         binding.tvSelectedPlanDescription.text = plan.description ?: "-"
         binding.tvSelectedValidity.text = plan.validity ?: "-"
         binding.tvSelectedTalktime.text =
-            if (plan.talktime == null || plan.talktime < 0) "-" else "₹%.2f".format(plan.talktime)
+            if (plan.talktime == null || plan.talktime < 0) "-" else getString(R.string.fmtCurrencyAmount).format(plan.talktime)
         binding.tvSelectedData.text = if (plan.data.isNullOrEmpty()) "--" else plan.data
         binding.etAmount.setText(plan.amount?.toString() ?: "")
         binding.cvPlanDetails.visibility = View.VISIBLE
@@ -288,6 +288,8 @@ class PostpaidActivity : BaseActivity() {
             return
         }
         Utility.hideKeyboard(mActivity)
+        // TODO(B2C-59): temporary stand-in — replace with PostpaidPlanSelectionActivity once
+        // mobile-postpaid/plans API is ready; !! is safe — both IDs are checked non-null above
         PrepaidPlanSelectionActivity.start(
             mActivity, planSelectionLauncher, selectedOperatorId!!, selectedCircleId!!
         )
