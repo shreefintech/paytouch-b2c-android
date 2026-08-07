@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="@dimen/page_margin_horizontal">
+
+        <!-- Guide text -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_medium"
+            android:includeFontPadding="false"
+            android:text="@string/msgSelfieGuide"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_13" />
+
+        <!-- Selfie area -->
+        <FrameLayout
+            android:layout_width="@dimen/kyc_selfie_size"
+            android:layout_height="@dimen/kyc_selfie_size"
+            android:layout_marginTop="@dimen/margin_large">
+
+            <!-- Guide circle (visible before capture) -->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivSelfieGuide"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_selfie_guide"
+                android:padding="@dimen/margin_extra_large"
+                android:src="@drawable/ic_profile"
+                android:tint="@color/hint_color" />
+
+            <!-- Selfie preview circle (GONE until captured) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcvSelfiePreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:cardCornerRadius="90dp"
+                app:cardElevation="0dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivSelfiePreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Edit / Delete icons (GONE until captured) -->
+            <LinearLayout
+                android:id="@+id/llSelfieActions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivEditSelfie"
+                    android:layout_width="@dimen/upload_edit_size"
+                    android:layout_height="@dimen/upload_edit_size"
+                    android:background="@drawable/bg_transaction_icon"
+                    android:padding="@dimen/margin_extra_small"
+                    android:src="@drawable/ic_edit_placeholder"
+                    android:tint="@color/form_wizard_success" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivDeleteSelfie"
+                    android:layout_width="@dimen/upload_edit_size"
+                    android:layout_height="@dimen/upload_edit_size"
+                    android:layout_marginStart="@dimen/margin_extra_small"
+                    android:background="@drawable/bg_transaction_icon"
+                    android:padding="@dimen/margin_extra_small"
+                    android:src="@drawable/ic_cross"
+                    android:tint="@color/form_wizard_reject" />
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Instructions -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_medium"
+            android:includeFontPadding="false"
+            android:text="@string/msgSelfieInstruction1"
+            android:textColor="@color/hint_color"
+            android:textSize="@dimen/text_size_12" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:fontFamily="@font/proza_libre_medium"
+            android:includeFontPadding="false"
+            android:text="@string/msgSelfieInstruction2"
+            android:textColor="@color/hint_color"
+            android:textSize="@dimen/text_size_12" />
+
+        <!-- Capture button -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="@dimen/margin_extra_large"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="@dimen/button_corner_radius"
+            app:cardElevation="@dimen/card_elevation">
+
+            <LinearLayout
+                android:id="@+id/btnCapture"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/btnCapture"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_14" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

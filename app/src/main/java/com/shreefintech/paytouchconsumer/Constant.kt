@@ -13,8 +13,6 @@ object Constant {
     const val KEY_MOBILE = "MOBILE"
     const val KEY_TOKEN_TYPE = "TOKEN_TYPE"
     const val KEY_WALLET_BALANCE = "WALLET_BALANCE"
-
-
     const val KEY_REFERRAL_CODE = "ReferralCode"
 
     // External URLs

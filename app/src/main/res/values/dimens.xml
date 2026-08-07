@@ -98,4 +98,9 @@
     <dimen name="filter_status_height">30dp</dimen>
     <dimen name="share_btn_height">40dp</dimen>
     <dimen name="glass_normal_radius">15dp</dimen>
+
+    <!-- KYC step dot indicator -->
+    <dimen name="kyc_dot_size">8dp</dimen>
+    <dimen name="kyc_dot_margin">6dp</dimen>
+    <dimen name="kyc_selfie_size">180dp</dimen>
 </resources>
