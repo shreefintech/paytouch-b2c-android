@@ -350,5 +350,6 @@
     <string name="textFilter">Filter</string>
 
     <string name="msgInsufficientBalance">Insufficient balance. Please add funds to your wallet.</string>
+    <string name="hintSearchPrepaidTransaction">Search mobile number or Transaction ID</string>
 
 </resources>
