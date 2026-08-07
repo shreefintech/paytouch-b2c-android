@@ -3,6 +3,7 @@ package com.shreefintech.paytouchconsumer.retrofit
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
@@ -178,6 +179,13 @@ interface ApiService {
     fun getUserWalletData(
         @Header("Authorization") authorization: String
     ): Call<General<WalletDataItem>>
+
+    @GET("${AUTH}wallet/combined-wallet-history")
+    fun getWalletHistory(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): Call<General<WalletHistoryPageItem>>
 
     // ── Electricity ───────────────────────────────────────────────────────────
 

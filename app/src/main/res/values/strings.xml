@@ -435,5 +435,7 @@
     <string name="labelPoweredByPartners">Powered by • Bharat Connect • Indusind • PayTouch • ICICI</string>
     <string name="btnMakePayment">Make Payment</string>
     <string name="labelViewAll">View All</string>
+    <string name="textDebitSign">-%1$s</string>
+    <string name="textCreditSign">+%1$s</string>
 
 </resources>

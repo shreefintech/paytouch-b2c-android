@@ -7,7 +7,6 @@ import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -17,57 +16,52 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class LoadWalletViewModel(application: Application) : AndroidViewModel(application) {
+class WalletTransactionsViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun fetchUserWalletData(
-        onLoading: () -> Unit,
-        onSuccess: (WalletDataItem) -> Unit,
-        onError: (String) -> Unit
-    ) {
-        if (!Utility.isInternetAvailable(getApplication())) {
-            onError(getString(R.string.msgNoInternet))
-            return
-        }
-        onLoading()
-        ApiClient.apiService.getUserWalletData(bearerToken())
-            .enqueue(object : Callback<General<WalletDataItem>> {
-                override fun onResponse(
-                    call: Call<General<WalletDataItem>>,
-                    response: Response<General<WalletDataItem>>
-                ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        onSuccess(response.body()!!.data!!)
-                    } else {
-                        onError(
-                            ApiHelper.parseErrorMessage(
-                                getApplication(), response.code(), response.errorBody()?.string()
-                            )
-                        )
-                    }
-                }
-
-                override fun onFailure(call: Call<General<WalletDataItem>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
-                }
-            })
+    companion object {
+        private const val PER_PAGE = 20
     }
 
-    fun fetchRecentHistory(
+    private var currentPage = 0
+    var isLastPage = false
+        private set
+    var isLoading = false
+        private set
+
+    fun canLoadMore() = !isLoading && !isLastPage
+
+    fun nextPage() = currentPage + 1
+
+    fun loadHistory(
+        page: Int,
+        onLoading: () -> Unit,
         onSuccess: (ArrayList<WalletTransactionItem>) -> Unit,
         onError: (String) -> Unit
     ) {
+        if (page == 1) {
+            isLastPage  = false
+            currentPage = 0
+            isLoading   = false
+        }
+        if (isLoading) return
         if (!Utility.isInternetAvailable(getApplication())) {
             onError(getString(R.string.msgNoInternet))
             return
         }
-        ApiClient.apiService.getWalletHistory(bearerToken(), page = 1, perPage = 2)
+        isLoading = true
+        onLoading()
+        ApiClient.apiService.getWalletHistory(bearerToken(), page, PER_PAGE)
             .enqueue(object : Callback<General<WalletHistoryPageItem>> {
                 override fun onResponse(
                     call: Call<General<WalletHistoryPageItem>>,
                     response: Response<General<WalletHistoryPageItem>>
                 ) {
+                    isLoading = false
                     if (response.isSuccessful && response.body()?.data != null) {
-                        val rawList = response.body()!!.data!!.data ?: emptyList()
+                        val pageData = response.body()!!.data!!
+                        val rawList  = pageData.data ?: emptyList()
+                        isLastPage  = page >= (pageData.lastPage ?: 1)
+                        currentPage = page
                         val list = ArrayList<WalletTransactionItem>()
                         rawList.forEach { list.add(mapToWalletTransactionItem(it)) }
                         onSuccess(list)
@@ -81,6 +75,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 }
 
                 override fun onFailure(call: Call<General<WalletHistoryPageItem>>, t: Throwable) {
+                    isLoading = false
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
@@ -88,9 +83,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun mapToWalletTransactionItem(item: WalletHistoryItem): WalletTransactionItem {
         return WalletTransactionItem(
-            title = item.serviceName ?: "--",
-            date = Utility.formatDate(item.createdAt),
-            amount = Utility.formatAmount(item.amount),
+            title    = item.serviceName ?: "--",
+            date     = Utility.formatDate(item.createdAt),
+            amount   = Utility.formatAmount(item.amount),
             isCredit = item.type?.uppercase() == "CREDIT"
         )
     }

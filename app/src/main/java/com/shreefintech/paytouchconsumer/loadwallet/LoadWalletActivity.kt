@@ -12,9 +12,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
+import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoadWalletBinding
-import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
+import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
+import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 class LoadWalletActivity : BaseActivity() {
@@ -23,14 +25,11 @@ class LoadWalletActivity : BaseActivity() {
     private val viewModel: LoadWalletViewModel by viewModels()
 
     private var currentTab = TAB_TOTAL_BALANCE
-    private val transactionList = ArrayList<TransactionItem>()
-    private lateinit var transactionAdp: TransactionAdp
+    private val transactionList = ArrayList<WalletTransactionItem>()
+    private lateinit var transactionAdp: WalletTransactionAdp
 
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
-        private const val TAB_REFERRAL_WALLET = 1
-        private const val TAB_MY_WALLET = 2
-        private const val TAB_EARN = 3
 
         fun start(context: Context) {
             context.startActivity(Intent(context, LoadWalletActivity::class.java))
@@ -52,17 +51,61 @@ class LoadWalletActivity : BaseActivity() {
         setupRecyclerView()
         selectTab(TAB_TOTAL_BALANCE)
         onBack()
+        fetchWalletData()
+        fetchRecentHistory()
+    }
 
-        // TODO(PAYTOUCH-82): Fetch wallet balance from API and update tvWalletBalance
-        // TODO(PAYTOUCH-82): Fetch virtual account details and populate card fields
-        // TODO(PAYTOUCH-82): Fetch recent wallet transactions for rvTransactions
+    private fun fetchWalletData() {
+        viewModel.fetchUserWalletData(
+            onLoading = { showLoading() },
+            onSuccess = { data ->
+                hideLoading()
+                populateWalletData(data)
+            },
+            onError = { msg ->
+                hideLoading()
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
+    private fun fetchRecentHistory() {
+        viewModel.fetchRecentHistory(
+            onSuccess = { list ->
+                transactionList.clear()
+                transactionList.addAll(list)
+                transactionAdp.notifyDataSetChanged()
+                updateEmptyState()
+            },
+            onError = { /* silent — wallet data already shows its own error */ }
+        )
+    }
+
+    private fun showLoading() {
+        binding.viewDimmer.visibility = View.VISIBLE
+        binding.pbLoading.visibility = View.VISIBLE
+    }
+
+    private fun hideLoading() {
+        binding.viewDimmer.visibility = View.GONE
+        binding.pbLoading.visibility = View.GONE
+    }
+
+    private fun populateWalletData(data: WalletDataItem) {
+        binding.tvWalletBalance.text = Utility.formatAmount(data.walletBalance)
+        binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
+        binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
+        binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
+        binding.tvQrInvoiceAmount.text = data.vpa ?: "--"
+        binding.tvIfscCode.text = data.ifsc ?: "--"
+        val status = data.wallet?.status
+        if (!status.isNullOrEmpty()) {
+            binding.tvActiveStatus.text = status.replaceFirstChar { it.uppercaseChar() }
+        }
     }
 
     private fun setupRecyclerView() {
-        transactionAdp = TransactionAdp(mActivity, transactionList)
-        transactionAdp.onClickItem = {
-            // TODO(PAYTOUCH-82): Navigate to wallet transaction detail
-        }
+        transactionAdp = WalletTransactionAdp(mActivity, transactionList)
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
             adapter = transactionAdp
@@ -79,25 +122,13 @@ class LoadWalletActivity : BaseActivity() {
     private fun selectTab(tab: Int) {
         currentTab = tab
         val isTotalBalance = tab == TAB_TOTAL_BALANCE
-
         binding.llTotalBalanceContent.visibility = if (isTotalBalance) View.VISIBLE else View.GONE
         binding.tvComingSoon.visibility = if (isTotalBalance) View.GONE else View.VISIBLE
 
-        val activeColor = ContextCompat.getColor(mActivity, R.color.primary)
-        val inactiveColor = android.graphics.Color.TRANSPARENT
-        val activeTextColor = ContextCompat.getColor(mActivity, R.color.white)
-        val inactiveTextColor = ContextCompat.getColor(mActivity, R.color.primary)
-
-        listOf(
-            binding.cvTabTotalBalance to binding.tvTabTotalBalance,
-            binding.cvTabReferralWallet to binding.tvTabReferralWallet,
-            binding.cvTabMyWallet to binding.tvTabMyWallet,
-            binding.cvTabEarn to binding.tvTabEarn
-        ).forEachIndexed { index, (card, text) ->
-            val isSelected = index == tab
-            card.setCardBackgroundColor(if (isSelected) activeColor else inactiveColor)
-            text.setTextColor(if (isSelected) activeTextColor else inactiveTextColor)
-        }
+        val activeColor    = ContextCompat.getColor(mActivity, R.color.primary)
+        val inactiveColor  = android.graphics.Color.TRANSPARENT
+        val activeText     = ContextCompat.getColor(mActivity, R.color.white)
+        val inactiveText   = ContextCompat.getColor(mActivity, R.color.primary)
     }
 
     private fun onBack() {
@@ -115,29 +146,13 @@ class LoadWalletActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
-                binding.cvTabTotalBalance -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    selectTab(TAB_TOTAL_BALANCE)
-                }
-                binding.cvTabReferralWallet -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    selectTab(TAB_REFERRAL_WALLET)
-                }
-                binding.cvTabMyWallet -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    selectTab(TAB_MY_WALLET)
-                }
-                binding.cvTabEarn -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    selectTab(TAB_EARN)
-                }
                 binding.llMakePayment -> {
                     if (Utility.stopClick()) return@OnClickListener
                     // TODO(PAYTOUCH-82): Navigate to Make Payment flow
                 }
                 binding.llTransactionReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-82): Navigate to wallet transaction report screen
+                    WalletTransactionsActivity.start(mActivity)
                 }
             }
         }
