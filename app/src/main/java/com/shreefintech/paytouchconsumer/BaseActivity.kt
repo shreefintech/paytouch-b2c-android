@@ -7,16 +7,11 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.shreefintech.paytouchconsumer.utill.BetterActivityResult
-import com.shreefintech.paytouchconsumer.utill.ToastType
-import com.shreefintech.paytouchconsumer.utill.ToastUtil
 
 
 open class BaseActivity : AppCompatActivity() {
