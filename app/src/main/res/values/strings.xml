@@ -363,5 +363,6 @@
 
     <string name="msgInsufficientBalance">Insufficient balance. Please add funds to your wallet.</string>
     <string name="categoryPostpaid">Postpaid</string>
+    <string name="hintSearchPrepaidTransaction">Search mobile number or Transaction ID</string>
 
 </resources>
