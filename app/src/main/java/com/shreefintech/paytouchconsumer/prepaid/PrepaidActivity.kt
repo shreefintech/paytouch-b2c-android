@@ -24,6 +24,8 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidRecentTransactionActivity
+import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransactionReportActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidViewModel
@@ -149,9 +151,9 @@ class PrepaidActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
+                binding.tvPlatformFee.text = "₹%.2f".format(fee)
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
+                binding.tvTotalPayable.text = "₹%.2f".format(total)
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
@@ -169,14 +171,8 @@ class PrepaidActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            android.net.Uri.parse(Constant.URL_PLATFORM_TERMS)
-                        )
-                    )
+                    startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(Constant.URL_PLATFORM_TERMS)))
                 }
-
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
                     ds.color = ContextCompat.getColor(mActivity, R.color.primary)
@@ -223,11 +219,7 @@ class PrepaidActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
-                ToastUtil.showSuccess(
-                    mActivity,
-                    getString(R.string.msgPrepaidPaymentSuccess, mobileNumber)
-                )
-                finish()
+                PrepaidSmsReceiptActivity.start(mActivity, fromPayment = true)
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -291,10 +283,8 @@ class PrepaidActivity : BaseActivity() {
         binding.tvSelectedPlanDescription.text = plan.description ?: "-"
         binding.tvSelectedValidity.text = plan.validity ?: "-"
         binding.tvSelectedTalktime.text =
-            if (plan.talktime == null || plan.talktime < 0) "-" else getString(R.string.fmtCurrencyAmount).format(
-                plan.talktime
-            )
-        binding.tvSelectedData.text = if (plan.data.isNullOrEmpty()) "--" else plan.data
+            if (plan.talktime == null || plan.talktime < 0) "-" else "₹%.2f".format(plan.talktime)
+        binding.tvSelectedData.text = if(plan.data.isNullOrEmpty()) "--" else plan.data
         binding.etAmount.setText(plan.amount?.toString() ?: "")
         binding.cvPlanDetails.visibility = View.VISIBLE
     }
@@ -333,8 +323,7 @@ class PrepaidActivity : BaseActivity() {
         }
         Utility.hideKeyboard(mActivity)
         PrepaidPlanSelectionActivity.start(
-            mActivity, planSelectionLauncher, selectedOperatorId ?: return,
-            selectedCircleId ?: return
+            mActivity, planSelectionLauncher, selectedOperatorId!!, selectedCircleId!!
         )
     }
 
@@ -396,9 +385,7 @@ class PrepaidActivity : BaseActivity() {
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-            }
+            override fun handleOnBackPressed() { finish() }
         })
     }
 
@@ -409,49 +396,44 @@ class PrepaidActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
-
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
                     startActivity(Intent(mActivity, PrepaidTransactionReportActivity::class.java))
                 }
-
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
                     startActivity(Intent(mActivity, PrepaidTransactionStatusActivity::class.java))
                 }
-
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-54): Replace with PrepaidRecentTransactionActivity once created
+                    PrepaidRecentTransactionActivity.start(mActivity)
                 }
-
+                binding.llTabSmsReceipt -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    PrepaidSmsReceiptActivity.start(mActivity)
+                }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
                     showCompanyDropdown()
                 }
-
                 binding.flStateAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
                     showStateDropdown()
                 }
-
                 binding.llBrowsePlan -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressBrowse.get()) return@OnClickListener
                     onBrowsePlan()
                 }
-
                 binding.cvChangePlan -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBrowsePlan()
                 }
-
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
                     onProceedToPay()
                 }
-
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener

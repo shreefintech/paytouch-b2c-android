@@ -33,6 +33,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidProcessDi
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionStatusRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -238,6 +239,11 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: PrepaidTransactionReportRequest
     ): Call<General<List<PrepaidTransactionDataItem>>>
+
+    @GET("${AUTH}recharge/latest-payment")
+    fun getPrepaidLatestPayment(
+        @Header("Authorization") authorization: String
+    ): Call<General<PrepaidVerifyPaymentDataItem>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

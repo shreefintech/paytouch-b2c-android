@@ -192,7 +192,6 @@
     <string name="labelDataBenefit">Data</string>
     <string name="labelTalktime">Talktime</string>
     <string name="fmtPlanTalktimeData">Talktime: %1$s    Data: %2$s</string>
-    <string name="msgPrepaidPaymentSuccess">Recharge successful for %1$s</string>
 
     <!-- Electricity screen -->
     <string name="titleElectricityBill">Electricity Bill</string>
@@ -289,6 +288,7 @@
     <string name="labelStatusBullet">● %1$s</string>
     <string name="titleElectricityPaymentConfirmation">Electricity Payment Confirmation</string>
     <string name="titleGasPaymentConfirmation">Gas Payment Confirmation</string>
+    <string name="titlePrepaidPaymentConfirmation">Prepaid Payment Confirmation</string>
     <string name="labelPaytouchSmsNotification">Paytouch SMS Notification</string>
     <string name="labelBConnectTxnColon">B-Connect Txn ID:</string>
     <string name="labelDateColon">Date:</string>
@@ -305,6 +305,7 @@
     <string name="msgStoragePermissionRequired">Storage permission required to save receipt</string>
     <string name="msgSmsBody">Dear Customer, Your electricity bill payment of %1$s for Consumer %2$s has been successfully processed</string>
     <string name="msgGasSmsBody">Dear Customer, Your gas bill payment of %1$s for Consumer %2$s has been successfully processed</string>
+    <string name="msgPrepaidSmsBody">Dear Customer, Your mobile prepaid recharge of %1$s for Mobile Number %2$s has been successfully processed</string>
 
     <string name="labelDetailDate">Date - %s</string>
     <string name="labelDetailAmount">Amount - %s</string>
