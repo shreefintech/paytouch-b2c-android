@@ -96,4 +96,5 @@
     <dimen name="category_icon_size">52dp</dimen>
     <dimen name="text_size_15">15sp</dimen>
     <dimen name="filter_status_height">30dp</dimen>
+    <dimen name="share_btn_height">40dp</dimen>
 </resources>

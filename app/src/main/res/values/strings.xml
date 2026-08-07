@@ -265,7 +265,6 @@
 
     <!-- Transaction Detail screen -->
     <string name="titleTransactionStatus">Transaction Status</string>
-    <string name="labelMobileNo">Mobile No.</string>
     <string name="labelUsername">Username :</string>
     <string name="labelPayment">Payment</string>
     <string name="labelDate">Date</string>
@@ -389,5 +388,35 @@
     <string name="titleMunicipalTaxPaymentConfirmation">Municipal Tax Payment Confirmation</string>
     <string name="labelPropertyNo">Property No.</string>
     <string name="msgMunicipalTaxSmsBody">Dear Customer, Your municipal tax payment of %1$s for Property No %2$s has been successfully processed.</string>
+
+    <!-- My Account screen -->
+    <string name="titleMyAccount">My account</string>
+    <string name="titleReferAndEarn">Refer &amp; Earn</string>
+    <string name="tabAccountInfo">Account Info</string>
+    <string name="tabReferEarn">Refer&amp;Earn</string>
+    <string name="labelMemberId">Member ID</string>
+    <string name="labelMemberNo">Member No</string>
+    <string name="labelMemberCode">Member Code</string>
+    <string name="hintMemberId">Enter ID</string>
+    <string name="hintMemberNo">Enter number</string>
+    <string name="hintMemberCode">Enter code</string>
+    <string name="labelMobileNo">Mobile No</string>
+    <string name="labelEmail">Email</string>
+    <string name="labelCity">City</string>
+    <string name="labelRegistrationDate">Registration Date</string>
+    <string name="labelActivationDate">Activation Date</string>
+    <string name="hintDateFormat">dd-mm-yyyy</string>
+    <string name="labelBalance">Balance</string>
+    <string name="labelTotalEarnings">Total Earnings</string>
+    <string name="msgEarnPerReferral">Earn ₹2 for each referral</string>
+    <string name="msgShareReferralInfo">Share your referral link with friends and earn ₹2 for each successful referral.</string>
+    <string name="labelInviteFriends">Invite Friends</string>
+    <string name="btnCopy">Copy</string>
+    <string name="btnWhatsapp">Whatsapp</string>
+    <string name="btnFacebook">Facebook</string>
+    <string name="btnEmail">Email</string>
+    <string name="msgCopiedToClipboard">Copied to clipboard</string>
+    <string name="btnRefresh">Refresh</string>
+    <string name="latterI">i</string>
 
 </resources>
