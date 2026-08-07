@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.loadwallet
+package com.shreefintech.paytouchconsumer.loadwallet.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -83,9 +83,9 @@ class WalletTransactionsViewModel(application: Application) : AndroidViewModel(a
 
     private fun mapToWalletTransactionItem(item: WalletHistoryItem): WalletTransactionItem {
         return WalletTransactionItem(
-            title    = item.serviceName ?: "--",
-            date     = Utility.formatDate(item.createdAt),
-            amount   = Utility.formatAmount(item.amount),
+            title = item.serviceName ?: "--",
+            date = Utility.formatDate(item.createdAt),
+            amount = Utility.formatAmount(item.amount),
             isCredit = item.type?.uppercase() == "CREDIT"
         )
     }

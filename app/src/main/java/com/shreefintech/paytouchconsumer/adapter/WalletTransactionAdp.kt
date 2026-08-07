@@ -30,10 +30,12 @@ class WalletTransactionAdp(
             tvTitle.text = item.title
             tvDate.text = item.date
             if (item.isCredit) {
+                cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_success)
                 ivIcon.setImageResource(R.drawable.ic_creadit)
                 tvAmount.text = root.context.getString(R.string.textCreditSign, item.amount)
                 tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_success))
             } else {
+                cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_reject)
                 ivIcon.setImageResource(R.drawable.ic_debit)
                 tvAmount.text = root.context.getString(R.string.textDebitSign, item.amount)
                 tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_reject))

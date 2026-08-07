@@ -73,4 +73,7 @@
     <color name="wallet_success_stroke">#076E3C</color>
     <color name="wallet_pending_stroke">#B87513</color>
     <color name="wallet_pending_bg">#FFF8EB</color>
+
+
+    <color name="wallet_card_bg">#4DFFFFFF</color>
 </resources>

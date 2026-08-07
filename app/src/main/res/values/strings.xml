@@ -438,5 +438,27 @@
     <string name="labelViewAll">View All</string>
     <string name="textDebitSign">-%1$s</string>
     <string name="textCreditSign">+%1$s</string>
+    <string name="titleMakePayment">Make Payment</string>
+    <string name="labelDescription">Description</string>
+    <string name="hintEnterAmount">Enter Amount</string>
+    <string name="hintPaymentDescription">Payment Description</string>
+    <string name="btnProceedPayment">Proceed Payment</string>
+    <string name="msgSecurePayment">100% secure payment powered by PayTouch</string>
+
+    <!-- HDFC Payment flow -->
+    <string name="titlePaymentStatus">Payment Status</string>
+    <string name="msgPaymentSuccessful">Payment Successful</string>
+    <string name="msgPaymentInitiated">Payment Initiated</string>
+    <string name="msgPaymentProcessing">Payment Processing</string>
+    <string name="msgPaymentFailed">Payment Failed</string>
+    <string name="msgAmountRefunded">Amount Refunded</string>
+    <string name="msgPaymentPending">Payment Pending</string>
+    <string name="btnContinue">Continue</string>
+    <string name="btnCheckPaymentStatus">Check Payment Status</string>
+    <string name="msgLeavePaymentTitle">Leave Payment?</string>
+    <string name="msgLeavePaymentBody">Are you sure you want to leave the payment page?</string>
+    <string name="btnLeave">Leave</string>
+    <string name="btnStay">Stay</string>
+    <string name="labelOrderId">Order ID</string>
 
 </resources>
