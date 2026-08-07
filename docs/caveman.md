@@ -58,19 +58,48 @@ People in India pay 10+ different bills every month — electricity, phone, gas,
 
 | Screen | Class | Status |
 |---|---|---|
-| Login | `LoginActivity` | Implemented (UI) |
-| Register | `CreateAccountActivity` | Implemented (UI) |
-| OTP Verification | `OtpVerificationActivity` | Implemented (UI) |
-| Reset Password | `ResetPasswordActivity` | Implemented (UI) |
-| Reset MPIN | `ResetMpinActivity` | Implemented (UI) |
-| KYC | `UploadKycActivity` | Implemented (UI) |
-| Virtual Account | `CreateVirtualAccountActivity` | Implemented (UI) |
-| Home / Dashboard | `HomeActivity` | Implemented (UI) |
-| Category screens | TBD | Planned |
-| Pay Bill screens | TBD | Planned |
-| Transaction screens | TBD | Planned |
-| My Account | TBD | Planned |
-| Load Wallet | TBD | Planned |
+| Login | `LoginActivity` | ✅ Implemented (UI + API) |
+| Register | `CreateAccountActivity` | ✅ Implemented (UI + API) |
+| OTP Verification | `OtpVerificationActivity` | ✅ Implemented (UI + API) |
+| Reset Password | `ResetPasswordActivity` | ✅ Implemented (UI + API) |
+| Reset MPIN | `ResetMpinActivity` | ✅ Implemented (UI + API) |
+| KYC | `UploadKycActivity` | ✅ Implemented (UI + API) |
+| Virtual Account | `CreateVirtualAccountActivity` | ✅ Implemented (UI + API) |
+| Home / Dashboard | `HomeActivity` | ✅ Implemented (UI + API) |
+| Electricity — Pay | `ElectricityActivity` | ✅ Implemented (UI + API) |
+| Electricity — Recent Transactions | `RecentTransactionActivity` | ✅ Implemented (UI + API) |
+| Electricity — Report | `TransactionReportActivity` | ✅ Implemented (UI + API) |
+| Electricity — Status | `ElectricityTransactionStatusActivity` | ✅ Implemented (UI + API) |
+| Electricity — SMS Receipt | `SmsReceiptActivity` | ✅ Implemented (UI + API) |
+| Gas — Pay | `GasActivity` | ✅ Implemented (UI + API) |
+| Gas — Recent Transactions | `GasRecentTransactionActivity` | ✅ Implemented (UI + API) |
+| Gas — Report | `GasTransactionReportActivity` | ✅ Implemented (UI + API) |
+| Gas — Status | `GasTransactionStatusActivity` | ✅ Implemented (UI + API) |
+| Gas — SMS Receipt | `GasSmsReceiptActivity` | ✅ Implemented (UI + API) |
+| DTH — Pay | `DthActivity` | ✅ Implemented (UI + API) |
+| DTH — Plan Selection | `DthPlanSelectionActivity` | ✅ Implemented (UI + API) |
+| DTH — Recent Transactions | `DthRecentTransactionActivity` | ✅ Implemented (UI + API) |
+| DTH — Report | `DthTransactionReportActivity` | ✅ Implemented (UI + API) |
+| DTH — Status | `DthTransactionStatusActivity` | ✅ Implemented (UI + API) |
+| DTH — SMS Receipt | `DthSmsReceiptActivity` | ✅ Implemented (UI + API) |
+| Prepaid — Pay | `PrepaidActivity` | ✅ Implemented (UI + API) |
+| Prepaid — Plan Selection | `PrepaidPlanSelectionActivity` | ✅ Implemented (UI + API) |
+| Prepaid — Recent Transactions | `PrepaidRecentTransactionActivity` | ✅ Implemented (UI + API) |
+| Prepaid — Report | `PrepaidTransactionReportActivity` | ✅ Implemented (UI + API) |
+| Prepaid — Status | `PrepaidTransactionStatusActivity` | ✅ Implemented (UI + API) |
+| Prepaid — SMS Receipt | `PrepaidSmsReceiptActivity` | ✅ Implemented (UI + API) |
+| Postpaid — Pay | `PostpaidActivity` | ✅ Implemented (UI + API) |
+| Postpaid — Recent Transactions | `PostpaidRecentTransactionActivity` | ✅ Implemented (UI + API) |
+| Postpaid — Report | `PostpaidTransactionReportActivity` | ✅ Implemented (UI + API) |
+| Postpaid — Status | `PostpaidTransactionStatusActivity` | ✅ Implemented (UI + API) |
+| Postpaid — SMS Receipt | `PostpaidSmsReceiptActivity` | ✅ Implemented (UI + API) |
+| Shared Transaction Detail | `TransactionDetailActivity` | ✅ Implemented (shared by all modules) |
+| My Account | TBD | 📋 Planned |
+| Load Wallet | TBD | 📋 Planned |
+| Cable TV module | TBD | 📋 Planned |
+| FASTag module | TBD | 📋 Planned |
+| Loan Repayment module | TBD | 📋 Planned |
+| Municipal Tax module | TBD | 📋 Planned |
 
 ---
 
