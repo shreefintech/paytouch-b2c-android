@@ -121,9 +121,9 @@ class PrepaidActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = "₹%.2f".format(fee)
+                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = "₹%.2f".format(total)
+                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
