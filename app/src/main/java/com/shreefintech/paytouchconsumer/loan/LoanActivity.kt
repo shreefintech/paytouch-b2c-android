@@ -202,7 +202,8 @@ class LoanActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
-                // TODO: B2C-70 navigate to LoanSmsReceiptActivity once implemented
+                ToastUtil.showSuccess(mActivity, getString(R.string.msgPaymentSuccess))
+                // TODO(B2C-70): navigate to LoanSmsReceiptActivity once implemented
                 onReset()
             },
             onError = { msg ->
@@ -361,15 +362,15 @@ class LoanActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO: B2C-70 implement LoanTransactionReportActivity
+                    // TODO(B2C-70): implement LoanTransactionReportActivity
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO: B2C-70 implement LoanTransactionStatusActivity
+                    // TODO(B2C-70): implement LoanTransactionStatusActivity
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO: B2C-70 implement LoanSmsReceiptActivity
+                    // TODO(B2C-70): implement LoanSmsReceiptActivity
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener
@@ -396,7 +397,7 @@ class LoanActivity : BaseActivity() {
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO: B2C-70 implement LoanRecentTransactionActivity
+                    // TODO(B2C-70): implement LoanRecentTransactionActivity
                 }
             }
         }
