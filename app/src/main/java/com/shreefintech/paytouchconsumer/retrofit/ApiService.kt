@@ -24,6 +24,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityT
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
+import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagProcessPaymentRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
@@ -324,6 +327,19 @@ interface ApiService {
     fun getDthLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<DthLatestPaymentDataItem>>
+
+    // ── FASTag ────────────────────────────────────────────────────────────────
+
+    @GET("${AUTH}fastag/operators")
+    fun getFastagOperators(
+        @Header("Authorization") authorization: String
+    ): Call<General<List<FastagOperatorItem>>>
+
+    @POST("${AUTH}fastag")
+    fun processFastagPayment(
+        @Header("Authorization") authorization: String,
+        @Body request: FastagProcessPaymentRequest
+    ): Call<FastagPaymentItem>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 
