@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.gas.transactions
+﻿package com.shreefintech.paytouchconsumer.gas.transactions
 
 import android.content.Context
 import android.content.Intent
@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
@@ -60,7 +61,7 @@ class GasTransactionStatusActivity : BaseActivity() {
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion   = 0f,
             blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-            strokeColor  = Color.argb(180, 213, 38, 98),
+            strokeColor  = ContextCompat.getColor(mActivity, R.color.glass_stroke_primary),
             strokeWidth  = 1,
             solidStroke  = true,
         )

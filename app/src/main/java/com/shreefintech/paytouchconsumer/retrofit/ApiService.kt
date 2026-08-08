@@ -63,6 +63,17 @@ import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidProcessDi
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionStatusRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxFetchBillDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxLatestPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxRecentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxRecentPageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
 import retrofit2.Call
 import retrofit2.http.Body
@@ -411,6 +422,49 @@ interface ApiService {
     fun getLoanLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<LoanLatestPaymentDataItem>>
+
+    // ── Municipal Tax ─────────────────────────────────────────────────────────
+
+    @GET("${AUTH}municipal-taxes/operators")
+    fun getMunicipalTaxOperators(
+        @Header("Authorization") authorization: String
+    ): Call<General<List<MunicipalTaxOperatorItem>>>
+
+    @POST("${AUTH}municipal-taxes/fetch-bill")
+    fun fetchMunicipalTaxBill(
+        @Header("Authorization") authorization: String,
+        @Body request: MunicipalTaxFetchBillRequest
+    ): Call<General<List<MunicipalTaxFetchBillDataItem>>>
+
+    @POST("${AUTH}municipal-taxes/process-payment")
+    fun processMunicipalTaxPayment(
+        @Header("Authorization") authorization: String,
+        @Body request: MunicipalTaxProcessPaymentRequest
+    ): Call<MunicipalTaxPaymentItem>
+
+    @POST("${AUTH}mobile-recharge/transaction-status")
+    fun getMunicipalTaxTransactionStatus(
+        @Header("Authorization") authorization: String,
+        @Body request: MunicipalTaxTransactionStatusRequest
+    ): Call<General<List<MunicipalTaxTransactionReportDataItem>>>
+
+    @POST("${AUTH}municipal-taxes/payment-report")
+    fun getMunicipalTaxPaymentReport(
+        @Header("Authorization") authorization: String,
+        @Body request: MunicipalTaxTransactionReportRequest
+    ): Call<General<List<MunicipalTaxTransactionReportDataItem>>>
+
+    @GET("${AUTH}municipal-taxes/latest-payment")
+    fun getMunicipalTaxLatestPayment(
+        @Header("Authorization") authorization: String
+    ): Call<General<MunicipalTaxLatestPaymentDataItem>>
+
+    @GET("${AUTH}municipal-taxes/recent-transactions")
+    fun getMunicipalTaxRecentTransactions(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): Call<MunicipalTaxRecentPageItem>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

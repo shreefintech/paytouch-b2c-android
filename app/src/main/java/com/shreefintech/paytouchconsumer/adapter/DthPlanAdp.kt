@@ -1,9 +1,9 @@
-package com.shreefintech.paytouchconsumer.adapter
+﻿package com.shreefintech.paytouchconsumer.adapter
 
 import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemPrepaidPlanBinding
@@ -31,7 +31,7 @@ class DthPlanAdp(
             cornerRadius = binding.root.resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion   = 0f,
             blur         = binding.root.resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-            strokeColor  = Color.argb(180, 213, 38, 98),
+            strokeColor  = ContextCompat.getColor(mContext, R.color.glass_stroke_primary),
             strokeWidth  = 1,
             solidStroke  = true,
         )
@@ -41,7 +41,7 @@ class DthPlanAdp(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         holder.binding.apply {
-            tvPlanAmount.text = Utility.formatAmount((item.amount ?: 0).toDouble())
+            tvPlanAmount.text = Utility.formatAmount(item.amount?.toString())
             tvPlanValidity.text = item.validity ?: "--"
             tvPlanDescription.text = item.description ?: "--"
             tvPlanFooter.text = mContext.getString(
@@ -66,6 +66,6 @@ class DthPlanAdp(
 
     private fun formatTalktime(talktime: Double?): String {
         if (talktime == null || talktime < 0) return "-"
-        return Utility.formatAmount(talktime)
+        return Utility.formatAmount(talktime.toString())
     }
 }
