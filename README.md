@@ -44,7 +44,11 @@ com.shreefintech.paytouchconsumer/
 |   +-- viewmodel/
 |   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
 |
-+-- dth/                DTH recharge -- operator + plan selection, no bill fetch (isMobileCategory = true)
++-- dth/                DTH recharge -- operator + plan selection (mirrors Prepaid flow)
+|   +-- viewmodel/
+|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|
++-- fastag/             FASTag recharge -- no bill-fetch, vehicle number + amount, real-time fee
 |   +-- viewmodel/
 |   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
 |
@@ -55,7 +59,7 @@ com.shreefintech.paytouchconsumer/
 |
 +-- home/               (planned -- HomeActivity currently lives at root)
 |
-+-- adapter/            Shared adapters used across modules (TransactionAdp, RecentTransactionAdp, PrepaidPlanAdp, DthPlanAdp)
++-- adapter/            Shared adapters used across modules (TransactionAdp, RecentTransactionAdp, PrepaidPlanAdp)
 |
 +-- retrofit/           All networking
 |   +-- model/
@@ -66,6 +70,7 @@ com.shreefintech.paytouchconsumer/
 |   |   +-- prepaid/              Prepaid request/response DTOs
 |   |   +-- postpaid/             Postpaid request/response DTOs
 |   |   +-- dth/                  DTH request/response DTOs
+|   |   +-- fastag/               FASTag request/response DTOs
 |   |   \-- auth/
 |   |       +-- LoginItem.kt
 |   |       +-- RegisterItem.kt
@@ -141,13 +146,13 @@ Register / Login
 | Mobile Prepaid | `PrepaidActivity` | `PrepaidPlanSelectionActivity`, `PrepaidRecentTransactionActivity`, `PrepaidTransactionReportActivity`, `PrepaidTransactionStatusActivity`, `TransactionDetailActivity` (shared), `PrepaidSmsReceiptActivity` |
 | Mobile Postpaid | `PostpaidActivity` | `PrepaidPlanSelectionActivity` (shared from prepaid), `PostpaidRecentTransactionActivity`, `PostpaidTransactionReportActivity`, `PostpaidTransactionStatusActivity`, `TransactionDetailActivity` (shared), `PostpaidSmsReceiptActivity` |
 | DTH | `DthActivity` | `DthPlanSelectionActivity`, `DthRecentTransactionActivity`, `DthTransactionReportActivity`, `DthTransactionStatusActivity`, `TransactionDetailActivity` (shared), `DthSmsReceiptActivity` |
+| FASTag | `FastagActivity` | `FastagRecentTransactionActivity`, `FastagTransactionReportActivity`, `FastagTransactionStatusActivity`, `TransactionDetailActivity` (shared), `FastagSmsReceiptActivity` |
 
 ### Planned (stubs in HomeActivity)
 
 | Module | Status |
 |---|---|
 | TV Cable payment | Not started |
-| FASTag recharge | Not started |
 | Loan repayment | Not started |
 | Tax payment | Not started |
 | My Account | Not started |
@@ -372,7 +377,7 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | Gas | `app/src/main/java/.../gas/README.md` (mirrors Electricity -- read Electricity's README first) |
 | Mobile Prepaid | `app/src/main/java/.../prepaid/README.md` (adds plan selection + circle picker vs Gas/Electricity) |
 | Mobile Postpaid | `app/src/main/java/.../postpaid/README.md` (shares `PrepaidPlanSelectionActivity`; status searches by transaction ID) |
-| DTH | `app/src/main/java/.../dth/README.md` (plan selection, no bill fetch, isMobileCategory = true, process-direct endpoint) |
+| FASTag | `app/src/main/java/.../fastag/README.md` (no bill-fetch; vehicle number; real-time fee; no operator pre-load in recent transactions) |
 
 ---
 
@@ -384,5 +389,3 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | `docs/business_logic.md` | Domain rules, fee tiers, routing flags, field validation |
 | `docs/dos_and_donts.md` | Hard architecture and coding constraints |
 | `docs/screens_and_navigation.md` | Navigation graph, back-stack rules, intent extras |
-| `docs/api_reference.md` | All endpoint signatures and response shapes |
-| `docs/api_call_guide.md` | Retrofit call patterns, OkHttp setup, error parsing |

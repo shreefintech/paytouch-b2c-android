@@ -204,6 +204,16 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".fastag.transactions.FastagRecentTransactionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".fastag.transactions.FastagSmsReceiptActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".prepaid.transactions.PrepaidRecentTransactionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

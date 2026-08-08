@@ -9,5 +9,6 @@ data class UnifiedTransactionExtraItem(
     @field:SerializedName("circle_id")     val circleId: String?,
     @field:SerializedName("customer_name") val customerName: String?,
     @field:SerializedName("due_date")      val dueDate: String?,
-    @field:SerializedName("bill_period")   val billPeriod: String?
+    @field:SerializedName("bill_period")   val billPeriod: String?,
+    @field:SerializedName("operator_name")   val operatorName: String?
 )

@@ -23,6 +23,10 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityFastagBinding
+import com.shreefintech.paytouchconsumer.fastag.transactions.FastagRecentTransactionActivity
+import com.shreefintech.paytouchconsumer.fastag.transactions.FastagSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.fastag.transactions.FastagTransactionReportActivity
+import com.shreefintech.paytouchconsumer.fastag.transactions.FastagTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.fastag.viewmodel.FastagViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagOperatorItem
@@ -165,7 +169,7 @@ class FastagActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
-                // TODO(B2C-69): navigate to FastagSmsReceiptActivity
+                FastagSmsReceiptActivity.start(mActivity, true)
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -277,11 +281,11 @@ class FastagActivity : BaseActivity() {
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-69): FastagSmsReceiptActivity.start(mActivity)
+                    FastagSmsReceiptActivity.start(mActivity)
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-69): FastagRecentTransactionActivity.start(mActivity)
+                    FastagRecentTransactionActivity.start(mActivity)
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
