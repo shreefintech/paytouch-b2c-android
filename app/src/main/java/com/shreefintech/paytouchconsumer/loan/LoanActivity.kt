@@ -24,6 +24,8 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoanBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.loan.transactions.LoanRecentTransactionActivity
+import com.shreefintech.paytouchconsumer.loan.transactions.LoanSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.loan.transactions.LoanTransactionReportActivity
 import com.shreefintech.paytouchconsumer.loan.transactions.LoanTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.loan.viewmodel.LoanViewModel
@@ -204,8 +206,7 @@ class LoanActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.msgPaymentSuccess))
-                // TODO(B2C-70): navigate to LoanSmsReceiptActivity once implemented
+                LoanSmsReceiptActivity.start(mActivity, fromPayment = true)
                 onReset()
             },
             onError = { msg ->
@@ -372,7 +373,7 @@ class LoanActivity : BaseActivity() {
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-70): implement LoanSmsReceiptActivity
+                    LoanSmsReceiptActivity.start(mActivity)
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener
@@ -399,7 +400,7 @@ class LoanActivity : BaseActivity() {
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-70): implement LoanRecentTransactionActivity
+                    LoanRecentTransactionActivity.start(mActivity)
                 }
             }
         }
