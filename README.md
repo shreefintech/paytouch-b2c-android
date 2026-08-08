@@ -135,12 +135,12 @@ Register / Login
 | Gas | `GasActivity` | `GasRecentTransactionActivity`, `GasTransactionReportActivity`, `GasTransactionStatusActivity`, `TransactionDetailActivity` (shared), `GasSmsReceiptActivity` |
 | Mobile Prepaid | `PrepaidActivity` | `PrepaidPlanSelectionActivity`, `PrepaidRecentTransactionActivity`, `PrepaidTransactionReportActivity`, `PrepaidTransactionStatusActivity`, `TransactionDetailActivity` (shared), `PrepaidSmsReceiptActivity` |
 | Mobile Postpaid | `PostpaidActivity` | `PrepaidPlanSelectionActivity` (shared from prepaid), `PostpaidRecentTransactionActivity`, `PostpaidTransactionReportActivity`, `PostpaidTransactionStatusActivity`, `TransactionDetailActivity` (shared), `PostpaidSmsReceiptActivity` |
+| DTH | `DthActivity` | `DthPlanSelectionActivity` |
 
 ### Planned (stubs in HomeActivity)
 
 | Module | Status |
 |---|---|
-| DTH recharge | Not started |
 | TV Cable payment | Not started |
 | FASTag recharge | Not started |
 | Loan repayment | Not started |
