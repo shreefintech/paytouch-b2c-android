@@ -316,16 +316,25 @@ amount > 40000           → fee = ₹30
 ## 10. FASTag Recharge
 
 ### How It Differs
-- Uses `fetch-bill` to look up the account (same as bill payment)
-- Uses `process-recharge` (not `process-payment`)
+- **No `fetch-bill` step** — user enters vehicle number, operator, and amount directly (same style as Prepaid/DTH)
+- Uses `api/fastag` (not `process-payment`) to process the recharge
 
 ### API Endpoints
 | Method | Path | Purpose |
 |---|---|---|
-| POST | `api/fastag/fetch-bill` | Look up FASTag account |
-| POST | `api/fastag/process-recharge` | Process recharge |
-| POST | `api/fastag/transaction-status` | Check status |
-| GET | `api/fastag/transaction-report` | Reports |
+| GET | `api/fastag/operators` | Get FASTag operators |
+| POST | `api/fastag` | Process recharge |
+
+> `transaction-status`, `payment-report`, and SMS receipt for FASTag are not implemented yet — planned as a follow-up ticket.
+
+### Request Fields (Process Recharge)
+- `vehicle_number` (String, required)
+- `operator` (String, required), `operator_name` (String, required)
+- `circle` (String, required)
+- `amount` (Decimal, required), `platform_fee` (Decimal, required), `total_payable` (Decimal, required)
+
+### Response Fields (Process Recharge — flat)
+- `success` (Boolean), `message` (String), `req_id` (String), `status` (String), `transaction_id` (String)
 
 ---
 
