@@ -18,7 +18,9 @@ class TransactionFilterHelper(
     private val sheetBinding: SheetFilterBinding,
     private val bgOverlay: View,
     private val onApply: (fromDate: String?, toDate: String?, status: String?, consumerNo: String?) -> Unit,
-    private val onClear: () -> Unit
+    private val onClear: () -> Unit,
+    private val searchLabel: String? = null,
+    private val searchHint: String? = null
 ) {
 
     private lateinit var behavior: BottomSheetBehavior<View>
@@ -41,6 +43,9 @@ class TransactionFilterHelper(
     // ─── Setup ───────────────────────────────────────────────────────────────
 
     fun setup() {
+        searchLabel?.let { sheetBinding.tvSearchLabel.text = it }
+        searchHint?.let  { sheetBinding.etSearch.hint      = it }
+
         behavior = BottomSheetBehavior.from(sheetBinding.root)
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
 

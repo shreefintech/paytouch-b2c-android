@@ -368,6 +368,7 @@
     <!-- FASTag screen -->
     <string name="titleFastagRecharge">FASTag Recharge</string>
     <string name="labelVehicleNumber">Vehicle Number</string>
+    <string name="labelVehicleNumberFmt">Vehicle Number %s</string>
     <string name="hintVehicleNumber">Enter Vehicle Number (e.g. MH12AB1234)</string>
     <string name="msgVehicleNumberEmpty">Please enter vehicle number</string>
 

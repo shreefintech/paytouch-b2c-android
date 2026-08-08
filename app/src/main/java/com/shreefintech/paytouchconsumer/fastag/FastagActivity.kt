@@ -269,11 +269,11 @@ class FastagActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-69): startActivity(Intent(mActivity, FastagTransactionReportActivity::class.java))
+                    startActivity(Intent(mActivity, FastagTransactionReportActivity::class.java))
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-69): FastagTransactionStatusActivity.start(mActivity)
+                    startActivity(Intent(mActivity, FastagTransactionStatusActivity::class.java))
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
