@@ -56,7 +56,7 @@ Always prioritize optimized, maintainable, and production-ready code. Generate s
 ```
 com.shreefintech.paytouchconsumer/
 ├── auth/           # Login, OTP, password/MPIN flows, create-account
-├── onboarding/     # KYC upload (UploadKycActivity), Virtual Account creation (CreateVirtualAccountActivity)
+├── onboarding/     # Virtual Account creation (CreateVirtualAccountActivity); onboarding/kyc/ — KYC hub (KycActivity), identity verification, bank details
 ├── home/           # Home/Dashboard screen (HomeActivity — currently at root level, will move here)
 ├── electricity/    # Electricity bill payment screen
 ├── gas/            # Gas bill payment screen

@@ -2,6 +2,7 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:scrollbars="none">
 
     <LinearLayout
@@ -17,106 +18,156 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/proza_libre_medium"
             android:includeFontPadding="false"
+            android:textAlignment="center"
             android:text="@string/msgSelfieGuide"
             android:textColor="@color/black"
             android:textSize="@dimen/text_size_13" />
 
         <!-- Selfie area -->
-        <FrameLayout
-            android:layout_width="@dimen/kyc_selfie_size"
-            android:layout_height="@dimen/kyc_selfie_size"
-            android:layout_marginTop="@dimen/margin_large">
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/selfie_card_stroke"
+            app:cardBackgroundColor="@color/white"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:padding="@dimen/margin_medium">
 
-            <!-- Guide circle (visible before capture) -->
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ivSelfieGuide"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_selfie_guide"
-                android:padding="@dimen/margin_extra_large"
-                android:src="@drawable/ic_profile"
-                android:tint="@color/hint_color" />
-
-            <!-- Selfie preview circle (GONE until captured) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/mcvSelfiePreview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                app:cardCornerRadius="90dp"
-                app:cardElevation="0dp"
-                xmlns:app="http://schemas.android.com/apk/res-auto">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/ivSelfiePreview"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Edit / Delete icons (GONE until captured) -->
-            <LinearLayout
-                android:id="@+id/llSelfieActions"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                xmlns:app="http://schemas.android.com/apk/res-auto">
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingVertical="@dimen/margin_extra_large"
+                android:paddingHorizontal="@dimen/margin_large">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/ivEditSelfie"
-                    android:layout_width="@dimen/upload_edit_size"
-                    android:layout_height="@dimen/upload_edit_size"
-                    android:background="@drawable/bg_transaction_icon"
-                    android:padding="@dimen/margin_extra_small"
-                    android:src="@drawable/ic_edit_placeholder"
-                    android:tint="@color/form_wizard_success" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/ivDeleteSelfie"
-                    android:layout_width="@dimen/upload_edit_size"
-                    android:layout_height="@dimen/upload_edit_size"
-                    android:layout_marginStart="@dimen/margin_extra_small"
-                    android:background="@drawable/bg_transaction_icon"
-                    android:padding="@dimen/margin_extra_small"
-                    android:src="@drawable/ic_cross"
-                    android:tint="@color/form_wizard_reject" />
+                <FrameLayout
+                    android:id="@+id/flSelfie"
+                    android:layout_width="@dimen/kyc_selfie_size"
+                    android:layout_height="@dimen/kyc_selfie_size"
+                    android:background="@drawable/bg_selfie_guide"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
 
-            </LinearLayout>
-        </FrameLayout>
+                    <!-- Guide circle (visible before capture) -->
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivSelfieGuide"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="40dp"
+                        android:src="@drawable/ic_selfie" />
 
-        <!-- Instructions -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_large"
-            android:fontFamily="@font/proza_libre_medium"
-            android:includeFontPadding="false"
-            android:text="@string/msgSelfieInstruction1"
-            android:textColor="@color/hint_color"
-            android:textSize="@dimen/text_size_12" />
+                    <!-- Selfie preview circle (GONE until captured) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/mcvSelfiePreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="visible"
+                        app:strokeWidth="0dp"
+                        android:layout_margin="2dp"
+                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardElevation="0dp"
+                        app:shapeAppearance="@style/CircleCard">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_extra_small"
-            android:fontFamily="@font/proza_libre_medium"
-            android:includeFontPadding="false"
-            android:text="@string/msgSelfieInstruction2"
-            android:textColor="@color/hint_color"
-            android:textSize="@dimen/text_size_12" />
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivSelfiePreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop" />
+
+                    </com.google.android.material.card.MaterialCardView>
+                </FrameLayout>
+
+                <!-- Instructions -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvDes1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/msgSelfieInstruction1"
+                    android:textColor="@color/hint_color"
+                    android:textSize="@dimen/text_size_12"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/flSelfie"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvDes2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_extra_small"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/msgSelfieInstruction2"
+                    android:textColor="@color/hint_color"
+                    app:layout_constraintTop_toBottomOf="@id/tvDes1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:textSize="@dimen/text_size_12" />
+
+
+                <LinearLayout
+                    android:id="@+id/llSelfieActions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <FrameLayout
+                        android:id="@+id/flEdit1"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivEditProof1"
+                            android:layout_width="@dimen/upload_edit_size"
+                            android:layout_height="@dimen/upload_edit_size"
+                            android:background="?selectableItemBackgroundBorderless"
+                            android:padding="2dp"
+                            android:src="@drawable/ic_edit_placeholder"
+                            android:tint="@color/form_wizard_success" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/flDelete1"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:layout_marginTop="@dimen/margin_small">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivDeleteProof1"
+                            android:layout_width="@dimen/upload_edit_size"
+                            android:layout_height="@dimen/upload_edit_size"
+                            android:background="?selectableItemBackgroundBorderless"
+                            android:padding="2dp"
+                            android:src="@drawable/ic_cross"
+                            android:tint="@color/form_wizard_reject" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Capture button -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="@dimen/button_height"
             android:layout_marginTop="@dimen/margin_extra_large"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             app:cardBackgroundColor="@color/primary"
             app:cardCornerRadius="@dimen/button_corner_radius"
-            app:cardElevation="@dimen/card_elevation">
+            app:strokeWidth="0dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:id="@+id/btnCapture"

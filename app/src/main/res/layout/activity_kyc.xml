@@ -14,23 +14,38 @@
         android:layout_height="match_parent"
         android:background="@drawable/img_screen_bg">
 
+        <include
+            layout="@layout/lyt_toolbar"
+            android:id="@+id/incToolbar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
         <!-- ── Header: PayTouch logo + BharatConnect logo (no back button) ── -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/lytHeader"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_height"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_extra_large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/incToolbar">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ivLogo"
+
+            <!-- KYC Verification title -->
+            <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="0dp"
-                android:layout_height="55dp"
-                android:layout_marginStart="@dimen/margin_large"
-                android:src="@drawable/img_paytouch"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:text="@string/titleKycVerification"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_20"
+                android:maxLines="2"
+                android:ellipsize="end"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintDimensionRatio="3:1"
+                app:layout_constraintEnd_toStartOf="@id/ivBharatConnect"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -38,7 +53,6 @@
                 android:id="@+id/ivBharatConnect"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
-                android:layout_marginEnd="@dimen/margin_large"
                 android:src="@drawable/img_bharat_connect"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -70,23 +84,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/page_margin_horizontal">
-
-                    <!-- KYC Verification title -->
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/proza_libre_bold"
-                        android:includeFontPadding="false"
-                        android:text="@string/titleKycVerification"
-                        android:textColor="@color/primary"
-                        android:textSize="@dimen/text_size_20" />
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:padding="@dimen/margin_medium">
 
                     <!-- Document Progress card -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_large"
+                        android:layout_marginTop="@dimen/margin_medium"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="@dimen/card_corner_radius"
                         app:cardElevation="@dimen/card_elevation"
@@ -140,8 +146,7 @@
                                 android:layout_marginTop="@dimen/margin_small"
                                 android:max="2"
                                 android:progress="0"
-                                android:progressTint="@color/primary"
-                                android:progressBackgroundTint="@color/secondary" />
+                                android:progressDrawable="@drawable/progress_rounded"  />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:layout_width="match_parent"
@@ -176,6 +181,7 @@
                         android:layout_marginTop="@dimen/margin_medium"
                         android:clickable="true"
                         android:focusable="true"
+                        app:strokeWidth="0dp"
                         android:foreground="?selectableItemBackground"
                         android:onClickListener="@{onClickListener}"
                         app:cardBackgroundColor="@color/white"
@@ -196,16 +202,15 @@
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/text_size_14"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@id/ivIdentityArrow"
+                                app:layout_constraintEnd_toStartOf="@id/ivSectionAStatus"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/ivIdentityArrow"
+                                android:id="@+id/ivSectionAStatus"
                                 android:layout_width="@dimen/icon_small"
                                 android:layout_height="@dimen/icon_small"
-                                android:src="@drawable/ic_right_arrow"
-                                android:tint="@color/primary"
+                                android:src="@drawable/ic_success"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -221,6 +226,7 @@
                         android:layout_marginTop="@dimen/margin_medium"
                         android:clickable="true"
                         android:focusable="true"
+                        app:strokeWidth="0dp"
                         android:foreground="?selectableItemBackground"
                         android:onClickListener="@{onClickListener}"
                         app:cardBackgroundColor="@color/white"
@@ -241,16 +247,15 @@
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/text_size_14"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@id/ivBankArrow"
+                                app:layout_constraintEnd_toStartOf="@id/ivSectionBStatus"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/ivBankArrow"
+                                android:id="@+id/ivSectionBStatus"
                                 android:layout_width="@dimen/icon_small"
                                 android:layout_height="@dimen/icon_small"
-                                android:src="@drawable/ic_right_arrow"
-                                android:tint="@color/primary"
+                                android:src="@drawable/ic_reject"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />

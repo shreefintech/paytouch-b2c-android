@@ -112,7 +112,7 @@ SplashActivity  (2s logo -> GET /api/user)
     |
     \-- Logged in + internet
             |
-            +-- requires_kyc = true -------------------------> UploadKycActivity
+            +-- requires_kyc = true -------------------------> KycActivity
             +-- requires_virtual_account = true -------------> CreateVirtualAccountActivity
             \-- all flags clear -----------------------------> HomeActivity
 ```
@@ -128,7 +128,7 @@ Server-driven via flags on the login / session response. Users cannot skip any s
 ```
 Register / Login
     |
-    +-- requires_kyc = true             --> UploadKycActivity
+    +-- requires_kyc = true             --> KycActivity (Identity Verification + Bank Details)
     +-- requires_mpin = true            --> ResetMpinActivity (placeholder -- CreateMpinActivity not yet built)
     \-- requires_virtual_account = true --> CreateVirtualAccountActivity
                                                 |
@@ -144,7 +144,7 @@ Register / Login
 | Module | Entry Point | Sub-screens |
 |---|---|---|
 | Auth | `SplashActivity` -> `LoginActivity` | `CreateAccountActivity`, `OtpVerificationActivity`, `ResetPasswordActivity`, `ResetMpinActivity` |
-| Onboarding | `UploadKycActivity` | `CreateVirtualAccountActivity` |
+| Onboarding | `KycActivity` | `IdentityVerificationActivity`, `BankDetailsActivity`, `CreateVirtualAccountActivity` |
 | Home | `HomeActivity` | Category grid -- routes to bill payment screens |
 | Electricity | `ElectricityActivity` | `RecentTransactionActivity`, `TransactionReportActivity`, `ElectricityTransactionStatusActivity`, `TransactionDetailActivity` (shared), `SmsReceiptActivity` |
 | Gas | `GasActivity` | `GasRecentTransactionActivity`, `GasTransactionReportActivity`, `GasTransactionStatusActivity`, `TransactionDetailActivity` (shared), `GasSmsReceiptActivity` |

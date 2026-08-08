@@ -24,7 +24,7 @@
         <!-- ── KYC toolbar ── -->
         <include
             android:id="@+id/lytToolbar"
-            layout="@layout/lyt_kyc_toolbar"
+            layout="@layout/lyt_toolbar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"
             app:layout_constraintEnd_toEndOf="parent"
@@ -32,21 +32,37 @@
             app:layout_constraintTop_toTopOf="parent"
             app:onClickListener="@{onClickListener}" />
 
-        <!-- ── Step title ── -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvStepTitle"
+        <!-- Title row + BharatConnect logo -->
+        <LinearLayout
+            android:id="@+id/llTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
             android:layout_marginTop="@dimen/margin_medium"
-            android:fontFamily="@font/proza_libre_bold"
-            android:includeFontPadding="false"
-            android:textColor="@color/primary"
-            android:textSize="@dimen/text_size_20"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/lytToolbar"
-            tools:text="Details" />
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvStepTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_20"
+                tools:text="Details"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/img_bharat_connect" />
+        </LinearLayout>
 
         <!-- ── Previous / Continue buttons ── -->
         <LinearLayout
@@ -67,7 +83,7 @@
                 android:layout_weight="1"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="@dimen/button_corner_radius"
-                app:cardElevation="@dimen/card_elevation"
+                app:cardElevation="0dp"
                 app:strokeColor="@color/primary"
                 app:strokeWidth="1.5dp">
 
@@ -102,9 +118,10 @@
                 android:layout_width="0dp"
                 android:layout_height="@dimen/button_height"
                 android:layout_weight="1"
+                app:strokeWidth="0dp"
                 app:cardBackgroundColor="@color/primary"
                 app:cardCornerRadius="@dimen/button_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:id="@+id/btnContinue"
@@ -153,7 +170,7 @@
             app:layout_constraintBottom_toTopOf="@id/llButtons"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvStepTitle">
+            app:layout_constraintTop_toBottomOf="@id/llTitle">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"

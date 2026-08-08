@@ -63,7 +63,7 @@ People in India pay 10+ different bills every month — electricity, phone, gas,
 | OTP Verification | `OtpVerificationActivity` | ✅ Implemented (UI + API) |
 | Reset Password | `ResetPasswordActivity` | ✅ Implemented (UI + API) |
 | Reset MPIN | `ResetMpinActivity` | ✅ Implemented (UI + API) |
-| KYC | `UploadKycActivity` | ✅ Implemented (UI + API) |
+| KYC | `KycActivity` (+ `IdentityVerificationActivity`, `BankDetailsActivity`) | ✅ Implemented (UI + API) |
 | Virtual Account | `CreateVirtualAccountActivity` | ✅ Implemented (UI + API) |
 | Home / Dashboard | `HomeActivity` | ✅ Implemented (UI + API) |
 | Electricity — Pay | `ElectricityActivity` | ✅ Implemented (UI + API) |

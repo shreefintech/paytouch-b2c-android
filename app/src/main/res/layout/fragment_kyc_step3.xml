@@ -2,6 +2,7 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:scrollbars="none">
 
     <LinearLayout
@@ -52,7 +53,7 @@
         <FrameLayout
             android:id="@+id/flPanFront"
             android:layout_width="match_parent"
-            android:layout_height="110dp"
+            android:layout_height="@dimen/kyc_upload_height"
             android:layout_marginTop="@dimen/margin_small"
             android:background="@drawable/bg_upload_area"
             android:clickable="true"
@@ -66,11 +67,23 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_upload"
-                    android:tint="@color/primary" />
+                <com.shreefintech.paytouchconsumer.widget.LiquidGlassButton
+                    android:id="@+id/flUpload1"
+                    android:layout_width="@dimen/btn_height"
+                    android:layout_height="@dimen/btn_height"
+                    app:glassCornerRadius="@dimen/submit_btn_radius"
+                    app:normalTint="@android:color/transparent"
+                    app:pressedTint="@color/upload_btn_color">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivUpload1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/margin_small"
+                        android:src="@drawable/ic_upload"
+                        android:tint="@color/primary" />
+
+                </com.shreefintech.paytouchconsumer.widget.LiquidGlassButton>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
@@ -94,12 +107,24 @@
 
             </LinearLayout>
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ivPreviewPan"
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:visibility="gone" />
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                android:layout_margin="2dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                android:background="@android:color/transparent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivPreviewPan"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+            </androidx.cardview.widget.CardView>
 
             <LinearLayout
                 android:id="@+id/llEditDeletePan"
@@ -107,27 +132,44 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"
                 android:layout_margin="@dimen/margin_extra_small"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:visibility="gone">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/ivEditPan"
+                <FrameLayout
+                    android:id="@+id/flEdit1"
                     android:layout_width="@dimen/upload_edit_size"
                     android:layout_height="@dimen/upload_edit_size"
-                    android:background="@drawable/bg_transaction_icon"
-                    android:padding="@dimen/margin_extra_small"
-                    android:src="@drawable/ic_edit_placeholder"
-                    android:tint="@color/form_wizard_success" />
+                    android:layout_marginTop="@dimen/margin_tiny"
+                    android:layout_marginHorizontal="@dimen/margin_medium">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/ivDeletePan"
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivEditProof1"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_edit_placeholder"
+                        android:tint="@color/form_wizard_success" />
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/flDelete1"
                     android:layout_width="@dimen/upload_edit_size"
                     android:layout_height="@dimen/upload_edit_size"
-                    android:layout_marginStart="@dimen/margin_extra_small"
-                    android:background="@drawable/bg_transaction_icon"
-                    android:padding="@dimen/margin_extra_small"
-                    android:src="@drawable/ic_cross"
-                    android:tint="@color/form_wizard_reject" />
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginHorizontal="@dimen/margin_medium">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivDeleteProof1"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_cross"
+                        android:tint="@color/form_wizard_reject" />
+
+                </FrameLayout>
 
             </LinearLayout>
         </FrameLayout>

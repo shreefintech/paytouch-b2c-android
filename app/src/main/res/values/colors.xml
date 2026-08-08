@@ -83,4 +83,5 @@
     <color name="colorPaymentProcessing">#FF8F00</color>
     <color name="colorPaymentFailed">#D32F2F</color>
     <color name="colorPaymentRefunded">#7A63FF</color>
+    <color name="selfie_card_stroke">#66FDA4AF</color>
 </resources>

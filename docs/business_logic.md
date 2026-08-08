@@ -15,7 +15,7 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - Email must pass standard email format validation
 - Both password and MPIN login share the same `/api/login` endpoint; the payload differs
 - On login, the server response includes three boolean flags that drive routing:
-  - `requires_kyc = true` → send to `UploadKycActivity`
+  - `requires_kyc = true` → send to `KycActivity`
   - `requires_mpin = true` → send to MPIN creation screen
   - `requires_virtual_account = true` → send to `CreateVirtualAccountActivity`
   - All false → send to `HomeActivity`
@@ -67,39 +67,49 @@ Logged In → Logged Out (automatic, on any 401 response)
 
 ## 2. KYC (Know Your Customer)
 
-**Screen:** `onboarding/UploadKycActivity`
+**Screens:** `onboarding/kyc/KycActivity` (hub) → `onboarding/kyc/identity/IdentityVerificationActivity` + `onboarding/kyc/bank/BankDetailsActivity`
 
 ### What It Does
-Collects personal identity information and submits it to the server for verification. This unlocks the full account.
+KYC is split into two independently-completable sections, tracked by a 0/2 progress card on the hub:
+1. **Identity Verification** — a 4-step flow (Details → Aadhaar → PAN → Selfie) collecting identity documents and a selfie.
+2. **Bank Details** — 1 to 4 bank accounts with proof-of-account documents.
+
+Both sections must be completed before the user proceeds to `CreateVirtualAccountActivity`.
 
 ### Rules and Constraints
 - PAN card must match regex: `[A-Z]{5}[0-9]{4}[A-Z]{1}`
 - Aadhaar number must be exactly 12 digits
-- GST number is **optional** — validate format only when non-empty; never block submission if blank
-- Date of birth is selected via a date picker (not typed)
-- Age is auto-calculated from the selected DOB
-- After successful KYC, route to MPIN creation — never skip to Home
+- Selfie is captured via the system camera (no CameraX dependency); a captured selfie is required to submit step 4
+- Bank Details supports 1-4 accounts; the delete icon on a card is hidden when only one account remains
+- Terms & Conditions checkbox is mandatory before Bank Details submission
+- Section completion (`identityDone` / `bankDone`) is currently tracked locally via `SharedPreferenceHelper` (`Constant.KEY_KYC_IDENTITY_DONE` / `KEY_KYC_BANK_DONE`) until an account-status API is wired
+- After both sections are complete, route to `CreateVirtualAccountActivity` — never skip to Home
 
-### API Endpoints
+### API Endpoints (pending — currently stubbed with TODO(PAYTOUCH-KYC))
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `api/kyc/account-info` | Pre-fill form with existing KYC data if any |
-| POST | `api/kyc/submit` | Submit KYC data |
+| POST | `api/kyc/identity/submit` | Submit identity verification (mobile, email, Aadhaar, PAN, selfie + document uploads) |
+| POST | `api/kyc/bank-details/submit` | Submit 1-4 bank accounts + proof documents |
 
-### Request Fields (Submit)
-- `mobile_no` (String, required)
-- `member_name` (String, required)
-- `birth_date` (String, required, from date picker)
-- `age` (Int, required, auto-calculated)
-- `home_address` (String, required)
-- `city_name` (String, required)
-- `email` (String, required)
-- `pan_card_no` (String, required, regex validated)
-- `aadhaar_no` (String, required, 12 digits)
-- `gst_no` (String, optional)
+### Request Fields — Identity Verification
+- `mobile` (String, required, 10 digits)
+- `email` (String, required, email format)
+- `aadhaar_number` (String, required, 12 digits)
+- `aadhaar_front` / `aadhaar_back` (File, required)
+- `pan_number` (String, required, regex validated)
+- `pan_front` (File, required)
+- `selfie` (File, required)
+
+### Request Fields — Bank Details (per account, 1-4 accounts)
+- `account_number` (String, required, 9-18 digits)
+- `bank_name` (String, required)
+- `ifsc_code` (String, required, regex validated)
+- `branch_name` (String, required)
+- `proof_type` (String, required)
+- `bank_proof` (File, required)
 
 ### Edge Cases
-- If KYC was already partially submitted, `account-info` pre-fills the form
+- If either section was already submitted, its hub row should show a completed state (pre-fill pending API wiring)
 
 ---
 

@@ -28,7 +28,7 @@ SplashActivity (2s logo delay)
     │
     └── Logged in + internet ─► GET /api/user
             │
-            ├── requires_kyc = true    ──────────────► UploadKycActivity
+            ├── requires_kyc = true    ──────────────► KycActivity
             ├── requires_virtual_account = true ─────► CreateVirtualAccountActivity
             └── (none) ──────────────────────────────► HomeActivity
 ```

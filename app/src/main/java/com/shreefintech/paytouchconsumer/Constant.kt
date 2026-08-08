@@ -3,7 +3,7 @@ package com.shreefintech.paytouchconsumer
 object Constant {
 
     // API Base URLs
-    const val BASE_URL = "https://www.paytouch.in/"
+    const val BASE_URL = "https://tablet-frying-shy.ngrok-free.dev/"/*"https://www.paytouch.in/"*/
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
 
     // AUTH store keys
@@ -30,5 +30,9 @@ object Constant {
 
     // Load Wallet / Payment status extras
     const val EXTRA_FROM_PAYMENT = "from_payment"
+
+    // KYC hub — section completion flags (local until account-status API is wired)
+    const val KEY_KYC_IDENTITY_DONE = "KYC_IDENTITY_DONE"
+    const val KEY_KYC_BANK_DONE = "KYC_BANK_DONE"
 
 }

@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/margin_large"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:strokeWidth="0dp"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/margin_large">
+
+        <!-- Card title + delete -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCardTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/proza_libre_semi_bold"
+                android:includeFontPadding="false"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_14"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/ivDelete"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Bank Account 1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivDelete"
+                android:layout_width="@dimen/icon_small"
+                android:layout_height="@dimen/icon_small"
+                android:background="?selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_delete"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Account Number -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelAccountNumber"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etAccountNumber"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_input_field"
+            android:fontFamily="@font/proza_libre_medium"
+            android:hint="@string/hintAccountNumber"
+            android:includeFontPadding="false"
+            android:inputType="number"
+            android:maxLength="18"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/margin_small"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="?attr/colorTextHint"
+            android:textSize="@dimen/text_size_13" />
+
+        <!-- Bank Name / IFSC Code row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelBankName"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_13" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etBankName"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_height"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:background="@drawable/bg_input_field"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:hint="@string/hintBankName"
+                    android:includeFontPadding="false"
+                    android:maxLength="50"
+                    android:maxLines="1"
+                    android:paddingHorizontal="@dimen/margin_small"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textColorHint="?attr/colorTextHint"
+                    android:textSize="@dimen/text_size_13" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_small"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelIfscCode"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_13" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etIfscCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_height"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:background="@drawable/bg_input_field"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:hint="@string/hintIfscCode"
+                    android:includeFontPadding="false"
+                    android:inputType="textCapCharacters|textNoSuggestions"
+                    android:maxLength="11"
+                    android:maxLines="1"
+                    android:paddingHorizontal="@dimen/margin_small"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textColorHint="?attr/colorTextHint"
+                    android:textSize="@dimen/text_size_13" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Branch Name -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelBranchName"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etBranchName"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_input_field"
+            android:ellipsize="end"
+            android:fontFamily="@font/proza_libre_medium"
+            android:hint="@string/hintBranchName"
+            android:includeFontPadding="false"
+            android:maxLength="50"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/margin_small"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="?attr/colorTextHint"
+            android:textSize="@dimen/text_size_13" />
+
+        <!-- Proof Type dropdown -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelProofType"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13" />
+
+        <FrameLayout
+            android:id="@+id/flProofTypeAnchor"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_input_field"
+            android:clickable="true"
+            android:focusable="true">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvProofType"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:fontFamily="@font/proza_libre_medium"
+                android:gravity="center_vertical"
+                android:hint="@string/hintProofType"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:paddingStart="@dimen/margin_small"
+                android:paddingEnd="@dimen/icon_large"
+                android:singleLine="true"
+                android:textColor="@color/black"
+                android:textColorHint="?attr/colorTextHint"
+                android:textSize="@dimen/text_size_13" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivProofTypeArrow"
+                android:layout_width="@dimen/icon_small"
+                android:layout_height="@dimen/icon_small"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:src="@drawable/ic_down_arrow" />
+
+        </FrameLayout>
+
+        <!-- Bank Proof upload -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelBankProof"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13" />
+
+        <FrameLayout
+            android:id="@+id/flBankProof"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/kyc_upload_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_upload_area"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:id="@+id/llUploadProof"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.shreefintech.paytouchconsumer.widget.LiquidGlassButton
+                    android:id="@+id/flUpload1"
+                    android:layout_width="@dimen/btn_height"
+                    android:layout_height="@dimen/btn_height"
+                    app:glassCornerRadius="@dimen/submit_btn_radius"
+                    app:normalTint="@android:color/transparent"
+                    app:pressedTint="@color/upload_btn_color">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivUpload1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/margin_small"
+                        android:src="@drawable/ic_upload"
+                        android:tint="@color/primary" />
+
+                </com.shreefintech.paytouchconsumer.widget.LiquidGlassButton>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_extra_small"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelBankProof"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_12" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_tiny"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/msgUploadHint"
+                    android:textColor="@color/hint_color"
+                    android:textSize="@dimen/text_size_10" />
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                android:layout_margin="2dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                android:background="@android:color/transparent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivPreviewProof"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:id="@+id/llEditDeleteProof"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="@dimen/margin_extra_small"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:id="@+id/flEdit1"
+                    android:layout_width="@dimen/upload_edit_size"
+                    android:layout_height="@dimen/upload_edit_size"
+                    android:layout_marginTop="@dimen/margin_tiny"
+                    android:layout_marginHorizontal="@dimen/margin_medium">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivEditProof1"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_edit_placeholder"
+                        android:tint="@color/form_wizard_success" />
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/flDelete1"
+                    android:layout_width="@dimen/upload_edit_size"
+                    android:layout_height="@dimen/upload_edit_size"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginHorizontal="@dimen/margin_medium">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivDeleteProof1"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_cross"
+                        android:tint="@color/form_wizard_reject" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+        </FrameLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
