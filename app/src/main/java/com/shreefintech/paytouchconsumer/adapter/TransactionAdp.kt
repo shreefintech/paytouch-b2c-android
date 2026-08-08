@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemTransactionBinding
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
+import com.shreefintech.paytouchconsumer.utill.Utility
 
 class TransactionAdp(
     private val mContext: Context,
@@ -30,7 +31,7 @@ class TransactionAdp(
         val item = mArrayList[position]
         holder.binding.apply {
             ivCategoryIcon.setImageResource(item.categoryIconRes)
-            tvMobile.text = item.username
+            tvMobile.text = Utility.maskNumber(item.mobileNumber)
             tvTransactionId.text = item.transactionId
             tvAmount.text = item.amount
             tvStatus.text = item.status

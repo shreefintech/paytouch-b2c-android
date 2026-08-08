@@ -31,10 +31,17 @@ com.shreefintech.paytouchconsumer/
 |   \-- viewmodel/
 |
 +-- electricity/        Electricity bill payment + transaction history (canonical module template)
-|   +-- model/          RecentTransactionItem -- reused by other modules, not electricity-only
 |   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
 |
 +-- gas/                Gas bill payment + transaction history (mirrors electricity/ exactly)
+|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|
++-- prepaid/            Mobile prepaid recharge -- operator + circle + plan selection, no bill fetch
+|   +-- viewmodel/
+|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|
++-- postpaid/           Mobile postpaid bill payment -- shares PrepaidPlanSelectionActivity
+|   +-- viewmodel/
 |   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
 |
 +-- transactions/       Shared across ALL bill-payment modules -- never duplicate per module
@@ -44,7 +51,7 @@ com.shreefintech.paytouchconsumer/
 |
 +-- home/               (planned -- HomeActivity currently lives at root)
 |
-+-- adapter/            Shared adapters used across modules (TransactionAdp, RecentTransactionAdp)
++-- adapter/            Shared adapters used across modules (TransactionAdp, RecentTransactionAdp, PrepaidPlanAdp)
 |
 +-- retrofit/           All networking
 |   +-- model/
@@ -52,6 +59,8 @@ com.shreefintech.paytouchconsumer/
 |   |   +-- UserProfileItem.kt    GET /api/user response
 |   |   +-- electricity/          Electricity request/response DTOs
 |   |   +-- gas/                  Gas request/response DTOs
+|   |   +-- prepaid/              Prepaid request/response DTOs
+|   |   +-- postpaid/             Postpaid request/response DTOs
 |   |   \-- auth/
 |   |       +-- LoginItem.kt
 |   |       +-- RegisterItem.kt
@@ -122,14 +131,15 @@ Register / Login
 | Auth | `SplashActivity` -> `LoginActivity` | `CreateAccountActivity`, `OtpVerificationActivity`, `ResetPasswordActivity`, `ResetMpinActivity` |
 | Onboarding | `UploadKycActivity` | `CreateVirtualAccountActivity` |
 | Home | `HomeActivity` | Category grid -- routes to bill payment screens |
-| Electricity | `ElectricityActivity` | `RecentTransactionActivity`, `TransactionReportActivity`, `ElectricityTransactionStatusActivity`, `TransactionDetailActivity`, `SmsReceiptActivity` |
+| Electricity | `ElectricityActivity` | `RecentTransactionActivity`, `TransactionReportActivity`, `ElectricityTransactionStatusActivity`, `TransactionDetailActivity` (shared), `SmsReceiptActivity` |
 | Gas | `GasActivity` | `GasRecentTransactionActivity`, `GasTransactionReportActivity`, `GasTransactionStatusActivity`, `TransactionDetailActivity` (shared), `GasSmsReceiptActivity` |
+| Mobile Prepaid | `PrepaidActivity` | `PrepaidPlanSelectionActivity`, `PrepaidRecentTransactionActivity`, `PrepaidTransactionReportActivity`, `PrepaidTransactionStatusActivity`, `TransactionDetailActivity` (shared), `PrepaidSmsReceiptActivity` |
+| Mobile Postpaid | `PostpaidActivity` | `PrepaidPlanSelectionActivity` (shared from prepaid), `PostpaidRecentTransactionActivity`, `PostpaidTransactionReportActivity`, `PostpaidTransactionStatusActivity`, `TransactionDetailActivity` (shared), `PostpaidSmsReceiptActivity` |
 
 ### Planned (stubs in HomeActivity)
 
 | Module | Status |
 |---|---|
-| Mobile prepaid recharge | Not started |
 | DTH recharge | Not started |
 | TV Cable payment | Not started |
 | FASTag recharge | Not started |
@@ -155,8 +165,9 @@ Register / Login
 | No Context in ViewModel field | Pass context as a lambda parameter -- never store it as a field |
 | No network in Adapters | All API calls belong in a ViewModel |
 | `Utility.stopClick()` guard | Every click that triggers navigation, API call, or form submit must call this first |
-| Extend `BaseBillViewModel` | Every bill-payment ViewModel (Electricity, Gas, ...) extends this for shared `checkVpsBalance()` / `checkWalletBalance()` / `bearerToken()` -- never reimplement balance checks per module |
+| Extend `BaseBillViewModel` | Every main bill-payment ViewModel (Electricity, Gas, Prepaid, Postpaid) extends this for shared `checkVpsBalance()` / `checkWalletBalance()` / `bearerToken()` -- never reimplement balance checks per module. Transaction history / receipt ViewModels extend `AndroidViewModel` directly. |
 | Reuse `transactions/` package | `TransactionItem`, `TransactionDetailActivity`, `TransactionAdp`, `RecentTransactionAdp` are category-agnostic and shared by every module -- never fork per module |
+| Reuse `PrepaidPlanSelectionActivity` | Postpaid shares this screen from `prepaid/` -- do not create a `PostpaidPlanSelectionActivity` |
 
 ---
 
@@ -354,6 +365,8 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | Auth | `app/src/main/java/.../auth/README.md` |
 | Electricity | `app/src/main/java/.../electricity/README.md` (canonical bill-payment module reference) |
 | Gas | `app/src/main/java/.../gas/README.md` (mirrors Electricity -- read Electricity's README first) |
+| Mobile Prepaid | `app/src/main/java/.../prepaid/README.md` (adds plan selection + circle picker vs Gas/Electricity) |
+| Mobile Postpaid | `app/src/main/java/.../postpaid/README.md` (shares `PrepaidPlanSelectionActivity`; status searches by transaction ID) |
 
 ---
 

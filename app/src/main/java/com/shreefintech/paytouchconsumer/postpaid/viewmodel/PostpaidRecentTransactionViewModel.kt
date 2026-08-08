@@ -1,14 +1,14 @@
-package com.shreefintech.paytouchconsumer.electricity.viewmodel
+package com.shreefintech.paytouchconsumer.postpaid.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.transactions.model.RecentTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.UnifiedTransactionItem
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
+import com.shreefintech.paytouchconsumer.transactions.model.RecentTransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -16,7 +16,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RecentTransactionViewModel(application: Application) : AndroidViewModel(application) {
+class PostpaidRecentTransactionViewModel(application: Application) : AndroidViewModel(application) {
 
     private val operatorMap = HashMap<String, String>()
 
@@ -30,8 +30,6 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
     companion object {
         private const val PAGE_SIZE = 20
     }
-
-    // ── Public API ────────────────────────────────────────────────────────────
 
     fun loadOperatorsThenData(
         onLoading: () -> Unit,
@@ -48,25 +46,23 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
         operatorMap.clear()
         onLoading()
 
-        ApiClient.apiService.getElectricityOperators(bearerToken())
-            .enqueue(object : Callback<General<List<ElectricityOperatorItem>>> {
+        ApiClient.apiService.getPostpaidOperators(bearerToken())
+            .enqueue(object : Callback<General<List<PostpaidOperatorItem>>> {
                 override fun onResponse(
-                    call: Call<General<List<ElectricityOperatorItem>>>,
-                    response: Response<General<List<ElectricityOperatorItem>>>
+                    call: Call<General<List<PostpaidOperatorItem>>>,
+                    response: Response<General<List<PostpaidOperatorItem>>>
                 ) {
                     response.body()?.data?.forEach { op ->
-                        val id   = op.id   ?: return@forEach
                         val name = op.name ?: return@forEach
-                        operatorMap[id] = name
+                        op.id?.let { operatorMap[it] = name }
                     }
                     fetchTransactions(onSuccess, onError)
                 }
 
                 override fun onFailure(
-                    call: Call<General<List<ElectricityOperatorItem>>>,
+                    call: Call<General<List<PostpaidOperatorItem>>>,
                     t: Throwable
                 ) {
-                    // Operator fetch failed — proceed with empty map; transactions still load
                     fetchTransactions(onSuccess, onError)
                 }
             })
@@ -88,13 +84,11 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
         fetchTransactions(onSuccess, onError)
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────────
-
     private fun fetchTransactions(
         onSuccess: (List<RecentTransactionItem>) -> Unit,
         onError: (String) -> Unit
     ) {
-        ApiClient.apiService.getTransactions(bearerToken(), "electricity", currentPage, PAGE_SIZE)
+        ApiClient.apiService.getTransactions(bearerToken(), "mobile_postpaid", currentPage, PAGE_SIZE)
             .enqueue(object : Callback<General<List<UnifiedTransactionItem>>> {
                 override fun onResponse(
                     call: Call<General<List<UnifiedTransactionItem>>>,
@@ -131,7 +125,7 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
         val service = when {
             operatorId != null && operatorMap.containsKey(operatorId) -> operatorMap[operatorId]!!
             operatorId != null -> operatorId
-            else -> getString(R.string.categoryElectricity)
+            else -> getString(R.string.categoryPostpaid)
         }
         return RecentTransactionItem(
             categoryName      = service,
@@ -141,9 +135,8 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
             amount            = Utility.formatAmount(item.totalPayable ?: item.amount),
             accountNumber     = item.identifier ?: "-",
             reference         = item.referenceId ?: "-",
-            categoryIconRes   = R.drawable.ic_electricity,
-            isMobileCategory  = false
+            categoryIconRes   = R.drawable.ic_postpaid,
+            isMobileCategory  = true
         )
     }
-
 }

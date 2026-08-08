@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.prepaid.transactions
+package com.shreefintech.paytouchconsumer.postpaid.transactions
 
 import android.content.Context
 import android.content.Intent
@@ -15,26 +15,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.RecentTransactionAdp
-import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidRecentTransactionBinding
-import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidRecentTransactionViewModel
+import com.shreefintech.paytouchconsumer.databinding.ActivityPostpaidRecentTransactionBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidRecentTransactionViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-class PrepaidRecentTransactionActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityPrepaidRecentTransactionBinding
-    private lateinit var recentTransactionAdp: RecentTransactionAdp
-    private val viewModel: PrepaidRecentTransactionViewModel by viewModels()
+class PostpaidRecentTransactionActivity : BaseActivity() {
 
     companion object {
         fun start(context: Context) {
-            context.startActivity(Intent(context, PrepaidRecentTransactionActivity::class.java))
+            context.startActivity(Intent(context, PostpaidRecentTransactionActivity::class.java))
         }
     }
 
+    private lateinit var binding: ActivityPostpaidRecentTransactionBinding
+    private lateinit var recentTransactionAdp: RecentTransactionAdp
+    private val viewModel: PostpaidRecentTransactionViewModel by viewModels()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPrepaidRecentTransactionBinding.inflate(layoutInflater)
+        binding = ActivityPostpaidRecentTransactionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
@@ -58,6 +60,7 @@ class PrepaidRecentTransactionActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         onBack()
         loadInitialData()
+        // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadInitialData() }
     }
 
     private fun setupRecyclerView() {

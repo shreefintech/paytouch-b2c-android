@@ -307,12 +307,17 @@
     <string name="msgSmsBody">Dear Customer, Your electricity bill payment of %1$s for Consumer %2$s has been successfully processed</string>
     <string name="msgGasSmsBody">Dear Customer, Your gas bill payment of %1$s for Consumer %2$s has been successfully processed</string>
     <string name="msgPrepaidSmsBody">Dear Customer, Your mobile prepaid recharge of %1$s for Mobile Number %2$s has been successfully processed</string>
+    <string name="msgPostpaidSmsBody">Dear Customer, Your mobile postpaid bill payment of %1$s for Mobile Number %2$s has been successfully processed</string>
+    <string name="titlePostpaidPaymentConfirmation">Postpaid Payment Confirmation</string>
 
     <string name="labelDetailDate">Date - %s</string>
     <string name="labelDetailAmount">Amount - %s</string>
     <string name="labelDetailAccountNumber">Account Number - %s</string>
-    <string name="labelDetailReference">Reference - %s</string>
+    <string name="labelDetailReference">Transaction ID - %s</string>
+    <string name="labelDetailMobileNo">Mobile No - %s</string>
+    <string name="labelDetailConsumerNo">Consumer No - %s</string>
     <string name="labelMobileNoFmt">Mobile No. %s</string>
+    <string name="labelConsumerNoFmt">Consumer No. %s</string>
     <string name="labelUsernameFmt">Username : %s</string>
 
     <string name="apiErr400">Bad Request</string>

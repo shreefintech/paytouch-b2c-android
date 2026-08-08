@@ -15,5 +15,6 @@ data class TransactionItem(
     val referenceId: String,
     val userId: String,
     val accountNumber: String,
-    val companyName: String
+    val companyName: String,
+    val isMobileCategory: Boolean = false
 )

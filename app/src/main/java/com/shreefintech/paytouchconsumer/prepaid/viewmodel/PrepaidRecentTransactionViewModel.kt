@@ -131,12 +131,13 @@ class PrepaidRecentTransactionViewModel(application: Application) : AndroidViewM
         return RecentTransactionItem(
             categoryName      = service,
             accountHolderName = item.extra?.customerName ?: "-",
-            date              = if (item.createdAt.isNullOrBlank()) "-" else Utility.formatDate(item.createdAt, "dd MMM yyyy"),
+            date              = Utility.formatDate(item.createdAt, "dd MMM yyyy"),
             status            = item.status ?: "-",
-            amount            = Utility.formatAmount(item.amount ?: "--"),
+            amount            = Utility.formatAmount(item.totalPayable ?: item.amount),
             accountNumber     = item.identifier ?: "-",
             reference         = item.referenceId ?: "-",
-            categoryIconRes   = R.drawable.ic_prepaid
+            categoryIconRes   = R.drawable.ic_prepaid,
+            isMobileCategory  = true
         )
     }
 

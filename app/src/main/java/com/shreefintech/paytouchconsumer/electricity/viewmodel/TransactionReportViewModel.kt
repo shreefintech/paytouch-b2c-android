@@ -92,19 +92,20 @@ class TransactionReportViewModel(application: Application) : BaseBillViewModel(a
 
     private fun mapToTransactionItem(item: ElectricityTransactionReportDataItem): TransactionItem {
         return TransactionItem(
-            mobileNumber    = item.consumerNo ?: "--",
-            transactionId   = item.transactionId ?: "--",
-            amount          = "₹%.2f".format(item.amount ?: 0.0),
-            status          = item.status ?: "--",
-            categoryIconRes = R.drawable.ic_electricity,
-            username        = item.customerName ?: "--",
-            date            = item.createdAt ?: "--",
-            platformFee     = "₹%.2f".format(item.platformFee ?: 0.0),
-            totalPayable    = "₹%.2f".format(item.totalPayable ?: 0.0),
-            referenceId     = item.transactionId ?: "--",
-            userId          = item.id?.toString() ?: "--",
-            accountNumber   = item.consumerNo ?: "--",
-            companyName     = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--"
+            mobileNumber     = item.consumerNo ?: "--",
+            transactionId    = item.transactionId ?: "--",
+            amount           = Utility.formatAmount(item.amount),
+            status           = item.status ?: "--",
+            categoryIconRes  = R.drawable.ic_electricity,
+            username         = item.customerName ?: "--",
+            date             = item.createdAt ?: "--",
+            platformFee      = Utility.formatAmount(item.platformFee),
+            totalPayable     = Utility.formatAmount(item.totalPayable),
+            referenceId      = item.transactionId ?: "--",
+            userId           = item.id?.toString() ?: "--",
+            accountNumber    = item.consumerNo ?: "--",
+            companyName      = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--",
+            isMobileCategory = false
         )
     }
 

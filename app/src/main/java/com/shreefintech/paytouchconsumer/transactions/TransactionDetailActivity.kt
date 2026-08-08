@@ -67,7 +67,8 @@ class TransactionDetailActivity : BaseActivity() {
 
     private fun populateData() {
         val item = transactionItem ?: return
-        binding.tvMobileNumber.text  = getString(R.string.labelMobileNoFmt, item.mobileNumber)
+        val numberLabelFmt = if (item.isMobileCategory) R.string.labelMobileNoFmt else R.string.labelConsumerNoFmt
+        binding.tvMobileNumber.text  = getString(numberLabelFmt, item.mobileNumber)
         binding.tvUsername.text      = getString(R.string.labelUsernameFmt, item.username)
         binding.tvInfoAmount.text    = item.amount
         binding.tvStatus.text        = item.status

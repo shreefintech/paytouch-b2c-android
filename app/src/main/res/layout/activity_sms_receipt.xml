@@ -237,6 +237,7 @@
                                         android:orientation="horizontal">
 
                                         <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvConsumerNoLabel"
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
@@ -694,7 +695,7 @@
                                         <androidx.appcompat.widget.AppCompatImageView
                                             android:layout_width="@dimen/icon_xlarge"
                                             android:layout_height="@dimen/icon_xlarge"
-                                            android:backgroundTint="#FFDAEC"
+                                            android:backgroundTint="@color/receipt_icon_tint"
                                             android:padding="6dp"
                                             android:background="@drawable/bg_info_box"
                                             android:src="@drawable/ic_txn_id"
@@ -744,7 +745,7 @@
                                         <androidx.appcompat.widget.AppCompatImageView
                                             android:layout_width="@dimen/icon_xlarge"
                                             android:layout_height="@dimen/icon_xlarge"
-                                            android:backgroundTint="#FFDAEC"
+                                            android:backgroundTint="@color/receipt_icon_tint"
                                             android:padding="8dp"
                                             android:background="@drawable/bg_info_box"
                                             android:src="@drawable/ic_calender"

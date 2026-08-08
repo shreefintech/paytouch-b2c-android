@@ -98,6 +98,23 @@ com.shreefintech.paytouchconsumer/
 
 `BaseBillViewModel` provides `checkVpsBalance()` and `checkWalletBalance()` — methods only needed by payment-flow ViewModels. Report/status/receipt ViewModels use `bearerToken()` and `getString()` from `ViewModelExt.kt` instead. Do not flag the report/status ViewModels as inconsistent for extending `AndroidViewModel` directly.
 
+14. **`isMobileCategory` flag must be set in every `mapToTransactionItem()` and `mapToDisplayItem()`** — never hard-coded in the adapter. Set `isMobileCategory = true` for Mobile Prepaid, Mobile Postpaid, and DTH modules; `isMobileCategory = false` for all others (Electricity, Gas, etc.). The adapter uses this flag to switch between "Mobile No" and "Consumer No" labels — if it is missing the flag defaults to `false` (consumer label) which is silently wrong for mobile modules.
+
+    **SMS Receipt (`{Category}SmsReceiptActivity`)** — set `binding.tvConsumerNoLabel.text` dynamically in `populateReceiptFromApi()`. Never rely on the XML default alone. Consumer-number modules → `getString(R.string.labelConsumerNo)`; mobile-number modules → `getString(R.string.labelMobileNo)`.
+
+15. **Use `Utility.maskNumber()` for the account number shown in transaction list rows** — `TransactionAdp` calls `Utility.maskNumber(item.mobileNumber)` for `tvMobile`. The format is `9876*****0` (first 4 chars + five asterisks + last 1 char). Never display the raw unmasked number in a list row; the full number is only shown in `TransactionDetailActivity`.
+
+16. **`Utility.formatAmount()` has two overloads — use the correct one for the DTO field type:**
+    - `formatAmount(raw: String?)` — for all DTOs whose amount fields are `String?` (Gas, Prepaid, Postpaid, and future modules)
+    - `formatAmount(raw: Double?)` — delegates to the String overload via `raw?.toString()`; use only for Electricity DTOs (`ElectricityTransactionReportDataItem`) whose amount fields are `Double?`
+    - Never use `"₹%.2f".format(value)` or any raw string template for currency — always go through `Utility.formatAmount()`
+
+17. **`Utility.formatDate()` is the only date formatter** — never call `SimpleDateFormat` directly in a ViewModel. Use:
+    - `Utility.formatDate(raw, "dd MMM yyyy")` in Recent Transaction `mapToDisplayItem()` (e.g. `11 Jul 2026`)
+    - `Utility.formatDate(raw, "dd/MM/yyyy")` in `TransactionDetailActivity` for date-only display
+    - `Utility.formatDate(raw)` (default `"dd/MM/yyyy hh:mm a"`) for full datetime fields
+    - In `mapToTransactionItem()` pass `item.createdAt ?: "--"` raw — do not pre-format; `TransactionDetailActivity` formats it at display time
+
 ---
 
 ## Naming Conventions (quick ref)

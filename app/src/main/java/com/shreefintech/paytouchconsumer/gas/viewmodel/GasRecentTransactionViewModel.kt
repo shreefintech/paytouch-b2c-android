@@ -131,12 +131,13 @@ class GasRecentTransactionViewModel(application: Application) : AndroidViewModel
         return RecentTransactionItem(
             categoryName      = service,
             accountHolderName = item.extra?.customerName ?: "-",
-            date              = if (item.createdAt.isNullOrBlank()) "-" else Utility.formatDate(item.createdAt, "dd MMM yyyy"),
+            date              = Utility.formatDate(item.createdAt, "dd MMM yyyy"),
             status            = item.status ?: "-",
-            amount            = Utility.formatAmount(item.amount ?: "--"),
+            amount            = Utility.formatAmount(item.totalPayable ?: item.amount),
             accountNumber     = item.identifier ?: "-",
             reference         = item.referenceId ?: "-",
-            categoryIconRes   = R.drawable.ic_gas
+            categoryIconRes   = R.drawable.ic_gas,
+            isMobileCategory  = false
         )
     }
 
