@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class LoanTransactionReportDataItem(
     @field:SerializedName("id")                val id: Int?,
     @field:SerializedName("customer_name")     val customerName: String?,
-    @field:SerializedName("consumer_number")   val consumerNumber: String?,
+    @field:SerializedName("connection_number")   val connectionNumber: String?,
     @field:SerializedName("bill_amount")       val billAmount: String?,
     @field:SerializedName("platform_fee")      val platformFee: String?,
     @field:SerializedName("total_payable")     val totalPayable: String?,
