@@ -324,6 +324,8 @@ binding.cardGas -> {
 }
 ```
 
+**Per-module README timing — add the doc only once the module is complete.** Do not create a `{module}/README.md` (and do not add its row to the "Module READMEs" table in the root `README.md`) while a module is still missing pieces — e.g. its transaction history screens (Recent/Report/Status/SMS Receipt) haven't been built yet, or the payment flow is still stubbed. Documenting a half-built module produces a README that goes stale the moment the remaining screens land. It is fine — and expected — to update the root `README.md`'s Implemented/Planned module table as soon as the module's main Activity is wired from `HomeActivity`; only the dedicated per-module README file waits for full completion.
+
 ---
 
 ## Transaction Screens — Shared Structure Across All Modules
