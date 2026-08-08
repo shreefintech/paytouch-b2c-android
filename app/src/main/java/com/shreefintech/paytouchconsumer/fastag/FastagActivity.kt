@@ -165,7 +165,7 @@ class FastagActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
-                // TODO(PAYTOUCH-69): navigate to FastagSmsReceiptActivity
+                // TODO(B2C-69): navigate to FastagSmsReceiptActivity
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -269,19 +269,19 @@ class FastagActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-69): startActivity(Intent(mActivity, FastagTransactionReportActivity::class.java))
+                    // TODO(B2C-69): startActivity(Intent(mActivity, FastagTransactionReportActivity::class.java))
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-69): FastagTransactionStatusActivity.start(mActivity)
+                    // TODO(B2C-69): FastagTransactionStatusActivity.start(mActivity)
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-69): FastagSmsReceiptActivity.start(mActivity)
+                    // TODO(B2C-69): FastagSmsReceiptActivity.start(mActivity)
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-69): FastagRecentTransactionActivity.start(mActivity)
+                    // TODO(B2C-69): FastagRecentTransactionActivity.start(mActivity)
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
