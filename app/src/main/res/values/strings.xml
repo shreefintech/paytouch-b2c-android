@@ -495,5 +495,6 @@
     <string name="msgAgreeTAndCRequired">Please agree to the Terms &amp; Conditions</string>
     <string name="msgProofTypeEmpty">Please select proof type for account %d</string>
     <string name="msgBankProofRequired">Please upload bank proof for account %d</string>
+    <string name="textVerificationRejected">Verification Rejected</string>
 
 </resources>
