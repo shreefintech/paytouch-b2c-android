@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -16,16 +17,20 @@ import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.onboarding.CreateVirtualAccountActivity
 import com.shreefintech.paytouchconsumer.onboarding.kyc.bank.BankDetailsActivity
 import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.IdentityVerificationActivity
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 
 class KycActivity : BaseActivity() {
 
     private lateinit var binding: ActivityKycBinding
+    private val viewModel: KycViewModel by viewModels()
 
     private var identityDone = false
     private var bankDone = false
+    private var kycSubmission: KycSubmissionDataItem? = null
 
     private val identityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == 1) {
@@ -72,6 +77,30 @@ class KycActivity : BaseActivity() {
         identityDone = SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_KYC_IDENTITY_DONE, false)
         bankDone     = SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_KYC_BANK_DONE, false)
         updateProgress()
+
+        startKyc()
+    }
+
+    private fun startKyc() {
+        viewModel.startKyc(
+            onLoading = {
+                binding.shimmerKyc.visibility = View.VISIBLE
+                binding.shimmerKyc.startShimmer()
+                binding.llKycContent.visibility = View.GONE
+            },
+            onReady = { submission ->
+                kycSubmission = submission
+                binding.shimmerKyc.stopShimmer()
+                binding.shimmerKyc.visibility = View.GONE
+                binding.llKycContent.visibility = View.VISIBLE
+            },
+            onError = { msg ->
+                binding.shimmerKyc.stopShimmer()
+                binding.shimmerKyc.visibility = View.GONE
+                binding.llKycContent.visibility = View.VISIBLE
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
     }
 
     private fun updateProgress() {

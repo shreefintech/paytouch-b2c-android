@@ -2,6 +2,7 @@ package com.shreefintech.paytouchconsumer.retrofit
 
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
@@ -80,13 +81,17 @@ import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoIte
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderResponseItem
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -490,6 +495,29 @@ interface ApiService {
     fun getReferralInfo(
         @Header("Authorization") authorization: String
     ): Call<ReferralInfoItem>
+
+    // ── Dashboard KYC ─────────────────────────────────────────────────────────
+
+    @Multipart
+    @POST("${AUTH}dashboard-kyc/initiate")
+    fun initiateKyc(
+        @Header("Authorization") authorization: String,
+        @Part("entity_type") entityType: RequestBody
+    ): Call<General<KycSubmissionDataItem>>
+
+    @GET("${AUTH}dashboard-kyc/status")
+    fun getKycStatus(
+        @Header("Authorization") authorization: String
+    ): Call<General<KycSubmissionDataItem>>
+
+    @Multipart
+    @POST("${AUTH}dashboard-kyc/sections/a")
+    fun submitKycSectionA(
+        @Header("Authorization") authorization: String,
+        @Part("has_gst") hasGst: RequestBody,
+        @Part("documents[0][document_type]") documentType: RequestBody,
+        @Part document: MultipartBody.Part
+    ): Call<General<KycSubmissionDataItem>>
 
     // ── HDFC Payment Gateway ──────────────────────────────────────────────────
 
