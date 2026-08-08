@@ -23,6 +23,8 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDthBinding
+import com.shreefintech.paytouchconsumer.dth.transactions.DthRecentTransactionActivity
+import com.shreefintech.paytouchconsumer.dth.transactions.DthSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.dth.transactions.DthTransactionReportActivity
 import com.shreefintech.paytouchconsumer.dth.transactions.DthTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.dth.viewmodel.DthViewModel
@@ -182,8 +184,7 @@ class DthActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { _ ->
                 showProgressPay.set(false)
-                // TODO(B2C-68): replace with DthSmsReceiptActivity.start(mActivity, fromPayment = true) once DTH transaction screens are built
-                ToastUtil.showSuccess(mActivity, getString(R.string.msgDthRechargeSuccess))
+                DthSmsReceiptActivity.start(mActivity, fromPayment = true)
                 finish()
             },
             onError = { msg ->
@@ -358,6 +359,14 @@ class DthActivity : BaseActivity() {
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
                     startActivity(Intent(mActivity, DthTransactionStatusActivity::class.java))
+                }
+                binding.llTabSmsReceipt -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    DthSmsReceiptActivity.start(mActivity)
+                }
+                binding.llRecentTransactions -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    DthRecentTransactionActivity.start(mActivity)
                 }
             }
         }

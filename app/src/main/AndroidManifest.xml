@@ -212,6 +212,16 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".dth.transactions.DthRecentTransactionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".dth.transactions.DthSmsReceiptActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".dth.DthActivity"
             android:exported="false"
             android:screenOrientation="portrait"

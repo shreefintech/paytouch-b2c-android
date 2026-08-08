@@ -310,6 +310,11 @@
     <string name="msgPrepaidSmsBody">Dear Customer, Your mobile prepaid recharge of %1$s for Mobile Number %2$s has been successfully processed</string>
     <string name="msgPostpaidSmsBody">Dear Customer, Your mobile postpaid bill payment of %1$s for Mobile Number %2$s has been successfully processed</string>
     <string name="titlePostpaidPaymentConfirmation">Postpaid Payment Confirmation</string>
+    <string name="msgDthSmsBody">Dear Customer, Your DTH recharge of %1$s for Mobile Number %2$s has been successfully processed</string>
+    <string name="titleDthPaymentConfirmation">DTH Payment Confirmation</string>
+    <string name="msgCustomerNumberEmpty">Please enter customer number</string>
+    <string name="labelCustomerNumber">Customer Number</string>
+    <string name="hintCustomerNumber">Enter Subscriber ID</string>
 
     <string name="labelDetailDate">Date - %s</string>
     <string name="labelDetailAmount">Amount - %s</string>
