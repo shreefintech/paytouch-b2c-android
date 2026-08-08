@@ -12,7 +12,7 @@ import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
 import com.shreefintech.paytouchconsumer.onboarding.CreateVirtualAccountActivity
-import com.shreefintech.paytouchconsumer.onboarding.UploadKycActivity
+import com.shreefintech.paytouchconsumer.onboarding.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -65,7 +65,7 @@ class SplashActivity : BaseActivity() {
 
     private fun routeByFlags(data: UserProfileItem?) {
         val intent = when {
-            data?.requiresKyc == true            -> Intent(mActivity, UploadKycActivity::class.java)
+            data?.requiresKyc == true            -> Intent(mActivity, KycActivity::class.java)
             data?.requiresMpin == true           -> Intent(mActivity, ResetMpinActivity::class.java)
             data?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)
             else                                 -> Intent(mActivity, HomeActivity::class.java)

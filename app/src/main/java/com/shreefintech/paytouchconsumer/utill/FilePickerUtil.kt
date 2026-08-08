@@ -44,8 +44,8 @@ class FilePickerUtil(activity: AppCompatActivity) {
     // ─── Config ───────────────────────────────────────────────────────────────
 
     companion object {
-        private const val MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024 // 2MB
-        private val ALLOWED_EXTENSIONS = listOf("pdf", "jpg", "jpeg")
+        private const val MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 // 5MB
+        private val ALLOWED_EXTENSIONS = listOf("pdf", "jpg", "jpeg", "png")
     }
 
     // ─── Callbacks ────────────────────────────────────────────────────────────

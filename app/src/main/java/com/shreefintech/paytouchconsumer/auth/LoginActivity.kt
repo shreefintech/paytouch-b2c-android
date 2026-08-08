@@ -12,6 +12,7 @@ import android.text.TextPaint
 import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +32,7 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityLoginBinding
 import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.onboarding.CreateVirtualAccountActivity
-import com.shreefintech.paytouchconsumer.onboarding.UploadKycActivity
+import com.shreefintech.paytouchconsumer.onboarding.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -78,38 +79,9 @@ class LoginActivity : BaseActivity() {
         onBack()
         setupInputFilters()
         setupMpinBoxes()
-        setupTermsText()
         updateToggleUi(LoginMode.PASSWORD)
     }
 
-    private fun setupTermsText() {
-        val fullText = getString(R.string.labelTermsConditions)
-        val linkText = getString(R.string.termsLinkText)
-        val start = fullText.indexOf(linkText)
-        if (start < 0) {
-            binding.tvTerms.text = fullText
-            return
-        }
-        val spannable = SpannableString(fullText)
-        spannable.setSpan(
-            object : ClickableSpan() {
-                override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_PLATFORM_TERMS)))
-                }
-                override fun updateDrawState(ds: TextPaint) {
-                    super.updateDrawState(ds)
-                    ds.color = ContextCompat.getColor(mActivity, R.color.primary)
-                    ds.isUnderlineText = true
-                }
-            },
-            start,
-            start + linkText.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        binding.tvTerms.text = spannable
-        binding.tvTerms.movementMethod = LinkMovementMethod.getInstance()
-        binding.tvTerms.highlightColor = ContextCompat.getColor(mActivity, android.R.color.transparent)
-    }
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -230,6 +202,7 @@ class LoginActivity : BaseActivity() {
             }
 
             mobile.length != 10 -> {
+
                 msg = getString(R.string.msgMobileInvalid)
                 binding.etMobile.requestFocus()
             }
@@ -255,9 +228,6 @@ class LoginActivity : BaseActivity() {
                     .firstOrNull { it.text.isNullOrEmpty() }?.requestFocus()
             }
 
-            !binding.cbTerms.isChecked -> {
-                msg = getString(R.string.msgTermsNotAccepted)
-            }
 
             else -> handleSignIn(mobile, credential)
         }
@@ -267,6 +237,7 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun handleSignIn(mobile: String, credential: String) {
+
         viewModel.login(
             mobile = mobile,
             credential = credential,
@@ -286,7 +257,7 @@ class LoginActivity : BaseActivity() {
 
     private fun navigateAfterLogin(data: LoginItem?) {
         val intent = when {
-            data?.requiresKyc == true            -> Intent(mActivity, UploadKycActivity::class.java)
+            data?.requiresKyc == true            -> Intent(mActivity, KycActivity::class.java)
             data?.requiresMpin == true           -> Intent(mActivity, ResetMpinActivity::class.java)
             data?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)
             else                                 -> Intent(mActivity, HomeActivity::class.java)

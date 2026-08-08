@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/page_margin_horizontal">
+
+        <!-- Aadhaar Card Number -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelAadharCardNumber"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etAadhar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_input_field"
+            android:fontFamily="@font/proza_libre_medium"
+            android:hint="@string/hintAadharCardNumber"
+            android:includeFontPadding="false"
+            android:inputType="number"
+            android:maxLength="12"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/margin_small"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="?attr/colorTextHint"
+            android:textSize="@dimen/text_size_13" />
+
+        <!-- Front Side -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelFrontSide"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13" />
+
+        <FrameLayout
+            android:id="@+id/flAadharFront"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/kyc_upload_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_upload_area"
+            android:clickable="true"
+            android:focusable="true">
+
+            <!-- Upload prompt (visible before file) -->
+            <LinearLayout
+                android:id="@+id/llUploadFront"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.shreefintech.paytouchconsumer.widget.LiquidGlassButton
+                    android:id="@+id/flUpload1"
+                    android:layout_width="@dimen/btn_height"
+                    android:layout_height="@dimen/btn_height"
+                    app:glassCornerRadius="@dimen/submit_btn_radius"
+                    app:normalTint="@android:color/transparent"
+                    app:pressedTint="@color/upload_btn_color">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivUpload1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/margin_small"
+                        android:src="@drawable/ic_upload"
+                        android:tint="@color/primary" />
+
+                </com.shreefintech.paytouchconsumer.widget.LiquidGlassButton>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_extra_small"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelAadharFront"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_12" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_tiny"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/msgUploadHint"
+                    android:textColor="@color/hint_color"
+                    android:textSize="@dimen/text_size_10" />
+
+            </LinearLayout>
+
+            <!-- Preview (GONE until file selected) -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                android:layout_margin="2dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                android:background="@android:color/transparent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivPreviewFront"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Edit / Delete row (GONE until file selected) -->
+            <LinearLayout
+                android:id="@+id/llEditDeleteFront"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="@dimen/margin_extra_small"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:id="@+id/flEdit1"
+                    android:layout_width="@dimen/upload_edit_size"
+                    android:layout_height="@dimen/upload_edit_size"
+                    android:layout_marginTop="@dimen/margin_tiny"
+                    android:layout_marginHorizontal="@dimen/margin_medium">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivEditProof1"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_edit_placeholder"
+                        android:tint="@color/form_wizard_success" />
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/flDelete1"
+                    android:layout_width="@dimen/upload_edit_size"
+                    android:layout_height="@dimen/upload_edit_size"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginHorizontal="@dimen/margin_medium">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivDeleteProof1"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_cross"
+                        android:tint="@color/form_wizard_reject" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Back Side -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelBackSide"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13" />
+
+        <FrameLayout
+            android:id="@+id/flAadharBack"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/kyc_upload_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_upload_area"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:id="@+id/llUploadBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.shreefintech.paytouchconsumer.widget.LiquidGlassButton
+                    android:id="@+id/flUpload2"
+                    android:layout_width="@dimen/btn_height"
+                    android:layout_height="@dimen/btn_height"
+                    app:glassCornerRadius="@dimen/submit_btn_radius"
+                    app:normalTint="@android:color/transparent"
+                    app:pressedTint="@color/upload_btn_color">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivUpload2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/margin_small"
+                        android:src="@drawable/ic_upload"
+                        android:tint="@color/primary" />
+
+                </com.shreefintech.paytouchconsumer.widget.LiquidGlassButton>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_extra_small"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelAadharBack"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_12" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_tiny"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/msgUploadHint"
+                    android:textColor="@color/hint_color"
+                    android:textSize="@dimen/text_size_10" />
+
+            </LinearLayout>
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                android:layout_margin="2dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                android:background="@android:color/transparent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivPreviewBack"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:id="@+id/llEditDeleteBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="@dimen/margin_extra_small"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:id="@+id/flEdit2"
+                    android:layout_width="@dimen/upload_edit_size"
+                    android:layout_height="@dimen/upload_edit_size"
+                    android:layout_marginTop="@dimen/margin_tiny"
+                    android:layout_marginHorizontal="@dimen/margin_medium">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivEditProof2"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_edit_placeholder"
+                        android:tint="@color/form_wizard_success" />
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/flDelete2"
+                    android:layout_width="@dimen/upload_edit_size"
+                    android:layout_height="@dimen/upload_edit_size"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginHorizontal="@dimen/margin_medium">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivDeleteProof2"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_cross"
+                        android:tint="@color/form_wizard_reject" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+        </FrameLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

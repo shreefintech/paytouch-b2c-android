@@ -18,7 +18,7 @@
 - Any screen (explicit logout)
 
 **Exit points:**
-- Login success, `requires_kyc = true` → `UploadKycActivity`
+- Login success, `requires_kyc = true` → `KycActivity`
 - Login success, `requires_mpin = true` → MPIN creation screen (planned)
 - Login success, `requires_virtual_account = true` → `CreateVirtualAccountActivity`
 - Login success, all clear → `HomeActivity`
@@ -103,25 +103,61 @@
 
 ---
 
-### ✅ UploadKycActivity — "KYC Verification Screen"
+### ✅ KycActivity — "KYC Verification Hub"
 
-**Purpose:** Collect identity information to verify the user.
+**Purpose:** Entry point for KYC; shows a 0/2 document-progress card and launches the two required sections.
 
 **Entry points:**
 - `LoginActivity` (post-login routing, `requires_kyc = true`)
 - App launch (token exists, `requires_kyc = true`)
 
 **Exit points:**
-- Successful KYC submission → MPIN creation (planned)
+- "Identity Verification" tap → `IdentityVerificationActivity` (for result)
+- "Bank Details" tap → `BankDetailsActivity` (for result)
+- Both sections done → `CreateVirtualAccountActivity` (KycActivity finishes, no back stack)
 
 **Key UI elements:**
-- Mobile number, full name, address, city fields
-- Date of birth (date picker)
-- Age (auto-calculated, read-only)
-- Email field
-- PAN card number (validated)
-- Aadhaar number (validated, 12 digits)
-- Optional GST field
+- Document Progress card (count + horizontal progress bar)
+- Identity Verification row
+- Bank Details row
+
+---
+
+### ✅ IdentityVerificationActivity — "Identity Verification (4-step)"
+
+**Purpose:** Collect identity information across 4 steps: Details (mobile/email), Aadhaar upload, PAN upload, selfie capture.
+
+**Entry points:**
+- `KycActivity` ("Identity Verification" row)
+
+**Exit points:**
+- Previous on step 0 → back to `KycActivity` (no changes)
+- Submit on step 4 → `setResult(1)` → back to `KycActivity`
+
+**Key UI elements:**
+- Dot step indicator (4 dots) + step title
+- Step 1: Mobile Number, Email Address
+- Step 2: Aadhaar number, front/back upload slots
+- Step 3: PAN number, front upload slot
+- Step 4: Selfie capture (system camera) with circular guide
+- Previous / Continue (Submit on last step) buttons
+
+---
+
+### ✅ BankDetailsActivity — "Bank Details"
+
+**Purpose:** Collect 1-4 bank accounts (account number, bank name, IFSC, branch, proof type + proof upload).
+
+**Entry points:**
+- `KycActivity` ("Bank Details" row)
+
+**Exit points:**
+- Submit → `setResult(1)` → back to `KycActivity`
+
+**Key UI elements:**
+- Dynamically added bank account cards (max 4, min 1, delete per card when > 1)
+- Terms & Conditions checkbox
+- "+ Add Another Bank Account" button
 - Submit button
 
 ---
@@ -306,7 +342,7 @@ Session check (read SharedPreferences)
                                                                      │
                                                      Check onboarding flags:
                                                                      │
-                                       requires_kyc ────────────► UploadKycActivity ✅
+                                       requires_kyc ────────────► KycActivity ✅
                                                                      │      │
                                                                      │      └── Success ──► MpinActivity 📋
                                                                      │

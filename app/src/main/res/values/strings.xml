@@ -92,45 +92,28 @@
     <string name="msgPasswordMismatch">Passwords do not match</string>
     <string name="msgTermsNotAccepted">Please accept the terms &amp; conditions to continue</string>
 
-    <!-- Upload KYC screen -->
-    <string name="titleKycInfo">KYC Information form</string>
+    <!-- Shared strings still referenced by CreateVirtualAccountActivity / MyAccountActivity layouts -->
     <string name="labelPersonalInformation">Personal Information</string>
     <string name="labelMemberName">Member Name</string>
-    <string name="hintMemberName">Enter Member name</string>
-    <string name="labelBirthdate">Birthdate</string>
-    <string name="hintBirthdate">Enter your birthdate</string>
-    <string name="labelAge">Age</string>
-    <string name="hintAge">Enter your age</string>
     <string name="labelHomeAddress">Home Address</string>
-    <string name="hintHomeAddress">Enter your address</string>
-    <string name="labelCityName">City Name</string>
     <string name="hintSelectCity">Select City</string>
+
+    <!-- Shared identity-document strings (Create Virtual Account + KYC identity verification) -->
     <string name="labelPanCardNumber">Pan Card Number</string>
     <string name="hintPanCardNumber">Enter your pan card number</string>
     <string name="labelAadharCardNumber">Aadhar Card Number</string>
     <string name="hintAadharCardNumber">Enter your Aadhar card number</string>
-    <string name="labelGstNumber">GST Number</string>
-    <string name="hintGstNumber">Enter your GST Number</string>
     <string name="btnCreateVirtualAccount">Create Virtual Account</string>
-    <string name="msgMemberNameEmpty">Please enter member name</string>
-    <string name="msgMemberNameInvalid">Member name must contain only letters and spaces</string>
-    <string name="msgBirthdateEmpty">Please select your birthdate</string>
-    <string name="msgAgeInvalid">You must be at least 18 years old</string>
-    <string name="msgHomeAddressEmpty">Please enter your home address</string>
-    <string name="msgHomeAddressShort">Address must be at least 5 characters</string>
     <string name="msgCityEmpty">Please select your city</string>
     <string name="msgPanEmpty">Please enter your PAN card number</string>
     <string name="msgPanInvalid">Please enter a valid PAN card number</string>
     <string name="msgAadharEmpty">Please enter your Aadhar card number</string>
     <string name="msgAadharInvalid">Aadhar number must be exactly 12 digits</string>
-    <string name="msgGstEmpty">Please enter your GST number</string>
-    <string name="msgGstInvalid">Please enter a valid GST number</string>
-    <string name="msgKycSubmitSuccess">KYC details submitted successfully</string>
 
     <!-- Common error messages — msgNoInternet and errGeneric are declared above; no duplicates here -->
 
-    <string name="msgOnlyPdfJpgJpegAllowed">Only PDF, JPG, JPEG allowed.</string>
-    <string name="msgFileExceeds2mbLimit">File exceeds 2MB limit.</string>
+    <string name="msgOnlyPdfJpgJpegAllowed">Only PDF, JPG, JPEG, PNG allowed.</string>
+    <string name="msgFileExceeds2mbLimit">File exceeds 5MB limit.</string>
     <string name="msgUnableToReadFileTryAgain">Unable to read file. Try again.</string>
 
     <!-- Create Virtual Account screen -->
@@ -461,5 +444,59 @@
     <string name="btnLeave">Leave</string>
     <string name="btnStay">Stay</string>
     <string name="labelOrderId">Order ID</string>
+
+    <!-- KYC module — hub -->
+    <string name="titleKycVerification">KYC Verification</string>
+    <string name="labelDocumentProgress">Document Progress</string>
+    <string name="msgKycProgressSubtitle">Complete all sections to enable seamless transactions.</string>
+    <string name="labelRequiredSections">REQUIRED SECTIONS</string>
+    <string name="labelIdentityVerification">Identity Verification</string>
+    <string name="fmtDocumentProgress">%d / 2</string>
+
+    <!-- KYC module — identity verification steps -->
+    <string name="titleDetails">Details</string>
+    <string name="titleUploadAadharCard">Upload Aadhar Card</string>
+    <string name="titleUploadPanCard">Upload PAN Card</string>
+    <string name="titleSelfieCapture">Selfie Capture</string>
+    <string name="labelPanNumber">Permanent Account Number (PAN)</string>
+    <string name="labelFrontSide">Front Side</string>
+    <string name="labelBackSide">Back Side</string>
+    <string name="msgUploadHint">PDF,JPEG or JPG (Max 2MB)</string>
+    <string name="msgSelfieGuide">Keep a neutral face and align inside the grid guide</string>
+    <string name="msgSelfieInstruction1">● Ensure background lighting</string>
+    <string name="msgSelfieInstruction2">● Do not wear glasses or headwear</string>
+    <string name="btnCapture">Capture</string>
+    <string name="btnPrevious">Previous</string>
+
+    <!-- KYC module — identity validation -->
+    <string name="msgAadharFrontRequired">Please upload Aadhaar front side</string>
+    <string name="msgAadharBackRequired">Please upload Aadhaar back side</string>
+    <string name="msgPanFrontRequired">Please upload PAN card front side</string>
+    <string name="msgSelfieRequired">Please capture a selfie</string>
+    <string name="msgIdentitySubmitSuccess">Identity verification submitted successfully</string>
+
+    <!-- KYC module — bank details -->
+    <string name="fmtBankAccountTitle">Bank Account %d</string>
+    <string name="labelAccountNumber">Account Number</string>
+    <string name="hintAccountNumber">Enter Account Number</string>
+    <string name="labelBankName">Bank Name</string>
+    <string name="hintBankName">Enter Bank Name</string>
+    <string name="labelProofType">Proof Type</string>
+    <string name="hintProofType">Select Proof Type</string>
+    <string name="labelBankProof">Bank Proof</string>
+    <string name="btnAddBankAccount">+ Add Another Bank Account</string>
+    <string name="msgAgreeTAndC">I agree to the Terms &amp; Conditions</string>
+    <string name="msgBankDetailsSubmitSuccess">Bank details submitted successfully</string>
+
+    <!-- KYC module — bank validation -->
+    <string name="msgAccountNumberEmpty">Please enter account number</string>
+    <string name="msgAccountNumberInvalid">Please enter a valid account number</string>
+    <string name="msgBankNameEmpty">Please enter bank name</string>
+    <string name="msgAgreeTAndCRequired">Please agree to the Terms &amp; Conditions</string>
+    <string name="msgProofTypeEmpty">Please select proof type for account %d</string>
+    <string name="msgBankProofRequired">Please upload bank proof for account %d</string>
+    <string name="textVerificationRejected">Verification Rejected</string>
+    <string name="msgVerificationRejected">We couldn\'t verify your details, Please resubmit to continue</string>
+    <string name="btnRetry">Retry</string>
 
 </resources>
