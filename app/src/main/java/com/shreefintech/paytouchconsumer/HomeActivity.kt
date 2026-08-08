@@ -8,6 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
+import com.shreefintech.paytouchconsumer.dth.DthActivity
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -84,7 +85,8 @@ class HomeActivity : BaseActivity() {
 
                 binding.llDth -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-520): Navigate to DTH recharge screen
+                    startActivity(Intent(mActivity, DthActivity::class.java))
+
                 }
 
                 binding.llFastag -> {
