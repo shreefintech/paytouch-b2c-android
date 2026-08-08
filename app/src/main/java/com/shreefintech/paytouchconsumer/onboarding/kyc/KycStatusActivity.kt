@@ -7,8 +7,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.databinding.ActivityKycBinding
+import com.shreefintech.paytouchconsumer.databinding.ActivityKycStatusBindingImpl
 
 class KycStatusActivity : BaseActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

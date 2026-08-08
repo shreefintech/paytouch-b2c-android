@@ -496,5 +496,7 @@
     <string name="msgProofTypeEmpty">Please select proof type for account %d</string>
     <string name="msgBankProofRequired">Please upload bank proof for account %d</string>
     <string name="textVerificationRejected">Verification Rejected</string>
+    <string name="msgVerificationRejected">We couldn\'t verify your details, Please resubmit to continue</string>
+    <string name="btnRetry">Retry</string>
 
 </resources>
