@@ -373,8 +373,8 @@ interface ApiService {
 
         @GET("${AUTH}fastag/latest-payment")
         fun getFastagLatestPayment(
-        @Header("Authorization") authorization: String
-    ): Call<General<FastagLatestPaymentDataItem>>
+            @Header("Authorization") authorization: String
+        ): Call<General<FastagLatestPaymentDataItem>>
 
     // ── Loan ──────────────────────────────────────────────────────────────────
 
