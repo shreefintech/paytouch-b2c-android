@@ -83,4 +83,6 @@
     <color name="colorPaymentProcessing">#FF8F00</color>
     <color name="colorPaymentFailed">#D32F2F</color>
     <color name="colorPaymentRefunded">#7A63FF</color>
+    <color name="personal_info_label">#6B7280</color>
+    <color name="account_card_label">#FFFFF0</color>
 </resources>

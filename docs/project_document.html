@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PayTouch Consumer — Project Documentation</title>
+<style>
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Variables ── */
+  :root {
+    --primary:   #D52662;
+    --orange:    #FF9F43;
+    --dark:      #1a1a2e;
+    --gray:      #4A4A4A;
+    --light-bg:  #f8f9fa;
+    --border:    #e0e0e0;
+    --success:   #1A7A34;
+    --planned:   #7A6A00;
+    --font:      'Segoe UI', Arial, sans-serif;
+    --mono:      'Consolas', 'Courier New', monospace;
+  }
+
+  /* ── Base ── */
+  body {
+    font-family: var(--font);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--dark);
+    background: #fff;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 32px;
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { max-width: 100%; margin: 0; padding: 12mm 15mm; font-size: 11px; }
+    .no-print { display: none !important; }
+    a { color: inherit; text-decoration: none; }
+    .page-break { page-break-before: always; }
+    .no-break { page-break-inside: avoid; }
+    pre, table { page-break-inside: auto; }
+    h2 { page-break-before: always; }
+    h2.no-page-break { page-break-before: auto; }
+    .cover { page-break-after: always; }
+    .toc { page-break-after: always; }
+  }
+
+  /* ── Cover ── */
+  .cover {
+    min-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    border-bottom: 4px solid var(--primary);
+    padding-bottom: 48px;
+    margin-bottom: 48px;
+  }
+  .cover-logo {
+    background: linear-gradient(135deg, var(--primary), var(--orange));
+    color: #fff;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    padding: 10px 22px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 32px;
+  }
+  .cover h1 {
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .cover .sub {
+    font-size: 16px;
+    color: var(--gray);
+    margin-bottom: 40px;
+  }
+  .cover-meta { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 32px; }
+  .cover-meta-item { }
+  .cover-meta-item .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); font-weight: 700; }
+  .cover-meta-item .value { font-size: 14px; color: var(--dark); font-weight: 600; margin-top: 2px; }
+  .cover-bar {
+    width: 60px; height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--orange));
+    border-radius: 2px;
+    margin-bottom: 24px;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--light-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 48px;
+  }
+  .toc h2 { font-size: 16px; margin-bottom: 14px; color: var(--primary); border: none; padding: 0; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--dark); text-decoration: none; font-size: 13px; }
+  .toc a:hover { color: var(--primary); }
+  .toc .sub-list { list-style: disc; margin-top: 4px; padding-left: 20px; }
+  .toc .sub-list li { font-size: 12px; color: var(--gray); }
+
+  /* ── Headings ── */
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 6px;
+    margin: 40px 0 16px;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--dark);
+    margin: 24px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h3::before {
+    content: '';
+    display: inline-block;
+    width: 4px; height: 16px;
+    background: var(--orange);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray);
+    margin: 16px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Text ── */
+  p { margin: 8px 0; color: var(--gray); }
+  ul, ol { padding-left: 22px; margin: 8px 0; }
+  li { margin: 4px 0; color: var(--gray); }
+  strong { color: var(--dark); }
+  blockquote {
+    border-left: 4px solid var(--orange);
+    padding: 10px 16px;
+    background: #FFF8F0;
+    border-radius: 0 6px 6px 0;
+    margin: 12px 0;
+    color: var(--gray);
+    font-style: italic;
+  }
+
+  /* ── Code ── */
+  code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: #f4f4f4;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: #c7254e;
+  }
+  pre {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 12px 0;
+    line-height: 1.5;
+  }
+  pre code { background: none; border: none; color: inherit; padding: 0; font-size: inherit; }
+  .comment { color: #6c7086; }
+  .keyword { color: #cba6f7; }
+  .string { color: #a6e3a1; }
+  .type { color: #89dceb; }
+
+  /* ── Tables ── */
+  .table-wrap { overflow-x: auto; margin: 12px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  th {
+    background: var(--primary);
+    color: #fff;
+    text-align: left;
+    padding: 8px 12px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td {
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--gray);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: var(--light-bg); }
+  tr:hover td { background: #fef0f6; }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .badge-green  { background: #C8F5D8; color: var(--success); }
+  .badge-orange { background: #FFD9A1; color: #A06000; }
+  .badge-gray   { background: #EAEAEA; color: #5C5C5C; }
+  .badge-primary { background: #f9e4ed; color: var(--primary); }
+
+  /* ── Cards ── */
+  .card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    background: #fff;
+  }
+  .card-warning {
+    border-left: 4px solid var(--orange);
+    background: #FFF8F0;
+  }
+  .card-danger {
+    border-left: 4px solid #CC0000;
+    background: #FFF5F5;
+  }
+  .card-success {
+    border-left: 4px solid var(--success);
+    background: #F0FFF4;
+  }
+
+  /* ── Do / Don't ── */
+  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+  .do-box, .dont-box {
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .do-box { background: #F0FFF4; border: 1px solid #1A7A34; }
+  .dont-box { background: #FFF5F5; border: 1px solid #CC0000; }
+  .do-box h4 { color: var(--success); margin: 0 0 8px; }
+  .dont-box h4 { color: #CC0000; margin: 0 0 8px; }
+
+  /* ── Section divider ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  /* ── Status row ── */
+  .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  .status-item {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green  { background: var(--success); }
+  .dot-orange { background: var(--orange); }
+  .dot-gray   { background: #aaa; }
+  .status-item .name { font-size: 12px; font-weight: 600; color: var(--dark); }
+  .status-item .cls  { font-size: 11px; color: var(--gray); font-family: var(--mono); }
+
+  /* ── Nav tree ── */
+  .nav-tree {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 8px;
+    padding: 16px;
+    line-height: 1.8;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 2px solid var(--border);
+    text-align: center;
+    color: #aaa;
+    font-size: 11px;
+  }
+
+  /* ── Inline label ── */
+  .lbl {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    background: #f4f4f4;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 6px;
+    color: var(--gray);
+    font-family: var(--mono);
+  }
+
+  /* ── Rule list ── */
+  .rule-list { list-style: none; padding: 0; }
+  .rule-list li {
+    padding: 8px 12px 8px 36px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    color: var(--gray);
+  }
+  .rule-list li::before {
+    content: attr(data-num);
+    position: absolute;
+    left: 8px;
+    top: 9px;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--primary);
+    color: #fff;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+  .rule-list li:last-child { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ COVER ════════════════ -->
+<div class="cover">
+  <div class="cover-logo">PayTouch</div>
+  <div class="cover-bar"></div>
+  <h1>PayTouch Consumer<br>Project Documentation</h1>
+  <p class="sub">Android Fintech Application — Developer Reference</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Company</div>
+      <div class="value">Shreefintech Solutions</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Platform</div>
+      <div class="value">Android (Kotlin)</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Phase</div>
+      <div class="value">UI Implementation</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Min / Target SDK</div>
+      <div class="value">24 / 36</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Last Updated</div>
+      <div class="value">August 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ TOC ════════════════ -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#overview">Project Overview</a></li>
+    <li><a href="#techstack">Tech Stack</a></li>
+    <li><a href="#packages">Package Structure</a></li>
+    <li><a href="#naming">Naming Conventions</a></li>
+    <li><a href="#architecture">Architecture Rules</a></li>
+    <li><a href="#patterns">Key Code Patterns</a>
+      <ul class="sub-list">
+        <li>Network Call Pattern</li>
+        <li>Button Loading State</li>
+        <li>Click Handling</li>
+        <li>Intent Data Passing</li>
+        <li>Bottom Sheet Pattern</li>
+      </ul>
+    </li>
+    <li><a href="#modules">Module Implementation Status</a></li>
+    <li><a href="#navigation">Screens &amp; Navigation</a></li>
+    <li><a href="#business">Business Logic Rules</a></li>
+    <li><a href="#shared">Shared Components</a></li>
+    <li><a href="#api">API Reference</a></li>
+    <li><a href="#dosdonts">DOs &amp; DON'Ts</a></li>
+    <li><a href="#known">Known Issues</a></li>
+  </ol>
+</div>
+
+<!-- ════════════════ 1. OVERVIEW ════════════════ -->
+<h2 id="overview">1. Project Overview</h2>
+
+<p>
+  <strong>PayTouch Consumer</strong> is a utility bill payment and digital wallet app for Indian consumers.
+  It centralises electricity, gas, mobile, DTH, cable, broadband, FASTag, loan, and municipal tax payments
+  into a single app with a shared wallet, unified transaction history, and consistent payment receipts.
+  Built by Shree Fintech Solutions and powered by the PayTouch platform (<code>paytouch.in</code>).
+</p>
+
+<blockquote>
+  Current state: UI implementation phase. All network calls are stubbed with <code>TODO(PAYTOUCH-xxx):</code> comments. API wiring and business logic finalization happen in a later phase.
+</blockquote>
+
+<h3>Who Uses It</h3>
+<p>Regular consumers only — single user role. Every logged-in user has the same feature set. Before accessing payment features, users must complete a mandatory 4-step onboarding:</p>
+<ol>
+  <li>Register an account</li>
+  <li>Complete KYC (Know Your Customer) verification</li>
+  <li>Create a 4-digit MPIN</li>
+  <li>Set up a Virtual Account (banking details)</li>
+</ol>
+
+<h3>External Systems</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>System</th><th>Base URL</th><th>Purpose</th></tr>
+  <tr><td>PayTouch Main API</td><td><code>paytouch.in</code></td><td>Auth, KYC, MPIN, bill payments, wallet</td></tr>
+  <tr><td>VPS Admin Backend</td><td><code>admin.paytouch.in</code></td><td>User, transaction, KYC, balance tracking</td></tr>
+  <tr><td>HDFC SmartGateway</td><td>—</td><td>Payment processing</td></tr>
+  <tr><td>Firebase FCM</td><td>—</td><td>Push notifications</td></tr>
+  <tr><td>Firebase Analytics + Crashlytics</td><td>—</td><td>Analytics &amp; crash reporting</td></tr>
+</table>
+</div>
+
+<!-- ════════════════ 2. TECH STACK ════════════════ -->
+<h2 id="techstack">2. Tech Stack</h2>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Notes</th></tr>
+  <tr><td>Language</td><td>Kotlin (JVM 11)</td><td></td></tr>
+  <tr><td>UI</td><td>Views + ViewBinding + DataBinding</td><td>Jetpack Compose for new isolated components only</td></tr>
+  <tr><td>Networking</td><td>Retrofit 2.11 + OkHttp 4 + Gson 2.13</td><td>All calls use <code>Call&lt;T&gt;</code> + <code>.enqueue()</code></td></tr>
+  <tr><td>Architecture</td><td>Hybrid MVVM</td><td>Some screens Activity-driven, some use ViewModel</td></tr>
+  <tr><td>Image Loading</td><td>Glide 4.16</td><td>Always specify placeholder + error drawable</td></tr>
+  <tr><td>Auth</td><td>Bearer token</td><td>Stored in SharedPreferences via SharedPreferenceHelper</td></tr>
+  <tr><td>Push</td><td>Firebase Cloud Messaging 25.0</td><td>Planned</td></tr>
+  <tr><td>Analytics</td><td>Firebase Analytics + Crashlytics</td><td></td></tr>
+  <tr><td>Min SDK</td><td>24 (Android 7.0)</td><td></td></tr>
+  <tr><td>Target SDK</td><td>36</td><td></td></tr>
+</table>
+</div>
+
+<!-- ════════════════ 3. PACKAGE STRUCTURE ════════════════ -->
+<h2 id="packages">3. Package Structure</h2>
+
+<pre><code>com.shreefintech.paytouchconsumer/
+<span class="comment">├── auth/           # Login, OTP, password/MPIN flows, create-account</span>
+├── onboarding/     <span class="comment"># KYC (UploadKycActivity), Virtual Account (CreateVirtualAccountActivity)</span>
+├── home/           <span class="comment"># Home/Dashboard screen (HomeActivity)</span>
+├── electricity/    <span class="comment"># Electricity bill payment (canonical reference module)</span>
+│   └── transactions/
+├── gas/            <span class="comment"># Gas bill payment</span>
+│   └── transactions/
+├── dth/            <span class="comment"># DTH recharge (plan-selection module)</span>
+│   └── transactions/
+├── prepaid/        <span class="comment"># Mobile Prepaid recharge (plan-selection module)</span>
+│   └── transactions/
+├── postpaid/       <span class="comment"># Mobile Postpaid bill payment</span>
+│   └── transactions/
+├── myaccount/      <span class="comment"># My Account (Account Info + Refer &amp; Earn)</span>
+│   └── viewmodel/
+├── transactions/   <span class="comment"># Shared: TransactionDetailActivity, TransactionItem</span>
+│   └── model/
+├── adapter/        <span class="comment"># Shared adapters: TransactionAdp, RecentTransactionAdp</span>
+├── enums/          <span class="comment"># Project-wide enums (LoginMode, etc.)</span>
+├── glass/          <span class="comment"># LiquidGlassEffect custom blur UI components</span>
+├── retrofit/       <span class="comment"># ApiService, ApiClient, ApiHelper, all DTOs</span>
+│   └── model/
+├── utill/          <span class="comment"># Utilities — NOTE: "utill" spelling is intentional, never rename</span>
+├── widget/         <span class="comment"># Reusable custom views (LiquidGlassButton, CustomDropdown, etc.)</span>
+├── BaseActivity.kt
+├── HomeActivity.kt
+└── Constant.kt     <span class="comment"># All URLs, keys, SharedPrefs key names</span></code></pre>
+
+<!-- ════════════════ 4. NAMING CONVENTIONS ════════════════ -->
+<h2 id="naming">4. Naming Conventions</h2>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Thing</th><th>Convention</th><th>Example</th></tr>
+  <tr><td>Activity</td><td>PascalCase + <code>Activity</code></td><td><code>HomeActivity</code>, <code>GasActivity</code></td></tr>
+  <tr><td>Adapter</td><td>PascalCase + <code>Adp</code></td><td><code>TransactionAdp</code> — never <code>TransactionAdapter</code></td></tr>
+  <tr><td>Model / DTO</td><td>PascalCase + <code>Item</code></td><td><code>TransactionItem</code>, <code>LoginItem</code></td></tr>
+  <tr><td>ViewModel</td><td>PascalCase + <code>ViewModel</code></td><td><code>GasViewModel</code></td></tr>
+  <tr><td>Layout — Activity</td><td><code>activity_</code> + snake_case</td><td><code>activity_home.xml</code></td></tr>
+  <tr><td>Layout — List item</td><td><code>item_</code> + snake_case</td><td><code>item_transaction.xml</code></td></tr>
+  <tr><td>Layout — Reusable</td><td><code>lyt_</code> + snake_case</td><td><code>lyt_toolbar.xml</code></td></tr>
+  <tr><td>Layout — Bottom sheet</td><td><code>sheet_</code> + snake_case</td><td><code>sheet_filter.xml</code></td></tr>
+  <tr><td>Drawable — Icon</td><td><code>ic_</code> prefix</td><td><code>ic_wallet.xml</code></td></tr>
+  <tr><td>Drawable — Background</td><td><code>bg_</code> prefix</td><td><code>bg_category_item.xml</code></td></tr>
+  <tr><td>Drawable — Image</td><td><code>img_</code> prefix</td><td><code>img_screen_bg.png</code></td></tr>
+  <tr><td>String — Message/toast</td><td><code>msg</code> prefix</td><td><code>msgNoInternet</code></td></tr>
+  <tr><td>String — Screen title</td><td><code>title</code> prefix</td><td><code>titleMyAccount</code></td></tr>
+  <tr><td>String — Field label</td><td><code>label</code> prefix</td><td><code>labelMemberCode</code></td></tr>
+  <tr><td>String — Input hint</td><td><code>hint</code> prefix</td><td><code>hintMobileNo</code></td></tr>
+  <tr><td>String — Button text</td><td><code>btn</code> prefix</td><td><code>btnFetchBill</code></td></tr>
+  <tr><td>String — Error</td><td><code>err</code> prefix</td><td><code>errInvalidPan</code></td></tr>
+</table>
+</div>
+
+<h3>Hard Naming Rules</h3>
+<ul>
+  <li><strong>Models/DTOs MUST end in <code>Item</code></strong> — never <code>Response</code>, <code>Model</code>, <code>Dto</code>, or <code>Data</code></li>
+  <li><strong>Adapters MUST end in <code>Adp</code></strong> — never <code>Adapter</code></li>
+  <li><strong>Activities MUST end in <code>Activity</code></strong> — never <code>Screen</code>, <code>Page</code>, <code>View</code></li>
+  <li><strong>Drawables MUST use <code>ic_</code> / <code>bg_</code> / <code>img_</code></strong> — never bare names</li>
+  <li><strong>Package <code>utill</code></strong> — this spelling is intentional, never rename</li>
+</ul>
+
+<!-- ════════════════ 5. ARCHITECTURE RULES ════════════════ -->
+<h2 id="architecture">5. Architecture Rules</h2>
+
+<ul class="rule-list">
+  <li data-num="1"><strong>ApiClient</strong> is the only source for Retrofit — never construct Retrofit directly inside a ViewModel or Activity.</li>
+  <li data-num="2"><strong>SharedPreferenceHelper</strong> is the only way to read/write SharedPreferences — never call <code>getSharedPreferences()</code> directly.</li>
+  <li data-num="3"><strong>Constant.kt</strong> is where all hardcoded URLs and keys live — no inline strings in code.</li>
+  <li data-num="4"><strong>ToastUtil</strong> is the only way to show user messages — never use raw <code>Toast.makeText()</code>.</li>
+  <li data-num="5"><strong>Utility.isInternetAvailable()</strong> must be called before every network request.</li>
+  <li data-num="6">All Activities must extend <strong>BaseActivity</strong> — never extend <code>AppCompatActivity</code> directly.</li>
+  <li data-num="7">Network errors must be parsed via <strong>ApiHelper.parseErrorMessage()</strong>.</li>
+  <li data-num="8">Adapters must not contain business logic or network calls.</li>
+  <li data-num="9">ViewModels must not store Activity/Context references.</li>
+  <li data-num="10">All API endpoints must be declared in <strong>ApiService</strong> or <strong>ApiAdminService</strong> — never raw HTTP calls inside Activity/ViewModel.</li>
+  <li data-num="11"><code>mapToTransactionItem()</code> must use <code>item.id?.toString() ?: "--"</code> for <code>userId</code> — never loop index.</li>
+  <li data-num="12">Never generate <code>transaction_id</code> client-side for payment requests — the backend owns this.</li>
+  <li data-num="13">ViewModel base class is role-based: main payment VMs → <code>BaseBillViewModel</code>; report/status/receipt VMs → <code>AndroidViewModel</code>.</li>
+  <li data-num="14"><code>isMobileCategory</code> flag must be set in every <code>mapToTransactionItem()</code> and <code>mapToDisplayItem()</code>.</li>
+  <li data-num="15">Always use <code>Utility.maskNumber()</code> for account numbers shown in transaction list rows.</li>
+  <li data-num="16"><code>Utility.formatAmount(raw: String?)</code> for String DTOs; <code>formatAmount(raw: Double?)</code> for Electricity DTOs — never raw string templates.</li>
+  <li data-num="17"><code>Utility.formatDate()</code> is the only date formatter — never call <code>SimpleDateFormat</code> directly in a ViewModel.</li>
+</ul>
+
+<h3>ViewModel Base Class Table</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>ViewModel Role</th><th>Base Class</th></tr>
+  <tr><td><code>{Category}ViewModel</code> — main payment screen</td><td><code>BaseBillViewModel</code></td></tr>
+  <tr><td><code>{Category}RecentTransactionViewModel</code></td><td><code>AndroidViewModel</code></td></tr>
+  <tr><td><code>{Category}TransactionReportViewModel</code></td><td><code>AndroidViewModel</code></td></tr>
+  <tr><td><code>{Category}TransactionStatusViewModel</code></td><td><code>AndroidViewModel</code></td></tr>
+  <tr><td><code>{Category}SmsReceiptViewModel</code></td><td><code>AndroidViewModel</code></td></tr>
+</table>
+</div>
+
+<!-- ════════════════ 6. KEY PATTERNS ════════════════ -->
+<h2 id="patterns">6. Key Code Patterns</h2>
+
+<h3>Network Call Pattern</h3>
+<p>All Retrofit endpoints return <code>Call&lt;T&gt;</code> — never <code>suspend fun</code>. Always invoke with <code>.enqueue()</code>.</p>
+
+<pre><code><span class="comment">// ApiService declaration</span>
+<span class="keyword">fun</span> someEndpoint(<span class="keyword">@Field</span>(<span class="string">"x"</span>) x: String): Call&lt;SomeItem&gt;
+
+<span class="comment">// ViewModel call</span>
+<span class="keyword">if</span> (!Utility.isInternetAvailable(mActivity)) <span class="keyword">return</span>
+ApiClient.apiService.someEndpoint(body).enqueue(<span class="keyword">object</span> : Callback&lt;SomeItem&gt; {
+    <span class="keyword">override fun</span> onResponse(call: Call&lt;SomeItem&gt;, response: Response&lt;SomeItem&gt;) {
+        <span class="keyword">if</span> (response.isSuccessful) { <span class="comment">/* handle */</span> }
+        <span class="keyword">else</span> { ToastUtil.show(mActivity, ApiHelper.parseErrorMessage(...)) }
+    }
+    <span class="keyword">override fun</span> onFailure(call: Call&lt;SomeItem&gt;, t: Throwable) {
+        ToastUtil.show(mActivity, t.localizedMessage)
+    }
+})</code></pre>
+
+<h3>Button Loading State Pattern</h3>
+<p>Every button that triggers an API call shows a <code>ProgressBar</code> inside itself while the call is in flight.</p>
+
+<pre><code><span class="comment">// XML — DataBinding variables in &lt;data&gt; block</span>
+&lt;variable name=<span class="string">"showProgressFetch"</span> type=<span class="string">"androidx.databinding.ObservableBoolean"</span> /&gt;
+
+<span class="comment">// Button XML — toggle label/progress</span>
+&lt;TextView android:visibility=<span class="string">"@{showProgressFetch ? View.GONE : View.VISIBLE}"</span> /&gt;
+&lt;ProgressBar android:visibility=<span class="string">"@{showProgressFetch ? View.VISIBLE : View.GONE}"</span> /&gt;
+
+<span class="comment">// Kotlin — declare, assign, toggle</span>
+<span class="keyword">private val</span> showProgressFetch = ObservableBoolean(<span class="keyword">false</span>)
+binding.showProgressFetch = showProgressFetch
+
+showProgressFetch.set(<span class="keyword">true</span>)   <span class="comment">// before API call</span>
+showProgressFetch.set(<span class="keyword">false</span>)  <span class="comment">// in both onResponse and onFailure</span>
+
+<span class="comment">// Click guard</span>
+<span class="keyword">if</span> (showProgressFetch.get()) <span class="keyword">return</span>@OnClickListener</code></pre>
+
+<h3>Click Handling Pattern</h3>
+<p>One centralized <code>onClickListener()</code> with a <code>when</code> block. Always guard rapid taps with <code>Utility.stopClick()</code>.</p>
+
+<pre><code><span class="keyword">private fun</span> onClickListener(): View.OnClickListener {
+    <span class="keyword">return</span> View.OnClickListener {
+        <span class="keyword">when</span> (it) {
+            binding.btnFetch -> {
+                <span class="keyword">if</span> (Utility.stopClick()) <span class="keyword">return</span>@OnClickListener
+                onFetchBill()
+            }
+            binding.btnPay -> {
+                <span class="keyword">if</span> (Utility.stopClick()) <span class="keyword">return</span>@OnClickListener
+                onPay()
+            }
+        }
+    }
+}</code></pre>
+
+<h3>Intent Data Passing (Object Transfer Rule)</h3>
+<p>Always pass a single object as a JSON string — never individual <code>putExtra</code> fields.</p>
+
+<pre><code><span class="comment">// Companion object in receiving Activity</span>
+<span class="keyword">private const val</span> EXTRA_ITEM = <span class="string">"extra_item"</span>
+
+<span class="keyword">fun</span> start(context: Context, item: MyItem) {
+    context.startActivity(Intent(context, MyDetailActivity::class.java).apply {
+        putExtra(EXTRA_ITEM, Gson().toJson(item))
+    })
+}
+
+<span class="comment">// Lazy field in receiving Activity</span>
+<span class="keyword">private val</span> myItem: MyItem? <span class="keyword">by lazy</span> {
+    intent.getStringExtra(EXTRA_ITEM)?.let { Gson().fromJson(it, MyItem::class.java) }
+}</code></pre>
+
+<h3>Bottom Sheet Pattern</h3>
+<p>Always use <code>BottomSheetBehavior</code> embedded in the layout — never <code>Dialog</code>.</p>
+
+<pre><code><span class="comment">// Activity layout: CoordinatorLayout → main content + viewBg overlay + include sheet</span>
+<span class="comment">// Sheet XML root: ConstraintLayout with app:layout_behavior="...BottomSheetBehavior"</span>
+
+<span class="keyword">private lateinit var</span> sheetBehavior: BottomSheetBehavior&lt;View&gt;
+
+<span class="keyword">private fun</span> setupSheet() {
+    sheetBehavior = BottomSheetBehavior.from(binding.incSheet.root)
+    sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+    sheetBehavior.addBottomSheetCallback(<span class="keyword">object</span> : BottomSheetBehavior.BottomSheetCallback() {
+        <span class="keyword">override fun</span> onStateChanged(bottomSheet: View, newState: Int) {
+            <span class="keyword">when</span> (newState) {
+                STATE_EXPANDED -> binding.viewBg.visibility = View.VISIBLE
+                STATE_HIDDEN   -> binding.viewBg.visibility = View.GONE
+            }
+        }
+        <span class="keyword">override fun</span> onSlide(bottomSheet: View, slideOffset: Float) {}
+    })
+}</code></pre>
+
+<h3>Date Formatting Reference</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Screen</th><th>Format String</th><th>Output Example</th></tr>
+  <tr><td>Recent transaction list</td><td><code>"dd MMM yyyy"</code></td><td><code>11 Jul 2026</code></td></tr>
+  <tr><td>Account Info (registration/activation dates)</td><td><code>"dd-MM-yyyy"</code></td><td><code>15-03-2023</code></td></tr>
+  <tr><td>Transaction detail (date-only)</td><td><code>"dd/MM/yyyy"</code></td><td><code>11/07/2026</code></td></tr>
+  <tr><td>Full datetime display (default)</td><td><code>"dd/MM/yyyy hh:mm a"</code></td><td><code>11/07/2026 03:45 PM</code></td></tr>
+</table>
+</div>
+
+<blockquote>
+  <strong>Input formats supported by <code>Utility.formatDate()</code>:</strong> ISO 8601 (<code>yyyy-MM-dd'T'HH:mm:ss</code>), <code>dd/MM/yyyy hh:mm a</code>, <code>dd/MM/yyyy HH:mm:ss</code>, <code>dd/MM/yyyy</code>, <code>yyyy-MM-dd</code>. Tries each in order; returns raw string on complete failure.
+</blockquote>
+
+<h3>API Response Wrapper Rules</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Response Shape</th><th>Declaration</th><th>Success Check</th></tr>
+  <tr><td><code>General&lt;T&gt;</code> wrapped — <code>{"data": ..., "success": ...}</code></td><td><code>Call&lt;General&lt;YourItem?&gt;&gt;</code></td><td><code>isSuccessful &amp;&amp; body?.data != null</code></td></tr>
+  <tr><td>Flat — has <code>success: Boolean</code> field</td><td><code>Call&lt;YourItem&gt;</code></td><td><code>isSuccessful &amp;&amp; body?.success == true</code></td></tr>
+  <tr><td>Flat — no <code>success</code> field</td><td><code>Call&lt;YourItem&gt;</code></td><td><code>response.isSuccessful</code></td></tr>
+</table>
+</div>
+
+<p><strong>DTO Nullability Rule:</strong> Every field in an API response DTO must be nullable (<code>?</code>). Gson silently sets any missing field to null — non-nullable fields crash at runtime. Local DTOs (passed between Activities) follow normal nullability rules.</p>
+
+<pre><code><span class="comment">// API response DTO — all fields nullable + @field:SerializedName required</span>
+<span class="keyword">data class</span> SomeItem(
+    <span class="keyword">@field:SerializedName</span>(<span class="string">"id"</span>)     <span class="keyword">val</span> id: Int?,
+    <span class="keyword">@field:SerializedName</span>(<span class="string">"amount"</span>) <span class="keyword">val</span> amount: Double?,
+    <span class="keyword">@field:SerializedName</span>(<span class="string">"name"</span>)   <span class="keyword">val</span> name: String?
+)
+
+<span class="comment">// Local DTO — no annotations; nullable only where genuinely optional</span>
+<span class="keyword">data class</span> SomeLocalItem(
+    <span class="keyword">val</span> id: Int,
+    <span class="keyword">val</span> amount: Double,
+    <span class="keyword">val</span> note: String?    <span class="comment">// genuinely optional</span>
+)</code></pre>
+
+<!-- ════════════════ 7. MODULE STATUS ════════════════ -->
+<h2 id="modules">7. Module Implementation Status</h2>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Module</th><th>Main Screen</th><th>Recent Txns</th><th>Report</th><th>Status</th><th>SMS Receipt</th></tr>
+  <tr>
+    <td>Electricity</td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+  </tr>
+  <tr>
+    <td>Gas</td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+  </tr>
+  <tr>
+    <td>DTH</td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+  </tr>
+  <tr>
+    <td>Mobile Prepaid</td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+  </tr>
+  <tr>
+    <td>Mobile Postpaid</td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+  </tr>
+  <tr>
+    <td>My Account</td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td>—</td><td>—</td><td>—</td><td>—</td>
+  </tr>
+  <tr>
+    <td>Cable TV</td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+  </tr>
+  <tr>
+    <td>FASTag</td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+  </tr>
+  <tr>
+    <td>Loan Repayment</td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+  </tr>
+  <tr>
+    <td>Municipal Tax</td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+  </tr>
+  <tr>
+    <td>Load Wallet</td>
+    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td>—</td><td>—</td><td>—</td><td>—</td>
+  </tr>
+</table>
+</div>
+
+<h3>Auth &amp; Onboarding Screens</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Screen</th><th>Class</th><th>Status</th></tr>
+  <tr><td>Login</td><td><code>LoginActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>Register</td><td><code>CreateAccountActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>OTP Verification</td><td><code>OtpVerificationActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>Reset Password</td><td><code>ResetPasswordActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>Reset MPIN</td><td><code>ResetMpinActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>KYC Upload</td><td><code>UploadKycActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>Virtual Account Setup</td><td><code>CreateVirtualAccountActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>Home / Dashboard</td><td><code>HomeActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>Shared Transaction Detail</td><td><code>TransactionDetailActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+</table>
+</div>
+
+<!-- ════════════════ 8. NAVIGATION ════════════════ -->
+<h2 id="navigation">8. Screens &amp; Navigation</h2>
+
+<h3>Onboarding Sequence</h3>
+<pre><code>Register / Login
+      ↓
+UploadKycActivity  (requires_kyc = true)
+      ↓
+MPIN Creation      (requires_mpin = true)
+      ↓
+CreateVirtualAccountActivity  (requires_virtual_account = true)
+      ↓
+HomeActivity       (all flags false)</code></pre>
+
+<h3>Navigation Tree (Abbreviated)</h3>
+<div class="nav-tree">SplashActivity
+  ├── No token ─────────────────────────────► LoginActivity
+  │                                                │
+  │                                         ┌──────┴──────┐
+  │                                    Register      Login success
+  │                                         │             │
+  │                              CreateAccountActivity    │
+  │                                                       ▼
+  └── Token exists ───────────────────► Check onboarding flags
+                                                         │
+                          requires_kyc ──────────► UploadKycActivity
+                          requires_mpin ─────────► MpinActivity (📋)
+                          requires_virtual_account ► CreateVirtualAccountActivity
+                          All clear ──────────────► HomeActivity
+                                                         │
+                         ┌───────────────────────────────┤
+                         ▼                               ▼
+               ElectricityActivity             GasActivity, DthActivity,
+               (canonical reference)           PrepaidActivity, PostpaidActivity,
+                         │                     FasTagActivity, LoanActivity...
+                         │
+              Pay ─ Recent ─ Report ─ Status ─ SMS Receipt
+              ✅     ✅        ✅        ✅         ✅
+
+All detail taps ──────────────────────────► TransactionDetailActivity (shared)
+
+[401 anywhere] ────────────────────────────► LoginActivity (stack cleared)</div>
+
+<h3>Navigation Rules</h3>
+<ul>
+  <li><strong>Back stack after login:</strong> Stack is cleared — user cannot press Back to reach login from Home.</li>
+  <li><strong>Forced logout (401):</strong> Stack completely cleared with <code>FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK</code>.</li>
+  <li><strong>No cross-module navigation:</strong> Never start one module's Activity from another. Leave empty with a <code>TODO(ticket)</code> comment for pending modules.</li>
+  <li><strong>Result refresh:</strong> Use <code>ActivityResultLauncher</code> when a child screen's data changes should trigger a parent refresh.</li>
+  <li><strong>Object passing:</strong> Always <code>Gson().toJson(item)</code> into a single <code>putExtra</code> — never multiple individual extras.</li>
+</ul>
+
+<h3>Intent Extras Reference</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>From</th><th>To</th><th>Extra Key</th><th>Type</th></tr>
+  <tr><td><code>DthActivity</code></td><td><code>DthPlanSelectionActivity</code></td><td><code>extra_operator_id</code></td><td>String</td></tr>
+  <tr><td><code>DthPlanSelectionActivity</code></td><td><code>DthActivity</code> (result)</td><td><code>extra_selected_plan</code></td><td>JSON <code>DthPlanItem</code></td></tr>
+  <tr><td><code>{Category}Activity</code></td><td><code>{Category}SmsReceiptActivity</code></td><td><code>extra_from_payment</code></td><td>Boolean</td></tr>
+  <tr><td>Any module</td><td><code>TransactionDetailActivity</code></td><td><code>extra_item</code></td><td>JSON <code>TransactionItem</code></td></tr>
+</table>
+</div>
+
+<!-- ════════════════ 9. BUSINESS LOGIC ════════════════ -->
+<h2 id="business">9. Business Logic Rules</h2>
+
+<h3>Platform Fee Calculation</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Payment Amount</th><th>Platform Fee</th></tr>
+  <tr><td>Below ₹1,000</td><td>₹4</td></tr>
+  <tr><td>₹1,000 – ₹5,000</td><td>₹8</td></tr>
+  <tr><td>₹5,001 – ₹40,000</td><td>₹20</td></tr>
+  <tr><td>Above ₹40,000</td><td>₹30</td></tr>
+</table>
+</div>
+
+<h3>Standard Bill Payment Flow</h3>
+<ol>
+  <li>User selects operator from API-fetched dropdown</li>
+  <li>User enters consumer/account number</li>
+  <li>App calls <code>fetch-bill</code> API → displays outstanding amount, due date, consumer name</li>
+  <li>User confirms; platform fee is calculated and shown</li>
+  <li>Payment processed via <code>process-payment</code> API</li>
+  <li>App calls <code>transaction-status</code> for final result</li>
+  <li>Success/failure sound plays (<code>payment_success.mp3</code> / <code>payment_failed.mp3</code>)</li>
+  <li>Receipt is displayed</li>
+</ol>
+
+<h3>Input Validation Rules</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Field</th><th>Rule</th></tr>
+  <tr><td>Mobile number</td><td>Exactly 10 digits</td></tr>
+  <tr><td>PAN card</td><td>Regex: <code>[A-Z]{5}[0-9]{4}[A-Z]{1}</code></td></tr>
+  <tr><td>Aadhaar number</td><td>Exactly 12 digits</td></tr>
+  <tr><td>Password</td><td>Min 8 characters; includes uppercase, number, special character</td></tr>
+  <tr><td>MPIN</td><td>Exactly 4 digits; confirmation must match</td></tr>
+  <tr><td>Email</td><td>Standard email format</td></tr>
+  <tr><td>GST number</td><td>Validate format only if non-empty; never block submission if blank</td></tr>
+</table>
+</div>
+
+<h3>Authentication &amp; Session Rules</h3>
+<ul>
+  <li>Token is checked at Splash — no token → go to Login</li>
+  <li>Any 401 response → clear ALL SharedPreferences → launch LoginActivity (stack cleared)</li>
+  <li>Login flags drive routing: <code>requires_kyc</code>, <code>requires_mpin</code>, <code>requires_virtual_account</code></li>
+  <li>MPIN is never stored locally — only a boolean flag <code>mpin_created</code></li>
+</ul>
+
+<h3>SharedPreferences Store Map</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Store</th><th>Key</th><th>Type</th><th>Purpose</th></tr>
+  <tr><td><code>AUTH</code></td><td><code>TOKEN</code></td><td>String</td><td>Bearer token</td></tr>
+  <tr><td><code>AUTH</code></td><td><code>USERID</code></td><td>Int</td><td>User ID</td></tr>
+  <tr><td><code>AUTH</code></td><td><code>EMAIL</code></td><td>String</td><td>User email</td></tr>
+  <tr><td><code>AUTH</code></td><td><code>MOBILE</code></td><td>String</td><td>Mobile number</td></tr>
+  <tr><td><code>AUTH</code></td><td><code>ReferralCode</code></td><td>String</td><td>Referral code</td></tr>
+  <tr><td><code>app_prefs</code></td><td><code>mpin_created</code></td><td>Boolean</td><td>MPIN setup complete</td></tr>
+  <tr><td><code>app_prefs</code></td><td><code>virtual_account</code></td><td>Boolean</td><td>VA setup complete</td></tr>
+</table>
+</div>
+
+<h3>Module Type Classification</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Module</th><th>Flow Type</th><th>isMobileCategory</th><th>Notes</th></tr>
+  <tr><td>Electricity, Gas</td><td>Fetch-bill → Pay</td><td><code>false</code></td><td>Consumer number</td></tr>
+  <tr><td>Mobile Prepaid</td><td>Select plan → Pay (no fetch-bill)</td><td><code>true</code></td><td>Requires circle selection</td></tr>
+  <tr><td>Mobile Postpaid</td><td>Fetch-bill → Pay</td><td><code>true</code></td><td>Mobile number</td></tr>
+  <tr><td>DTH</td><td>Select plan → Pay (no fetch-bill)</td><td><code>true</code></td><td>Plan selection screen</td></tr>
+  <tr><td>FASTag</td><td>Enter vehicle no + amount → Pay</td><td><code>false</code></td><td>No fetch-bill step</td></tr>
+  <tr><td>Loan, Municipal Tax</td><td>Fetch-bill → Pay</td><td><code>false</code></td><td>Consumer number</td></tr>
+</table>
+</div>
+
+<h3>Confirmed Backend Quirks — Do NOT "Fix"</h3>
+<div class="card card-warning no-break">
+  <table>
+    <tr><th>Location</th><th>Apparent Anomaly</th><th>Confirmed Behaviour</th></tr>
+    <tr>
+      <td><code>getMunicipalTaxTransactionStatus</code></td>
+      <td>Uses <code>@POST("mobile-recharge/transaction-status")</code></td>
+      <td>Backend-side intentional routing — the mobile-recharge endpoint serves municipal tax queries too.</td>
+    </tr>
+    <tr>
+      <td><code>MunicipalTaxLatestPaymentDataItem.subService</code></td>
+      <td><code>@field:SerializedName("subservice")</code> — no underscore</td>
+      <td>API contract sends <code>subservice</code> not <code>sub_service</code>. Do not rename.</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ════════════════ 10. SHARED COMPONENTS ════════════════ -->
+<h2 id="shared">10. Shared Components</h2>
+
+<p>These components are shared across ALL modules — <strong>never duplicate per module</strong>.</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Component</th><th>Location</th><th>Shared By</th></tr>
+  <tr><td><code>TransactionDetailActivity</code></td><td><code>transactions/</code></td><td>All modules — never create per-module copies</td></tr>
+  <tr><td><code>TransactionAdp</code></td><td><code>adapter/</code></td><td>All modules — category icon driven by <code>item.categoryIconRes</code></td></tr>
+  <tr><td><code>RecentTransactionAdp</code></td><td><code>adapter/</code></td><td>All modules</td></tr>
+  <tr><td><code>TransactionItem</code></td><td><code>transactions/model/</code></td><td>UI model — no API fields</td></tr>
+  <tr><td><code>RecentTransactionItem</code></td><td><code>transactions/model/</code></td><td>UI model for recent list</td></tr>
+  <tr><td><code>TransactionFilterHelper</code></td><td><code>utill/</code></td><td>All report screens</td></tr>
+  <tr><td><code>ReceiptHelper</code></td><td><code>utill/</code></td><td>All SMS receipt screens</td></tr>
+  <tr><td><code>item_transaction.xml</code></td><td><code>res/layout/</code></td><td>All modules via <code>TransactionAdp</code></td></tr>
+  <tr><td><code>lyt_shimmer_transaction_item.xml</code></td><td><code>res/layout/</code></td><td>All transaction activities</td></tr>
+  <tr><td><code>sheet_filter.xml</code></td><td><code>res/layout/</code></td><td>All report screens</td></tr>
+</table>
+</div>
+
+<h3>Extension Functions — Never Re-implement</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Function</th><th>Declared In</th><th>Replaces</th></tr>
+  <tr><td><code>bearerToken()</code></td><td><code>utill/ViewModelExt.kt</code></td><td>Any local <code>"Bearer $token"</code> construction</td></tr>
+  <tr><td><code>getString(@StringRes id)</code></td><td><code>utill/ViewModelExt.kt</code></td><td>Any local string-resource lookup in ViewModel</td></tr>
+  <tr><td><code>Utility.formatAmount(String?)</code></td><td><code>utill/Utility.kt</code></td><td>Any local <code>NumberFormat</code> / currency formatting</td></tr>
+  <tr><td><code>Utility.formatDate(raw, format)</code></td><td><code>utill/Utility.kt</code></td><td>Any direct <code>SimpleDateFormat</code> usage in ViewModel</td></tr>
+  <tr><td><code>Utility.maskNumber(number)</code></td><td><code>utill/Utility.kt</code></td><td>Masked account display — format: <code>9876*****0</code></td></tr>
+</table>
+</div>
+
+<h3>mapToTransactionItem() Field Rules</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Field</th><th>Value Rule</th></tr>
+  <tr><td><code>userId</code></td><td><code>item.id?.toString() ?: "--"</code> — never loop index</td></tr>
+  <tr><td><code>date</code></td><td><code>item.createdAt ?: "--"</code> — raw ISO string, do not pre-format</td></tr>
+  <tr><td><code>amount</code></td><td><code>Utility.formatAmount(item.amount)</code> — never string template</td></tr>
+  <tr><td><code>platformFee</code></td><td><code>Utility.formatAmount(item.platformFee)</code> or <code>"₹0.00"</code> if absent</td></tr>
+  <tr><td><code>categoryIconRes</code></td><td><code>R.drawable.ic_{category}</code></td></tr>
+  <tr><td><code>isMobileCategory</code></td><td><code>true</code> for Mobile Prepaid, Postpaid, DTH; <code>false</code> for all others</td></tr>
+</table>
+</div>
+
+<h3>Files to Generate Per New Module</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>File</th><th>Copy From</th></tr>
+  <tr><td><code>{Category}Activity</code> + <code>activity_{category}.xml</code></td><td><code>ElectricityActivity</code></td></tr>
+  <tr><td><code>{Category}ViewModel</code></td><td><code>ElectricityViewModel</code> (extends <code>BaseBillViewModel</code>)</td></tr>
+  <tr><td><code>{Category}RecentTransaction*</code> (Activity + ViewModel + XML)</td><td>Electricity equivalent</td></tr>
+  <tr><td><code>{Category}TransactionReport*</code> (Activity + ViewModel + XML)</td><td>Electricity equivalent</td></tr>
+  <tr><td><code>{Category}TransactionStatus*</code> (Activity + ViewModel + XML)</td><td>Electricity equivalent</td></tr>
+  <tr><td><code>{Category}SmsReceipt*</code> (Activity + ViewModel + XML)</td><td>Electricity equivalent</td></tr>
+  <tr><td>DTOs in <code>retrofit/model/{category}/</code></td><td>Match actual API contract</td></tr>
+  <tr><td><code>ApiService.kt</code> entries</td><td>Under <code>// ── {Category} ──</code> block</td></tr>
+</table>
+</div>
+
+<!-- ════════════════ 11. API REFERENCE ════════════════ -->
+<h2 id="api">11. API Reference</h2>
+
+<h3>Authentication Endpoints</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Method</th><th>Path</th><th>Purpose</th><th>Response Model</th></tr>
+  <tr><td>POST</td><td><code>api/login</code></td><td>Login (password or MPIN)</td><td><code>LoginItem</code></td></tr>
+  <tr><td>POST</td><td><code>api/register</code></td><td>Create new account</td><td><code>RegisterItem</code></td></tr>
+  <tr><td>GET</td><td><code>api/user</code></td><td>Fetch user profile &amp; flags</td><td><code>UserProfileItem</code></td></tr>
+  <tr><td>POST</td><td><code>api/logout</code></td><td>Invalidate session</td><td><code>MessageItem</code></td></tr>
+</table>
+</div>
+
+<h3>Standard Bill Payment Endpoints Pattern</h3>
+<p>Replace <code>{category}</code> with: <code>electricity</code>, <code>gas</code>, <code>mobile-postpaid</code>, etc.</p>
+<div class="table-wrap">
+<table>
+  <tr><th>Method</th><th>Path</th><th>Purpose</th></tr>
+  <tr><td>GET</td><td><code>api/{category}/operators</code></td><td>Operator list</td></tr>
+  <tr><td>POST</td><td><code>api/{category}/fetch-bill</code></td><td>Fetch outstanding bill</td></tr>
+  <tr><td>POST</td><td><code>api/{category}/process-payment</code></td><td>Process payment</td></tr>
+  <tr><td>POST</td><td><code>api/{category}/transaction-status</code></td><td>Check transaction status by ID</td></tr>
+  <tr><td>GET</td><td><code>api/{category}/payment-reports</code></td><td>Filtered payment reports</td></tr>
+  <tr><td>GET</td><td><code>api/{category}/latest-payment</code></td><td>Most recent payment (for SMS receipt)</td></tr>
+</table>
+</div>
+
+<h3>Other Key Endpoints</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Method</th><th>Path</th><th>Purpose</th></tr>
+  <tr><td>POST</td><td><code>api/kyc/submit</code></td><td>Submit KYC data</td></tr>
+  <tr><td>POST</td><td><code>api/virtual-account/create</code></td><td>Create virtual account (multipart)</td></tr>
+  <tr><td>GET</td><td><code>api/wallet/balance</code></td><td>Get current wallet balance</td></tr>
+  <tr><td>GET</td><td><code>api/shreefintech-token</code></td><td>Fetch dynamic payment token</td></tr>
+  <tr><td>GET</td><td><code>api/recharge/plans/{opId}/{circleId}</code></td><td>Prepaid plans</td></tr>
+  <tr><td>POST</td><td><code>api/mpin/create</code></td><td>Create MPIN during onboarding</td></tr>
+  <tr><td>POST</td><td><code>api/password/send-otp</code></td><td>Begin password reset</td></tr>
+  <tr><td>POST</td><td><code>api/kyc/account-info</code></td><td>My Account info</td></tr>
+</table>
+</div>
+
+<!-- ════════════════ 12. DOs & DON'Ts ════════════════ -->
+<h2 id="dosdonts">12. DOs &amp; DON'Ts</h2>
+
+<h3>Architecture — DOs</h3>
+<ul>
+  <li>Use <code>ApiClient</code> as the only Retrofit source — one client per distinct base URL</li>
+  <li>Use <code>SharedPreferenceHelper</code> as the ONLY SharedPreferences access point</li>
+  <li>Put all URLs, keys, and constants in <code>Constant.kt</code></li>
+  <li>Call <code>Utility.isInternetAvailable()</code> before every network request</li>
+  <li>Handle 401 responses globally via an OkHttp interceptor — not per-ViewModel</li>
+  <li>Use <code>ActivityResultLauncher</code> for all Activity results and file picking</li>
+  <li>Prefer Data Binding (<code>android:onClickListener="@{onClickListener}"</code>) over programmatic <code>setOnClickListener()</code></li>
+  <li>Store every payment attempt in Room DB immediately — success or failure</li>
+  <li>Play audio feedback after every payment</li>
+  <li>Use <code>MaterialCardView</code> for card/container backgrounds — never create new drawables for solid-color shapes</li>
+</ul>
+
+<h3>Architecture — DON'Ts</h3>
+<ul>
+  <li>Don't put network calls in Activities — all calls go in ViewModels</li>
+  <li>Don't use <code>suspend fun</code> or coroutines for Retrofit API calls</li>
+  <li>Don't create multiple SharedPreferences stores for the same user</li>
+  <li>Don't hardcode any active URL, key, or token in Activity/ViewModel code</li>
+  <li>Don't store Activity/Context references as ViewModel fields</li>
+  <li>Don't call <code>Toast.makeText()</code> directly — always use <code>ToastUtil</code></li>
+  <li>Don't call <code>notifyDataSetChanged()</code> for a single-item RecyclerView update</li>
+  <li>Don't load images with Glide without a placeholder and error drawable</li>
+  <li>Don't use <code>startActivity()</code> without calling <code>Utility.stopClick()</code> first</li>
+  <li>Don't navigate cross-module (e.g. starting ElectricityActivity from GasActivity)</li>
+</ul>
+
+<h3>UI Loading — DON'T use full-screen loaders</h3>
+<div class="card card-danger no-break">
+  <p><strong>Wrong:</strong> Full-screen progress dialog, overlay, or alpha-only dimming for button-triggered API calls.</p>
+  <p><strong>Right:</strong> Show a <code>ProgressBar</code> inside the specific button that was tapped. For dropdown loading, show a spinner inside the field slot only. One <code>ObservableBoolean</code> per button — never a single shared <code>isLoading</code> flag.</p>
+</div>
+
+<h3>RecyclerView Update Rules</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Operation</th><th>Correct Approach</th></tr>
+  <tr><td>Single item created/updated</td><td><code>notifyItemChanged(position)</code></td></tr>
+  <tr><td>Single item deleted</td><td><code>mArrayList.removeAt(position)</code> + <code>notifyItemRemoved(position)</code></td></tr>
+  <tr><td>Full reload (filter/search/page 1)</td><td><code>mArrayList.clear()</code> + <code>notifyDataSetChanged()</code></td></tr>
+  <tr><td>Pagination append</td><td><code>notifyItemRangeInserted(insertStart, count)</code></td></tr>
+</table>
+</div>
+
+<h3>LiquidGlassButton Attachment Rule</h3>
+<p>Every <code>LiquidGlassButton</code> in an Activity <strong>must</strong> call <code>.attach(root as ViewGroup)</code> in <code>onCreate()</code> after <code>setContentView()</code>.</p>
+<pre><code><span class="comment">// In onCreate(), after setContentView():</span>
+binding.flUpload1.attach(binding.clRoot <span class="keyword">as</span> ViewGroup)
+binding.flSubmit.attach(binding.clRoot <span class="keyword">as</span> ViewGroup)</code></pre>
+
+<!-- ════════════════ 13. KNOWN ISSUES ════════════════ -->
+<h2 id="known">13. Known Issues to Resolve Before Release</h2>
+
+<div class="card card-danger no-break">
+  <h4>Issue 1 — QR Payment URL</h4>
+  <p>The Dynamic QR payment feature uses a <code>ngrok-free.dev</code> tunnel URL which will break in production. Replace with a stable production URL before any live deployment.</p>
+</div>
+
+<div class="card card-warning no-break">
+  <h4>Issue 2 — Static Shreefintech Token</h4>
+  <p>The dynamic token from <code>api/shreefintech-token</code> is stored in a static field <code>Constant.TOKEN</code> — race condition risk in multi-thread scenarios. Move to <code>SharedPreferenceHelper</code> or a Repository before the API wiring phase.</p>
+</div>
+
+<div class="card card-warning no-break">
+  <h4>Issue 3 — Legacy MobiKwik API</h4>
+  <p>Some payment flows may route through <code>dashboard.shreefintechsolutions.com/api/mobikwik/</code>. Audit each endpoint before wiring — determine which are still active and which have been replaced by <code>paytouch.in</code> equivalents.</p>
+</div>
+
+<div class="card card-warning no-break">
+  <h4>Issue 4 — Postpaid Plan Selection (B2C-59)</h4>
+  <p><code>PostpaidActivity.onBrowsePlan()</code> currently launches <code>PrepaidPlanSelectionActivity</code> as a temporary stand-in. Replace with dedicated <code>PostpaidPlanSelectionActivity</code> once <code>mobile-postpaid/plans</code> API is ready. Marked with <code>TODO(B2C-59)</code>.</p>
+</div>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<div class="footer">
+  PayTouch Consumer · Project Documentation · Shreefintech Solutions<br>
+  Internal use only · Generated August 2026
+</div>
+
+</body>
+</html>

@@ -21,7 +21,6 @@ object Constant {
     const val URL_PLATFORM_TERMS = "https://www.paytouch.in/terms/platform"
 
     // Circle IDs for bill payment modules
-    const val GAS_CIRCLE_ID  = "0"
     const val LOAN_CIRCLE_ID = "0"
 
     // Auth flow type extras

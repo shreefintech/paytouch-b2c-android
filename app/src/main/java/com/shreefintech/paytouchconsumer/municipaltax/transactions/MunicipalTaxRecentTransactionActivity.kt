@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.municipaltax.transactions
+package com.shreefintech.paytouchconsumer.municipaltax.transactions
 
 import android.content.Context
 import android.content.Intent

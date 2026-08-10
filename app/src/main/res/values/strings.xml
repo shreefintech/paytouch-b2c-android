@@ -39,7 +39,6 @@
     <string name="createAccountSubtitle">Enter your Details To get started</string>
     <string name="labelEmailAddress">Email Address</string>
     <string name="hintEmail">Enter your email address</string>
-    <string name="labelReferralCode">Referral Code</string>
     <string name="labelOptional">(Optional)</string>
     <string name="hintReferralCode">Enter your referral code</string>
     <string name="labelConfirmPassword">Confirm Password</string>
@@ -407,6 +406,13 @@
     <string name="labelActivationDate">Activation Date</string>
     <string name="hintDateFormat">dd-mm-yyyy</string>
     <string name="labelBalance">Balance</string>
+    <string name="labelWalletBalance">Wallet Balance</string>
+    <string name="labelContactDetails">Contact Details</string>
+    <string name="labelPhoneNumber">Phone Number</string>
+    <string name="labelMembershipTimeline">Membership Timeline</string>
+    <string name="labelRegisteredOn">Registered On</string>
+    <string name="labelActivatedOn">Activated On</string>
+    <string name="btnViewKycDetails">View KYC Details</string>
     <string name="labelTotalEarnings">Total Earnings</string>
     <string name="msgEarnPerReferral">Earn ₹2 for each referral</string>
     <string name="msgShareReferralInfo">Share your referral link with friends and earn ₹2 for each successful referral.</string>
@@ -416,8 +422,12 @@
     <string name="btnFacebook">Facebook</string>
     <string name="btnEmail">Email</string>
     <string name="msgCopiedToClipboard">Copied to clipboard</string>
+    <string name="labelAmountZero">₹0.00</string>
+    <string name="labelReferralCode">Referral Code</string>
+    <string name="labelReferralLink">Referral Link</string>
     <string name="btnRefresh">Refresh</string>
     <string name="latterI">i</string>
+    <string name="idColon">ID:</string>
 
     <!-- Load Wallet screen -->
     <string name="titleMyWallet">My Wallet</string>

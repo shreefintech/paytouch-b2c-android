@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.postpaid.transactions
+package com.shreefintech.paytouchconsumer.postpaid.transactions
 
 import android.graphics.Color
 import android.os.Bundle

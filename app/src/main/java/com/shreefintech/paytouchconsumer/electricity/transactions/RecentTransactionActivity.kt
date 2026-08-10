@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.electricity.transactions
+package com.shreefintech.paytouchconsumer.electricity.transactions
 
 import android.graphics.Color
 import android.os.Bundle
