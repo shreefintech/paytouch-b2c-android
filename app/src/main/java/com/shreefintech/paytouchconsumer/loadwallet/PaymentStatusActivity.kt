@@ -1,17 +1,15 @@
 package com.shreefintech.paytouchconsumer.loadwallet
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
-import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
 import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
@@ -98,39 +96,62 @@ class PaymentStatusActivity : BaseActivity() {
     }
 
     private fun populateStatus(status: String) {
-        val (label, colorRes, iconRes) = resolveStatus(status)
-        binding.tvStatusLabel.text = label
-
-        // bg_payment_status_icon.xml is a <shape> drawable — GradientDrawable at runtime
-        val drawable = binding.flStatusIcon.background.mutate() as GradientDrawable
-        drawable.setColor(ContextCompat.getColor(mActivity, colorRes))
-
-        binding.ivStatusIcon.setImageResource(iconRes)
+        val display = resolveStatus(status)
+        binding.tvStatusLabel.text = display.label
+        binding.tvStatusDescription.text = display.description
+        binding.tvAmountLabel.text = display.amountLabel
         binding.tvOrderId.text = orderId
         binding.tvAmount.text = Utility.formatAmount(amount)
+        // TODO(B2C-82): load gif_Success for success, gif_rejected for failed/pending once assets are added
+        // val gifRes = if (status.uppercase() in listOf(STATUS_CHARGED, STATUS_AUTHORIZED)) R.drawable.gif_Success else R.drawable.gif_rejected
+        // Glide.with(mActivity).asGif().load(gifRes).into(binding.ivGif)
     }
 
     private data class StatusDisplay(
         val label: String,
-        @ColorRes val colorRes: Int,
-        @DrawableRes val iconRes: Int
+        val description: String,
+        val amountLabel: String
     )
 
     private fun resolveStatus(status: String): StatusDisplay {
         return when (status.uppercase()) {
-            STATUS_CHARGED, STATUS_AUTHORIZED ->
-                StatusDisplay(getString(R.string.msgPaymentSuccessful), R.color.colorPaymentSuccess, R.drawable.ic_success)
-            STATUS_NEW ->
-                StatusDisplay(getString(R.string.msgPaymentInitiated), R.color.colorPaymentInitiated, R.drawable.ic_pending)
-            STATUS_PENDING_VBV, STATUS_AUTHORIZING, STATUS_STARTED ->
-                StatusDisplay(getString(R.string.msgPaymentProcessing), R.color.colorPaymentProcessing, R.drawable.ic_pending)
-            STATUS_JUSPAY_DECLINED, STATUS_AUTHENTICATION_FAILED, STATUS_AUTHORIZATION_FAILED ->
-                StatusDisplay(getString(R.string.msgPaymentFailed), R.color.colorPaymentFailed, R.drawable.ic_cross)
-            STATUS_AUTO_REFUNDED ->
-                StatusDisplay(getString(R.string.msgAmountRefunded), R.color.colorPaymentRefunded, R.drawable.ic_success)
-            else ->
-                StatusDisplay(getString(R.string.msgPaymentPending), R.color.colorPaymentProcessing, R.drawable.ic_pending)
+            STATUS_CHARGED, STATUS_AUTHORIZED -> StatusDisplay(
+                label       = getString(R.string.msgPaymentSuccessful),
+                description = getString(R.string.msgPaymentSuccessDescription),
+                amountLabel = getString(R.string.labelAmountPaid)
+            )
+            STATUS_NEW -> StatusDisplay(
+                label       = getString(R.string.msgPaymentInitiated),
+                description = getString(R.string.msgPaymentInitiatedDescription),
+                amountLabel = getString(R.string.labelAmountPending)
+            )
+            STATUS_PENDING_VBV, STATUS_AUTHORIZING, STATUS_STARTED -> StatusDisplay(
+                label       = getString(R.string.msgPaymentProcessing),
+                description = getString(R.string.msgPaymentPendingDescription),
+                amountLabel = getString(R.string.labelAmountPending)
+            )
+            STATUS_JUSPAY_DECLINED, STATUS_AUTHENTICATION_FAILED, STATUS_AUTHORIZATION_FAILED -> StatusDisplay(
+                label       = getString(R.string.msgPaymentFailed),
+                description = getString(R.string.msgPaymentFailedDescription),
+                amountLabel = getString(R.string.labelAmountFailed)
+            )
+            STATUS_AUTO_REFUNDED -> StatusDisplay(
+                label       = getString(R.string.msgAmountRefunded),
+                description = getString(R.string.msgPaymentRefundedDescription),
+                amountLabel = getString(R.string.labelAmountRefunded)
+            )
+            else -> StatusDisplay(
+                label       = getString(R.string.msgPaymentPending),
+                description = getString(R.string.msgPaymentPendingDescription),
+                amountLabel = getString(R.string.labelAmountPending)
+            )
         }
+    }
+
+    private fun copyOrderId() {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("order_id", orderId))
+        ToastUtil.showSuccess(mActivity, getString(R.string.msgOrderIdCopied))
     }
 
     private fun startCountdown() {
@@ -184,6 +205,10 @@ class PaymentStatusActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressCheck.get()) return@OnClickListener
                     recheckStatus()
+                }
+                binding.ivCopyOrderId -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    copyOrderId()
                 }
             }
         }

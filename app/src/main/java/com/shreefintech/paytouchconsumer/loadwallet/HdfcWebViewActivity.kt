@@ -59,11 +59,17 @@ class HdfcWebViewActivity : BaseActivity() {
             domStorageEnabled = true
             loadWithOverviewMode = true
             useWideViewPort = true
+            builtInZoomControls = false
+            setSupportMultipleWindows(false)
         }
 
         binding.webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
+                if (returnUrl.isNotEmpty() && url.startsWith(returnUrl)) {
+                    finish()
+                    return
+                }
                 binding.pbPageLoad.visibility = View.VISIBLE
             }
 
@@ -76,11 +82,12 @@ class HdfcWebViewActivity : BaseActivity() {
                 view: WebView,
                 request: WebResourceRequest
             ): Boolean {
-                val url = request.url.toString()
-                if (returnUrl.isNotEmpty() && url.startsWith(returnUrl)) {
-                    finish()
-                    return true
-                }
+                // Strategy A disabled — testing Strategy B (onPageStarted) only
+                // val url = request.url.toString()
+                // if (returnUrl.isNotEmpty() && url.startsWith(returnUrl)) {
+                //     finish()
+                //     return true
+                // }
                 return false
             }
         }

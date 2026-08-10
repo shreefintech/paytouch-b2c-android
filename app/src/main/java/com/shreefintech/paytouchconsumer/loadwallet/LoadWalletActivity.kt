@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -44,13 +43,7 @@ class LoadWalletActivity : BaseActivity() {
 
     private val showProgressPay = ObservableBoolean(false)
     private var pendingOrderId: String? = null
-
-    private val hdfcLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        val orderId = pendingOrderId ?: return@registerForActivityResult
-        checkOrderStatus(orderId)
-    }
+    private var isWebViewOpened = false
 
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
@@ -108,6 +101,15 @@ class LoadWalletActivity : BaseActivity() {
         fetchRecentHistory()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (isWebViewOpened) {
+            isWebViewOpened = false
+            val orderId = pendingOrderId ?: return
+            checkOrderStatus(orderId)
+        }
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (intent.getBooleanExtra(Constant.EXTRA_FROM_PAYMENT, false)) {
@@ -146,12 +148,12 @@ class LoadWalletActivity : BaseActivity() {
         val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
         val description = sheetBinding.etDescription.text?.toString()?.trim() ?: ""
         if (amountStr.isEmpty()) {
-            ToastUtil.showDelete(mActivity, getString(R.string.hintEnterAmount))
+            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
             return
         }
         val amount = amountStr.toDoubleOrNull()
         if (amount == null || amount <= 0) {
-            ToastUtil.showDelete(mActivity, getString(R.string.hintEnterAmount))
+            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
             return
         }
         Utility.hideKeyboard(mActivity)
@@ -162,12 +164,24 @@ class LoadWalletActivity : BaseActivity() {
             onSuccess = { orderItem ->
                 showProgressPay.set(false)
                 pendingOrderId = orderItem.orderId
-                val payUrl = orderItem.paymentLinks?.web ?: ""
-                val returnUrl = orderItem.returnUrl ?: ""
-                hidePaymentSheet()
-                hdfcLauncher.launch(
-                    HdfcWebViewActivity.newIntent(mActivity, payUrl, returnUrl)
-                )
+                val initialStatus = orderItem.status?.uppercase() ?: ""
+                if (initialStatus in setOf("JUSPAY_DECLINED", "AUTHENTICATION_FAILED", "AUTHORIZATION_FAILED", "AUTO_REFUNDED")) {
+                    pendingOrderId = null
+                    PaymentStatusActivity.start(
+                        context = mActivity,
+                        item = PaymentStatusItem(
+                            orderId = orderItem.orderId ?: "",
+                            amount  = orderItem.amount ?: "",
+                            status  = orderItem.status ?: "NEW"
+                        )
+                    )
+                } else {
+                    val payUrl = orderItem.paymentLinks?.web ?: ""
+                    val returnUrl = orderItem.returnUrl ?: ""
+                    hidePaymentSheet()
+                    isWebViewOpened = true
+                    startActivity(HdfcWebViewActivity.newIntent(mActivity, payUrl, returnUrl))
+                }
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -189,14 +203,22 @@ class LoadWalletActivity : BaseActivity() {
                     item = PaymentStatusItem(
                         orderId = orderItem.orderId ?: orderId,
                         amount  = orderItem.amount ?: "",
-                        status  = orderItem.status ?: ""
+                        status  = orderItem.status ?: "NEW"
                     )
                 )
             },
-            onError = { msg ->
+            onError = { _ ->
                 hideLoading()
                 pendingOrderId = null
-                ToastUtil.showDelete(mActivity, msg)
+                // Always open status screen with last-known data so user can see order ID and retry
+                PaymentStatusActivity.start(
+                    context = mActivity,
+                    item = PaymentStatusItem(
+                        orderId = orderId,
+                        amount  = "",
+                        status  = "NEW"
+                    )
+                )
             }
         )
     }

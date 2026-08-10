@@ -435,7 +435,6 @@
     <string name="tabReferralWallet">Referral Wallet</string>
     <string name="tabMyWallet">My Wallet</string>
     <string name="tabEarn">Earn</string>
-    <string name="labelWalletBalance">Wallet Balance</string>
     <string name="labelSuccessTransactions">Success</string>
     <string name="labelPendingTransactions">Pending</string>
     <string name="labelTransactionsZero">Transactions: 0</string>
@@ -451,6 +450,7 @@
     <string name="titleMakePayment">Make Payment</string>
     <string name="labelDescription">Description</string>
     <string name="hintEnterAmount">Enter Amount</string>
+    <string name="errEnterAmount">Please enter a valid amount</string>
     <string name="hintPaymentDescription">Payment Description</string>
     <string name="btnProceedPayment">Proceed Payment</string>
     <string name="msgSecurePayment">100% secure payment powered by PayTouch</string>
@@ -471,5 +471,16 @@
     <string name="btnLeave">Leave</string>
     <string name="btnStay">Stay</string>
     <string name="labelOrderId">Order ID</string>
+    <string name="labelAmountFailed">Amount Failed</string>
+    <string name="labelAmountPending">Amount Pending</string>
+    <string name="labelAmountRefunded">Amount Refunded</string>
+    <string name="msgPaymentSuccessDescription">Your payment has been processed successfully. Thank you for choosing PayTouch.</string>
+    <string name="msgPaymentInitiatedDescription">Your payment has been initiated and is awaiting confirmation.</string>
+    <string name="msgPaymentPendingDescription">Your payment is being processed. Please wait while we confirm your transaction.</string>
+    <string name="msgPaymentFailedDescription">Your payment could not be completed. Please try again or contact support.</string>
+    <string name="msgPaymentRefundedDescription">Your amount has been refunded successfully to your account.</string>
+    <string name="msgPoweredBy">Powered by SHREE Fintech Solutions Pvt. Ltd.</string>
+    <string name="textRajkotGujarat">Rajkot, Gujarat</string>
+    <string name="msgOrderIdCopied">Order ID copied</string>
 
 </resources>
