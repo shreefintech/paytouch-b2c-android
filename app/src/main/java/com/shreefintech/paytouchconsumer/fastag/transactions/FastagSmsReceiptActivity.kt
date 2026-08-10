@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.fastag.transactions
+package com.shreefintech.paytouchconsumer.fastag.transactions
 
 import android.Manifest
 import android.content.Context

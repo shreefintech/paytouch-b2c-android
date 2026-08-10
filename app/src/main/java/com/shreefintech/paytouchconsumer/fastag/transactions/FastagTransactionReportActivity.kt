@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.fastag.transactions
+package com.shreefintech.paytouchconsumer.fastag.transactions
 
 import android.graphics.Color
 import android.os.Bundle

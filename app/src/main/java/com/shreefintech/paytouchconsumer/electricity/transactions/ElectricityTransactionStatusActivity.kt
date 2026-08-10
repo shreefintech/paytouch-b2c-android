@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.electricity.transactions
+package com.shreefintech.paytouchconsumer.electricity.transactions
 
 import android.content.Context
 import android.content.Intent

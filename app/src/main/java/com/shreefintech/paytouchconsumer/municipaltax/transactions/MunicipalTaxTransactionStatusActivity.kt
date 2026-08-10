@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.municipaltax.transactions
+package com.shreefintech.paytouchconsumer.municipaltax.transactions
 
 import android.os.Bundle
 import android.view.View
