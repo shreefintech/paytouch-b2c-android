@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.gas.transactions
+package com.shreefintech.paytouchconsumer.gas.transactions
 
 import android.graphics.Color
 import android.os.Bundle

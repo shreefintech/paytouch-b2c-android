@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.dth.transactions
+package com.shreefintech.paytouchconsumer.dth.transactions
 
 import android.graphics.Color
 import android.os.Bundle

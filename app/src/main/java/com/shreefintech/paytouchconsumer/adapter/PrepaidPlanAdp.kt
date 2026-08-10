@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.adapter
+package com.shreefintech.paytouchconsumer.adapter
 
 import android.content.Context
 import android.graphics.Color
