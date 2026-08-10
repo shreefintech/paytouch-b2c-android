@@ -24,6 +24,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataIt
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import androidx.core.view.isVisible
 
 class MyAccountActivity : BaseActivity() {
 
@@ -60,17 +61,6 @@ class MyAccountActivity : BaseActivity() {
             )
             insets
         }
-
-        LiquidGlassEffect.attach(
-            targetView = binding.flCard,
-            rootView = binding.clRoot as ViewGroup,
-            cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion = 0f,
-            blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-            strokeColor = ContextCompat.getColor(mActivity, R.color.glass_stroke_primary),
-            strokeWidth = 1,
-            solidStroke = true,
-        )
 
         binding.onClickListener = onClickListener()
         binding.showProgressRefresh = showProgressRefresh
@@ -116,8 +106,8 @@ class MyAccountActivity : BaseActivity() {
             onLoading = {
                 isReferEarnLoading = true
                 // shimmer only shown if Refer & Earn tab is active when loading starts
-                if (binding.shimmerReferEarn.visibility == View.VISIBLE ||
-                    binding.llReferEarnContent.visibility == View.VISIBLE
+                if (binding.shimmerReferEarn.isVisible ||
+                    binding.llReferEarnContent.isVisible
                 ) {
                     binding.shimmerReferEarn.visibility = View.VISIBLE
                     binding.shimmerReferEarn.startShimmer()
@@ -153,8 +143,8 @@ class MyAccountActivity : BaseActivity() {
         binding.tvStatus.text = data.status ?: "--"
         binding.tvCity.text = data.cityName ?: "--"
         binding.tvHomeAddress.text = data.homeAddress ?: "--"
-        binding.tvRegistrationDate.text = data.registrationDate ?: "--"
-        binding.tvActivationDate.text = data.activationDate ?: "--"
+        binding.tvRegistrationDate.text = Utility.formatDate(data.registrationDate, "dd-MM-yyyy")
+        binding.tvActivationDate.text = Utility.formatDate(data.activationDate, "dd-MM-yyyy")
 
         val balanceRaw = data.balance ?: "--"
         val (amount, words) = parseBalance(balanceRaw)
@@ -235,7 +225,6 @@ class MyAccountActivity : BaseActivity() {
             binding.llAccountInfoContent.visibility = View.GONE
         }
 
-        binding.cvRefresh.visibility = if (isAccountInfo) View.VISIBLE else View.GONE
         binding.tvTitle.setText(if (isAccountInfo) R.string.titleMyAccount else R.string.titleReferAndEarn)
 
         val activeColor = ContextCompat.getColor(mActivity, R.color.primary)
@@ -276,10 +265,9 @@ class MyAccountActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     selectTab(TAB_REFER_EARN)
                 }
-                binding.cvRefresh -> {
+                binding.cvViewKycDetails -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (showProgressRefresh.get()) return@OnClickListener
-                    loadAccountInfo()
+                    // TODO(B2C-81): navigate to KycDetailsActivity when implemented
                 }
                 binding.ivCopyReferralCode -> {
                     if (Utility.stopClick()) return@OnClickListener

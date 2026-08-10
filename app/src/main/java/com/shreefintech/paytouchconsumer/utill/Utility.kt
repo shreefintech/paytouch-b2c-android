@@ -47,14 +47,23 @@ object Utility {
 
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
-        return try {
-            val input = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            val output = SimpleDateFormat(format, Locale.getDefault())
-            val date = input.parse(createdAt.substringBefore(".").substringBefore("+"))
-            if (date != null) output.format(date) else createdAt
-        } catch (e: Exception) {
-            createdAt
+        val cleaned = createdAt.substringBefore(".").substringBefore("+")
+        val inputFormats = listOf(
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "dd/MM/yyyy hh:mm a",
+            "dd/MM/yyyy HH:mm:ss",
+            "dd/MM/yyyy",
+            "yyyy-MM-dd"
+        )
+        val output = SimpleDateFormat(format, Locale.getDefault())
+        for (pattern in inputFormats) {
+            try {
+                val date = SimpleDateFormat(pattern, Locale.getDefault()).parse(cleaned)
+                if (date != null) return output.format(date)
+            } catch (_: Exception) {
+            }
         }
+        return createdAt
     }
 
     fun isInternetAvailable(context: Context): Boolean {
@@ -106,10 +115,10 @@ object Utility {
 
     fun calculatePlatformFee(amount: Double): Double {
         return when {
-            amount < 1000  -> 4.0
+            amount < 1000 -> 4.0
             amount <= 5000 -> 8.0
             amount <= 40000 -> 20.0
-            else            -> 30.0
+            else -> 30.0
         }
     }
 

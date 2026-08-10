@@ -69,4 +69,6 @@
     <color name="whatsapp_green">#128C7E</color>
     <color name="facebook_blue">#0C44AE</color>
     <color name="email_orange">#C4720A</color>
+    <color name="personal_info_label">#6B7280</color>
+    <color name="account_card_label">#FFFFF0</color>
 </resources>
