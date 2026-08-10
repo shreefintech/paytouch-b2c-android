@@ -426,8 +426,52 @@
                                 app:cardBackgroundColor="@color/white"
                                 app:strokeColor="?attr/colorPrimary"
                                 app:strokeWidth="1dp"
-                                android:layout_marginStart="@dimen/margin_small"
-                                android:layout_marginEnd="@dimen/margin_small">
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:layout_marginStart="@dimen/margin_small">
+
+                                <LinearLayout
+                                    android:id="@+id/llTax"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="?selectableItemBackground"
+                                    android:gravity="center"
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="vertical"
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingBottom="@dimen/margin_medium"
+                                    android:paddingStart="@dimen/margin_small"
+                                    android:paddingEnd="@dimen/margin_small">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="@dimen/category_icon_size"
+                                        android:layout_height="@dimen/category_icon_size"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:src="@drawable/ic_tax" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:gravity="center"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/categoryMunicipalTax"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="@color/white"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp"
+                                android:layout_marginStart="@dimen/margin_small">
 
                                 <LinearLayout
                                     android:id="@+id/llMyAccount"
@@ -460,51 +504,6 @@
                                         android:textColor="@color/black"
                                         android:textSize="@dimen/text_size_11" />
                                 </LinearLayout>
-                            </com.google.android.material.card.MaterialCardView>
-
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="@color/white"
-                                app:strokeColor="?attr/colorPrimary"
-                                app:strokeWidth="1dp"
-                                android:layout_marginStart="@dimen/margin_small">
-
-                                <LinearLayout
-                                    android:id="@+id/llTax"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:background="?selectableItemBackground"
-                                    android:gravity="center"
-                                    android:onClickListener="@{onClickListener}"
-                                    android:orientation="vertical"
-                                    android:paddingTop="@dimen/margin_medium"
-                                    android:paddingBottom="@dimen/margin_medium"
-                                    android:paddingStart="@dimen/margin_small"
-                                    android:paddingEnd="@dimen/margin_small">
-
-                                    <androidx.appcompat.widget.AppCompatImageView
-                                        android:layout_width="@dimen/category_icon_size"
-                                        android:layout_height="@dimen/category_icon_size"
-                                        android:layout_gravity="center"
-                                        android:background="@drawable/bg_toggle_selected"
-                                        android:src="@drawable/ic_tax" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="@dimen/margin_small"
-                                        android:fontFamily="@font/proza_libre_medium"
-                                        android:gravity="center"
-                                        android:includeFontPadding="false"
-                                        android:text="@string/categoryTax"
-                                        android:textColor="@color/black"
-                                        android:textSize="@dimen/text_size_11" />
-                                </LinearLayout>
-
                             </com.google.android.material.card.MaterialCardView>
 
                         </LinearLayout>

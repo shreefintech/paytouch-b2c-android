@@ -45,6 +45,7 @@
 
     <!-- LiquidGlass Effect -->
     <color name="stroke_color">#66FFFFFF</color>           <!-- semi-transparent white border -->
+    <color name="glass_stroke_primary">#B4D52662</color>   <!-- primary #D52662 at ~70% opacity (alpha 180/255) -->
     <color name="filter_bg">#99FFFFFF</color>              <!-- pill/filter button pressed bg -->
 
     <!-- Document upload cards -->
