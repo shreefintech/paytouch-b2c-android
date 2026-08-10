@@ -8,9 +8,6 @@
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
-        <variable
-            name="showProgressRefresh"
-            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -13,11 +13,10 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.databinding.ObservableBoolean
+
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityMyAccountBinding
-import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.myaccount.viewmodel.MyAccountViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
@@ -34,7 +33,6 @@ class MyAccountActivity : BaseActivity() {
     private var isAccountInfoLoading = true
     private var isReferEarnLoading = false
     private var currentTab = TAB_ACCOUNT_INFO
-    private val showProgressRefresh = ObservableBoolean(false)
 
     companion object {
         private const val TAB_ACCOUNT_INFO = 0
@@ -63,7 +61,6 @@ class MyAccountActivity : BaseActivity() {
         }
 
         binding.onClickListener = onClickListener()
-        binding.showProgressRefresh = showProgressRefresh
         selectTab(TAB_ACCOUNT_INFO)
         onBack()
 
@@ -77,14 +74,12 @@ class MyAccountActivity : BaseActivity() {
         viewModel.getAccountInfo(
             onLoading = {
                 isAccountInfoLoading = true
-                showProgressRefresh.set(true)
                 binding.shimmerAccountInfo.visibility = View.VISIBLE
                 binding.shimmerAccountInfo.startShimmer()
                 binding.llAccountInfoContent.visibility = View.GONE
             },
             onSuccess = { data ->
                 isAccountInfoLoading = false
-                showProgressRefresh.set(false)
                 binding.shimmerAccountInfo.stopShimmer()
                 binding.shimmerAccountInfo.visibility = View.GONE
                 binding.llAccountInfoContent.visibility = View.VISIBLE
@@ -92,7 +87,6 @@ class MyAccountActivity : BaseActivity() {
             },
             onError = { msg ->
                 isAccountInfoLoading = false
-                showProgressRefresh.set(false)
                 binding.shimmerAccountInfo.stopShimmer()
                 binding.shimmerAccountInfo.visibility = View.GONE
                 binding.llAccountInfoContent.visibility = View.VISIBLE
@@ -272,12 +266,12 @@ class MyAccountActivity : BaseActivity() {
                 binding.ivCopyReferralCode -> {
                     if (Utility.stopClick()) return@OnClickListener
                     val code = binding.tvReferralCode.text.toString()
-                    if (code != "--") copyToClipboard("Referral Code", code)
+                    if (code != "--") copyToClipboard(getString(R.string.labelReferralCode), code)
                 }
                 binding.cvCopyReferralLink -> {
                     if (Utility.stopClick()) return@OnClickListener
                     val link = binding.tvReferralLink.text.toString()
-                    if (link != "--") copyToClipboard("Referral Link", link)
+                    if (link != "--") copyToClipboard(getString(R.string.labelReferralLink), link)
                 }
                 binding.cvShareWhatsapp -> {
                     if (Utility.stopClick()) return@OnClickListener

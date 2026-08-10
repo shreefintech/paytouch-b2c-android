@@ -423,6 +423,8 @@
     <string name="btnFacebook">Facebook</string>
     <string name="btnEmail">Email</string>
     <string name="msgCopiedToClipboard">Copied to clipboard</string>
+    <string name="labelReferralCode">Referral Code</string>
+    <string name="labelReferralLink">Referral Link</string>
     <string name="btnRefresh">Refresh</string>
     <string name="latterI">i</string>
 
