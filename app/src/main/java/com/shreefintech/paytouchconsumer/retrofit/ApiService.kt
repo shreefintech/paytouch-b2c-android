@@ -75,6 +75,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTa
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -465,6 +467,19 @@ interface ApiService {
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Call<MunicipalTaxRecentPageItem>
+
+    // ── My Account ───────────────────────────────────────────────────────────
+
+    @GET("${AUTH}kyc/account-info")
+    fun getKycAccountInfo(
+        @Header("Authorization") authorization: String,
+        @Query("id") id: String
+    ): Call<AccountInfoItem>
+
+    @GET("${AUTH}referral-info")
+    fun getReferralInfo(
+        @Header("Authorization") authorization: String
+    ): Call<ReferralInfoItem>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

@@ -249,30 +249,77 @@ Full module implemented. Standard bill-payment flow (`isMobileCategory = true`):
 
 ---
 
+### ✅ FASTag Module
+
+No bill-fetch step — user enters vehicle number and amount directly. Platform fee calculated in real time.
+
+| Screen | Class | Package |
+|---|---|---|
+| Recharge | `FastagActivity` | `fastag/` |
+| Recent Transactions | `FastagRecentTransactionActivity` | `fastag/transactions/` |
+| Transaction Report | `FastagTransactionReportActivity` | `fastag/transactions/` |
+| Transaction Status | `FastagTransactionStatusActivity` | `fastag/transactions/` |
+| SMS Receipt | `FastagSmsReceiptActivity` | `fastag/transactions/` |
+
+---
+
+### ✅ Loan Repayment Module
+
+Bill-fetch pattern (mirrors Gas). `circleId = "0"` hardcoded. Flat payment response (no `ccf` field).
+
+| Screen | Class | Package |
+|---|---|---|
+| Pay Bill | `LoanActivity` | `loan/` |
+| Recent Transactions | `LoanRecentTransactionActivity` | `loan/transactions/` |
+| Transaction Report | `LoanTransactionReportActivity` | `loan/transactions/` |
+| Transaction Status | `LoanTransactionStatusActivity` | `loan/transactions/` |
+| SMS Receipt | `LoanSmsReceiptActivity` | `loan/transactions/` |
+
+---
+
+### ✅ Municipal Tax Module
+
+Bill-fetch pattern. Transaction-status endpoint intentionally routes via `mobile-recharge/transaction-status` (backend-side routing — do not change the URL).
+
+| Screen | Class | Package |
+|---|---|---|
+| Pay Bill | `MunicipalTaxActivity` | `municipaltax/` |
+| Recent Transactions | `MunicipalTaxRecentTransactionActivity` | `municipaltax/transactions/` |
+| Transaction Report | `MunicipalTaxTransactionReportActivity` | `municipaltax/transactions/` |
+| Transaction Status | `MunicipalTaxTransactionStatusActivity` | `municipaltax/transactions/` |
+| SMS Receipt | `MunicipalTaxSmsReceiptActivity` | `municipaltax/transactions/` |
+
+---
+
+### ✅ MyAccountActivity — "My Account"
+
+**Purpose:** View KYC-derived user profile and referral/earn information.
+
+**Entry points:** `HomeActivity` ("My Account" tile)
+
+**Exit points:** Back → `HomeActivity`
+
+**Tabs:**
+
+| Tab | Content |
+|---|---|
+| Account Info | Member ID/No/Code/Name, Mobile, Email, Status, City, Address, Registration Date, Activation Date, Balance |
+| Refer & Earn | Referral Code (copyable), Referral Link (copyable + shareable via WhatsApp / Facebook / Email / Share) |
+
+**API calls (both triggered on `onCreate()`):**
+
+| Endpoint | Purpose |
+|---|---|
+| `GET api/kyc/account-info` | Fetch account profile data |
+| `GET api/referral` | Fetch referral code and link |
+
+**Pending:** `TODO(B2C-81)` — "View KYC Details" navigates to `KycDetailsActivity` when built. `TODO(PAYTOUCH-523)` — expose `totalEarnings` and `earningPotential` on Refer & Earn tab.
+
+---
+
 ## Planned Screens
 
 The following screens are defined in the navigation plan but not yet implemented.
-
----
-
-### 📋 Category Home Screens (remaining)
-
-| Category | Home Activity | Status |
-|---|---|---|
-| Cable TV | `CableTvActivity` | Planned |
-| FASTag | `FasTagActivity` | Planned |
-| Loan Repayment | `LoanRepaymentActivity` | Planned |
-| Municipal Tax | `MunicipalTaxActivity` | Planned |
-
-Each planned module also needs: Recent Transactions, Transaction Report, Transaction Status, SMS Receipt screens following the same pattern as implemented modules.
-
----
-
-### 📋 MyAccountActivity — "My Account"
-
-**Purpose:** View user profile, manage MPIN, view KYC status.
-
-**Entry points:** `HomeActivity` ("My Account" tile)
 
 ---
 
@@ -281,6 +328,14 @@ Each planned module also needs: Recent Transactions, Transaction Report, Transac
 **Purpose:** Top up the user's digital wallet.
 
 **Entry points:** `HomeActivity` ("Load Wallet" button)
+
+---
+
+### 📋 Cable TV Module
+
+Bill-fetch pattern (mirrors Gas/Electricity).
+
+---
 
 ---
 
@@ -330,11 +385,20 @@ Session check (read SharedPreferences)
                ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅   ✅    ✅    ✅   ✅
 
                            │                              │
-               PrepaidActivity ✅              PostpaidActivity ✅       ... (Cable, FASTag, Loan, Tax 📋)
+               PrepaidActivity ✅              PostpaidActivity ✅       FastagActivity ✅
+                           │                              │                    │
+               Plans  Recent Report Status   Recent Report Status    Recent Report Status Receipt
+                Sel    Txns        Receipt    Txns        Receipt      Txns
+                ✅      ✅    ✅    ✅   ✅     ✅    ✅    ✅    ✅         ✅    ✅    ✅    ✅
+
                            │                              │
-               Plans  Recent Report Status   Recent Report Status Receipt
-                Sel    Txns        Receipt    Txns
-                ✅      ✅    ✅    ✅   ✅     ✅    ✅    ✅    ✅
+               LoanActivity ✅             MunicipalTaxActivity ✅    MyAccountActivity ✅
+                           │                              │
+               Recent Report Status Receipt  Recent Report Status Receipt  (Account Info + Refer & Earn tabs)
+                Txns                          Txns
+                ✅    ✅    ✅    ✅             ✅    ✅    ✅    ✅
+
+               ... (Cable TV 📋)
 
 All detail taps → TransactionDetailActivity ✅ (shared by all modules)
 

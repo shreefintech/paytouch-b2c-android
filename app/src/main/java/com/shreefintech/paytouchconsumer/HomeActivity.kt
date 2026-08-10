@@ -15,6 +15,7 @@ import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loan.LoanActivity
 import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
+import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -109,7 +110,7 @@ class HomeActivity : BaseActivity() {
 
                 binding.llMyAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-520): Navigate to My Account screen
+                    MyAccountActivity.start(mActivity)
                 }
 
                 binding.cvLoadWallet -> {
