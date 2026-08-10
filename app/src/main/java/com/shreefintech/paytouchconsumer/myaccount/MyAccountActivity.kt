@@ -142,7 +142,7 @@ class MyAccountActivity : BaseActivity() {
 
         val balanceRaw = data.balance ?: "--"
         val (amount, words) = parseBalance(balanceRaw)
-        binding.tvBalance.text = amount
+        binding.tvBalance.text = if (data.balance != null) Utility.formatAmount(amount) else "--"
         if (words.isNotEmpty()) {
             binding.tvBalanceWords.text = "($words)"
             binding.tvBalanceWords.visibility = View.VISIBLE

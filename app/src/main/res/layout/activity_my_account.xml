@@ -288,8 +288,8 @@
                                                 android:layout_height="wrap_content"
                                                 android:fontFamily="@font/proza_libre_medium"
                                                 android:includeFontPadding="false"
-                                                android:text="ID: "
-                                                android:textColor="#CCFFFFFF"
+                                                android:text="@string/idColon"
+                                                android:textColor="@color/account_card_label"
                                                 android:textSize="@dimen/text_size_12" />
 
                                             <androidx.appcompat.widget.AppCompatTextView
@@ -298,7 +298,7 @@
                                                 android:layout_height="wrap_content"
                                                 android:fontFamily="@font/proza_libre_medium"
                                                 android:includeFontPadding="false"
-                                                android:textColor="#CCFFFFFF"
+                                                android:textColor="@color/account_card_label"
                                                 android:textSize="@dimen/text_size_12" />
                                         </LinearLayout>
                                     </LinearLayout>
@@ -961,7 +961,7 @@
                                         android:layout_height="wrap_content"
                                         android:fontFamily="@font/proza_libre_bold"
                                         android:includeFontPadding="false"
-                                        android:text="₹0.00"
+                                        android:text="@string/labelAmountZero"
                                         android:textColor="@color/toast_text_success"
                                         android:textSize="@dimen/text_size_14" />
 
@@ -1033,7 +1033,7 @@
                                         android:layout_height="wrap_content"
                                         android:fontFamily="@font/proza_libre_bold"
                                         android:includeFontPadding="false"
-                                        android:text="₹0.00"
+                                        android:text="@string/labelAmountZero"
                                         android:textColor="@color/earn_row_teal_text"
                                         android:textSize="@dimen/text_size_14" />
 
@@ -1105,7 +1105,7 @@
                                         android:layout_height="wrap_content"
                                         android:fontFamily="@font/proza_libre_bold"
                                         android:includeFontPadding="false"
-                                        android:text="₹0.00"
+                                        android:text="@string/labelAmountZero"
                                         android:textColor="@color/toast_text_warning"
                                         android:textSize="@dimen/text_size_14" />
 

@@ -39,7 +39,6 @@
     <string name="createAccountSubtitle">Enter your Details To get started</string>
     <string name="labelEmailAddress">Email Address</string>
     <string name="hintEmail">Enter your email address</string>
-    <string name="labelReferralCode">Referral Code</string>
     <string name="labelOptional">(Optional)</string>
     <string name="hintReferralCode">Enter your referral code</string>
     <string name="labelConfirmPassword">Confirm Password</string>
@@ -423,9 +422,11 @@
     <string name="btnFacebook">Facebook</string>
     <string name="btnEmail">Email</string>
     <string name="msgCopiedToClipboard">Copied to clipboard</string>
+    <string name="labelAmountZero">₹0.00</string>
     <string name="labelReferralCode">Referral Code</string>
     <string name="labelReferralLink">Referral Link</string>
     <string name="btnRefresh">Refresh</string>
     <string name="latterI">i</string>
+    <string name="idColon">ID:</string>
 
 </resources>
