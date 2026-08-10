@@ -56,6 +56,13 @@ com.shreefintech.paytouchconsumer/
 |   +-- viewmodel/
 |   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
 |
++-- municipaltax/       Municipal tax payment -- bill-fetch pattern; transaction-status routes via mobile-recharge endpoint
+|   +-- viewmodel/
+|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|
++-- myaccount/          My Account -- two-tab profile viewer (Account Info + Refer & Earn)
+|   \-- viewmodel/
+|
 +-- transactions/       Shared across ALL bill-payment modules -- never duplicate per module
 |   +-- model/
 |   |   \-- TransactionItem.kt         Category-agnostic report/status row model
@@ -76,6 +83,8 @@ com.shreefintech.paytouchconsumer/
 |   |   +-- dth/                  DTH request/response DTOs
 |   |   +-- fastag/               FASTag request/response DTOs
 |   |   +-- loan/                 Loan request/response DTOs
+|   |   +-- municipaltax/         Municipal tax request/response DTOs
+|   |   +-- myaccount/            AccountInfoItem, AccountInfoDataItem, ReferralInfoItem, ReferralDataItem
 |   |   \-- auth/
 |   |       +-- LoginItem.kt
 |   |       +-- RegisterItem.kt
@@ -153,14 +162,14 @@ Register / Login
 | DTH | `DthActivity` | `DthPlanSelectionActivity`, `DthRecentTransactionActivity`, `DthTransactionReportActivity`, `DthTransactionStatusActivity`, `TransactionDetailActivity` (shared), `DthSmsReceiptActivity` |
 | FASTag | `FastagActivity` | `FastagRecentTransactionActivity`, `FastagTransactionReportActivity`, `FastagTransactionStatusActivity`, `TransactionDetailActivity` (shared), `FastagSmsReceiptActivity` |
 | Loan Repayment | `LoanActivity` | `LoanRecentTransactionActivity`, `LoanTransactionReportActivity`, `LoanTransactionStatusActivity`, `TransactionDetailActivity` (shared), `LoanSmsReceiptActivity` |
+| Municipal Tax | `MunicipalTaxActivity` | `MunicipalTaxRecentTransactionActivity`, `MunicipalTaxTransactionReportActivity`, `MunicipalTaxTransactionStatusActivity`, `TransactionDetailActivity` (shared), `MunicipalTaxSmsReceiptActivity` |
+| My Account | `MyAccountActivity` | Two-tab screen: Account Info + Refer & Earn |
 
 ### Planned (stubs in HomeActivity)
 
 | Module | Status |
 |---|---|
 | TV Cable payment | Not started |
-| Tax payment | Not started |
-| My Account | Not started |
 | Load Wallet | Not started |
 | Broadband | Not started |
 
@@ -384,6 +393,7 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | Mobile Postpaid | `app/src/main/java/.../postpaid/README.md` (shares `PrepaidPlanSelectionActivity`; status searches by transaction ID) |
 | FASTag | `app/src/main/java/.../fastag/README.md` (no bill-fetch; vehicle number; real-time fee; no operator pre-load in recent transactions) |
 | Loan Repayment | `app/src/main/java/.../loan/README.md` (bill-fetch pattern like Gas; circleId = "0"; flat payment response; no ccf field) |
+| My Account | `app/src/main/java/.../myaccount/README.md` (two-tab profile viewer; Account Info from KYC data; Refer & Earn with copy/share) |
 
 ---
 

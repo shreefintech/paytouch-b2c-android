@@ -94,12 +94,12 @@ People in India pay 10+ different bills every month — electricity, phone, gas,
 | Postpaid — Status | `PostpaidTransactionStatusActivity` | ✅ Implemented (UI + API) |
 | Postpaid — SMS Receipt | `PostpaidSmsReceiptActivity` | ✅ Implemented (UI + API) |
 | Shared Transaction Detail | `TransactionDetailActivity` | ✅ Implemented (shared by all modules) |
-| My Account | TBD | 📋 Planned |
+| FASTag — Pay / Recharge | `FastagActivity` + transactions | ✅ Implemented (UI + API) |
+| Loan Repayment — Pay | `LoanActivity` + transactions | ✅ Implemented (UI + API) |
+| Municipal Tax — Pay | `MunicipalTaxActivity` + transactions | ✅ Implemented (UI + API) |
+| My Account | `MyAccountActivity` | ✅ Implemented (UI + API) |
 | Load Wallet | TBD | 📋 Planned |
 | Cable TV module | TBD | 📋 Planned |
-| FASTag module | TBD | 📋 Planned |
-| Loan Repayment module | TBD | 📋 Planned |
-| Municipal Tax module | TBD | 📋 Planned |
 
 ---
 

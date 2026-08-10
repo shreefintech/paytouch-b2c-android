@@ -362,7 +362,7 @@
     </div>
     <div class="cover-meta-item">
       <div class="label">Phase</div>
-      <div class="value">UI Implementation</div>
+      <div class="value">API Integration</div>
     </div>
     <div class="cover-meta-item">
       <div class="label">Min / Target SDK</div>
@@ -414,7 +414,7 @@
 </p>
 
 <blockquote>
-  Current state: UI implementation phase. All network calls are stubbed with <code>TODO(PAYTOUCH-xxx):</code> comments. API wiring and business logic finalization happen in a later phase.
+  Current state: API integration phase. Core modules (Auth, Electricity, Gas, Prepaid, Postpaid, DTH, FASTag, Loan, Municipal Tax, My Account) have live API integration. New modules may begin with UI stubs marked <code>TODO(PAYTOUCH-xxx):</code>.
 </blockquote>
 
 <h3>Who Uses It</h3>
@@ -473,6 +473,12 @@
 ├── prepaid/        <span class="comment"># Mobile Prepaid recharge (plan-selection module)</span>
 │   └── transactions/
 ├── postpaid/       <span class="comment"># Mobile Postpaid bill payment</span>
+│   └── transactions/
+├── fastag/         <span class="comment"># FASTag recharge — vehicle number + amount, real-time fee</span>
+│   └── transactions/
+├── loan/           <span class="comment"># Loan repayment — bill-fetch pattern; circleId = "0"</span>
+│   └── transactions/
+├── municipaltax/   <span class="comment"># Municipal tax payment — bill-fetch pattern</span>
 │   └── transactions/
 ├── myaccount/      <span class="comment"># My Account (Account Info + Refer &amp; Earn)</span>
 │   └── viewmodel/
@@ -760,18 +766,18 @@ showProgressFetch.set(<span class="keyword">false</span>)  <span class="comment"
   <tr>
     <td>FASTag</td>
     <td><span class="badge badge-green">✅ Done</span></td>
-    <td><span class="badge badge-gray">📋 Planned</span></td>
-    <td><span class="badge badge-gray">📋 Planned</span></td>
-    <td><span class="badge badge-gray">📋 Planned</span></td>
-    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
   </tr>
   <tr>
     <td>Loan Repayment</td>
     <td><span class="badge badge-green">✅ Done</span></td>
-    <td><span class="badge badge-gray">📋 Planned</span></td>
-    <td><span class="badge badge-gray">📋 Planned</span></td>
-    <td><span class="badge badge-gray">📋 Planned</span></td>
-    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
   </tr>
   <tr>
     <td>Municipal Tax</td>
