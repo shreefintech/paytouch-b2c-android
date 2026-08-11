@@ -20,6 +20,7 @@ import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoadWalletBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetMakePaymentBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
@@ -153,18 +154,43 @@ class LoadWalletActivity : BaseActivity() {
             return
         }
 
-        HdfcPaymentHelper.payWalletTopup(
-            context = mActivity,
+        viewModel.createHdfcOrder(
             amount = amount,
             description = description,
             onLoading = { showProgressPay.set(true) },
-            onLoadingDone = { showProgressPay.set(false) },
-            onBeforeWebView = {
+            onSuccess = { data ->
+                showProgressPay.set(false)
+                val status = data.status?.uppercase().orEmpty()
+                if (HdfcPaymentHelper.isFailedStatus(status)) {
+                    PaymentStatusActivity.start(
+                        mActivity,
+                        PaymentStatusItem(
+                            orderId = data.orderId ?: "",
+                            amount  = data.amount ?: "",
+                            status  = data.status ?: "NEW"
+                        )
+                    )
+                    return@createHdfcOrder
+                }
+                val payUrl = data.paymentLinks?.web.orEmpty()
+                if (payUrl.isEmpty()) {
+                    ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                    return@createHdfcOrder
+                }
                 Utility.hideKeyboard(mActivity)
                 hidePaymentSheet()
+                HdfcPaymentHelper.launchPayment(
+                    context   = mActivity,
+                    orderId   = data.orderId ?: "",
+                    amount    = data.amount ?: "",
+                    payUrl    = payUrl,
+                    returnUrl = data.returnUrl ?: ""
+                )
             },
-            onStatusLoading = { showLoading() },
-            onStatusLoadingDone = { hideLoading() }
+            onError = { msg ->
+                showProgressPay.set(false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
         )
     }
 

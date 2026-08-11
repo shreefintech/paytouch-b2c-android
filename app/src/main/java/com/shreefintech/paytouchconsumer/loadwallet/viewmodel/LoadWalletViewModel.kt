@@ -8,6 +8,9 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
+import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderResponseItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -49,6 +52,44 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
+    }
+
+    fun createHdfcOrder(
+        amount: Double,
+        description: String,
+        onLoading: () -> Unit,
+        onSuccess: (HdfcOrderItem) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        onLoading()
+        ApiClient.apiService.createHdfcOrder(
+            authorization = bearerToken(),
+            request = HdfcCreateOrderRequest(amount = amount, description = description)
+        ).enqueue(object : Callback<HdfcOrderResponseItem> {
+            override fun onResponse(
+                call: Call<HdfcOrderResponseItem>,
+                response: Response<HdfcOrderResponseItem>
+            ) {
+                val body = response.body()
+                if (response.isSuccessful && body?.success == true && body.data != null) {
+                    onSuccess(body.data!!)
+                } else {
+                    onError(
+                        body?.message ?: ApiHelper.parseErrorMessage(
+                            getApplication(), response.code(), response.errorBody()?.string()
+                        )
+                    )
+                }
+            }
+
+            override fun onFailure(call: Call<HdfcOrderResponseItem>, t: Throwable) {
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
+            }
+        })
     }
 
     fun fetchRecentHistory(

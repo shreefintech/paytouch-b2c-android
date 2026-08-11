@@ -4,13 +4,14 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
@@ -92,13 +93,14 @@ class PaymentStatusActivity : BaseActivity() {
 
     private fun populateStatus(status: String) {
         val display = resolveStatus(status)
+        val statusColor = ContextCompat.getColor(mActivity, display.statusColorRes)
         binding.tvStatusLabel.text = display.label
-        binding.tvStatusLabel.setTextColor(display.statusColor)
+        binding.tvStatusLabel.setTextColor(statusColor)
         binding.tvStatusDescription.text = display.description
         binding.tvAmountLabel.text = display.amountLabel
         binding.tvOrderId.text = orderId
         binding.tvAmount.text = Utility.formatAmount(amount)
-        binding.tvAmount.setTextColor(display.statusColor)
+        binding.tvAmount.setTextColor(statusColor)
         loadGif(display.gifRes)
     }
 
@@ -106,21 +108,17 @@ class PaymentStatusActivity : BaseActivity() {
         val label: String,
         val description: String,
         val amountLabel: String,
-        val statusColor: Int,
+        @ColorRes val statusColorRes: Int,
         @DrawableRes val gifRes: Int
     )
 
     private fun resolveStatus(status: String): StatusDisplay {
-        val successColor = Color.parseColor("#07974F")
-        val pendingColor = Color.parseColor("#D89633")
-        val failedColor = Color.parseColor("#D84C55")
-
         return when (status.uppercase()) {
             STATUS_CHARGED, STATUS_AUTHORIZED -> StatusDisplay(
                 label = getString(R.string.msgPaymentSuccessful),
                 description = getString(R.string.msgPaymentSuccessDescription),
                 amountLabel = getString(R.string.labelAmountPaid),
-                statusColor = successColor,
+                statusColorRes = R.color.colorStatusSuccess,
                 gifRes = R.drawable.gif_success
             )
 
@@ -128,7 +126,7 @@ class PaymentStatusActivity : BaseActivity() {
                 label = getString(R.string.msgPaymentInitiated),
                 description = getString(R.string.msgPaymentInitiatedDescription),
                 amountLabel = getString(R.string.labelAmountPending),
-                statusColor = pendingColor,
+                statusColorRes = R.color.colorStatusPending,
                 gifRes = R.drawable.gif_pending
             )
 
@@ -136,7 +134,7 @@ class PaymentStatusActivity : BaseActivity() {
                 label = getString(R.string.msgPaymentProcessing),
                 description = getString(R.string.msgPaymentPendingDescription),
                 amountLabel = getString(R.string.labelAmountPending),
-                statusColor = pendingColor,
+                statusColorRes = R.color.colorStatusPending,
                 gifRes = R.drawable.gif_pending
             )
 
@@ -144,7 +142,7 @@ class PaymentStatusActivity : BaseActivity() {
                 label = getString(R.string.msgPaymentFailed),
                 description = getString(R.string.msgPaymentFailedDescription),
                 amountLabel = getString(R.string.labelAmountFailed),
-                statusColor = failedColor,
+                statusColorRes = R.color.colorStatusFailed,
                 gifRes = R.drawable.gif_rejected
             )
 
@@ -152,7 +150,7 @@ class PaymentStatusActivity : BaseActivity() {
                 label = getString(R.string.msgAmountRefunded),
                 description = getString(R.string.msgPaymentRefundedDescription),
                 amountLabel = getString(R.string.labelAmountRefunded),
-                statusColor = failedColor,
+                statusColorRes = R.color.colorStatusFailed,
                 gifRes = R.drawable.gif_rejected
             )
 
@@ -160,7 +158,7 @@ class PaymentStatusActivity : BaseActivity() {
                 label = getString(R.string.msgPaymentPending),
                 description = getString(R.string.msgPaymentPendingDescription),
                 amountLabel = getString(R.string.labelAmountPending),
-                statusColor = pendingColor,
+                statusColorRes = R.color.colorStatusPending,
                 gifRes = R.drawable.gif_pending
             )
         }

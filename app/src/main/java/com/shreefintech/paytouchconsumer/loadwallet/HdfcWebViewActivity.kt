@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -29,7 +28,6 @@ class HdfcWebViewActivity : BaseActivity() {
     private var gatewayHost: String? = null  // host of the initial HDFC payment URL
 
     companion object {
-        private const val TAG = "HdfcWebView"
         private const val EXTRA_URL = "hdfc_payment_url"
         private const val EXTRA_RETURN_URL = "hdfc_return_url"
 
