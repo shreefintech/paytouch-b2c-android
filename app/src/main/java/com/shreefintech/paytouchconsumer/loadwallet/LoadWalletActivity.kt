@@ -20,7 +20,6 @@ import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoadWalletBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetMakePaymentBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
@@ -42,8 +41,6 @@ class LoadWalletActivity : BaseActivity() {
     private lateinit var sheetBehavior: BottomSheetBehavior<View>
 
     private val showProgressPay = ObservableBoolean(false)
-    private var pendingOrderId: String? = null
-    private var isWebViewOpened = false
 
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
@@ -67,7 +64,12 @@ class LoadWalletActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
-            binding.incPaymentSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
+            binding.incPaymentSheet.root.setPadding(
+                0,
+                0,
+                0,
+                maxOf(imeInsets.bottom, systemBars.bottom)
+            )
             insets
         }
 
@@ -99,15 +101,6 @@ class LoadWalletActivity : BaseActivity() {
         onBack()
         fetchWalletData()
         fetchRecentHistory()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (isWebViewOpened) {
-            isWebViewOpened = false
-            val orderId = pendingOrderId ?: return
-            checkOrderStatus(orderId)
-        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -156,70 +149,19 @@ class LoadWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
             return
         }
-        Utility.hideKeyboard(mActivity)
-        viewModel.createHdfcOrder(
+
+        HdfcPaymentHelper.payWalletTopup(
+            context = mActivity,
             amount = amount,
             description = description,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { orderItem ->
-                showProgressPay.set(false)
-                pendingOrderId = orderItem.orderId
-                val initialStatus = orderItem.status?.uppercase() ?: ""
-                if (initialStatus in setOf("JUSPAY_DECLINED", "AUTHENTICATION_FAILED", "AUTHORIZATION_FAILED", "AUTO_REFUNDED")) {
-                    pendingOrderId = null
-                    PaymentStatusActivity.start(
-                        context = mActivity,
-                        item = PaymentStatusItem(
-                            orderId = orderItem.orderId ?: "",
-                            amount  = orderItem.amount ?: "",
-                            status  = orderItem.status ?: "NEW"
-                        )
-                    )
-                } else {
-                    val payUrl = orderItem.paymentLinks?.web ?: ""
-                    val returnUrl = orderItem.returnUrl ?: ""
-                    hidePaymentSheet()
-                    isWebViewOpened = true
-                    startActivity(HdfcWebViewActivity.newIntent(mActivity, payUrl, returnUrl))
-                }
+            onLoadingDone = { showProgressPay.set(false) },
+            onBeforeWebView = {
+                Utility.hideKeyboard(mActivity)
+                hidePaymentSheet()
             },
-            onError = { msg ->
-                showProgressPay.set(false)
-                ToastUtil.showDelete(mActivity, msg)
-            }
-        )
-    }
-
-    private fun checkOrderStatus(orderId: String) {
-        showLoading()
-        viewModel.checkHdfcOrderStatus(
-            orderId = orderId,
-            onLoading = {},
-            onSuccess = { orderItem ->
-                hideLoading()
-                pendingOrderId = null
-                PaymentStatusActivity.start(
-                    context = mActivity,
-                    item = PaymentStatusItem(
-                        orderId = orderItem.orderId ?: orderId,
-                        amount  = orderItem.amount ?: "",
-                        status  = orderItem.status ?: "NEW"
-                    )
-                )
-            },
-            onError = { _ ->
-                hideLoading()
-                pendingOrderId = null
-                // Always open status screen with last-known data so user can see order ID and retry
-                PaymentStatusActivity.start(
-                    context = mActivity,
-                    item = PaymentStatusItem(
-                        orderId = orderId,
-                        amount  = "",
-                        status  = "NEW"
-                    )
-                )
-            }
+            onStatusLoading = { showLoading() },
+            onStatusLoadingDone = { hideLoading() }
         )
     }
 
@@ -282,7 +224,7 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
-        binding.tvQrInvoiceAmount.text = data.vpa ?: "--"
+        binding.tvQrInvoiceAmount.text = Utility.formatAmount(data.liveBankBalance)
         binding.tvIfscCode.text = data.ifsc ?: "--"
         val status = data.wallet?.status
         if (!status.isNullOrEmpty()) {
