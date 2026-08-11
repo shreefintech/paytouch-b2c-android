@@ -106,7 +106,10 @@ class LoadWalletActivity : BaseActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (intent.getBooleanExtra(Constant.EXTRA_FROM_PAYMENT, false)) {
+            Utility.hideKeyboard(mActivity)
             if (isPaymentSheetVisible()) hidePaymentSheet()
+            sheetBinding.etAmount.clearFocus()
+            sheetBinding.etDescription.clearFocus()
             sheetBinding.etAmount.setText("")
             sheetBinding.etDescription.setText("")
             fetchWalletData()

@@ -27,6 +27,7 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityPaymentStatusBindin
 import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.gone
 
 class PaymentStatusActivity : BaseActivity() {
 
@@ -78,7 +79,7 @@ class PaymentStatusActivity : BaseActivity() {
         }
 
         binding.onClickListener = onClickListener()
-
+        binding.lytToolbar.ivBack.gone()
         populateStatus(statusStr)
         autoFinishHandler.postDelayed({ goToWallet() }, 5000L)
         onBack()
