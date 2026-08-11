@@ -28,7 +28,7 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:layout_gravity="center"
-            tools:src="@drawable/ic_creadit" />
+            tools:src="@drawable/ic_credit" />
 
         <!-- Title + Date -->
         <LinearLayout

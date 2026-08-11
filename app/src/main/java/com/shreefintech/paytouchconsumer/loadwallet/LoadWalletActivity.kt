@@ -225,15 +225,11 @@ class LoadWalletActivity : BaseActivity() {
     private fun fetchRecentHistory() {
         viewModel.fetchRecentHistory(
             onSuccess = { list ->
-                transactionList.clear()
-                transactionList.addAll(list)
-                transactionAdp.notifyDataSetChanged()
+                transactionAdp.updateList(list)
                 updateEmptyState()
             },
-            onError = {
-                // Intentionally silent: fetchUserWalletData always runs first and shows its own
-                // error toast. Recent history is supplementary display only.
-                // TODO(B2C-82): show history error independently if the two calls are ever decoupled
+            onError = { msg ->
+                ToastUtil.showDelete(mActivity, msg)
             }
         )
     }

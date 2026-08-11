@@ -94,7 +94,7 @@ object HdfcPaymentHelper {
                     response: Response<HdfcOrderResponseItem>
                 ) {
                     if (context.isFinishing || context.isDestroyed) { clearPendingState(); return }
-                    val data = response.body()?.data
+                    val data = if (response.isSuccessful && response.body()?.success == true) response.body()?.data else null
                     openStatusActivity(
                         context,
                         orderId = data?.orderId ?: orderId,
