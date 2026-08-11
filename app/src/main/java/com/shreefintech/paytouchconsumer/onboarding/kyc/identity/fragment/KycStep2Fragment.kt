@@ -55,7 +55,7 @@ class KycStep2Fragment : BaseKycStepFragment() {
         binding.ivUpload1.setOnClickListener { pickFront() }
         binding.ivDeleteProof1.setOnClickListener { clearSlot(isFront = true) }
 
-        binding.flUpload1.setOnClickListener { pickBack() }
+        binding.flUpload2.setOnClickListener { pickBack() }
         binding.ivUpload2.setOnClickListener { pickBack() }
         binding.ivDeleteProof2.setOnClickListener { clearSlot(isFront = false) }
     }

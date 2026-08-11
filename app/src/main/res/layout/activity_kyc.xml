@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
@@ -15,11 +16,11 @@
         android:background="@drawable/img_screen_bg">
 
         <include
-            layout="@layout/lyt_toolbar"
             android:id="@+id/incToolbar"
-            app:layout_constraintStart_toStartOf="parent"
+            layout="@layout/lyt_toolbar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- ── Header: PayTouch logo + BharatConnect logo (no back button) ── -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -37,13 +38,13 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
                 android:fontFamily="@font/proza_libre_bold"
                 android:includeFontPadding="false"
+                android:maxLines="2"
                 android:text="@string/titleKycVerification"
                 android:textColor="@color/primary"
                 android:textSize="@dimen/text_size_20"
-                android:maxLines="2"
-                android:ellipsize="end"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/ivBharatConnect"
                 app:layout_constraintStart_toStartOf="parent"
@@ -65,8 +66,8 @@
             android:id="@+id/flCard"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="@dimen/margin_medium"
             android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
             android:layout_marginBottom="@dimen/margin_medium"
             android:clipToOutline="true"
             android:outlineProvider="background"
@@ -91,7 +92,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/margin_medium"
-                        android:visibility="visible">
+                        android:visibility="gone">
 
                         <include layout="@layout/lyt_shimmer_kyc" />
                     </com.facebook.shimmer.ShimmerFrameLayout>
@@ -100,188 +101,214 @@
                         android:id="@+id/llKycContent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
                         android:clipChildren="false"
                         android:clipToPadding="false"
+                        android:orientation="vertical"
                         android:padding="@dimen/margin_medium"
-                        android:visibility="gone">
+                        android:visibility="visible">
 
-                    <!-- Document Progress card -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_medium"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="@dimen/card_elevation"
-                        app:strokeColor="@color/primary"
-                        app:strokeWidth="1dp">
-
-                        <LinearLayout
+                        <!-- Document Progress card -->
+                        <com.google.android.material.card.MaterialCardView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="@dimen/margin_large">
+                            android:layout_marginTop="@dimen/margin_medium"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="@dimen/card_corner_radius"
+                            app:cardElevation="@dimen/card_elevation"
+                            app:strokeColor="@color/primary"
+                            app:strokeWidth="1dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="@dimen/margin_large">
+
+                                <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvProgressLabel"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelDocumentProgress"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_14"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toStartOf="@id/tvProgressCount"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvProgressCount"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/fmtDocumentProgress"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_14"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent" />
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                                <ProgressBar
+                                    android:id="@+id/pbDocProgress"
+                                    style="?android:attr/progressBarStyleHorizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="6dp"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:max="2"
+                                    android:progress="0"
+                                    android:progressDrawable="@drawable/progress_rounded" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_extra_small"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/msgKycProgressSubtitle"
+                                    android:textColor="@color/hint_color"
+                                    android:textSize="@dimen/text_size_12" />
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Required Sections label -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_extra_large"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:letterSpacing="0.05"
+                            android:text="@string/labelRequiredSections"
+                            android:textColor="@color/hint_color"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <!-- Identity Verification row -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/mcIdentity"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/button_height"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?selectableItemBackground"
+                            android:onClickListener="@{onClickListener}"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="@dimen/card_corner_radius"
+                            app:cardElevation="@dimen/card_elevation"
+                            app:strokeWidth="0dp">
 
                             <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
+                                android:layout_height="match_parent"
+                                android:paddingHorizontal="@dimen/margin_large">
 
                                 <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvProgressLabel"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/proza_libre_semi_bold"
                                     android:includeFontPadding="false"
-                                    android:text="@string/labelDocumentProgress"
-                                    android:textColor="@color/primary"
+                                    android:text="@string/labelIdentityVerification"
+                                    android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_14"
                                     app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toStartOf="@id/tvProgressCount"
+                                    app:layout_constraintEnd_toStartOf="@id/ivSectionAStatus"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
 
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvProgressCount"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/proza_libre_semi_bold"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/fmtDocumentProgress"
-                                    android:textColor="@color/primary"
-                                    android:textSize="@dimen/text_size_14"
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivSectionAStatus"
+                                    android:layout_width="@dimen/icon_small"
+                                    android:layout_height="@dimen/icon_small"
+                                    android:src="@drawable/ic_success"
+                                    android:visibility="gone"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
 
                             </androidx.constraintlayout.widget.ConstraintLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
-                            <ProgressBar
-                                android:id="@+id/pbDocProgress"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_marginTop="@dimen/margin_small"
-                                android:max="2"
-                                android:progress="0"
-                                android:progressDrawable="@drawable/progress_rounded"  />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_extra_small"
-                                android:fontFamily="@font/proza_libre_medium"
-                                android:includeFontPadding="false"
-                                android:text="@string/msgKycProgressSubtitle"
-                                android:textColor="@color/hint_color"
-                                android:textSize="@dimen/text_size_12" />
-
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Required Sections label -->
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_extra_large"
-                        android:fontFamily="@font/proza_libre_semi_bold"
-                        android:includeFontPadding="false"
-                        android:letterSpacing="0.05"
-                        android:text="@string/labelRequiredSections"
-                        android:textColor="@color/hint_color"
-                        android:textSize="@dimen/text_size_12" />
-
-                    <!-- Identity Verification row -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/mcIdentity"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/button_height"
-                        android:layout_marginTop="@dimen/margin_medium"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:strokeWidth="0dp"
-                        android:foreground="?selectableItemBackground"
-                        android:onClickListener="@{onClickListener}"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="@dimen/card_elevation">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
+                        <!-- Bank Details row -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/mcBank"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingHorizontal="@dimen/margin_large">
+                            android:layout_height="@dimen/button_height"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?selectableItemBackground"
+                            android:onClickListener="@{onClickListener}"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="@dimen/card_corner_radius"
+                            app:cardElevation="@dimen/card_elevation"
+                            app:strokeWidth="0dp">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/proza_libre_semi_bold"
-                                android:includeFontPadding="false"
-                                android:text="@string/labelIdentityVerification"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@id/ivSectionAStatus"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:paddingHorizontal="@dimen/margin_large">
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/ivSectionAStatus"
-                                android:layout_width="@dimen/icon_small"
-                                android:layout_height="@dimen/icon_small"
-                                android:src="@drawable/ic_success"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelBankDetails"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toStartOf="@id/ivSectionBStatus"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivSectionBStatus"
+                                    android:layout_width="@dimen/icon_small"
+                                    android:layout_height="@dimen/icon_small"
+                                    android:src="@drawable/ic_reject"
+                                    android:visibility="gone"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <!-- Bank Details row -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/mcBank"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/button_height"
-                        android:layout_marginTop="@dimen/margin_medium"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:strokeWidth="0dp"
-                        android:foreground="?selectableItemBackground"
-                        android:onClickListener="@{onClickListener}"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="@dimen/card_elevation">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:paddingHorizontal="@dimen/margin_large">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/proza_libre_semi_bold"
-                                android:includeFontPadding="false"
-                                android:text="@string/labelBankDetails"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@id/ivSectionBStatus"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/ivSectionBStatus"
-                                android:layout_width="@dimen/icon_small"
-                                android:layout_height="@dimen/icon_small"
-                                android:src="@drawable/ic_reject"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                     </LinearLayout>
+
+                    <!-- Shown when registration is pending approval (initiate returns 403) -->
+                    <LinearLayout
+                        android:id="@+id/llPendingRegistration"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/margin_large"
+                        android:paddingVertical="@dimen/margin_extra_large"
+                        android:visibility="gone">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvPendingRegistrationMsg"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
+                            android:textColor="@color/hint_color"
+                            android:textSize="@dimen/text_size_14" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
         </FrameLayout>

@@ -2,6 +2,10 @@ package com.shreefintech.paytouchconsumer.retrofit
 
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycAgreeDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
@@ -508,7 +512,7 @@ interface ApiService {
     @GET("${AUTH}dashboard-kyc/status")
     fun getKycStatus(
         @Header("Authorization") authorization: String
-    ): Call<General<KycSubmissionDataItem>>
+    ): Call<KycStatusItem>
 
     @Multipart
     @POST("${AUTH}dashboard-kyc/sections/a")
@@ -518,6 +522,38 @@ interface ApiService {
         @Part("documents[0][document_type]") documentType: RequestBody,
         @Part document: MultipartBody.Part
     ): Call<General<KycSubmissionDataItem>>
+
+    @Multipart
+    @POST("${AUTH}dashboard-kyc/sections/b/signatory")
+    fun submitKycSectionB(
+        @Header("Authorization") authorization: String,
+        @Part("email") email: RequestBody,
+        @Part("mobile") mobile: RequestBody,
+        @Part("pan_number") panNumber: RequestBody,
+        @Part("aadhaar_number") aadhaarNumber: RequestBody,
+        @Part panFile: MultipartBody.Part,
+        @Part aadhaarFrontFile: MultipartBody.Part,
+        @Part aadhaarBackFile: MultipartBody.Part,
+        @Part passportPhotoFile: MultipartBody.Part
+    ): Call<General<KycSignatoryDataItem>>
+
+    @Multipart
+    @POST("${AUTH}dashboard-kyc/sections/c")
+    fun submitKycSectionC(
+        @Header("Authorization") authorization: String,
+        @Part parts: List<MultipartBody.Part>
+    ): Call<General<KycSubmissionDataItem>>
+
+    @POST("${AUTH}dashboard-kyc/agree")
+    fun agreeKyc(
+        @Header("Authorization") authorization: String,
+        @Body body: RequestBody
+    ): Call<General<KycAgreeDataItem>>
+
+    @GET("${AUTH}dashboard-kyc/my-account")
+    fun getKycMyAccount(
+        @Header("Authorization") authorization: String
+    ): Call<KycMyAccountItem>
 
     // ── HDFC Payment Gateway ──────────────────────────────────────────────────
 

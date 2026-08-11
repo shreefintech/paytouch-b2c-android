@@ -31,8 +31,7 @@ object Constant {
     // Load Wallet / Payment status extras
     const val EXTRA_FROM_PAYMENT = "from_payment"
 
-    // KYC hub — section completion flags (local until account-status API is wired)
-    const val KEY_KYC_IDENTITY_DONE = "KYC_IDENTITY_DONE"
-    const val KEY_KYC_BANK_DONE = "KYC_BANK_DONE"
+    // Dashboard storage base URL — used as root for file_url values returned by /my-account
+    const val BASE_URL_DASHBOARD_STORAGE = "https://paytouch-dashboard.local/storage"
 
 }

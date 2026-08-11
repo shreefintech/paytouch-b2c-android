@@ -30,6 +30,11 @@ import java.io.File
 
 class IdentityVerificationActivity : BaseActivity() {
 
+    companion object {
+        fun buildIntent(context: android.content.Context): android.content.Intent =
+            android.content.Intent(context, IdentityVerificationActivity::class.java)
+    }
+
     private lateinit var binding: ActivityIdentityVerificationBinding
     private val viewModel: IdentityVerificationViewModel by viewModels()
     private var showProgressSubmit = ObservableBoolean(false)

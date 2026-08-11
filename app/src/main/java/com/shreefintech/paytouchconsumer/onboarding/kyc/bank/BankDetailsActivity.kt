@@ -1,5 +1,7 @@
 package com.shreefintech.paytouchconsumer.onboarding.kyc.bank
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -32,6 +34,8 @@ class BankDetailsActivity : BaseActivity() {
     companion object {
         private const val MAX_ACCOUNTS = 4
         private val IFSC_REGEX = Regex("^[A-Z]{4}0[A-Z0-9]{6}$")
+
+        fun buildIntent(context: Context): Intent = Intent(context, BankDetailsActivity::class.java)
     }
 
     private lateinit var binding: ActivityBankDetailsBinding
@@ -80,7 +84,7 @@ class BankDetailsActivity : BaseActivity() {
 
         onBack()
         setupFilePicker()
-        addBankCard()
+        initBankCards()
     }
 
     private fun onBack() {
@@ -92,6 +96,10 @@ class BankDetailsActivity : BaseActivity() {
     }
 
     // ─── Dynamic bank cards ───────────────────────────────────────────────────
+
+    private fun initBankCards() {
+        addBankCard()
+    }
 
     private fun addBankCard() {
         if (bankCardBindings.size >= MAX_ACCOUNTS) return
