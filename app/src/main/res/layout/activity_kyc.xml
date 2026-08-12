@@ -79,11 +79,12 @@
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fillViewport="true"
                 android:scrollbars="none">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical">
 
                     <!-- ════════ KYC SHIMMER ════════ -->
@@ -291,8 +292,8 @@
                         android:id="@+id/llPendingRegistration"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_gravity="center_vertical"
                         android:orientation="vertical"
+                        android:gravity="center"
                         android:paddingHorizontal="@dimen/margin_large"
                         android:paddingVertical="@dimen/margin_extra_large"
                         android:visibility="gone">
@@ -301,8 +302,8 @@
                             android:id="@+id/tvPendingRegistrationMsg"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textAlignment="center"
                             android:fontFamily="@font/proza_libre_medium"
-                            android:gravity="center"
                             android:includeFontPadding="false"
                             android:textColor="@color/hint_color"
                             android:textSize="@dimen/text_size_14" />
