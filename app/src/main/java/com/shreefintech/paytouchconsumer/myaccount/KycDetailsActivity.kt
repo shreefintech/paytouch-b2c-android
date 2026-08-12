@@ -53,6 +53,7 @@ class KycDetailsActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         setupDocumentSlider()
         onBack()
+        retryCallback = { loadKycDetails() }
         loadKycDetails()
     }
 
@@ -72,6 +73,11 @@ class KycDetailsActivity : BaseActivity() {
     }
 
     private fun loadKycDetails() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.fetchMyAccount(
             onLoading = {
                 binding.pbLoading.isVisible = true

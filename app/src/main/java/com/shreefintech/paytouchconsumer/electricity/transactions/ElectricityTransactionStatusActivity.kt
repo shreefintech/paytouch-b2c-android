@@ -78,6 +78,7 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
 
         // Pre-fill from caller and set as the initial query
         prefillTransactionId?.let { binding.etSearch.setText(it); activeQuery = it }
+        retryCallback = { loadPage(1) }
         loadPage(1)
     }
 
@@ -120,9 +121,12 @@ class ElectricityTransactionStatusActivity : BaseActivity() {
 
     // ── Data Loading ──────────────────────────────────────────────────────────
 
-    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadPage(1) }
-    //  once the no-internet placeholder design is finalised.
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.searchTransactionStatus(
             query     = activeQuery,
             page      = page,

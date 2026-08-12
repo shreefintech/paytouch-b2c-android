@@ -60,8 +60,8 @@ class PostpaidRecentTransactionActivity : BaseActivity() {
         setupRecyclerView()
         binding.onClickListener = onClickListener()
         onBack()
+        retryCallback = { loadInitialData() }
         loadInitialData()
-        // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadInitialData() }
     }
 
     private fun setupRecyclerView() {
@@ -83,9 +83,9 @@ class PostpaidRecentTransactionActivity : BaseActivity() {
         })
     }
 
-    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadInitialData() }
-    //  once the no-internet placeholder design is finalised.
     private fun loadInitialData() {
+        if (!Utility.isInternetAvailable(mActivity)) { showNoInternet(); return }
+        hideNoInternet()
         viewModel.loadOperatorsThenData(
             onLoading = {
                 binding.shimmerLayout.visibility = View.VISIBLE
@@ -113,6 +113,10 @@ class PostpaidRecentTransactionActivity : BaseActivity() {
     }
 
     private fun loadNextPage() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         viewModel.loadNextPage(
             onLoading = {
                 binding.pbLoadMore.visibility = View.VISIBLE

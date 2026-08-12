@@ -24,6 +24,7 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDocPreviewBinding
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
+import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -87,6 +88,7 @@ class DocPreviewActivity : BaseActivity() {
 
         setupToolbar()
         setupPinchToZoom()
+        retryCallback = { loadFileFromUrl(fileUrl) }
         loadFileFromUrl(fileUrl)
     }
 
@@ -125,6 +127,11 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     private fun loadFileFromUrl(url: String) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         val lower = url.lowercase()
         when {
             isPdfUrl(lower)   -> downloadAndShowPdf(url)

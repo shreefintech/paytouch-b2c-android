@@ -200,6 +200,10 @@ class IdentityVerificationActivity : BaseActivity() {
     }
 
     private fun submitIdentity() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         viewModel.submitIdentity(
             onLoading = { showProgressSubmit.set(true) },
             onSuccess = {

@@ -96,6 +96,7 @@ class PrepaidActivity : BaseActivity() {
         setupInputFilters()
         setupAmountWatcher()
         setupTermsText()
+        retryCallback = { loadOperators() }
         loadOperators()
         onBack()
     }
@@ -161,6 +162,8 @@ class PrepaidActivity : BaseActivity() {
     // ── API Calls (via ViewModel) ─────────────────────────────────────────────
 
     private fun loadOperators() {
+        if (!Utility.isInternetAvailable(mActivity)) { showNoInternet(); return }
+        hideNoInternet()
         viewModel.loadOperators(
             onLoading = { setOperatorLoading(true) },
             onSuccess = { operators ->

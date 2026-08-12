@@ -61,6 +61,7 @@ class WalletTransactionsActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         setupRecyclerView()
         onBack()
+        retryCallback = { loadPage(1) }
         loadPage(1)
     }
 
@@ -88,6 +89,11 @@ class WalletTransactionsActivity : BaseActivity() {
     // ── Data Loading ──────────────────────────────────────────────────────────
 
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.loadHistory(
             page      = page,
             onLoading = {

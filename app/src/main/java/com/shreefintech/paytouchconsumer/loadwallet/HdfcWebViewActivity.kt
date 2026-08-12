@@ -16,6 +16,8 @@ import androidx.appcompat.app.AlertDialog
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityHdfcWebViewBinding
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
+import com.shreefintech.paytouchconsumer.utill.Utility
 
 class HdfcWebViewActivity : BaseActivity() {
 
@@ -49,6 +51,11 @@ class HdfcWebViewActivity : BaseActivity() {
         onBack()
 
         if (paymentUrl.isNotEmpty()) {
+            if (!Utility.isInternetAvailable(mActivity)) {
+                ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+                finish()
+                return
+            }
             binding.webView.loadUrl(paymentUrl)
         } else {
             finish()

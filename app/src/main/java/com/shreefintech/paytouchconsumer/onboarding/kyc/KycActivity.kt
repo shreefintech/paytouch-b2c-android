@@ -80,10 +80,16 @@ class KycActivity : BaseActivity() {
         )
 
         binding.onClickListener = onClickListener()
+        retryCallback = { startKyc() }
         startKyc()
     }
 
     private fun startKyc() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.startKyc(
             onLoading = {
                 binding.shimmerKyc.visibility         = View.VISIBLE
@@ -166,6 +172,10 @@ class KycActivity : BaseActivity() {
     }
 
     private fun agreeAndNavigateToStatus() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         binding.shimmerKyc.visibility  = View.VISIBLE
         binding.shimmerKyc.startShimmer()
         binding.llKycContent.visibility = View.GONE

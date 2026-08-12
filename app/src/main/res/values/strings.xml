@@ -544,5 +544,9 @@
     <string name="error_failed_to_load">Failed to load: %s</string>
     <string name="label_page_indicator">%1$d / %2$d</string>
     <string name="loading">Loading...</string>
+    <string name="textYouLostConnection">You Lost Connection!</string>
+    <string name="msgNoInternetDes">No Internet Connection Found. Check Your Connection or Try Again!</string>
+    <string name="textTryAgain">Try Again</string>
+    <string name="textRetry">Retry</string>
 
 </resources>

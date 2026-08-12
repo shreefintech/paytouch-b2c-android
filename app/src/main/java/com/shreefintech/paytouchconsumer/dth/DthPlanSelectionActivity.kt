@@ -55,6 +55,7 @@ class DthPlanSelectionActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         setupRecyclerView()
         onBack()
+        retryCallback = { loadPlans() }
         loadPlans()
     }
 
@@ -68,6 +69,11 @@ class DthPlanSelectionActivity : BaseActivity() {
     }
 
     private fun loadPlans() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.loadPlans(
             operatorId = operatorId,
             onLoading = {

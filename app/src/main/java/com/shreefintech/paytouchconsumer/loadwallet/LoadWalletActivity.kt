@@ -100,8 +100,8 @@ class LoadWalletActivity : BaseActivity() {
         setupPaymentSheet()
         selectTab(TAB_TOTAL_BALANCE)
         onBack()
-        fetchWalletData()
-        fetchRecentHistory()
+        retryCallback = { loadData() }
+        loadData()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -141,7 +141,21 @@ class LoadWalletActivity : BaseActivity() {
         })
     }
 
+    private fun loadData() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
+        fetchWalletData()
+        fetchRecentHistory()
+    }
+
     private fun onProceedPayment() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
         val description = sheetBinding.etDescription.text?.toString()?.trim() ?: ""
         if (amountStr.isEmpty()) {

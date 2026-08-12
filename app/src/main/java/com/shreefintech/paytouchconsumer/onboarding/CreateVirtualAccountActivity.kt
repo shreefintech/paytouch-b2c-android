@@ -330,6 +330,11 @@ class CreateVirtualAccountActivity : BaseActivity() {
         val panUri         = uploadUris[2] ?: return
         val proofUri       = uploadUris[3] ?: return
 
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+
         viewModel.submitVirtualAccount(
             fullName       = binding.etFullName.text?.toString()?.trim()    ?: "",
             mobile         = binding.etMobile.text?.toString()?.trim()      ?: "",

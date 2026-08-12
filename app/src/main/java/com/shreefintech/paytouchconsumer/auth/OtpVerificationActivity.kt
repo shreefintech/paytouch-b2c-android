@@ -76,6 +76,7 @@ class OtpVerificationActivity : BaseActivity() {
 
         onBack()
         setupOtpBoxes()
+        retryCallback = { sendOtp() }
         sendOtp()
         startResendTimer()
     }
@@ -94,6 +95,11 @@ class OtpVerificationActivity : BaseActivity() {
     }
 
     private fun sendOtp() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.sendOtp(
             context = mActivity,
             mobile = mobile,
@@ -191,6 +197,10 @@ class OtpVerificationActivity : BaseActivity() {
 
     private fun onSubmitOtp() {
         if (!validate()) return
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         viewModel.verifyOtp(
             context = mActivity,
             mobile = mobile,
@@ -206,6 +216,10 @@ class OtpVerificationActivity : BaseActivity() {
     }
 
     private fun onResendOtp() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         viewModel.resendOtp(
             context = mActivity,
             mobile = mobile,

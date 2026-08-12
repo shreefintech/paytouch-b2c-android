@@ -44,7 +44,7 @@ class KycDocumentAdp(
         if (resolvedUrl.isNullOrBlank()) {
             holder.binding.pbItemLoading.visibility = View.GONE
             holder.binding.ivDocument.visibility = View.VISIBLE
-            holder.binding.ivDocument.setImageResource(R.drawable.ic_aadhar_placeholder)
+            holder.binding.ivDocument.setImageDrawable(null)
             return
         }
 
@@ -86,7 +86,7 @@ class KycDocumentAdp(
                     if (bitmap != null) {
                         holder.binding.ivDocument.setImageBitmap(bitmap)
                     } else {
-                        holder.binding.ivDocument.setImageResource(R.drawable.ic_aadhar_placeholder)
+                        holder.binding.ivDocument.setImageDrawable(null)
                     }
                 }
             }

@@ -280,6 +280,10 @@ class BankDetailsActivity : BaseActivity() {
 
     private fun onSubmit() {
         if (!validate()) return
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
 
         val accounts = bankCardBindings.mapIndexed { index, card ->
             BankAccountInput(

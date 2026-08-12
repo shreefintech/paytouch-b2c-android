@@ -73,6 +73,7 @@ class MunicipalTaxTransactionReportActivity : BaseActivity() {
         setupFilterSheet()
         binding.onClickListener = onClickListener()
         onBack()
+        retryCallback = { loadPage(1) }
         callReport(null, null, null, null)
     }
 
@@ -130,6 +131,11 @@ class MunicipalTaxTransactionReportActivity : BaseActivity() {
     }
 
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.loadReport(
             fromDate     = filterFromDate,
             toDate       = filterToDate,

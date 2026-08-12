@@ -74,6 +74,7 @@ class LoanTransactionReportActivity : BaseActivity() {
         setupFilterSheet()
 
         binding.onClickListener = onClickListener()
+        retryCallback = { loadPage(1) }
         onBack()
 
         callReport(null, null, null, null)
@@ -136,6 +137,11 @@ class LoanTransactionReportActivity : BaseActivity() {
     }
 
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.loadReport(
             fromDate   = filterFromDate,
             toDate     = filterToDate,
