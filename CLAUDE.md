@@ -2,7 +2,7 @@
 
 PayTouch Consumer is a **fintech Android app** (Kotlin) for Indian consumers to pay utility bills (electricity, gas, mobile, DTH, cable, broadband, FASTag, loans, taxes) and manage a digital wallet. Single user role — every logged-in user has the same feature set. Built by Shreefintech.
 
-> **Current state:** This project is in the **UI implementation phase**. API wiring is pending — all network calls are currently stubbed with `TODO(PAYTOUCH-xxx):` comments. Validations and business logic will be finalized once APIs are connected. Do not treat missing API calls or relaxed validations as bugs.
+> **Current state:** API wiring is **in progress**. Core modules (Auth, Electricity, Gas, Prepaid, Postpaid, DTH, FASTag, Loan, Municipal Tax, My Account) have live API integration. Newly added modules may begin with UI stubs marked `TODO(PAYTOUCH-xxx):` — do not treat pending stubs or relaxed validations as bugs.
 
 > Business logic reference: `docs/business_logic.md` | Architecture rules: `docs/dos_and_donts.md` | System overview: `docs/caveman.md`
 
@@ -58,14 +58,24 @@ com.shreefintech.paytouchconsumer/
 ├── auth/           # Login, OTP, password/MPIN flows, create-account
 ├── onboarding/     # KYC upload (UploadKycActivity), Virtual Account creation (CreateVirtualAccountActivity)
 ├── home/           # Home/Dashboard screen (HomeActivity — currently at root level, will move here)
-├── electricity/    # Electricity bill payment screen
-├── gas/            # Gas bill payment screen
+├── electricity/    # Electricity bill payment + transaction history (canonical module template)
+├── gas/            # Gas bill payment + transaction history
+├── prepaid/        # Mobile prepaid recharge — operator + circle + plan selection
+├── postpaid/       # Mobile postpaid bill payment
+├── dth/            # DTH recharge — operator + plan selection
+├── fastag/         # FASTag recharge — vehicle number + amount, real-time fee, no bill-fetch
+├── loan/           # Loan repayment — bill-fetch pattern; circleId = "0"
+├── municipaltax/   # Municipal tax payment — bill-fetch pattern
+├── myaccount/      # My Account — two-tab profile viewer (Account Info + Refer & Earn)
+├── transactions/   # Shared TransactionDetailActivity + TransactionItem model (never duplicated per module)
+├── adapter/        # Shared adapters: TransactionAdp, RecentTransactionAdp, PrepaidPlanAdp, DthPlanAdp
 ├── enums/          # Project-wide enums (LoginMode, etc.)
 ├── glass/          # LiquidGlassEffect custom blur UI components
-├── retrofit/       # All networking (ApiService, ApiClient, ApiHelper, models) — wiring pending
+├── retrofit/       # All networking (ApiService, ApiClient, ApiHelper, models)
 ├── utill/          # Shared utilities — NOTE: spelling "utill" is intentional, never rename
 ├── widget/         # Reusable custom views (LiquidGlassButton, CustomDropdown, etc.)
 ├── BaseActivity.kt
+├── BaseBillViewModel.kt
 ├── HomeActivity.kt
 └── Constant.kt
 ```
