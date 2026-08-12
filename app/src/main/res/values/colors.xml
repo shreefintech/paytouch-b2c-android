@@ -90,4 +90,6 @@
     <color name="personal_info_label">#6B7280</color>
     <color name="account_card_label">#FFFFF0</color>
     <color name="status_divider">#A299A1</color>
+    <color name="kyc_icon_bg">#FEEEF1</color>
+    <color name="preview_btn_bg">#FFC8DB</color>
 </resources>

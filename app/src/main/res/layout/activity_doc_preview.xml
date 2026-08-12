@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        tools:context=".admin.kyc.DocPreviewActivity">
+
+        <!-- AppBar -->
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/lyt_toolbar" />
+        <!-- Root below AppBar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_below="@id/toolbar">
+
+            <!-- File type chip label -->
+            <TextView
+                android:id="@+id/tvFileType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:text="@string/loading"
+                android:textSize="12sp"
+                android:visibility="gone"
+                android:fontFamily="@font/proza_libre_semi_bold"
+                android:textColor="?attr/colorPrimary" />
+
+            <!-- Full-screen loading spinner (shown while downloading) -->
+            <ProgressBar
+                android:id="@+id/progressBarLoad"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:visibility="visible"
+                tools:visibility="gone" />
+
+            <!-- Content area (hidden during download) -->
+            <FrameLayout
+                android:id="@+id/layoutContent"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <!--
+                    ImageView — used for:
+                      • Image URLs  (bitmap set directly)
+                      • PDF pages   (PdfRenderer renders each page as bitmap)
+                    Pinch-to-zoom handled in code via ScaleGestureDetector.
+                -->
+                <ImageView
+                    android:id="@+id/imagePreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:background="@color/white"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:src="@drawable/ic_launcher_background" />
+
+                <!--
+                    WebView — fallback for:
+                      • Unknown file types
+                      • PDFs that fail to download (opened via Google Docs viewer)
+                -->
+                <WebView
+                    android:id="@+id/webViewPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+                <!-- WebView loading progress bar -->
+                <ProgressBar
+                    android:id="@+id/progressBarWeb"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_gravity="top"
+                    android:max="100"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:progress="60" />
+
+                <!-- Error message -->
+                <TextView
+                    android:id="@+id/tvError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:padding="24dp"
+                    android:textColor="#B00020"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    tools:text="Failed to load document"
+                    tools:visibility="gone" />
+
+            </FrameLayout>
+
+            <!-- PDF page navigation bar (shown only when rendering PDF) -->
+            <LinearLayout
+                android:id="@+id/layoutPdfControls"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:background="?attr/colorSurface"
+                android:elevation="4dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageButton
+                    android:id="@+id/btnPrevPage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:rotation="180"
+                    android:src="@drawable/ic_right_arrow"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:enabled="false" />
+
+                <TextView
+                    android:id="@+id/tvPageIndicator"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="1 / 5" />
+
+                <ImageButton
+                    android:id="@+id/btnNextPage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_right_arrow"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

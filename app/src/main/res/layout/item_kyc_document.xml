@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="@dimen/margin_small"
+        app:cardBackgroundColor="@color/sheet_divider"
+        app:cardCornerRadius="@dimen/card_corner_radius"
+        app:cardElevation="0dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivDocument"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+    </androidx.cardview.widget.CardView>
+
+    <ProgressBar
+        android:id="@+id/pbItemLoading"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/primary"
+        android:visibility="gone" />
+
+</FrameLayout>

@@ -104,4 +104,6 @@
     <dimen name="kyc_dot_margin">6dp</dimen>
     <dimen name="kyc_selfie_size">180dp</dimen>
     <dimen name="kyc_upload_height">130dp</dimen>
+    <dimen name="kyc_gradiant_line_width">120dp</dimen>
+    <dimen name="kyc_icon_bg_size">40dp</dimen>
 </resources>

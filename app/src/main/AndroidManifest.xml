@@ -278,6 +278,10 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".myaccount.KycDetailsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".loadwallet.LoadWalletActivity"
             android:exported="false"
             android:launchMode="singleTop"

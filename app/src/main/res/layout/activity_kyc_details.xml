@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg">
+
+        <!-- Toolbar -->
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <!-- Title row: "KYC Details" + Bharat Connect -->
+        <LinearLayout
+            android:id="@+id/llTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:text="@string/titleKycDetails"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_20" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/img_bharat_connect" />
+        </LinearLayout>
+
+        <!-- Loading spinner -->
+        <ProgressBar
+            android:id="@+id/pbLoading"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:indeterminateTint="@color/primary"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llTitle" />
+
+        <!-- Scrollable content -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nsvContent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llTitle">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/page_margin_horizontal"
+                android:paddingBottom="@dimen/margin_large">
+
+                <!-- ══════════════════════════════════════════════════
+                     CARD 1 — Identity Details
+                     "Verified" is BELOW the title (left side).
+                     Avatar is on the RIGHT of the header block.
+                     ONE divider after header. NO dividers between fields.
+                     ══════════════════════════════════════════════════ -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="@dimen/normal_card_radius"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin_large">
+
+                        <!-- Header: [title + Verified + bar] LEFT | [avatar] RIGHT -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <!-- Left: title stacked with Verified + accent bar -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelIdentityDetails"
+                                    android:textColor="@color/primary"
+                                    android:textSize="@dimen/text_size_16" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvIdentityStatus"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/colorStatusSuccess"
+                                    android:textSize="@dimen/text_size_12" />
+
+                                <!-- Colored accent bar (width matches approx. title width) -->
+                                <View
+                                    android:id="@+id/viewIdentityStatusBar"
+                                    android:layout_width="@dimen/kyc_gradiant_line_width"
+                                    android:layout_height="2dp"
+                                    android:layout_marginTop="4dp"
+                                    android:background="@drawable/kyc_gradiant_line" />
+                            </LinearLayout>
+
+                            <!-- Right: circular profile avatar -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                app:cardBackgroundColor="@color/secondary"
+                                app:shapeAppearance="@style/CircleCard"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivAvatar"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/ic_profile" />
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+
+                        <!-- Mobile Number row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="@dimen/kyc_icon_bg_size"
+                                android:layout_height="@dimen/kyc_icon_bg_size"
+                                android:layout_marginEnd="@dimen/margin_medium"
+                                app:cardBackgroundColor="@color/kyc_icon_bg"
+                                app:cardCornerRadius="5dp"
+                                app:cardElevation="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/margin_small"
+                                    android:src="@drawable/ic_phone"
+                                    android:tint="@color/primary" />
+
+                            </androidx.cardview.widget.CardView>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelMobileNumber"
+                                    android:textColor="@color/personal_info_label"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvMobile"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Aadhar Card Number + PAN Card Number (two equal columns) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="@dimen/margin_small_medium"
+                            android:orientation="horizontal">
+
+                            <!-- Aadhar column -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="@dimen/kyc_icon_bg_size"
+                                    android:layout_height="@dimen/kyc_icon_bg_size"
+                                    android:layout_marginEnd="@dimen/margin_medium"
+                                    app:cardBackgroundColor="@color/kyc_icon_bg"
+                                    app:cardCornerRadius="5dp"
+                                    app:cardElevation="0dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:padding="@dimen/margin_small"
+                                        android:src="@drawable/ic_aadhar"
+                                        android:tint="@color/primary" />
+                                </androidx.cardview.widget.CardView>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelAadharCardNumber"
+                                        android:textColor="@color/personal_info_label"
+                                        android:textSize="@dimen/text_size_10" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvAadhaar"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="@dimen/margin_medium"
+                                android:background="@color/sheet_divider" />
+
+                            <!-- PAN column -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelPanCardNumber"
+                                        android:textColor="@color/personal_info_label"
+                                        android:textSize="@dimen/text_size_10" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvPan"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Email Address row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_small_medium"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="@dimen/kyc_icon_bg_size"
+                                android:layout_height="@dimen/kyc_icon_bg_size"
+                                android:layout_marginEnd="@dimen/margin_medium"
+                                app:cardBackgroundColor="@color/kyc_icon_bg"
+                                app:cardCornerRadius="5dp"
+                                app:cardElevation="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/margin_small"
+                                    android:src="@drawable/ic_email_1"
+                                    android:tint="@color/primary" />
+                            </androidx.cardview.widget.CardView>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelEmailAddress"
+                                    android:textColor="@color/personal_info_label"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvEmail"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Header: title LEFT | Verified RIGHT -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_extra_large"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_bold"
+                                android:includeFontPadding="false"
+                                android:text="@string/labelBankDetails"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_size_16" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvBankStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/proza_libre_semi_bold"
+                                android:includeFontPadding="false"
+                                android:textColor="@color/colorStatusSuccess"
+                                android:textSize="@dimen/text_size_12" />
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/view1"
+                            android:layout_width="@dimen/kyc_gradiant_line_width"
+                            android:layout_height="2dp"
+                            android:layout_marginTop="@dimen/margin_tiny"
+                            android:background="@drawable/kyc_gradiant_line" />
+
+                        <!-- Account Number -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="@dimen/kyc_icon_bg_size"
+                                android:layout_height="@dimen/kyc_icon_bg_size"
+                                android:layout_marginEnd="@dimen/margin_medium"
+                                app:cardBackgroundColor="@color/kyc_icon_bg"
+                                app:cardCornerRadius="5dp"
+                                app:cardElevation="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/margin_small"
+                                    android:src="@drawable/ic_user_1"
+                                    android:tint="@color/primary" />
+                            </androidx.cardview.widget.CardView>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelBankAccountNumber"
+                                    android:textColor="@color/personal_info_label"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvAccountNumber"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Bank Name (with icon) | IFSC code (no icon) — two columns -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_small_medium"
+                            android:orientation="horizontal">
+
+                            <!-- Bank Name column -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="@dimen/kyc_icon_bg_size"
+                                    android:layout_height="@dimen/kyc_icon_bg_size"
+                                    android:layout_marginEnd="@dimen/margin_medium"
+                                    app:cardBackgroundColor="@color/kyc_icon_bg"
+                                    app:cardCornerRadius="5dp"
+                                    app:cardElevation="0dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:padding="@dimen/margin_small"
+                                        android:src="@drawable/ic_bank"
+                                        android:tint="@color/primary" />
+                                </androidx.cardview.widget.CardView>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelBankName"
+                                        android:textColor="@color/personal_info_label"
+                                        android:textSize="@dimen/text_size_11" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvBankName"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="@dimen/margin_medium"
+                                android:background="@color/sheet_divider" />
+
+                            <!-- IFSC code column (no icon, just label + value) -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelIfscCode"
+                                    android:textColor="@color/personal_info_label"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvIfsc"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Branch name row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_small_medium"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="@dimen/kyc_icon_bg_size"
+                                android:layout_height="@dimen/kyc_icon_bg_size"
+                                android:layout_marginEnd="@dimen/margin_medium"
+                                app:cardBackgroundColor="@color/kyc_icon_bg"
+                                app:cardCornerRadius="5dp"
+                                app:cardElevation="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/margin_small"
+                                    android:src="@drawable/ic_location"
+                                    android:tint="@color/primary" />
+                            </androidx.cardview.widget.CardView>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_medium"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelBranchName"
+                                    android:textColor="@color/personal_info_label"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvBranchName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Header: title LEFT | Verified RIGHT -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_extra_large"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_bold"
+                                android:includeFontPadding="false"
+                                android:text="@string/labelUploadedDocuments"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_size_16" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvDocumentsStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/proza_libre_semi_bold"
+                                android:includeFontPadding="false"
+                                android:textColor="@color/colorStatusSuccess"
+                                android:textSize="@dimen/text_size_12" />
+                        </LinearLayout>
+
+                        <!-- Single divider below header -->
+                        <View
+                            android:id="@+id/view2"
+                            android:layout_width="@dimen/kyc_gradiant_line_width"
+                            android:layout_height="2dp"
+                            android:layout_marginTop="@dimen/margin_tiny"
+                            android:background="@drawable/kyc_gradiant_line" />
+
+                        <!-- Documents slider content (hidden when empty) -->
+                        <LinearLayout
+                            android:id="@+id/llDocumentsContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_extra_large"
+                            android:orientation="vertical"
+                            android:visibility="visible">
+
+                            <!-- Document title ABOVE the image (centered, semi-bold) -->
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvDocumentTitle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/margin_small"
+                                android:fontFamily="@font/proza_libre_semi_bold"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/text_size_13" />
+
+                            <!-- Document image slider -->
+                            <androidx.viewpager2.widget.ViewPager2
+                                android:id="@+id/vpDocuments"
+                                android:layout_width="match_parent"
+                                android:layout_height="180dp" />
+
+                            <!-- Dot indicator (centered, below image) -->
+                            <LinearLayout
+                                android:id="@+id/llDots"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="@dimen/margin_small_medium"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal" />
+
+                            <!-- Preview button (centered) -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/cvPreview"
+                                android:layout_width="120dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="@dimen/margin_large"
+                                android:onClickListener="@{onClickListener}"
+                                app:cardBackgroundColor="@color/preview_btn_bg"
+                                app:cardCornerRadius="5dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:gravity="center"
+                                    android:paddingVertical="@dimen/margin_small"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/btnPreview"
+                                    android:textColor="@color/primary"
+                                    android:textSize="@dimen/text_size_14" />
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+
+                        <!-- Empty state message -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvNoDocuments"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
+                            android:padding="@dimen/margin_large"
+                            android:text="@string/msgNoKycDocuments"
+                            android:textColor="@color/personal_info_label"
+                            android:textSize="@dimen/text_size_13"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

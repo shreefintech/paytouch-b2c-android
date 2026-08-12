@@ -261,7 +261,7 @@ class MyAccountActivity : BaseActivity() {
                 }
                 binding.cvViewKycDetails -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-81): navigate to KycDetailsActivity when implemented
+                    KycDetailsActivity.start(mActivity)
                 }
                 binding.ivCopyReferralCode -> {
                     if (Utility.stopClick()) return@OnClickListener
