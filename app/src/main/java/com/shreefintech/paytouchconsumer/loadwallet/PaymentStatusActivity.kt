@@ -1,62 +1,52 @@
 package com.shreefintech.paytouchconsumer.loadwallet
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.viewModels
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import androidx.databinding.ObservableBoolean
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPaymentStatusBinding
 import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
-import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.PaymentStatusViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.gone
 
 class PaymentStatusActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPaymentStatusBinding
-    private val viewModel: PaymentStatusViewModel by viewModels()
 
     private val passItem: PaymentStatusItem? by lazy {
-        intent.getStringExtra(EXTRA_ITEM)?.let { Gson().fromJson(it, PaymentStatusItem::class.java) }
+        intent.getStringExtra(EXTRA_ITEM)
+            ?.let { Gson().fromJson(it, PaymentStatusItem::class.java) }
     }
     private val orderId: String by lazy { passItem?.orderId ?: "" }
     private val amount: String by lazy { passItem?.amount ?: "" }
     private val statusStr: String by lazy { passItem?.status ?: "" }
 
-    private val showProgressCheck = ObservableBoolean(false)
-
-    private val countdownHandler = Handler(Looper.getMainLooper())
-    private var countdownSeconds = COUNTDOWN_START
-    private var isCountdownCancelled = false
-
-    private val countdownRunnable = object : Runnable {
-        override fun run() {
-            if (isCountdownCancelled) return
-            if (countdownSeconds > 0) {
-                binding.tvContinue.text = getString(R.string.btnContinueCountdown, countdownSeconds)
-                countdownSeconds--
-                countdownHandler.postDelayed(this, 1000L)
-            } else {
-                goToWallet()
-            }
-        }
-    }
+    private val autoFinishHandler = Handler(Looper.getMainLooper())
+    private var isNavigating = false
 
     companion object {
         private const val EXTRA_ITEM = "extra_item"
-        private const val COUNTDOWN_START = 5
 
         private const val STATUS_CHARGED = "CHARGED"
         private const val STATUS_AUTHORIZED = "AUTHORIZED"
@@ -83,84 +73,140 @@ class PaymentStatusActivity : BaseActivity() {
         binding = ActivityPaymentStatusBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.onClickListener = onClickListener()
-        binding.showProgressCheck = showProgressCheck
+        ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
+        binding.onClickListener = onClickListener()
+        binding.lytToolbar.ivBack.gone()
         populateStatus(statusStr)
-        startCountdown()
+        autoFinishHandler.postDelayed({ goToWallet() }, 5000L)
         onBack()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        isCountdownCancelled = true
-        countdownHandler.removeCallbacks(countdownRunnable)
+        autoFinishHandler.removeCallbacksAndMessages(null)
     }
 
     private fun populateStatus(status: String) {
-        val (label, colorRes, iconRes) = resolveStatus(status)
-        binding.tvStatusLabel.text = label
-
-        // bg_payment_status_icon.xml is a <shape> drawable — GradientDrawable at runtime
-        val drawable = binding.flStatusIcon.background.mutate() as GradientDrawable
-        drawable.setColor(ContextCompat.getColor(mActivity, colorRes))
-
-        binding.ivStatusIcon.setImageResource(iconRes)
+        val display = resolveStatus(status)
+        val statusColor = ContextCompat.getColor(mActivity, display.statusColorRes)
+        binding.tvStatusLabel.text = display.label
+        binding.tvStatusLabel.setTextColor(statusColor)
+        binding.tvStatusDescription.text = display.description
+        binding.tvAmountLabel.text = display.amountLabel
         binding.tvOrderId.text = orderId
         binding.tvAmount.text = Utility.formatAmount(amount)
+        binding.tvAmount.setTextColor(statusColor)
+        loadGif(display.gifRes)
     }
 
     private data class StatusDisplay(
         val label: String,
-        @ColorRes val colorRes: Int,
-        @DrawableRes val iconRes: Int
+        val description: String,
+        val amountLabel: String,
+        @ColorRes val statusColorRes: Int,
+        @DrawableRes val gifRes: Int
     )
 
     private fun resolveStatus(status: String): StatusDisplay {
         return when (status.uppercase()) {
-            STATUS_CHARGED, STATUS_AUTHORIZED ->
-                StatusDisplay(getString(R.string.msgPaymentSuccessful), R.color.colorPaymentSuccess, R.drawable.ic_success)
-            STATUS_NEW ->
-                StatusDisplay(getString(R.string.msgPaymentInitiated), R.color.colorPaymentInitiated, R.drawable.ic_pending)
-            STATUS_PENDING_VBV, STATUS_AUTHORIZING, STATUS_STARTED ->
-                StatusDisplay(getString(R.string.msgPaymentProcessing), R.color.colorPaymentProcessing, R.drawable.ic_pending)
-            STATUS_JUSPAY_DECLINED, STATUS_AUTHENTICATION_FAILED, STATUS_AUTHORIZATION_FAILED ->
-                StatusDisplay(getString(R.string.msgPaymentFailed), R.color.colorPaymentFailed, R.drawable.ic_cross)
-            STATUS_AUTO_REFUNDED ->
-                StatusDisplay(getString(R.string.msgAmountRefunded), R.color.colorPaymentRefunded, R.drawable.ic_success)
-            else ->
-                StatusDisplay(getString(R.string.msgPaymentPending), R.color.colorPaymentProcessing, R.drawable.ic_pending)
+            STATUS_CHARGED, STATUS_AUTHORIZED -> StatusDisplay(
+                label = getString(R.string.msgPaymentSuccessful),
+                description = getString(R.string.msgPaymentSuccessDescription),
+                amountLabel = getString(R.string.labelAmountPaid),
+                statusColorRes = R.color.colorStatusSuccess,
+                gifRes = R.drawable.gif_success
+            )
+
+            STATUS_NEW -> StatusDisplay(
+                label = getString(R.string.msgPaymentInitiated),
+                description = getString(R.string.msgPaymentInitiatedDescription),
+                amountLabel = getString(R.string.labelAmountPending),
+                statusColorRes = R.color.colorStatusPending,
+                gifRes = R.drawable.gif_pending
+            )
+
+            STATUS_PENDING_VBV, STATUS_AUTHORIZING, STATUS_STARTED -> StatusDisplay(
+                label = getString(R.string.msgPaymentProcessing),
+                description = getString(R.string.msgPaymentPendingDescription),
+                amountLabel = getString(R.string.labelAmountPending),
+                statusColorRes = R.color.colorStatusPending,
+                gifRes = R.drawable.gif_pending
+            )
+
+            STATUS_JUSPAY_DECLINED, STATUS_AUTHENTICATION_FAILED, STATUS_AUTHORIZATION_FAILED -> StatusDisplay(
+                label = getString(R.string.msgPaymentFailed),
+                description = getString(R.string.msgPaymentFailedDescription),
+                amountLabel = getString(R.string.labelAmountFailed),
+                statusColorRes = R.color.colorStatusFailed,
+                gifRes = R.drawable.gif_rejected
+            )
+
+            STATUS_AUTO_REFUNDED -> StatusDisplay(
+                label = getString(R.string.msgAmountRefunded),
+                description = getString(R.string.msgPaymentRefundedDescription),
+                amountLabel = getString(R.string.labelAmountRefunded),
+                statusColorRes = R.color.colorStatusFailed,
+                gifRes = R.drawable.gif_rejected
+            )
+
+            else -> StatusDisplay(
+                label = getString(R.string.msgPaymentPending),
+                description = getString(R.string.msgPaymentPendingDescription),
+                amountLabel = getString(R.string.labelAmountPending),
+                statusColorRes = R.color.colorStatusPending,
+                gifRes = R.drawable.gif_pending
+            )
         }
     }
 
-    private fun startCountdown() {
-        countdownSeconds = COUNTDOWN_START
-        isCountdownCancelled = false
-        countdownHandler.post(countdownRunnable)
+    private fun loadGif(@DrawableRes gifRes: Int) {
+        Glide.with(mActivity)
+            .asGif()
+            .load(gifRes)
+            .listener(object : RequestListener<GifDrawable> {
+                override fun onLoadFailed(
+                    p0: GlideException?,
+                    p1: Any?,
+                    p2: Target<GifDrawable?>,
+                    p3: Boolean
+                ): Boolean = false
+
+                override fun onResourceReady(
+                    resource: GifDrawable,
+                    model: Any,
+                    target: Target<GifDrawable>?,
+                    dataSource: DataSource,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    resource.setLoopCount(1)
+                    return false
+                }
+            })
+            .into(binding.ivGif)
+    }
+
+    private fun copyOrderId() {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("order_id", orderId))
+        ToastUtil.showSuccess(mActivity, getString(R.string.msgOrderIdCopied))
     }
 
     private fun goToWallet() {
-        val intent = Intent(this, LoadWalletActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra(Constant.EXTRA_FROM_PAYMENT, true)
-        }
-        startActivity(intent)
-        finish()
-    }
-
-    private fun recheckStatus() {
-        viewModel.recheckStatus(
-            orderId   = orderId,
-            onLoading = { showProgressCheck.set(true) },
-            onSuccess = { orderItem ->
-                showProgressCheck.set(false)
-                populateStatus(orderItem.status ?: statusStr)
-            },
-            onError   = { msg ->
-                showProgressCheck.set(false)
-                ToastUtil.showDelete(mActivity, msg)
+        if (isNavigating) return
+        isNavigating = true
+        autoFinishHandler.removeCallbacksAndMessages(null)
+        startActivity(
+            Intent(this, LoadWalletActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                putExtra(Constant.EXTRA_FROM_PAYMENT, true)
             }
         )
+        finish()
     }
 
     private fun onBack() {
@@ -174,16 +220,9 @@ class PaymentStatusActivity : BaseActivity() {
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->
             when (view) {
-                binding.btnContinue -> {
+                binding.ivCopyOrderId -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    isCountdownCancelled = true
-                    countdownHandler.removeCallbacks(countdownRunnable)
-                    goToWallet()
-                }
-                binding.btnCheckStatus -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    if (showProgressCheck.get()) return@OnClickListener
-                    recheckStatus()
+                    copyOrderId()
                 }
             }
         }

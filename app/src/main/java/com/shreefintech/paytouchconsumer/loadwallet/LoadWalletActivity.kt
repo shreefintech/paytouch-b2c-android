@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -43,14 +42,6 @@ class LoadWalletActivity : BaseActivity() {
     private lateinit var sheetBehavior: BottomSheetBehavior<View>
 
     private val showProgressPay = ObservableBoolean(false)
-    private var pendingOrderId: String? = null
-
-    private val hdfcLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        val orderId = pendingOrderId ?: return@registerForActivityResult
-        checkOrderStatus(orderId)
-    }
 
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
@@ -74,7 +65,12 @@ class LoadWalletActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
-            binding.incPaymentSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
+            binding.incPaymentSheet.root.setPadding(
+                0,
+                0,
+                0,
+                maxOf(imeInsets.bottom, systemBars.bottom)
+            )
             insets
         }
 
@@ -111,7 +107,10 @@ class LoadWalletActivity : BaseActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (intent.getBooleanExtra(Constant.EXTRA_FROM_PAYMENT, false)) {
+            Utility.hideKeyboard(mActivity)
             if (isPaymentSheetVisible()) hidePaymentSheet()
+            sheetBinding.etAmount.clearFocus()
+            sheetBinding.etDescription.clearFocus()
             sheetBinding.etAmount.setText("")
             sheetBinding.etDescription.setText("")
             fetchWalletData()
@@ -146,56 +145,50 @@ class LoadWalletActivity : BaseActivity() {
         val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
         val description = sheetBinding.etDescription.text?.toString()?.trim() ?: ""
         if (amountStr.isEmpty()) {
-            ToastUtil.showDelete(mActivity, getString(R.string.hintEnterAmount))
+            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
             return
         }
         val amount = amountStr.toDoubleOrNull()
         if (amount == null || amount <= 0) {
-            ToastUtil.showDelete(mActivity, getString(R.string.hintEnterAmount))
+            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
             return
         }
-        Utility.hideKeyboard(mActivity)
+
         viewModel.createHdfcOrder(
             amount = amount,
             description = description,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { orderItem ->
+            onSuccess = { data ->
                 showProgressPay.set(false)
-                pendingOrderId = orderItem.orderId
-                val payUrl = orderItem.paymentLinks?.web ?: ""
-                val returnUrl = orderItem.returnUrl ?: ""
-                hidePaymentSheet()
-                hdfcLauncher.launch(
-                    HdfcWebViewActivity.newIntent(mActivity, payUrl, returnUrl)
-                )
-            },
-            onError = { msg ->
-                showProgressPay.set(false)
-                ToastUtil.showDelete(mActivity, msg)
-            }
-        )
-    }
-
-    private fun checkOrderStatus(orderId: String) {
-        showLoading()
-        viewModel.checkHdfcOrderStatus(
-            orderId = orderId,
-            onLoading = {},
-            onSuccess = { orderItem ->
-                hideLoading()
-                pendingOrderId = null
-                PaymentStatusActivity.start(
-                    context = mActivity,
-                    item = PaymentStatusItem(
-                        orderId = orderItem.orderId ?: orderId,
-                        amount  = orderItem.amount ?: "",
-                        status  = orderItem.status ?: ""
+                val status = data.status?.uppercase().orEmpty()
+                if (HdfcPaymentHelper.isFailedStatus(status)) {
+                    PaymentStatusActivity.start(
+                        mActivity,
+                        PaymentStatusItem(
+                            orderId = data.orderId ?: "",
+                            amount  = data.amount ?: "",
+                            status  = data.status ?: "NEW"
+                        )
                     )
+                    return@createHdfcOrder
+                }
+                val payUrl = data.paymentLinks?.web.orEmpty()
+                if (payUrl.isEmpty()) {
+                    ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                    return@createHdfcOrder
+                }
+                Utility.hideKeyboard(mActivity)
+                hidePaymentSheet()
+                HdfcPaymentHelper.launchPayment(
+                    context   = mActivity,
+                    orderId   = data.orderId ?: "",
+                    amount    = data.amount ?: "",
+                    payUrl    = payUrl,
+                    returnUrl = data.returnUrl ?: ""
                 )
             },
             onError = { msg ->
-                hideLoading()
-                pendingOrderId = null
+                showProgressPay.set(false)
                 ToastUtil.showDelete(mActivity, msg)
             }
         )
@@ -232,15 +225,11 @@ class LoadWalletActivity : BaseActivity() {
     private fun fetchRecentHistory() {
         viewModel.fetchRecentHistory(
             onSuccess = { list ->
-                transactionList.clear()
-                transactionList.addAll(list)
-                transactionAdp.notifyDataSetChanged()
+                transactionAdp.updateList(list)
                 updateEmptyState()
             },
-            onError = {
-                // Intentionally silent: fetchUserWalletData always runs first and shows its own
-                // error toast. Recent history is supplementary display only.
-                // TODO(B2C-82): show history error independently if the two calls are ever decoupled
+            onError = { msg ->
+                ToastUtil.showDelete(mActivity, msg)
             }
         )
     }
@@ -260,7 +249,7 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
-        binding.tvQrInvoiceAmount.text = data.vpa ?: "--"
+        binding.tvQrInvoiceAmount.text = Utility.formatAmount(data.liveBankBalance)
         binding.tvIfscCode.text = data.ifsc ?: "--"
         val status = data.wallet?.status
         if (!status.isNullOrEmpty()) {

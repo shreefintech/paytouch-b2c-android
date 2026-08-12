@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.dth.transactions
+package com.shreefintech.paytouchconsumer.dth.transactions
 
 import android.Manifest
 import android.content.Context

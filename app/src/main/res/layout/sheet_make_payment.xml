@@ -97,6 +97,7 @@
                     android:fontFamily="@font/proza_libre_regular"
                     android:hint="@string/hintEnterAmount"
                     android:inputType="numberDecimal"
+                    android:imeOptions="actionNext"
                     android:paddingHorizontal="@dimen/margin_large"
                     android:singleLine="true"
                     android:textColor="@color/primary"
@@ -146,6 +147,7 @@
                     android:hint="@string/hintPaymentDescription"
                     android:paddingHorizontal="@dimen/margin_large"
                     android:singleLine="true"
+                    android:imeOptions="actionDone"
                     android:textColor="@color/primary"
                     android:textColorHint="?attr/colorTextHint"
                     android:textSize="@dimen/text_size_13" />
@@ -165,6 +167,7 @@
             app:cardBackgroundColor="@color/primary"
             app:cardCornerRadius="@dimen/card_corner_radius"
             app:cardElevation="0dp"
+            app:strokeWidth="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/dummyView"
             app:layout_constraintStart_toStartOf="@id/dummyView"

@@ -96,9 +96,7 @@ class WalletTransactionsActivity : BaseActivity() {
             onSuccess = { list ->
                 if (page == 1) {
                     showShimmer(false)
-                    transactionList.clear()
-                    transactionList.addAll(list)
-                    transactionAdp.notifyDataSetChanged()
+                    transactionAdp.updateList(list)
                 } else {
                     showFooterLoader(false)
                     val insertStart = transactionList.size

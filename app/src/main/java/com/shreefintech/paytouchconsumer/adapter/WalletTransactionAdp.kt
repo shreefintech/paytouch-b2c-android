@@ -31,7 +31,7 @@ class WalletTransactionAdp(
             tvDate.text = item.date
             if (item.isCredit) {
                 cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_success)
-                ivIcon.setImageResource(R.drawable.ic_creadit)
+                ivIcon.setImageResource(R.drawable.ic_credit)
                 tvAmount.text = root.context.getString(R.string.textCreditSign, item.amount)
                 tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_success))
             } else {
@@ -41,6 +41,12 @@ class WalletTransactionAdp(
                 tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_reject))
             }
         }
+    }
+
+    fun updateList(items: List<WalletTransactionItem>) {
+        mArrayList.clear()
+        mArrayList.addAll(items)
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = mArrayList.size

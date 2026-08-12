@@ -3,13 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="android.view.View" />
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
-        <variable
-            name="showProgressCheck"
-            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,191 +14,227 @@
         android:layout_height="match_parent"
         android:background="@drawable/img_screen_bg">
 
-        <!-- Status icon circle -->
-        <FrameLayout
-            android:id="@+id/flStatusIcon"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_marginTop="64dp"
-            android:background="@drawable/bg_payment_status_icon"
+        <!-- ── Toolbar: PayTouch logo ── -->
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ivStatusIcon"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_success"
-                android:tint="@color/white" />
+        <!-- ── Bharat Connect logo (top-right, as-is) ── -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivBharatConnect"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:src="@drawable/img_bharat_connect"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar" />
 
-        </FrameLayout>
+        <!-- ── GIF ── -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivGif"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/tvStatusLabel"
+            app:layout_constraintTop_toBottomOf="@id/ivBharatConnect" />
 
-        <!-- Status label -->
+        <!-- ── Status title (color set programmatically) ── -->
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvStatusLabel"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginBottom="@dimen/margin_medium"
             android:fontFamily="@font/proza_libre_bold"
+            android:gravity="center"
             android:includeFontPadding="false"
             android:textColor="@color/black"
-            android:textSize="@dimen/text_size_18"
+            android:textSize="@dimen/text_size_20"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/flStatusIcon" />
+            app:layout_constraintBottom_toTopOf="@id/tvStatusDescription" />
 
-        <!-- Order ID row -->
-        <LinearLayout
-            android:id="@+id/llOrderId"
+        <!-- ── Status description ── -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvStatusDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/page_margin_horizontal"
-            android:layout_marginTop="@dimen/margin_extra_large"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_regular"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_13"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvStatusLabel">
+            app:layout_constraintBottom_toTopOf="@id/cvDetails"/>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/proza_libre_semi_bold"
-                android:includeFontPadding="false"
-                android:text="@string/labelOrderId"
-                android:textColor="@color/sub_text_color"
-                android:textSize="@dimen/text_size_13" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvOrderId"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/proza_libre_medium"
-                android:includeFontPadding="false"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_13" />
-
-        </LinearLayout>
-
-        <!-- Amount row -->
-        <LinearLayout
-            android:id="@+id/llAmount"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/llOrderId">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/proza_libre_semi_bold"
-                android:includeFontPadding="false"
-                android:text="@string/labelAmount"
-                android:textColor="@color/sub_text_color"
-                android:textSize="@dimen/text_size_13" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/proza_libre_bold"
-                android:includeFontPadding="false"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_14" />
-
-        </LinearLayout>
-
-        <!-- Check Payment Status button -->
+        <!-- ── Details card ── -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnCheckStatus"
+            android:id="@+id/cvDetails"
             android:layout_width="0dp"
-            android:layout_height="@dimen/btn_height"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/page_margin_horizontal"
-            android:layout_marginTop="@dimen/margin_extra_large"
-            android:onClickListener="@{onClickListener}"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="@dimen/card_corner_radius"
-            app:cardElevation="0dp"
-            app:layout_constraintBottom_toTopOf="@id/btnContinue"
+            android:layout_marginBottom="@dimen/margin_xlarge"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="@dimen/normal_card_radius"
+            app:cardElevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/llAmount"
-            app:layout_constraintVertical_chainStyle="packed"
-            app:strokeColor="@color/primary"
-            app:strokeWidth="1dp">
+            app:layout_constraintBottom_toTopOf="@id/divider">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/margin_extra_large"
+                android:paddingVertical="@dimen/margin_large">
 
+                <!-- Amount label (small, gray, center) -->
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tvAmountLabel"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:gravity="center"
                     android:includeFontPadding="false"
-                    android:text="@string/btnCheckPaymentStatus"
-                    android:textColor="@color/primary"
-                    android:textSize="@dimen/text_size_14"
-                    android:visibility="@{showProgressCheck ? View.GONE : View.VISIBLE}" />
+                    android:textColor="@color/sub_text_color"
+                    android:textSize="@dimen/text_size_13" />
 
-                <ProgressBar
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:indeterminateTint="@color/primary"
-                    android:visibility="@{showProgressCheck ? View.VISIBLE : View.GONE}" />
+                <!-- Amount value (large, bold — color set programmatically) -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="@dimen/margin_medium"
+                    android:background="@color/sheet_divider" />
+
+                <!-- Order ID row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:includeFontPadding="false"
+                        android:text="@string/labelOrderId"
+                        android:textColor="@color/sub_text_color"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvOrderId"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_small"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivCopyOrderId"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="@dimen/margin_small"
+                        android:onClickListener="@{onClickListener}"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_copy"
+                        app:tint="@color/black" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Continue countdown button -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnContinue"
+        <!-- Divider -->
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="@dimen/margin_xlarge"
+            android:background="@color/status_divider"
+            android:layout_marginHorizontal="@dimen/margin_xlarge"
+            app:layout_constraintBottom_toTopOf="@id/cvFooter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
+        <!-- ── Powered by footer bar (pinned to bottom) ── -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvFooter"
             android:layout_width="0dp"
-            android:layout_height="@dimen/btn_height"
-            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:layout_marginBottom="@dimen/margin_extra_large"
-            android:onClickListener="@{onClickListener}"
-            app:cardBackgroundColor="@color/primary"
+            android:layout_height="wrap_content"
             app:cardCornerRadius="@dimen/card_corner_radius"
             app:cardElevation="0dp"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginBottom="@dimen/margin_xxlarge"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnCheckStatus">
+            app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
+                android:id="@+id/llFooter"
+                android:background="@drawable/bg_account_profile_card"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:paddingTop="@dimen/margin_large"
+                android:paddingBottom="@dimen/margin_large">
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tvContinue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/proza_libre_bold"
                     android:includeFontPadding="false"
-                    android:text="@string/btnContinue"
+                    android:text="@string/msgPoweredBy"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_14" />
+                    android:textSize="@dimen/text_size_13" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/proza_libre_regular"
+                    android:includeFontPadding="false"
+                    android:text="@string/textRajkotGujarat"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_11" />
 
             </LinearLayout>
 
-        </com.google.android.material.card.MaterialCardView>
+        </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

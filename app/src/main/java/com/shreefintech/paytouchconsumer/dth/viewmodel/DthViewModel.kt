@@ -90,7 +90,7 @@ class DthViewModel(application: Application) : BaseBillViewModel(application) {
             DthProcessPaymentRequest(
                 cn     = mobileNo,
                 op     = operatorId,
-                amount = amount.toInt().toString()
+                amount = "%.2f".format(amount)
             )
         ).enqueue(object : Callback<DthPaymentItem> {
             override fun onResponse(call: Call<DthPaymentItem>, response: Response<DthPaymentItem>) {
