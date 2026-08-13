@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
@@ -19,12 +21,15 @@ import com.shreefintech.paytouchconsumer.loadwallet.LoadWalletActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.visible
 
 class HomeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHomeBinding
+    private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,9 +50,9 @@ class HomeActivity : BaseActivity() {
             blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
+        binding.lytToolbar.ivLogout.visible()
         binding.onClickListener = onClickListener()
-        // TODO(PAYTOUCH-585): Fetch shreefintech token from api/shreefintech-token and store in SharedPreferences
-        // TODO(PAYTOUCH-585): Fetch and display wallet balance from api/wallet/balance
+        binding.lytToolbar.onClickListener = onClickListener()
         onBack()
     }
 
@@ -63,9 +68,21 @@ class HomeActivity : BaseActivity() {
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->
             when (view) {
-                binding.lytToolbar.ivBack -> {
+                binding.lytToolbar.ivLogout -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    onBackPressedDispatcher.onBackPressed()
+                    viewModel.logout(
+                        onLoading = { binding.lytToolbar.ivLogout.isEnabled = false },
+                        onComplete = {
+                            SharedPreferenceHelper.clearSharedPreference(mActivity)
+                            startActivity(Intent(mActivity, LoginActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            })
+                        },
+                        onError = { msg ->
+                            binding.lytToolbar.ivLogout.isEnabled = true
+                            ToastUtil.showDelete(mActivity, msg)
+                        }
+                    )
                 }
 
                 binding.llElectricity -> {

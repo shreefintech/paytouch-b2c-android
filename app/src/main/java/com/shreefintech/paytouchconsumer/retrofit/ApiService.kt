@@ -114,6 +114,11 @@ interface ApiService {
         @Header("Authorization") authorization: String
     ): Call<UserProfileItem>
 
+    @POST("${AUTH}logout")
+    fun logout(
+        @Header("Authorization") authorization: String
+    ): Call<MessageItem>
+
     // ── Authentication ────────────────────────────────────────────────────────
 
     @FormUrlEncoded
