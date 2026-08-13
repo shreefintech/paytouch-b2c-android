@@ -261,7 +261,7 @@ class LoginActivity : BaseActivity() {
     private fun navigateAfterLogin(data: LoginItem?) {
         val intent = when {
             data?.requiresKyc == true            -> Intent(mActivity, KycActivity::class.java)
-            data?.requiresMpin == true           -> Intent(mActivity, ResetMpinActivity::class.java)
+            data?.requiresMpin == true           -> ResetMpinActivity.buildCreateIntent(mActivity)
             data?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)
             else                                 -> Intent(mActivity, HomeActivity::class.java)
         }

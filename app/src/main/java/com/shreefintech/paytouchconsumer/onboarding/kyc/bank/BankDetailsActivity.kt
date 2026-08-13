@@ -23,6 +23,8 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityBankDetailsBinding
 import com.shreefintech.paytouchconsumer.databinding.ItemBankAccountBinding
+import com.shreefintech.paytouchconsumer.enums.ProofType
+import com.shreefintech.paytouchconsumer.enums.StatementPeriod
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -46,10 +48,9 @@ class BankDetailsActivity : BaseActivity() {
     private var activeCardIndex = -1
 
     private val bankCardBindings = mutableListOf<ItemBankAccountBinding>()
-    private val proofTypes = mutableListOf<String?>()
+    private val proofTypes = mutableListOf<ProofType?>()
+    private val statementPeriods = mutableListOf<StatementPeriod?>()
     private val proofUris = mutableListOf<Uri?>()
-
-    private val proofTypeList = listOf("Cancelled Cheque", "Bank Statement")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,6 +109,7 @@ class BankDetailsActivity : BaseActivity() {
         val index = bankCardBindings.size
         bankCardBindings.add(card)
         proofTypes.add(null)
+        statementPeriods.add(null)
         proofUris.add(null)
 
         card.flUpload1.attach(card.root as ViewGroup)
@@ -124,6 +126,11 @@ class BankDetailsActivity : BaseActivity() {
         card.flProofTypeAnchor.setOnClickListener {
             if (Utility.stopClick()) return@setOnClickListener
             showProofTypeDropdown(card)
+        }
+
+        card.flStatementPeriodAnchor.setOnClickListener {
+            if (Utility.stopClick()) return@setOnClickListener
+            showStatementPeriodDropdown(card)
         }
 
         val openPicker = View.OnClickListener {
@@ -161,6 +168,7 @@ class BankDetailsActivity : BaseActivity() {
         binding.llBankContainer.removeView(card.root)
         bankCardBindings.removeAt(index)
         proofTypes.removeAt(index)
+        statementPeriods.removeAt(index)
         proofUris.removeAt(index)
 
         bankCardBindings.forEachIndexed { i, b -> b.tvCardTitle.text = getString(R.string.fmtBankAccountTitle, i + 1) }
@@ -192,8 +200,32 @@ class BankDetailsActivity : BaseActivity() {
             anchorView = card.flProofTypeAnchor,
             arrowView  = card.ivProofTypeArrow,
             textView   = card.tvProofType,
-            items      = proofTypeList
-        ) { selected, _ -> proofTypes[bankCardBindings.indexOf(card)] = selected }
+            items      = ProofType.entries.map { it.displayName }
+        ) { _, position ->
+            val selected = ProofType.entries[position]
+            val index = bankCardBindings.indexOf(card)
+            proofTypes[index] = selected
+            if (selected == ProofType.BANK_STATEMENT) {
+                card.llStatementPeriod.visibility = View.VISIBLE
+            } else {
+                card.llStatementPeriod.visibility = View.GONE
+                card.tvStatementPeriod.text = null
+                statementPeriods[index] = null
+            }
+        }
+    }
+
+    private fun showStatementPeriodDropdown(card: ItemBankAccountBinding) {
+        Utility.hideKeyboard(binding.clRoot)
+        CustomDropdown.showDropdown(
+            activity   = mActivity,
+            anchorView = card.flStatementPeriodAnchor,
+            arrowView  = card.ivStatementPeriodArrow,
+            textView   = card.tvStatementPeriod,
+            items      = StatementPeriod.entries.map { it.displayName }
+        ) { _, position ->
+            statementPeriods[bankCardBindings.indexOf(card)] = StatementPeriod.entries[position]
+        }
     }
 
     // ─── Bank proof upload ────────────────────────────────────────────────────
@@ -272,7 +304,8 @@ class BankDetailsActivity : BaseActivity() {
             ifsc.isEmpty()                     -> { card.etIfscCode.requestFocus(); getString(R.string.msgIfscEmpty) }
             !IFSC_REGEX.matches(ifsc)          -> { card.etIfscCode.requestFocus(); getString(R.string.msgIfscInvalid) }
             branchName.isEmpty()               -> { card.etBranchName.requestFocus(); getString(R.string.msgBranchNameEmpty) }
-            proofTypes[index].isNullOrEmpty()  -> getString(R.string.msgProofTypeEmpty, index + 1)
+            proofTypes[index] == null          -> getString(R.string.msgProofTypeEmpty, index + 1)
+            proofTypes[index] == ProofType.BANK_STATEMENT && statementPeriods[index] == null -> getString(R.string.msgStatementPeriodRequired, index + 1)
             proofUris[index] == null           -> getString(R.string.msgBankProofRequired, index + 1)
             else -> null
         }
@@ -287,12 +320,13 @@ class BankDetailsActivity : BaseActivity() {
 
         val accounts = bankCardBindings.mapIndexed { index, card ->
             BankAccountInput(
-                accountNumber = card.etAccountNumber.text?.toString()?.trim() ?: "",
-                bankName      = card.etBankName.text?.toString()?.trim()      ?: "",
-                ifscCode      = card.etIfscCode.text?.toString()?.trim()      ?: "",
-                branchName    = card.etBranchName.text?.toString()?.trim()   ?: "",
-                proofType     = proofTypes[index] ?: "",
-                proofUri      = proofUris[index] ?: return
+                accountNumber   = card.etAccountNumber.text?.toString()?.trim() ?: "",
+                bankName        = card.etBankName.text?.toString()?.trim()      ?: "",
+                ifscCode        = card.etIfscCode.text?.toString()?.trim()      ?: "",
+                branchName      = card.etBranchName.text?.toString()?.trim()    ?: "",
+                proofType       = proofTypes[index]?.apiValue                   ?: "",
+                proofUri        = proofUris[index]                              ?: return,
+                statementPeriod = statementPeriods[index]
             )
         }
 

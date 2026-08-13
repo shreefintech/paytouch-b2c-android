@@ -76,48 +76,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <!-- Previous -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="@dimen/button_height"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="@dimen/button_corner_radius"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/primary"
-                app:strokeWidth="1.5dp">
-
-                <LinearLayout
-                    android:id="@+id/btnPrevious"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?selectableItemBackground"
-                    android:gravity="center"
-                    android:onClickListener="@{onClickListener}">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/proza_libre_semi_bold"
-                        android:includeFontPadding="false"
-                        android:text="@string/btnPrevious"
-                        android:textColor="@color/primary"
-                        android:textSize="@dimen/text_size_14" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <View
-                android:layout_width="@dimen/margin_medium"
-                android:layout_height="1dp" />
-
             <!-- Continue / Submit -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="@dimen/button_height"
-                android:layout_weight="1"
                 app:strokeWidth="0dp"
                 app:cardBackgroundColor="@color/primary"
                 app:cardCornerRadius="@dimen/button_corner_radius"

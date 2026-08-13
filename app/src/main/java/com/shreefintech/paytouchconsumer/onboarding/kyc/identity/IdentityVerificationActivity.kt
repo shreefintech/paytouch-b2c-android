@@ -1,5 +1,9 @@
 package com.shreefintech.paytouchconsumer.onboarding.kyc.identity
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -15,6 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
+import java.io.ByteArrayOutputStream
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityIdentityVerificationBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -50,12 +55,20 @@ class IdentityVerificationActivity : BaseActivity() {
     private var onDocumentPicked: ((Uri) -> Unit)? = null
 
     // ─── Selfie capture via system camera ──────────────────────────────────────
+    private var cameraOutputFile: File? = null
     private var cameraOutputUri: Uri? = null
     private var onSelfieCaptured: ((Uri) -> Unit)? = null
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        val file = cameraOutputFile
         val uri = cameraOutputUri
-        if (success && uri != null) onSelfieCaptured?.invoke(uri)
+        val callback = onSelfieCaptured
         onSelfieCaptured = null
+        if (success && file != null && uri != null && callback != null) {
+            Thread {
+                compressIfNeeded(file)
+                runOnUiThread { callback(uri) }
+            }.start()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -179,10 +192,46 @@ class IdentityVerificationActivity : BaseActivity() {
         val dir = File(cacheDir, "kyc").also { it.mkdirs() }
         val file = File(dir, "selfie_${System.currentTimeMillis()}.jpg")
         val uri = FileProvider.getUriForFile(mActivity, "${mActivity.packageName}.fileprovider", file)
+        cameraOutputFile = file
         cameraOutputUri = uri
         onSelfieCaptured = onCaptured
         cameraLauncher.launch(uri)
     }
+
+    private fun compressIfNeeded(file: File) {
+        val maxBytes = 2 * 1024 * 1024
+        val needsCompress = file.length() > maxBytes
+        val rotation = exifRotation(file.absolutePath)
+        if (!needsCompress && rotation == 0) return
+
+        val raw = BitmapFactory.decodeFile(file.absolutePath) ?: return
+        val bitmap = if (rotation != 0) {
+            Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
+                .also { if (it !== raw) raw.recycle() }
+        } else raw
+
+        var quality = if (needsCompress) 85 else 95
+        while (true) {
+            val bos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
+            val bytes = bos.toByteArray()
+            if (bytes.size <= maxBytes || quality == 40) {
+                file.writeBytes(bytes)
+                break
+            }
+            quality -= 15
+        }
+        bitmap.recycle()
+    }
+
+    private fun exifRotation(path: String): Int = try {
+        when (ExifInterface(path).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+            ExifInterface.ORIENTATION_ROTATE_90  -> 90
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270
+            else -> 0
+        }
+    } catch (e: Exception) { 0 }
 
     // ─── Navigation ─────────────────────────────────────────────────────────────
 
@@ -220,7 +269,7 @@ class IdentityVerificationActivity : BaseActivity() {
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->
             when (view) {
-                binding.btnPrevious -> {
+                binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }

@@ -1,7 +1,6 @@
 package com.shreefintech.paytouchconsumer.onboarding.kyc
 
 import android.app.Application
-import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
@@ -14,13 +13,10 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.ByteArrayOutputStream
 
 class KycViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -105,14 +101,9 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
             })
     }
 
-    // TODO(PAYTOUCH-KYC): Dashboard rejects an empty `documents` array over multipart — remove this placeholder once fixed.
     private fun submitSectionAPlaceholder(onReady: () -> Unit, onError: (String) -> Unit) {
-        val hasGstBody       = "0".toRequestBody(textMediaType)
-        val documentTypeBody = "gst".toRequestBody(textMediaType)
-        val documentPart     = MultipartBody.Part.createFormData(
-            "documents[0][file]", "gst_placeholder.jpg", placeholderDocumentBody()
-        )
-        ApiClient.apiService.submitKycSectionA(bearerToken(), hasGstBody, documentTypeBody, documentPart)
+        val hasGstBody = "0".toRequestBody(textMediaType)
+        ApiClient.apiService.submitKycSectionA(bearerToken(), hasGstBody)
             .enqueue(object : Callback<General<KycSubmissionDataItem>> {
                 override fun onResponse(
                     call: Call<General<KycSubmissionDataItem>>,
@@ -178,11 +169,4 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
             })
     }
 
-    private fun placeholderDocumentBody(): RequestBody {
-        val bitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
-        val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-        bitmap.recycle()
-        return stream.toByteArray().toRequestBody("image/jpeg".toMediaTypeOrNull())
-    }
 }

@@ -70,9 +70,12 @@
     <string name="msgPasswordWeak">Password must include uppercase, number, and special character</string>
     <string name="msgConfirmNewPasswordEmpty">Please confirm your new password</string>
 
-    <!-- Reset MPIN screen -->
+    <!-- Reset / Create MPIN screen -->
     <string name="titleResetMpin">Reset MPIN</string>
     <string name="subtitleResetMpin">Set a new MPIN to keep your account secure</string>
+    <string name="titleCreateMpin">Create MPIN</string>
+    <string name="subtitleCreateMpin">Set an MPIN to secure your account</string>
+    <string name="btnCreateMpin">Create MPIN</string>
     <string name="msgMpinRules">MPIN must be a 4-digit number and shouldn\'t match your birth year or repeat the same digit</string>
     <string name="labelNewMpin">New MPIN</string>
     <string name="labelConfirmMpin">Confirm MPIN</string>
@@ -111,8 +114,8 @@
 
     <!-- Common error messages — msgNoInternet and errGeneric are declared above; no duplicates here -->
 
-    <string name="msgOnlyPdfJpgJpegAllowed">Only PDF, JPG, JPEG, PNG allowed.</string>
-    <string name="msgFileExceeds2mbLimit">File exceeds 5MB limit.</string>
+    <string name="msgOnlyPdfJpgJpegAllowed">Only PDF, JPG, JPEG allowed.</string>
+    <string name="msgFileExceeds2mbLimit">File exceeds 2MB limit.</string>
     <string name="msgUnableToReadFileTryAgain">Unable to read file. Try again.</string>
 
     <!-- Create Virtual Account screen -->
@@ -516,6 +519,9 @@
     <string name="msgAgreeTAndCRequired">Please agree to the Terms &amp; Conditions</string>
     <string name="msgProofTypeEmpty">Please select proof type for account %d</string>
     <string name="msgBankProofRequired">Please upload bank proof for account %d</string>
+    <string name="labelStatementPeriod">Statement Period</string>
+    <string name="hintStatementPeriod">Select Statement Period</string>
+    <string name="msgStatementPeriodRequired">Please select statement period for account %d</string>
     <string name="textVerificationPending">Verification Pending</string>
     <string name="msgVerificationPending">Your KYC is under review. We\'ll notify you once it\'s approved.</string>
     <string name="textVerificationApproved">Verification Approved</string>

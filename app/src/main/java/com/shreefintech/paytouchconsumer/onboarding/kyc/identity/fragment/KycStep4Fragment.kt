@@ -41,19 +41,28 @@ class KycStep4Fragment : BaseKycStepFragment() {
         attachEditDeleteGlass(binding.flDelete1)
         viewModel.selfieUri?.let { showPreview(it) }
 
-        binding.btnCapture.setOnClickListener { capture() }
-        binding.ivEditProof1.setOnClickListener { capture() }
-        binding.ivDeleteProof1.setOnClickListener { clearSelfie() }
+        binding.btnCapture.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            capture()
+        }
+        binding.ivEditProof1.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            capture()
+        }
+        binding.ivDeleteProof1.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            clearSelfie()
+        }
     }
 
     private fun attachEditDeleteGlass(targetView: View) {
         LiquidGlassEffect.attach(
-            targetView   = targetView,
-            rootView     = binding.root as ViewGroup,
+            targetView = targetView,
+            rootView = binding.root as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.filter_btn_radius),
-            distortion   = 0f,
-            blur         = resources.getDimensionPixelSize(R.dimen.filter_btn_blure),
-            tintColor    = ContextCompat.getColor(requireContext(), R.color.filter_bg)
+            distortion = 0f,
+            blur = resources.getDimensionPixelSize(R.dimen.filter_btn_blure),
+            tintColor = ContextCompat.getColor(requireContext(), R.color.filter_bg)
         )
     }
 
@@ -71,8 +80,8 @@ class KycStep4Fragment : BaseKycStepFragment() {
         val ctx = context ?: return
         Glide.with(ctx).clear(binding.ivSelfiePreview)
         binding.mcvSelfiePreview.visibility = View.GONE
-        binding.llSelfieActions.visibility  = View.GONE
-        binding.ivSelfieGuide.visibility    = View.VISIBLE
+        binding.llSelfieActions.visibility = View.GONE
+        binding.ivSelfieGuide.visibility = View.VISIBLE
     }
 
     private fun showPreview(uri: Uri) {
@@ -83,7 +92,10 @@ class KycStep4Fragment : BaseKycStepFragment() {
             .load(uri)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
-                    e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>,
+                    isFirstResource: Boolean
                 ): Boolean = false
 
                 override fun onResourceReady(
@@ -94,7 +106,7 @@ class KycStep4Fragment : BaseKycStepFragment() {
             .into(binding.ivSelfiePreview)
 
         binding.mcvSelfiePreview.visibility = View.VISIBLE
-        binding.llSelfieActions.visibility  = View.VISIBLE
+        binding.llSelfieActions.visibility = View.VISIBLE
     }
 
     override fun validate(): Boolean {
