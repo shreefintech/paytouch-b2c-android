@@ -16,6 +16,7 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityKycBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.onboarding.kyc.bank.BankDetailsActivity
 import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.IdentityVerificationActivity
+import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -116,14 +117,23 @@ class KycActivity : BaseActivity() {
     }
 
     private fun applyStatus(statusItem: KycStatusItem) {
-        identityDone = statusItem.submission?.sectionBSubmittedAt != null
-        bankDone     = statusItem.submission?.sectionCSubmittedAt != null
+        val sub = statusItem.submission
+        if (KycSubmissionStatus.from(sub?.status) == KycSubmissionStatus.KYC_SUBMITTED &&
+            sub?.sectionASubmittedAt != null &&
+            sub.sectionBSubmittedAt != null &&
+            sub.sectionCSubmittedAt != null) {
+            KycStatusActivity.start(mActivity, statusItem)
+            finish()
+            return
+        }
+        identityDone = sub?.sectionBSubmittedAt != null
+        bankDone     = sub?.sectionCSubmittedAt != null
         updateSectionIcons(statusItem)
         updateProgress()
     }
 
     private fun updateSectionIcons(statusItem: KycStatusItem) {
-        val isRejected = statusItem.submission?.status?.contains("reject") == true
+        val isRejected = KycSubmissionStatus.from(statusItem.submission?.status) == KycSubmissionStatus.KYC_REJECTED
 
         // Identity card icon — driven by section B
         when {
