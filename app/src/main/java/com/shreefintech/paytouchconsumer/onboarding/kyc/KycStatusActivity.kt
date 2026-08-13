@@ -6,9 +6,16 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
@@ -92,17 +99,37 @@ class KycStatusActivity : BaseActivity() {
     }
 
     private fun showPending() {
-        binding.iv1.setImageResource(R.drawable.img_kyc_pending)
+        loadGif(R.drawable.gif_kyc_pending)
         binding.tvTitle1.text = getString(R.string.textVerificationPending)
         binding.tvDes.text = getString(R.string.msgVerificationPending)
         binding.cvRetry.visibility = View.GONE
     }
 
     private fun showRejected() {
-        binding.iv1.setImageResource(R.drawable.img_kyc_rejected)
+        loadGif(R.drawable.gif_kyc_rejected)
         binding.tvTitle1.text = getString(R.string.textVerificationRejected)
         binding.tvDes.text = getString(R.string.msgVerificationRejected)
         binding.cvRetry.visibility = View.VISIBLE
+    }
+
+    private fun loadGif(@DrawableRes res: Int) {
+        Glide.with(this)
+            .asGif()
+            .load(res)
+            .listener(object : RequestListener<GifDrawable> {
+                override fun onResourceReady(
+                    resource: GifDrawable, model: Any, target: Target<GifDrawable>?,
+                    dataSource: DataSource, isFirstResource: Boolean
+                ): Boolean {
+                    resource.setLoopCount(1)
+                    return false
+                }
+                override fun onLoadFailed(
+                    e: GlideException?, model: Any?, target: Target<GifDrawable>,
+                    isFirstResource: Boolean
+                ) = false
+            })
+            .into(binding.iv1)
     }
 
     private fun navigateToLogin() {
