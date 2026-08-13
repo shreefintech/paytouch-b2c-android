@@ -483,4 +483,12 @@
     <string name="textRajkotGujarat">Rajkot, Gujarat</string>
     <string name="msgOrderIdCopied">Order ID copied</string>
 
+    <!-- Confirm Payment dialog -->
+    <string name="titleAddMoney">Add Money</string>
+    <string name="subtitleAddMoneyToWallet">Add money to your wallet</string>
+    <string name="titleConfirmPayment">Confirm Payment</string>
+    <string name="labelAvailableBalance">Available Balance:</string>
+    <string name="msgSecurePaymentProcessedBy">Secure Payment Processed By</string>
+    <string name="btnPaySecurely">Pay Securely</string>
+
 </resources>
