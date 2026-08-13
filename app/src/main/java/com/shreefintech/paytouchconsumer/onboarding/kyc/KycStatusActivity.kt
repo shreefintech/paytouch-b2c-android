@@ -25,6 +25,7 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityKycStatusBinding
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.gone
 
 class KycStatusActivity : BaseActivity() {
 
@@ -58,10 +59,11 @@ class KycStatusActivity : BaseActivity() {
             insets
         }
 
+
         binding.swipeRefresh.setColorSchemeColors(ContextCompat.getColor(mActivity, R.color.primary))
         binding.swipeRefresh.setOnRefreshListener { refreshStatus() }
 
-        binding.lytToolbar.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.lytToolbar.ivBack.gone()
         binding.cvRetry.setOnClickListener {
             if (Utility.stopClick()) return@setOnClickListener
             onRetry()

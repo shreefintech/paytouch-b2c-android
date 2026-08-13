@@ -472,8 +472,7 @@
     <!-- KYC module — hub -->
     <string name="titleKycVerification">KYC Verification</string>
     <string name="labelDocumentProgress">Document Progress</string>
-    <string name="msgKycProgressSubtitle">Complete all sections to enable seamless transactions.</string>
-    <string name="labelRequiredSections">REQUIRED SECTIONS</string>
+    <string name="msgKycProgressSubtitle">Complete all sections to enable seamless transactions.</string>    <string name="labelRequiredSections">REQUIRED SECTIONS</string>
     <string name="labelIdentityVerification">Identity Verification</string>
     <string name="fmtDocumentProgress">%d / 2</string>
 
@@ -522,11 +521,11 @@
     <string name="labelStatementPeriod">Statement Period</string>
     <string name="hintStatementPeriod">Select Statement Period</string>
     <string name="msgStatementPeriodRequired">Please select statement period for account %d</string>
-    <string name="textVerificationPending">Verification Pending</string>
-    <string name="msgVerificationPending">Your KYC is under review. We\'ll notify you once it\'s approved.</string>
+    <string name="textVerificationPending">Wait a While!</string>
+    <string name="msgVerificationPending">Your documents are being verified. Please wait.</string>
     <string name="textVerificationApproved">Verification Approved</string>
     <string name="msgVerificationApproved">Your KYC has been approved successfully.</string>
-    <string name="textVerificationRejected">Verification Rejected</string>
+    <string name="textVerificationRejected">Verification Failed!</string>
     <string name="msgVerificationRejected">We couldn\'t verify your details, Please resubmit to continue</string>
     <string name="btnRetry">Retry</string>
 

@@ -2,6 +2,7 @@ package com.shreefintech.paytouchconsumer.onboarding.kyc
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -36,25 +37,27 @@ class KycActivity : BaseActivity() {
     private var identityDone = false
     private var bankDone = false
 
-    private val identityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == 1) {
-            identityDone = true
-            binding.ivSectionAStatus.setImageResource(R.drawable.ic_success)
-            binding.ivSectionAStatus.visibility = View.VISIBLE
-            onSectionResult()
+    private val identityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == 1) {
+                identityDone = true
+                binding.ivSectionAStatus.setImageResource(R.drawable.ic_success)
+                binding.ivSectionAStatus.visibility = View.VISIBLE
+                onSectionResult()
 
-            updateProgress()
+                updateProgress()
+            }
         }
-    }
 
-    private val bankLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == 1) {
-            bankDone = true
-            binding.ivSectionBStatus.setImageResource(R.drawable.ic_success)
-            binding.ivSectionBStatus.visibility = View.VISIBLE
-            onSectionResult()
+    private val bankLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == 1) {
+                bankDone = true
+                binding.ivSectionBStatus.setImageResource(R.drawable.ic_success)
+                binding.ivSectionBStatus.visibility = View.VISIBLE
+                onSectionResult()
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,14 +73,14 @@ class KycActivity : BaseActivity() {
         binding.incToolbar.ivBack.gone()
 
         LiquidGlassEffect.attach(
-            targetView  = binding.flCard,
-            rootView    = binding.clRoot as ViewGroup,
+            targetView = binding.flCard,
+            rootView = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion  = 0f,
+            distortion = 0f,
             strokeWidth = 1,
             strokeColor = ContextCompat.getColor(mActivity, R.color.primary),
             solidStroke = true,
-            blur        = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
+            blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
         binding.onClickListener = onClickListener()
@@ -87,29 +90,29 @@ class KycActivity : BaseActivity() {
     private fun startKyc() {
         viewModel.startKyc(
             onLoading = {
-                binding.shimmerKyc.visibility         = View.VISIBLE
+                binding.shimmerKyc.visibility = View.VISIBLE
                 binding.shimmerKyc.startShimmer()
-                binding.llKycContent.visibility        = View.GONE
+                binding.llKycContent.visibility = View.GONE
                 binding.llPendingRegistration.visibility = View.GONE
             },
             onReady = { statusItem ->
                 binding.shimmerKyc.stopShimmer()
-                binding.shimmerKyc.visibility         = View.GONE
-                binding.llKycContent.visibility        = View.VISIBLE
+                binding.shimmerKyc.visibility = View.GONE
+                binding.llKycContent.visibility = View.VISIBLE
                 binding.llPendingRegistration.visibility = View.GONE
                 applyStatus(statusItem)
             },
             onRegistrationPending = { msg ->
                 binding.shimmerKyc.stopShimmer()
-                binding.shimmerKyc.visibility         = View.GONE
-                binding.llKycContent.visibility        = View.GONE
+                binding.shimmerKyc.visibility = View.GONE
+                binding.llKycContent.visibility = View.GONE
                 binding.llPendingRegistration.visibility = View.VISIBLE
-                binding.tvPendingRegistrationMsg.text  = msg
+                binding.tvPendingRegistrationMsg.text = msg
             },
             onError = { msg ->
                 binding.shimmerKyc.stopShimmer()
-                binding.shimmerKyc.visibility         = View.GONE
-                binding.llKycContent.visibility        = View.VISIBLE
+                binding.shimmerKyc.visibility = View.GONE
+                binding.llKycContent.visibility = View.VISIBLE
                 binding.llPendingRegistration.visibility = View.GONE
                 ToastUtil.showDelete(mActivity, msg)
             }
@@ -121,31 +124,46 @@ class KycActivity : BaseActivity() {
         if (KycSubmissionStatus.from(sub?.status) == KycSubmissionStatus.KYC_SUBMITTED &&
             sub?.sectionASubmittedAt != null &&
             sub.sectionBSubmittedAt != null &&
-            sub.sectionCSubmittedAt != null) {
+            sub.sectionCSubmittedAt != null
+        ) {
             KycStatusActivity.start(mActivity, statusItem)
             finish()
             return
         }
         identityDone = sub?.sectionBSubmittedAt != null
-        bankDone     = sub?.sectionCSubmittedAt != null
+        bankDone = sub?.sectionCSubmittedAt != null
+
         updateSectionIcons(statusItem)
         updateProgress()
     }
 
     private fun updateSectionIcons(statusItem: KycStatusItem) {
-        val isRejected = KycSubmissionStatus.from(statusItem.submission?.status) == KycSubmissionStatus.KYC_REJECTED
+        val isRejected =
+            KycSubmissionStatus.from(statusItem.submission?.status) == KycSubmissionStatus.KYC_REJECTED
 
         // Identity card icon — driven by section B
         when {
             statusItem.submission?.sectionBSubmittedAt != null -> {
                 binding.ivSectionAStatus.setImageResource(R.drawable.ic_success)
                 binding.ivSectionAStatus.visibility = View.VISIBLE
+                binding.ivSectionAStatus.imageTintList = null
+                binding.mcIdentity.alpha = 0.8f
             }
+
             isRejected -> {
                 binding.ivSectionAStatus.setImageResource(R.drawable.ic_reject)
                 binding.ivSectionAStatus.visibility = View.VISIBLE
+                binding.ivSectionAStatus.imageTintList = null
+                binding.mcIdentity.alpha = 1f
             }
-            else -> binding.ivSectionAStatus.visibility = View.GONE
+
+            else -> {
+                binding.ivSectionAStatus.setImageResource(R.drawable.ic_right_arrow)
+                binding.ivSectionAStatus.imageTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sheet_divider))
+                binding.ivSectionAStatus.visibility = View.VISIBLE
+                binding.mcIdentity.alpha = 1f
+            }
         }
 
         // Bank card icon — driven by section C
@@ -153,12 +171,28 @@ class KycActivity : BaseActivity() {
             statusItem.submission?.sectionCSubmittedAt != null -> {
                 binding.ivSectionBStatus.setImageResource(R.drawable.ic_success)
                 binding.ivSectionBStatus.visibility = View.VISIBLE
+                binding.ivSectionBStatus.imageTintList = null
+                binding.mcBank.alpha = 0.8f
             }
+
             isRejected -> {
                 binding.ivSectionBStatus.setImageResource(R.drawable.ic_reject)
                 binding.ivSectionBStatus.visibility = View.VISIBLE
+                binding.ivSectionBStatus.imageTintList = null
+                binding.mcBank.alpha = 1f
             }
-            else -> binding.ivSectionBStatus.visibility = View.GONE
+
+            else -> {
+                binding.ivSectionBStatus.setImageResource(R.drawable.ic_right_arrow)
+                binding.ivSectionBStatus.imageTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sheet_divider))
+                binding.ivSectionBStatus.visibility = View.VISIBLE
+                if(identityDone){
+                    binding.mcBank.alpha = 1.0f
+                } else{
+                    binding.mcBank.alpha = 0.7f
+                }
+            }
         }
     }
 
@@ -176,7 +210,7 @@ class KycActivity : BaseActivity() {
     }
 
     private fun agreeAndNavigateToStatus() {
-        binding.shimmerKyc.visibility  = View.VISIBLE
+        binding.shimmerKyc.visibility = View.VISIBLE
         binding.shimmerKyc.startShimmer()
         binding.llKycContent.visibility = View.GONE
 
@@ -188,7 +222,7 @@ class KycActivity : BaseActivity() {
             },
             onError = { msg ->
                 binding.shimmerKyc.stopShimmer()
-                binding.shimmerKyc.visibility  = View.GONE
+                binding.shimmerKyc.visibility = View.GONE
                 binding.llKycContent.visibility = View.VISIBLE
                 ToastUtil.showDelete(mActivity, msg)
             }
@@ -200,11 +234,13 @@ class KycActivity : BaseActivity() {
             when (view) {
                 binding.mcIdentity -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (identityDone) return@OnClickListener
                     identityLauncher.launch(IdentityVerificationActivity.buildIntent(mActivity))
                 }
 
                 binding.mcBank -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (!identityDone || bankDone) return@OnClickListener
                     bankLauncher.launch(BankDetailsActivity.buildIntent(mActivity))
                 }
             }
