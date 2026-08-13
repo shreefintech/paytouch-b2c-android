@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
+import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.ResetMpinViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityResetMpinBinding
@@ -24,10 +25,21 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 
 class ResetMpinActivity : BaseActivity() {
 
+    companion object {
+        private const val EXTRA_IS_CREATE_MODE = "extra_is_create_mode"
+
+        fun buildCreateIntent(context: android.content.Context): Intent =
+            Intent(context, ResetMpinActivity::class.java).apply {
+                putExtra(EXTRA_IS_CREATE_MODE, true)
+            }
+    }
+
     private lateinit var binding: ActivityResetMpinBinding
     private val viewModel: ResetMpinViewModel by viewModels()
     private var showProgress = ObservableBoolean(false)
+
     private val mobile by lazy { intent.getStringExtra(Constant.EXTRA_MOBILE) ?: "" }
+    private val isCreateMode by lazy { intent.getBooleanExtra(EXTRA_IS_CREATE_MODE, false) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,14 +69,14 @@ class ResetMpinActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.showProgress    = showProgress
 
-        onBack()
+        if (isCreateMode) applyCreateModeLabels()
         setupMpinBoxes()
     }
 
-    private fun onBack() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() { navigateToLogin() }
-        })
+    private fun applyCreateModeLabels() {
+        binding.tvTitle.setText(R.string.titleCreateMpin)
+        binding.tvSubtitle.setText(R.string.subtitleCreateMpin)
+        binding.tvChangeMpinLabel.setText(R.string.btnCreateMpin)
     }
 
     private fun setupMpinBoxes() {
@@ -152,26 +164,40 @@ class ResetMpinActivity : BaseActivity() {
         return true
     }
 
-    private fun onChangeMpin() {
+    private fun onSubmit() {
         if (!validate()) return
-        val newMpin = collectMpin(
+        val mpin = collectMpin(
             listOf(binding.etNewMpin1, binding.etNewMpin2, binding.etNewMpin3, binding.etNewMpin4)
         )
-        viewModel.changeMpin(
-            context   = mActivity,
-            mobile    = mobile,
-            newMpin   = newMpin,
-            onLoading = { showProgress.set(true) },
-            onSuccess = { showProgress.set(false); navigateToLogin() },
-            onError   = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
-        )
+        if (isCreateMode) {
+            viewModel.createMpin(
+                mpin      = mpin,
+                onLoading = { showProgress.set(true) },
+                onSuccess = { showProgress.set(false); navigateToHome() },
+                onError   = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
+            )
+        } else {
+            viewModel.changeMpin(
+                context   = mActivity,
+                mobile    = mobile,
+                newMpin   = mpin,
+                onLoading = { showProgress.set(true) },
+                onSuccess = { showProgress.set(false); navigateToLogin() },
+                onError   = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
+            )
+        }
+    }
+
+    private fun navigateToHome() {
+        startActivity(Intent(mActivity, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        })
     }
 
     private fun navigateToLogin() {
-        val intent = Intent(mActivity, LoginActivity::class.java).apply {
+        startActivity(Intent(mActivity, LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        startActivity(intent)
+        })
         finish()
     }
 
@@ -180,11 +206,7 @@ class ResetMpinActivity : BaseActivity() {
             when (view) {
                 binding.llChangeMpin -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    onChangeMpin()
-                }
-                binding.tvBackToSignIn -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    navigateToLogin()
+                    onSubmit()
                 }
             }
         }

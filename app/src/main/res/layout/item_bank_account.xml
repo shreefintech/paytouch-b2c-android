@@ -235,6 +235,62 @@
 
         </FrameLayout>
 
+        <!-- Statement Period dropdown (visible only when proof type is Bank Statement) -->
+        <LinearLayout
+            android:id="@+id/llStatementPeriod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_large"
+                android:fontFamily="@font/proza_libre_semi_bold"
+                android:includeFontPadding="false"
+                android:text="@string/labelStatementPeriod"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_13" />
+
+            <FrameLayout
+                android:id="@+id/flStatementPeriodAnchor"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginTop="@dimen/margin_small"
+                android:background="@drawable/bg_input_field"
+                android:clickable="true"
+                android:focusable="true">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvStatementPeriod"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:gravity="center_vertical"
+                    android:hint="@string/hintStatementPeriod"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:paddingStart="@dimen/margin_small"
+                    android:paddingEnd="@dimen/icon_large"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textColorHint="?attr/colorTextHint"
+                    android:textSize="@dimen/text_size_13" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivStatementPeriodArrow"
+                    android:layout_width="@dimen/icon_small"
+                    android:layout_height="@dimen/icon_small"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="@dimen/margin_small"
+                    android:src="@drawable/ic_down_arrow" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
         <!-- Bank Proof upload -->
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"

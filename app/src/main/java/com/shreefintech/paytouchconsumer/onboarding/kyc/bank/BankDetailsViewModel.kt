@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.enums.StatementPeriod
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -23,7 +24,8 @@ data class BankAccountInput(
     val ifscCode: String,
     val branchName: String,
     val proofType: String,
-    val proofUri: Uri
+    val proofUri: Uri,
+    val statementPeriod: StatementPeriod?
 )
 
 class BankDetailsViewModel(application: Application) : AndroidViewModel(application) {
@@ -48,11 +50,12 @@ class BankDetailsViewModel(application: Application) : AndroidViewModel(applicat
             parts += MultipartBody.Part.createFormData("bank_accounts[$i][account_number]", account.accountNumber)
             parts += MultipartBody.Part.createFormData("bank_accounts[$i][bank_name]", account.bankName)
             parts += MultipartBody.Part.createFormData("bank_accounts[$i][ifsc]", account.ifscCode)
-            val proofTypeApi = if (account.proofType == "Cancelled Cheque") "cancelled_cheque" else "bank_statement"
-            parts += MultipartBody.Part.createFormData("bank_accounts[$i][proof_type]", proofTypeApi)
+            parts += MultipartBody.Part.createFormData("bank_accounts[$i][proof_type]", account.proofType)
+            account.statementPeriod?.let {
+                parts += MultipartBody.Part.createFormData("bank_accounts[$i][statement_period]", it.apiValue)
+            }
             val proofBytes = contentResolver.openInputStream(account.proofUri)?.use { it.readBytes() } ?: ByteArray(0)
             parts += MultipartBody.Part.createFormData("bank_accounts[$i][bank_proof]", "bank_proof_$i.jpg", proofBytes.toRequestBody(imgMediaType))
-            // TODO(PAYTOUCH-KYC): add statement_period field when the UI supports it (required for bank_statement proof type)
         }
 
         ApiClient.apiService.submitKycSectionC(bearerToken(), parts)

@@ -66,7 +66,7 @@ class SplashActivity : BaseActivity() {
     private fun routeByFlags(data: UserProfileItem?) {
         val intent = when {
             data?.requiresKyc == true            -> Intent(mActivity, KycActivity::class.java)
-            data?.requiresMpin == true           -> Intent(mActivity, ResetMpinActivity::class.java)
+            data?.requiresMpin == true           -> Intent(mActivity, LoginActivity::class.java)
             data?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)
             else                                 -> Intent(mActivity, HomeActivity::class.java)
         }

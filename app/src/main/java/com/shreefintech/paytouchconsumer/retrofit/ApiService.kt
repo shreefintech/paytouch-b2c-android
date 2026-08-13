@@ -9,8 +9,10 @@ import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MpinItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
@@ -183,6 +185,12 @@ interface ApiService {
         @Field("new_mpin") newMpin: String,
         @Field("new_mpin_confirmation") newMpinConfirmation: String
     ): Call<MessageItem>
+
+    @POST("${AUTH}mpin/create")
+    fun createMpin(
+        @Header("Authorization") token: String,
+        @Body body: CreateMpinRequest
+    ): Call<MpinItem>
 
     // ── Wallet ────────────────────────────────────────────────────────────────
 
@@ -518,9 +526,7 @@ interface ApiService {
     @POST("${AUTH}dashboard-kyc/sections/a")
     fun submitKycSectionA(
         @Header("Authorization") authorization: String,
-        @Part("has_gst") hasGst: RequestBody,
-        @Part("documents[0][document_type]") documentType: RequestBody,
-        @Part document: MultipartBody.Part
+        @Part("has_gst") hasGst: RequestBody
     ): Call<General<KycSubmissionDataItem>>
 
     @Multipart

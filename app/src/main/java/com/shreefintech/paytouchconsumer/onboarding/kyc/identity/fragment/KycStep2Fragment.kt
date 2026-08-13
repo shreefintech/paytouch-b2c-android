@@ -45,31 +45,54 @@ class KycStep2Fragment : BaseKycStepFragment() {
         attachEditDeleteGlass(binding.flEdit2)
         attachEditDeleteGlass(binding.flDelete2)
 
-        binding.etAadhar.filters = arrayOf(InputFilter.LengthFilter(12), Utility.digitFilter(), Utility.EmojiExcludeFilter())
+        binding.etAadhar.filters = arrayOf(
+            InputFilter.LengthFilter(12),
+            Utility.digitFilter(),
+            Utility.EmojiExcludeFilter()
+        )
         binding.etAadhar.setText(viewModel.aadhaarNumber)
 
         viewModel.aadhaarFrontUri?.let { showPreview(it, isFront = true) }
         viewModel.aadhaarBackUri?.let { showPreview(it, isFront = false) }
 
-        binding.flUpload1.setOnClickListener { pickFront() }
-        binding.ivUpload1.setOnClickListener { pickFront() }
-        binding.ivDeleteProof1.setOnClickListener { clearSlot(isFront = true) }
+        binding.flUpload1.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            pickFront()
+        }
+        binding.flEdit1.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            pickFront()
+        }
+        binding.ivDeleteProof1.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            clearSlot(isFront = true)
+        }
 
-        binding.flUpload2.setOnClickListener { pickBack() }
-        binding.ivUpload2.setOnClickListener { pickBack() }
-        binding.ivDeleteProof2.setOnClickListener { clearSlot(isFront = false) }
+        binding.flUpload2.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            pickBack()
+        }
+        binding.flEdit2.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            pickBack()
+        }
+        binding.ivDeleteProof2.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            clearSlot(isFront = false)
+        }
     }
 
     private fun attachEditDeleteGlass(targetView: View) {
         LiquidGlassEffect.attach(
-            targetView   = targetView,
-            rootView     = binding.root as ViewGroup,
+            targetView = targetView,
+            rootView = binding.root as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.filter_btn_radius),
-            distortion   = 0f,
-            blur         = resources.getDimensionPixelSize(R.dimen.filter_btn_blure),
-            tintColor    = ContextCompat.getColor(requireContext(), R.color.filter_bg)
+            distortion = 0f,
+            blur = resources.getDimensionPixelSize(R.dimen.filter_btn_blure),
+            tintColor = ContextCompat.getColor(requireContext(), R.color.filter_bg)
         )
     }
+
     private fun hostActivity() = requireActivity() as IdentityVerificationActivity
 
     private fun pickFront() {
@@ -93,20 +116,20 @@ class KycStep2Fragment : BaseKycStepFragment() {
         if (isFront) viewModel.aadhaarFrontUri = null else viewModel.aadhaarBackUri = null
 
         val ctx = context ?: return
-        val uploadPrompt  = if (isFront) binding.llUploadFront else binding.llUploadBack
-        val preview       = if (isFront) binding.ivPreviewFront else binding.ivPreviewBack
+        val uploadPrompt = if (isFront) binding.llUploadFront else binding.llUploadBack
+        val preview = if (isFront) binding.ivPreviewFront else binding.ivPreviewBack
         val editDeleteRow = if (isFront) binding.llEditDeleteFront else binding.llEditDeleteBack
 
         Glide.with(ctx).clear(preview)
-        preview.visibility       = View.GONE
+        preview.visibility = View.GONE
         editDeleteRow.visibility = View.GONE
-        uploadPrompt.visibility  = View.VISIBLE
+        uploadPrompt.visibility = View.VISIBLE
     }
 
     private fun showPreview(uri: Uri, isFront: Boolean) {
         val ctx = context ?: return
-        val uploadPrompt  = if (isFront) binding.llUploadFront else binding.llUploadBack
-        val preview       = if (isFront) binding.ivPreviewFront else binding.ivPreviewBack
+        val uploadPrompt = if (isFront) binding.llUploadFront else binding.llUploadBack
+        val preview = if (isFront) binding.ivPreviewFront else binding.ivPreviewBack
         val editDeleteRow = if (isFront) binding.llEditDeleteFront else binding.llEditDeleteBack
 
         uploadPrompt.visibility = View.GONE
@@ -115,7 +138,10 @@ class KycStep2Fragment : BaseKycStepFragment() {
             .load(uri)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
-                    e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>,
+                    isFirstResource: Boolean
                 ): Boolean = false
 
                 override fun onResourceReady(
@@ -125,20 +151,28 @@ class KycStep2Fragment : BaseKycStepFragment() {
             })
             .into(preview)
 
-        preview.visibility       = View.VISIBLE
+        preview.visibility = View.VISIBLE
         editDeleteRow.visibility = View.VISIBLE
     }
 
     override fun validate(): Boolean {
         val aadhaar = binding.etAadhar.text?.toString()?.trim() ?: ""
         val msg = when {
-            aadhaar.isEmpty()                  -> { binding.etAadhar.requestFocus(); getString(R.string.msgAadharEmpty) }
-            aadhaar.length != 12                -> { binding.etAadhar.requestFocus(); getString(R.string.msgAadharInvalid) }
-            viewModel.aadhaarFrontUri == null  -> getString(R.string.msgAadharFrontRequired)
-            viewModel.aadhaarBackUri == null   -> getString(R.string.msgAadharBackRequired)
+            aadhaar.isEmpty() -> {
+                binding.etAadhar.requestFocus(); getString(R.string.msgAadharEmpty)
+            }
+
+            aadhaar.length != 12 -> {
+                binding.etAadhar.requestFocus(); getString(R.string.msgAadharInvalid)
+            }
+
+            viewModel.aadhaarFrontUri == null -> getString(R.string.msgAadharFrontRequired)
+            viewModel.aadhaarBackUri == null -> getString(R.string.msgAadharBackRequired)
             else -> null
         }
-        if (msg != null) { ToastUtil.showDelete(requireActivity(), msg); return false }
+        if (msg != null) {
+            ToastUtil.showDelete(requireActivity(), msg); return false
+        }
 
         viewModel.aadhaarNumber = aadhaar
         return true

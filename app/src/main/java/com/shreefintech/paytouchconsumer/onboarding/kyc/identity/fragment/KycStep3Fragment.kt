@@ -49,24 +49,34 @@ class KycStep3Fragment : BaseKycStepFragment() {
         val upperCaseFilter = InputFilter { source, start, end, _, _, _ ->
             source.subSequence(start, end).toString().uppercase()
         }
-        binding.etPan.filters = arrayOf(InputFilter.LengthFilter(10), upperCaseFilter, Utility.EmojiExcludeFilter())
+        binding.etPan.filters =
+            arrayOf(InputFilter.LengthFilter(10), upperCaseFilter, Utility.EmojiExcludeFilter())
         binding.etPan.setText(viewModel.panNumber)
 
         viewModel.panFrontUri?.let { showPreview(it) }
 
-        binding.flUpload1.setOnClickListener { pickFront() }
-        binding.ivEditProof1.setOnClickListener { pickFront() }
-        binding.ivDeleteProof1.setOnClickListener { clearFront() }
+        binding.flUpload1.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            pickFront()
+        }
+        binding.ivEditProof1.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            pickFront()
+        }
+        binding.ivDeleteProof1.setOnClickListener {
+            Utility.hideKeyboard(requireActivity())
+            clearFront()
+        }
     }
 
     private fun attachEditDeleteGlass(targetView: View) {
         LiquidGlassEffect.attach(
-            targetView   = targetView,
-            rootView     = binding.root as ViewGroup,
+            targetView = targetView,
+            rootView = binding.root as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.filter_btn_radius),
-            distortion   = 0f,
-            blur         = resources.getDimensionPixelSize(R.dimen.filter_btn_blure),
-            tintColor    = ContextCompat.getColor(requireContext(), R.color.filter_bg)
+            distortion = 0f,
+            blur = resources.getDimensionPixelSize(R.dimen.filter_btn_blure),
+            tintColor = ContextCompat.getColor(requireContext(), R.color.filter_bg)
         )
     }
 
@@ -83,9 +93,9 @@ class KycStep3Fragment : BaseKycStepFragment() {
         viewModel.panFrontUri = null
         val ctx = context ?: return
         Glide.with(ctx).clear(binding.ivPreviewPan)
-        binding.ivPreviewPan.visibility    = View.GONE
+        binding.ivPreviewPan.visibility = View.GONE
         binding.llEditDeletePan.visibility = View.GONE
-        binding.llUploadPan.visibility     = View.VISIBLE
+        binding.llUploadPan.visibility = View.VISIBLE
     }
 
     private fun showPreview(uri: Uri) {
@@ -96,7 +106,10 @@ class KycStep3Fragment : BaseKycStepFragment() {
             .load(uri)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
-                    e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>,
+                    isFirstResource: Boolean
                 ): Boolean = false
 
                 override fun onResourceReady(
@@ -106,19 +119,27 @@ class KycStep3Fragment : BaseKycStepFragment() {
             })
             .into(binding.ivPreviewPan)
 
-        binding.ivPreviewPan.visibility    = View.VISIBLE
+        binding.ivPreviewPan.visibility = View.VISIBLE
         binding.llEditDeletePan.visibility = View.VISIBLE
     }
 
     override fun validate(): Boolean {
         val pan = binding.etPan.text?.toString()?.trim() ?: ""
         val msg = when {
-            pan.isEmpty()                  -> { binding.etPan.requestFocus(); getString(R.string.msgPanEmpty) }
-            !PAN_REGEX.matches(pan)        -> { binding.etPan.requestFocus(); getString(R.string.msgPanInvalid) }
-            viewModel.panFrontUri == null  -> getString(R.string.msgPanFrontRequired)
+            pan.isEmpty() -> {
+                binding.etPan.requestFocus(); getString(R.string.msgPanEmpty)
+            }
+
+            !PAN_REGEX.matches(pan) -> {
+                binding.etPan.requestFocus(); getString(R.string.msgPanInvalid)
+            }
+
+            viewModel.panFrontUri == null -> getString(R.string.msgPanFrontRequired)
             else -> null
         }
-        if (msg != null) { ToastUtil.showDelete(requireActivity(), msg); return false }
+        if (msg != null) {
+            ToastUtil.showDelete(requireActivity(), msg); return false
+        }
 
         viewModel.panNumber = pan
         return true
