@@ -490,5 +490,7 @@
     <string name="labelAvailableBalance">Available Balance:</string>
     <string name="msgSecurePaymentProcessedBy">Secure Payment Processed By</string>
     <string name="btnPaySecurely">Pay Securely</string>
+    <string name="msgPoweredByPrefix">Powered by </string>
+    <string name="msgPoweredByCompany">SHREE Fintech Solutions Pvt. Ltd.</string>
 
 </resources>

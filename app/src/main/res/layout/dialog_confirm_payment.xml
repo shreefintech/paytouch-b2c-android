@@ -50,8 +50,8 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"
-            android:src="@drawable/ic_close"
+            android:padding="5dp"
+            android:src="@drawable/ic_cross"
             android:tint="@color/primary" />
     </com.google.android.material.card.MaterialCardView>
 
@@ -59,9 +59,9 @@
     <View
         android:id="@+id/divider1"
         android:layout_width="0dp"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
         android:layout_marginTop="16dp"
-        android:background="@color/sheet_divider"
+        android:background="@drawable/bg_divider_gradient"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
@@ -98,9 +98,9 @@
     <View
         android:id="@+id/divider2"
         android:layout_width="0dp"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
         android:layout_marginTop="16dp"
-        android:background="@color/sheet_divider"
+        android:background="@drawable/bg_divider_gradient"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAmount" />
@@ -122,39 +122,41 @@
         android:id="@+id/tvAvailableBalance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:textColor="@color/black"
         android:textSize="@dimen/text_size_14"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider2"
+        app:layout_constraintBaseline_toBaselineOf="@id/tvAvailableBalanceLabel"
         tools:text="₹303.00" />
 
     <!-- Lock icon + Secure Payment text -->
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivLock"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:layout_marginTop="14dp"
-        android:src="@drawable/ic_lock"
-        android:tint="@color/primary"
-        app:layout_constraintBottom_toBottomOf="@id/tvSecurePayment"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvAvailableBalanceLabel" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvSecurePayment"
+    <LinearLayout
+        android:id="@+id/llSecurePayment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
         android:layout_marginTop="12dp"
-        android:text="@string/msgSecurePaymentProcessedBy"
-        android:textColor="@color/primary"
-        android:textSize="@dimen/text_size_13"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/ivLock"
-        app:layout_constraintTop_toBottomOf="@id/tvAvailableBalanceLabel" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAvailableBalanceLabel">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLock"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/ic_lock"
+            android:tint="@color/primary" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSecurePayment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="@string/msgSecurePaymentProcessedBy"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <!-- PayTouch logo -->
     <androidx.appcompat.widget.AppCompatImageView
@@ -166,7 +168,7 @@
         android:src="@drawable/img_paytouch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSecurePayment" />
+        app:layout_constraintTop_toBottomOf="@id/llSecurePayment" />
 
     <!-- Pay Securely button -->
     <com.google.android.material.card.MaterialCardView
@@ -182,29 +184,59 @@
         app:layout_constraintTop_toBottomOf="@id/ivPaytouchLogo"
         app:strokeWidth="0dp">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="@string/btnPaySecurely"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_size_16"
-            android:textStyle="bold" />
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPaySecurelyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btnPaySecurely"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_16"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                android:id="@+id/pbPaySecurely"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:indeterminateTint="@color/white"
+                android:visibility="gone" />
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <!-- Powered by -->
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvPoweredBy"
+    <LinearLayout
+        android:id="@+id/llPoweredBy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:text="@string/msgPoweredBy"
-        android:textColor="@color/primary"
-        android:textSize="@dimen/text_size_12"
-        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardPaySecurely" />
+        app:layout_constraintTop_toBottomOf="@id/cardPaySecurely">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/msgPoweredByPrefix"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_12" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPoweredBy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/msgPoweredByCompany"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_12"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvRajkot"
@@ -216,6 +248,6 @@
         android:textSize="@dimen/text_size_11"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvPoweredBy" />
+        app:layout_constraintTop_toBottomOf="@id/llPoweredBy" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
