@@ -3,13 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="android.view.View" />
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
-        <variable
-            name="showProgressPay"
-            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -186,15 +182,7 @@
                     android:includeFontPadding="false"
                     android:text="@string/btnProceedPayment"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_14"
-                    android:visibility="@{showProgressPay ? View.GONE : View.VISIBLE}" />
-
-                <ProgressBar
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:indeterminateTint="@color/white"
-                    android:visibility="@{showProgressPay ? View.VISIBLE : View.GONE}" />
+                    android:textSize="@dimen/text_size_14" />
 
             </LinearLayout>
 

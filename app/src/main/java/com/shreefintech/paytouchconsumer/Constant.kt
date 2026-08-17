@@ -32,4 +32,19 @@ object Constant {
     // Load Wallet / Payment status extras
     const val EXTRA_FROM_PAYMENT = "from_payment"
 
+    // HDFC Payment Gateway — order status codes
+    const val HDFC_STATUS_CHARGED               = "CHARGED"
+    const val HDFC_STATUS_AUTHORIZED            = "AUTHORIZED"
+    const val HDFC_STATUS_NEW                   = "NEW"
+    const val HDFC_STATUS_PENDING_VBV           = "PENDING_VBV"
+    const val HDFC_STATUS_AUTHORIZING           = "AUTHORIZING"
+    const val HDFC_STATUS_STARTED               = "STARTED"
+    const val HDFC_STATUS_JUSPAY_DECLINED       = "JUSPAY_DECLINED"
+    const val HDFC_STATUS_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED"
+    const val HDFC_STATUS_AUTHORIZATION_FAILED  = "AUTHORIZATION_FAILED"
+    const val HDFC_STATUS_AUTO_REFUNDED         = "AUTO_REFUNDED"
+
+    // HDFC order creation
+    const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
+
 }
