@@ -11,10 +11,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import android.app.Dialog
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.util.Util
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.databinding.DialogConfirmPaymentBinding
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
@@ -43,6 +44,7 @@ class LoadWalletActivity : BaseActivity() {
     private lateinit var sheetBehavior: BottomSheetBehavior<View>
 
     private val showProgressPay = ObservableBoolean(false)
+    private var currentWalletBalance: String? = null
 
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
@@ -142,7 +144,7 @@ class LoadWalletActivity : BaseActivity() {
         })
     }
 
-    private fun onProceedPayment() {
+    private fun validateAndShowConfirmDialog() {
         val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
         val description = sheetBinding.etDescription.text?.toString()?.trim() ?: ""
         if (amountStr.isEmpty()) {
@@ -154,15 +156,64 @@ class LoadWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
             return
         }
+        hidePaymentSheet()
+        showConfirmDialog(amount, description)
+    }
 
+    private fun showConfirmDialog(amount: Double, description: String) {
+        val dialogBinding = DialogConfirmPaymentBinding.inflate(layoutInflater)
+        val dialog = Dialog(mActivity)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.88).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.setCancelable(true)
+
+        dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
+        dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
+
+        dialogBinding.cardClose.setOnClickListener { dialog.dismiss() }
+
+        dialogBinding.cardPaySecurely.setOnClickListener {
+            if (Utility.stopClick()) return@setOnClickListener
+            startHdfcFlow(
+                amount = amount,
+                description = description,
+                onShowProgress = {
+                    dialogBinding.tvPaySecurelyText.visibility = View.GONE
+                    dialogBinding.pbPaySecurely.visibility = View.VISIBLE
+                    dialogBinding.cardPaySecurely.isClickable = false
+                },
+                onHideProgress = {
+                    dialogBinding.tvPaySecurelyText.visibility = View.VISIBLE
+                    dialogBinding.pbPaySecurely.visibility = View.GONE
+                    dialogBinding.cardPaySecurely.isClickable = true
+                },
+                onDismiss = { dialog.dismiss() }
+            )
+        }
+
+        dialog.show()
+    }
+
+    private fun startHdfcFlow(
+        amount: Double,
+        description: String,
+        onShowProgress: () -> Unit,
+        onHideProgress: () -> Unit,
+        onDismiss: () -> Unit
+    ) {
         viewModel.createHdfcOrder(
             amount = amount,
             description = description,
-            onLoading = { showProgressPay.set(true) },
+            onLoading = onShowProgress,
             onSuccess = { data ->
-                showProgressPay.set(false)
+                onHideProgress()
                 val status = data.status?.uppercase().orEmpty()
                 if (HdfcPaymentHelper.isFailedStatus(status)) {
+                    onDismiss()
                     PaymentStatusActivity.start(
                         mActivity,
                         PaymentStatusItem(
@@ -175,11 +226,12 @@ class LoadWalletActivity : BaseActivity() {
                 }
                 val payUrl = data.paymentLinks?.web.orEmpty()
                 if (payUrl.isEmpty()) {
+                    onHideProgress()
                     ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
                     return@createHdfcOrder
                 }
                 Utility.hideKeyboard(mActivity)
-                hidePaymentSheet()
+                onDismiss()
                 HdfcPaymentHelper.launchPayment(
                     context   = mActivity,
                     orderId   = data.orderId ?: "",
@@ -189,7 +241,7 @@ class LoadWalletActivity : BaseActivity() {
                 )
             },
             onError = { msg ->
-                showProgressPay.set(false)
+                onHideProgress()
                 ToastUtil.showDelete(mActivity, msg)
             }
         )
@@ -246,6 +298,7 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun populateWalletData(data: WalletDataItem) {
+        currentWalletBalance = data.walletBalance
         binding.tvWalletBalance.text = Utility.formatAmount(data.walletBalance)
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
@@ -319,8 +372,7 @@ class LoadWalletActivity : BaseActivity() {
 
                 sheetBinding.btnProceedPayment -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (showProgressPay.get()) return@OnClickListener
-                    onProceedPayment()
+                    validateAndShowConfirmDialog()
                 }
             }
         }

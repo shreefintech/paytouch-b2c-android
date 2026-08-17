@@ -70,7 +70,7 @@
     <string name="msgPasswordWeak">Password must include uppercase, number, and special character</string>
     <string name="msgConfirmNewPasswordEmpty">Please confirm your new password</string>
 
-    <!-- Reset / Create MPIN screen -->
+    <!-- Reset MPIN screen -->
     <string name="titleResetMpin">Reset MPIN</string>
     <string name="subtitleResetMpin">Set a new MPIN to keep your account secure</string>
     <string name="titleCreateMpin">Create MPIN</string>
@@ -97,7 +97,14 @@
     <!-- Shared strings still referenced by CreateVirtualAccountActivity / MyAccountActivity layouts -->
     <string name="labelPersonalInformation">Personal Information</string>
     <string name="labelMemberName">Member Name</string>
+    <string name="hintMemberName">Enter Member name</string>
+    <string name="labelBirthdate">Birthdate</string>
+    <string name="hintBirthdate">Enter your birthdate</string>
+    <string name="labelAge">Age</string>
+    <string name="hintAge">Enter your age</string>
     <string name="labelHomeAddress">Home Address</string>
+    <string name="hintHomeAddress">Enter your address</string>
+    <string name="labelCityName">City Name</string>
     <string name="hintSelectCity">Select City</string>
 
     <!-- Shared identity-document strings (Create Virtual Account + KYC identity verification) -->
@@ -105,12 +112,23 @@
     <string name="hintPanCardNumber">Enter your pan card number</string>
     <string name="labelAadharCardNumber">Aadhar Card Number</string>
     <string name="hintAadharCardNumber">Enter your Aadhar card number</string>
+    <string name="labelGstNumber">GST Number</string>
+    <string name="hintGstNumber">Enter your GST Number</string>
     <string name="btnCreateVirtualAccount">Create Virtual Account</string>
+    <string name="msgMemberNameEmpty">Please enter member name</string>
+    <string name="msgMemberNameInvalid">Member name must contain only letters and spaces</string>
+    <string name="msgBirthdateEmpty">Please select your birthdate</string>
+    <string name="msgAgeInvalid">You must be at least 18 years old</string>
+    <string name="msgHomeAddressEmpty">Please enter your home address</string>
+    <string name="msgHomeAddressShort">Address must be at least 5 characters</string>
     <string name="msgCityEmpty">Please select your city</string>
     <string name="msgPanEmpty">Please enter your PAN card number</string>
     <string name="msgPanInvalid">Please enter a valid PAN card number</string>
     <string name="msgAadharEmpty">Please enter your Aadhar card number</string>
     <string name="msgAadharInvalid">Aadhar number must be exactly 12 digits</string>
+    <string name="msgGstEmpty">Please enter your GST number</string>
+    <string name="msgGstInvalid">Please enter a valid GST number</string>
+    <string name="msgKycSubmitSuccess">KYC details submitted successfully</string>
 
     <!-- Common error messages — msgNoInternet and errGeneric are declared above; no duplicates here -->
 
@@ -468,6 +486,16 @@
     <string name="msgPoweredBy">Powered by SHREE Fintech Solutions Pvt. Ltd.</string>
     <string name="textRajkotGujarat">Rajkot, Gujarat</string>
     <string name="msgOrderIdCopied">Order ID copied</string>
+
+    <!-- Confirm Payment dialog -->
+    <string name="titleAddMoney">Add Money</string>
+    <string name="subtitleAddMoneyToWallet">Add money to your wallet</string>
+    <string name="titleConfirmPayment">Confirm Payment</string>
+    <string name="labelAvailableBalance">Available Balance:</string>
+    <string name="msgSecurePaymentProcessedBy">Secure Payment Processed By</string>
+    <string name="btnPaySecurely">Pay Securely</string>
+    <string name="msgPoweredByPrefix">Powered by </string>
+    <string name="msgPoweredByCompany">SHREE Fintech Solutions Pvt. Ltd.</string>
 
     <!-- KYC module — hub -->
     <string name="titleKycVerification">KYC Verification</string>
