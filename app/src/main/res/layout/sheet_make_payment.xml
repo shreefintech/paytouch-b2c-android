@@ -100,7 +100,7 @@
                     android:imeOptions="actionNext"
                     android:paddingHorizontal="@dimen/margin_large"
                     android:singleLine="true"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/black"
                     android:textColorHint="?attr/colorTextHint"
                     android:textSize="@dimen/text_size_13" />
 
@@ -148,7 +148,7 @@
                     android:paddingHorizontal="@dimen/margin_large"
                     android:singleLine="true"
                     android:imeOptions="actionDone"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/black"
                     android:textColorHint="?attr/colorTextHint"
                     android:textSize="@dimen/text_size_13" />
 

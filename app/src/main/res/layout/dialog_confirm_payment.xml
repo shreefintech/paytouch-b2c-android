@@ -45,7 +45,8 @@
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeWidth="0dp">
+        app:strokeColor="@color/primary"
+        app:strokeWidth="1dp">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"
@@ -99,7 +100,7 @@
         android:id="@+id/divider2"
         android:layout_width="0dp"
         android:layout_height="2dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_extra_large"
         android:background="@drawable/bg_divider_gradient"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -135,7 +136,7 @@
         android:id="@+id/llSecurePayment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="@dimen/margin_large"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -177,9 +178,9 @@
         android:id="@+id/cardPaySecurely"
         android:layout_width="0dp"
         android:layout_height="@dimen/btn_height"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/margin_large"
         app:cardBackgroundColor="@color/primary"
-        app:cardCornerRadius="@dimen/submit_btn_radius"
+        app:cardCornerRadius="@dimen/card_corner_radius"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -217,7 +218,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:gravity="center_vertical"
+        android:gravity="top"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -227,17 +228,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/msgPoweredByPrefix"
-            android:textColor="@color/primary"
+            android:layout_marginEnd="@dimen/margin_small"
+            android:textColor="@color/sub_text_color"
             android:fontFamily="@font/proza_libre_regular"
-            android:textSize="@dimen/text_size_12" />
+            android:textSize="@dimen/text_size_11" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvPoweredBy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/msgPoweredByCompany"
+            android:text="@string/labelShreefintech"
             android:textColor="@color/primary"
-            android:textSize="@dimen/text_size_12"
+            android:textSize="@dimen/text_size_11"
             android:fontFamily="@font/proza_libre_semi_bold" />
     </LinearLayout>
 
@@ -248,7 +250,7 @@
         android:layout_marginTop="2dp"
         android:text="@string/textRajkotGujarat"
         android:textColor="@color/sub_text_color"
-        android:textSize="@dimen/text_size_11"
+        android:textSize="@dimen/text_size_10"
         android:fontFamily="@font/proza_libre_semi_bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
