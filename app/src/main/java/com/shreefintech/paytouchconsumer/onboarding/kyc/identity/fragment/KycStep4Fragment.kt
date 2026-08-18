@@ -69,14 +69,14 @@ class KycStep4Fragment : BaseKycStepFragment() {
     private fun capture() {
         if (Utility.stopClick()) return
         (requireActivity() as IdentityVerificationActivity).captureSelfie { uri ->
-            viewModel.selfieUri = uri
+            viewModel.setSelfieUri(uri)
             showPreview(uri)
         }
     }
 
     private fun clearSelfie() {
         if (Utility.stopClick()) return
-        viewModel.selfieUri = null
+        viewModel.setSelfieUri(null)
         val ctx = context ?: return
         Glide.with(ctx).clear(binding.ivSelfiePreview)
         binding.mcvSelfiePreview.visibility = View.GONE

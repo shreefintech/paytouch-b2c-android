@@ -11,7 +11,6 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
-import com.shreefintech.paytouchconsumer.onboarding.CreateVirtualAccountActivity
 import com.shreefintech.paytouchconsumer.onboarding.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
@@ -73,11 +72,6 @@ class SplashActivity : BaseActivity() {
         val intent = when {
             data?.requiresKyc == true -> Intent(mActivity, KycActivity::class.java)
             data?.requiresMpin == true -> ResetMpinActivity.buildCreateIntent(mActivity)
-            data?.requiresVirtualAccount == true -> Intent(
-                mActivity,
-                CreateVirtualAccountActivity::class.java
-            )
-
             else -> Intent(mActivity, HomeActivity::class.java)
         }
         navigate(intent)

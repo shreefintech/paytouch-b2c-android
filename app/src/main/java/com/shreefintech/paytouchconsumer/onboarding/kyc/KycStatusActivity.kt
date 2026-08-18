@@ -90,7 +90,7 @@ class KycStatusActivity : BaseActivity() {
 
     private fun renderStatus(item: KycStatusItem) {
         when (KycSubmissionStatus.from(item.submission?.status)) {
-            KycSubmissionStatus.KYC_APPROVED  -> navigateToLogin()
+            KycSubmissionStatus.KYC_APPROVED  -> navigateToMpin()
             KycSubmissionStatus.KYC_REJECTED  -> showRejected()
             KycSubmissionStatus.KYC_SUBMITTED -> showPending()
             KycSubmissionStatus.PENDING_KYC   -> {
@@ -135,7 +135,7 @@ class KycStatusActivity : BaseActivity() {
             .into(binding.iv1)
     }
 
-    private fun navigateToLogin() {
+    private fun navigateToMpin() {
         startActivity(ResetMpinActivity.buildCreateIntent(mActivity).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })

@@ -31,7 +31,6 @@ import com.shreefintech.paytouchconsumer.auth.viewmodel.LoginViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoginBinding
 import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.onboarding.CreateVirtualAccountActivity
 import com.shreefintech.paytouchconsumer.onboarding.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -259,7 +258,6 @@ class LoginActivity : BaseActivity() {
         val intent = when {
             data?.requiresKyc == true            -> Intent(mActivity, KycActivity::class.java)
             data?.requiresMpin == true           -> ResetMpinActivity.buildCreateIntent(mActivity)
-            data?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)
             else                                 -> Intent(mActivity, HomeActivity::class.java)
         }
         startActivity(intent)
