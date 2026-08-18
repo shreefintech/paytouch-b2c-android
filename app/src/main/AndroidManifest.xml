@@ -337,6 +337,7 @@
         <activity
             android:name=".loadwallet.HdfcWebViewActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait" />
 
         <activity

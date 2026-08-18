@@ -3,6 +3,7 @@ package com.shreefintech.paytouchconsumer.loadwallet
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.webkit.WebChromeClient
@@ -14,6 +15,8 @@ import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityHdfcWebViewBinding
@@ -54,7 +57,17 @@ class HdfcWebViewActivity : BaseActivity() {
 
         binding = ActivityHdfcWebViewBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                maxOf(imeInsets.bottom, systemBars.bottom)
+            )
+            insets
+        }
         setupWebView()
         onBack()
 
@@ -125,8 +138,57 @@ class HdfcWebViewActivity : BaseActivity() {
                 request: WebResourceRequest
             ): Boolean {
 
-                val url = request.url.toString()
-                return interceptReturnUrl(url)
+                val uri = request.url
+                val url = uri.toString()
+
+                // First check HDFC Return URL
+                if (interceptReturnUrl(url)) {
+                    return true
+                }
+
+                // Handle external schemes such as:
+                // tez://
+                // upi://
+                // phonepe://
+                // paytmmp://
+                // intent://
+                val scheme = uri.scheme
+
+                if (
+                    scheme != null &&
+                    !scheme.equals("http", ignoreCase = true) &&
+                    !scheme.equals("https", ignoreCase = true)
+                ) {
+                    openExternalUrl(uri)
+                    return true
+                }
+
+                return false
+            }
+
+            @Suppress("DEPRECATION")
+            override fun shouldOverrideUrlLoading(
+                view: WebView,
+                url: String
+            ): Boolean {
+
+                if (interceptReturnUrl(url)) {
+                    return true
+                }
+
+                val uri = url.toUri()
+                val scheme = uri.scheme
+
+                if (
+                    scheme != null &&
+                    !scheme.equals("http", ignoreCase = true) &&
+                    !scheme.equals("https", ignoreCase = true)
+                ) {
+                    openExternalUrl(uri)
+                    return true
+                }
+
+                return false
             }
 
             /**
@@ -265,5 +327,15 @@ class HdfcWebViewActivity : BaseActivity() {
                 }
             }
         )
+    }
+
+    private fun openExternalUrl(uri: Uri) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            startActivity(intent)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
