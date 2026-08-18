@@ -63,6 +63,10 @@ com.shreefintech.paytouchconsumer/
 +-- myaccount/          My Account -- two-tab profile viewer (Account Info + Refer & Earn)
 |   \-- viewmodel/
 |
++-- loadwallet/         Wallet top-up via HDFC payment gateway; wallet balance, virtual account, transaction history
+|   +-- model/          WalletTransactionItem (display), PaymentStatusItem (local DTO)
+|   \-- viewmodel/      LoadWalletViewModel, WalletTransactionsViewModel
+|
 +-- transactions/       Shared across ALL bill-payment modules -- never duplicate per module
 |   +-- model/
 |   |   \-- TransactionItem.kt         Category-agnostic report/status row model
@@ -85,6 +89,8 @@ com.shreefintech.paytouchconsumer/
 |   |   +-- loan/                 Loan request/response DTOs
 |   |   +-- municipaltax/         Municipal tax request/response DTOs
 |   |   +-- myaccount/            AccountInfoItem, AccountInfoDataItem, ReferralInfoItem, ReferralDataItem
+|   |   +-- hdfc/                 HdfcCreateOrderRequest, HdfcOrderItem, HdfcOrderResponseItem, HdfcPaymentLinksItem
+|   |   +-- wallet/               WalletHistoryItem, WalletHistoryPageItem
 |   |   \-- auth/
 |   |       +-- LoginItem.kt
 |   |       +-- RegisterItem.kt
@@ -164,13 +170,13 @@ Register / Login
 | Loan Repayment | `LoanActivity` | `LoanRecentTransactionActivity`, `LoanTransactionReportActivity`, `LoanTransactionStatusActivity`, `TransactionDetailActivity` (shared), `LoanSmsReceiptActivity` |
 | Municipal Tax | `MunicipalTaxActivity` | `MunicipalTaxRecentTransactionActivity`, `MunicipalTaxTransactionReportActivity`, `MunicipalTaxTransactionStatusActivity`, `TransactionDetailActivity` (shared), `MunicipalTaxSmsReceiptActivity` |
 | My Account | `MyAccountActivity` | Two-tab screen: Account Info + Refer & Earn |
+| Load Wallet | `LoadWalletActivity` | Wallet balance, virtual account info, HDFC top-up, wallet transaction history (`WalletTransactionsActivity`), payment status (`PaymentStatusActivity`) |
 
 ### Planned (stubs in HomeActivity)
 
 | Module | Status |
 |---|---|
 | TV Cable payment | Not started |
-| Load Wallet | Not started |
 | Broadband | Not started |
 
 ---
@@ -379,6 +385,12 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | `EXTRA_MOBILE` | Intent extra -- mobile number propagated through OTP and reset screens |
 | `FLOW_RESET_PASSWORD` | "RESET_PASSWORD" |
 | `FLOW_RESET_MPIN` | "RESET_MPIN" |
+| `EXTRA_FROM_PAYMENT` | Intent extra — `PaymentStatusActivity` → `LoadWalletActivity` (triggers data refresh) |
+| `HDFC_STATUS_CHARGED` / `HDFC_STATUS_AUTHORIZED` | HDFC success statuses |
+| `HDFC_STATUS_NEW` | HDFC order created, payment not yet attempted |
+| `HDFC_STATUS_PENDING_VBV` / `HDFC_STATUS_AUTHORIZING` / `HDFC_STATUS_STARTED` | HDFC in-progress statuses |
+| `HDFC_STATUS_JUSPAY_DECLINED` / `HDFC_STATUS_AUTHENTICATION_FAILED` / `HDFC_STATUS_AUTHORIZATION_FAILED` / `HDFC_STATUS_AUTO_REFUNDED` | HDFC failure statuses |
+| `HDFC_ORDER_PURPOSE_WALLET_TOPUP` | `"wallet_topup"` — default `purpose` field in `HdfcCreateOrderRequest` |
 
 ---
 
@@ -391,9 +403,12 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | Gas | `app/src/main/java/.../gas/README.md` (mirrors Electricity -- read Electricity's README first) |
 | Mobile Prepaid | `app/src/main/java/.../prepaid/README.md` (adds plan selection + circle picker vs Gas/Electricity) |
 | Mobile Postpaid | `app/src/main/java/.../postpaid/README.md` (shares `PrepaidPlanSelectionActivity`; status searches by transaction ID) |
+| DTH | `app/src/main/java/.../dth/README.md` (plan-selection module; isMobileCategory = true; mirrors Prepaid flow) |
 | FASTag | `app/src/main/java/.../fastag/README.md` (no bill-fetch; vehicle number; real-time fee; no operator pre-load in recent transactions) |
 | Loan Repayment | `app/src/main/java/.../loan/README.md` (bill-fetch pattern like Gas; circleId = "0"; flat payment response; no ccf field) |
+| Municipal Tax | `app/src/main/java/.../municipaltax/README.md` (bill-fetch pattern; transaction-status routes via mobile-recharge endpoint — intentional) |
 | My Account | `app/src/main/java/.../myaccount/README.md` (two-tab profile viewer; Account Info from KYC data; Refer & Earn with copy/share) |
+| Load Wallet | `app/src/main/java/.../loadwallet/README.md` (HDFC WebView payment; wallet balance + virtual account; paginated wallet transaction history) |
 
 ---
 

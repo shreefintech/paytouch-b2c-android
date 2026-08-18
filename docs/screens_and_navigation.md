@@ -155,7 +155,7 @@
 
 **Exit points:**
 - Category tile tap → respective category screen (planned)
-- "Load Wallet" tap → Load Wallet screen (planned)
+- "Load Wallet" tap → `LoadWalletActivity`
 
 **Key UI elements:**
 - Toolbar with PayTouch logo and back button
@@ -291,6 +291,23 @@ Bill-fetch pattern. Transaction-status endpoint intentionally routes via `mobile
 
 ---
 
+### ✅ Load Wallet Module
+
+Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules — no bill-fetch, no operator selection, no `BaseBillViewModel`. See `loadwallet/README.md` for the full payment flow and return-URL interception detail.
+
+| Screen | Class | Package |
+|---|---|---|
+| Wallet Balance & Top-up | `LoadWalletActivity` | `loadwallet/` |
+| Full Transaction History | `WalletTransactionsActivity` | `loadwallet/` |
+| HDFC Payment WebView | `HdfcWebViewActivity` | `loadwallet/` |
+| Payment Status | `PaymentStatusActivity` | `loadwallet/` |
+
+**Entry points:** `HomeActivity` ("Load Wallet" button)
+
+**Exit points (from `PaymentStatusActivity`):** auto-navigates back to `LoadWalletActivity` after 5 s, or immediately on back press.
+
+---
+
 ### ✅ MyAccountActivity — "My Account"
 
 **Purpose:** View KYC-derived user profile and referral/earn information.
@@ -320,14 +337,6 @@ Bill-fetch pattern. Transaction-status endpoint intentionally routes via `mobile
 ## Planned Screens
 
 The following screens are defined in the navigation plan but not yet implemented.
-
----
-
-### 📋 LoadWalletActivity — "Load Wallet"
-
-**Purpose:** Top up the user's digital wallet.
-
-**Entry points:** `HomeActivity` ("Load Wallet" button)
 
 ---
 

@@ -245,7 +245,7 @@ class LoadWalletActivity : BaseActivity() {
                         PaymentStatusItem(
                             orderId = data.orderId ?: "",
                             amount  = data.amount ?: "",
-                            status  = data.status ?: "NEW"
+                            status  = data.status ?: Constant.HDFC_STATUS_NEW
                         )
                     )
                     return@createHdfcOrder

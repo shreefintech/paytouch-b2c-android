@@ -97,12 +97,6 @@ class HdfcWebViewActivity : BaseActivity() {
 
         binding.webView.webViewClient = object : WebViewClient() {
 
-            /**
-             * Intercepts network/resource requests.
-             *
-             * Only the configured Return URL is treated as the
-             * payment return URL.
-             */
             override fun shouldInterceptRequest(
                 view: WebView,
                 request: WebResourceRequest
@@ -129,10 +123,6 @@ class HdfcWebViewActivity : BaseActivity() {
                 return null
             }
 
-            /**
-             * Handles user-initiated navigations such as
-             * form submissions and link clicks.
-             */
             override fun shouldOverrideUrlLoading(
                 view: WebView,
                 request: WebResourceRequest
@@ -191,10 +181,6 @@ class HdfcWebViewActivity : BaseActivity() {
                 return false
             }
 
-            /**
-             * Safety net for redirects that may not be caught
-             * by shouldInterceptRequest().
-             */
             override fun onPageStarted(
                 view: WebView,
                 url: String,
@@ -238,28 +224,6 @@ class HdfcWebViewActivity : BaseActivity() {
         }
     }
 
-    /**
-     * Strict Return URL matching.
-     *
-     * The URL is considered a Return URL only when:
-     *
-     * 1. Scheme matches
-     * 2. Host matches
-     * 3. Path starts with the configured Return URL path
-     *
-     * Example:
-     *
-     * Configured Return URL:
-     * https://example.com/payment/return
-     *
-     * Matches:
-     * https://example.com/payment/return
-     * https://example.com/payment/return?status=success
-     *
-     * Does NOT match:
-     * https://example.com/other
-     * https://another.com/payment/return
-     */
     private fun isReturnUrl(url: String): Boolean {
         if (returnUrl.isEmpty()) return false
 
@@ -283,12 +247,6 @@ class HdfcWebViewActivity : BaseActivity() {
         }
     }
 
-    /**
-     * Handles the Return URL on the main thread.
-     *
-     * hasReturned prevents duplicate finish() calls when
-     * multiple WebView callbacks detect the same Return URL.
-     */
     private fun interceptReturnUrl(url: String): Boolean {
         if (hasReturned) return false
 

@@ -10,7 +10,7 @@ object HdfcPaymentHelper {
     var pendingAmount: String? = null
         private set
 
-    val failedStatuses = setOf(
+    private val failedStatuses = setOf(
         Constant.HDFC_STATUS_JUSPAY_DECLINED,
         Constant.HDFC_STATUS_AUTHENTICATION_FAILED,
         Constant.HDFC_STATUS_AUTHORIZATION_FAILED,
