@@ -3,35 +3,46 @@ package com.shreefintech.paytouchconsumer.loadwallet
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityHdfcWebViewBinding
+import java.io.ByteArrayInputStream
 
 class HdfcWebViewActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHdfcWebViewBinding
 
-    private val paymentUrl: String by lazy { intent.getStringExtra(EXTRA_URL) ?: "" }
-    private val returnUrl: String by lazy { intent.getStringExtra(EXTRA_RETURN_URL) ?: "" }
+    private val paymentUrl: String by lazy {
+        intent.getStringExtra(EXTRA_URL) ?: ""
+    }
 
+    private val returnUrl: String by lazy {
+        intent.getStringExtra(EXTRA_RETURN_URL) ?: ""
+    }
+
+    @Volatile
     private var hasReturned = false
-    private var gatewayHost: String? = null  // host of the initial HDFC payment URL
 
     companion object {
         private const val EXTRA_URL = "hdfc_payment_url"
         private const val EXTRA_RETURN_URL = "hdfc_return_url"
 
-        fun newIntent(context: Context, payUrl: String, returnUrl: String): Intent =
+        fun newIntent(
+            context: Context,
+            payUrl: String,
+            returnUrl: String
+        ): Intent =
             Intent(context, HdfcWebViewActivity::class.java).apply {
                 putExtra(EXTRA_URL, payUrl)
                 putExtra(EXTRA_RETURN_URL, returnUrl)
@@ -40,10 +51,9 @@ class HdfcWebViewActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityHdfcWebViewBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        gatewayHost = if (paymentUrl.isNotEmpty()) Uri.parse(paymentUrl).host else null
 
         setupWebView()
         onBack()
@@ -74,23 +84,69 @@ class HdfcWebViewActivity : BaseActivity() {
 
         binding.webView.webViewClient = object : WebViewClient() {
 
-            // Handles user-initiated navigations (e.g. form posts, link taps)
+            /**
+             * Intercepts network/resource requests.
+             *
+             * Only the configured Return URL is treated as the
+             * payment return URL.
+             */
+            override fun shouldInterceptRequest(
+                view: WebView,
+                request: WebResourceRequest
+            ): WebResourceResponse? {
+
+                val url = request.url.toString()
+
+                if (!hasReturned && isReturnUrl(url)) {
+                    view.post {
+                        if (!hasReturned) {
+                            hasReturned = true
+                            finish()
+                        }
+                    }
+
+                    // Prevent WebView from loading the Return URL.
+                    return WebResourceResponse(
+                        "text/plain",
+                        "UTF-8",
+                        ByteArrayInputStream(ByteArray(0))
+                    )
+                }
+
+                return null
+            }
+
+            /**
+             * Handles user-initiated navigations such as
+             * form submissions and link clicks.
+             */
             override fun shouldOverrideUrlLoading(
                 view: WebView,
                 request: WebResourceRequest
             ): Boolean {
+
                 val url = request.url.toString()
                 return interceptReturnUrl(url)
             }
 
-            // Catches server-side redirects that bypass shouldOverrideUrlLoading
-            override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+            /**
+             * Safety net for redirects that may not be caught
+             * by shouldInterceptRequest().
+             */
+            override fun onPageStarted(
+                view: WebView,
+                url: String,
+                favicon: Bitmap?
+            ) {
                 if (!interceptReturnUrl(url)) {
                     binding.pbPageLoad.visibility = View.VISIBLE
                 }
             }
 
-            override fun onPageFinished(view: WebView, url: String) {
+            override fun onPageFinished(
+                view: WebView,
+                url: String
+            ) {
                 binding.pbPageLoad.visibility = View.GONE
             }
 
@@ -104,30 +160,77 @@ class HdfcWebViewActivity : BaseActivity() {
         }
 
         binding.webView.webChromeClient = object : WebChromeClient() {
-            override fun onProgressChanged(view: WebView, newProgress: Int) {
+
+            override fun onProgressChanged(
+                view: WebView,
+                newProgress: Int
+            ) {
                 binding.pbPageLoad.progress = newProgress
-                binding.pbPageLoad.visibility = if (newProgress < 100) View.VISIBLE else View.GONE
+                binding.pbPageLoad.visibility =
+                    if (newProgress < 100) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
+                    }
             }
         }
     }
 
-    // Strategy 1: match the returnUrl prefix from the API response (when present).
-    // Strategy 2: host-change detection — all HDFC gateway pages share the same host;
-    //             a navigation to any other host is the merchant callback URL.
-    // hasReturned guards against duplicate finish() calls across both strategies.
+    /**
+     * Strict Return URL matching.
+     *
+     * The URL is considered a Return URL only when:
+     *
+     * 1. Scheme matches
+     * 2. Host matches
+     * 3. Path starts with the configured Return URL path
+     *
+     * Example:
+     *
+     * Configured Return URL:
+     * https://example.com/payment/return
+     *
+     * Matches:
+     * https://example.com/payment/return
+     * https://example.com/payment/return?status=success
+     *
+     * Does NOT match:
+     * https://example.com/other
+     * https://another.com/payment/return
+     */
+    private fun isReturnUrl(url: String): Boolean {
+        if (returnUrl.isEmpty()) return false
+
+        return try {
+            val requestUri = url.toUri()
+            val returnUri = returnUrl.toUri()
+
+            requestUri.scheme.equals(
+                returnUri.scheme,
+                ignoreCase = true
+            ) &&
+                    requestUri.host.equals(
+                        returnUri.host,
+                        ignoreCase = true
+                    ) &&
+                    requestUri.path.orEmpty().startsWith(
+                        returnUri.path.orEmpty()
+                    )
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Handles the Return URL on the main thread.
+     *
+     * hasReturned prevents duplicate finish() calls when
+     * multiple WebView callbacks detect the same Return URL.
+     */
     private fun interceptReturnUrl(url: String): Boolean {
         if (hasReturned) return false
 
-        if (returnUrl.isNotEmpty()) {
-            if (url.startsWith(returnUrl)) {
-                hasReturned = true
-                finish()
-                return true
-            }
-        }
-
-        val urlHost = Uri.parse(url).host
-        if (gatewayHost != null && urlHost != null && urlHost != gatewayHost) {
+        if (isReturnUrl(url)) {
             hasReturned = true
             finish()
             return true
@@ -137,19 +240,30 @@ class HdfcWebViewActivity : BaseActivity() {
     }
 
     private fun onBack() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (binding.webView.canGoBack()) {
-                    binding.webView.goBack()
-                } else {
-                    AlertDialog.Builder(mActivity)
-                        .setTitle(getString(R.string.msgLeavePaymentTitle))
-                        .setMessage(getString(R.string.msgLeavePaymentBody))
-                        .setPositiveButton(getString(R.string.btnLeave)) { _, _ -> finish() }
-                        .setNegativeButton(getString(R.string.btnStay), null)
-                        .show()
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+
+                override fun handleOnBackPressed() {
+                    if (binding.webView.canGoBack()) {
+                        binding.webView.goBack()
+                    } else {
+                        AlertDialog.Builder(mActivity)
+                            .setTitle(getString(R.string.msgLeavePaymentTitle))
+                            .setMessage(getString(R.string.msgLeavePaymentBody))
+                            .setPositiveButton(
+                                getString(R.string.btnLeave)
+                            ) { _, _ ->
+                                finish()
+                            }
+                            .setNegativeButton(
+                                getString(R.string.btnStay),
+                                null
+                            )
+                            .show()
+                    }
                 }
             }
-        })
+        )
     }
 }
