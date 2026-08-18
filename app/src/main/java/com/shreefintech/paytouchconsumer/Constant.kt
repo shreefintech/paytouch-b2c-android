@@ -32,9 +32,6 @@ object Constant {
     // Load Wallet / Payment status extras
     const val EXTRA_FROM_PAYMENT = "from_payment"
 
-    // Dashboard storage base URL — used as root for file_url values returned by /my-account
-    const val BASE_URL_DASHBOARD_STORAGE = "https://paytouch-dashboard.local/storage"
-
     // HDFC Payment Gateway — order status codes
     const val HDFC_STATUS_CHARGED = "CHARGED"
     const val HDFC_STATUS_AUTHORIZED = "AUTHORIZED"
