@@ -5,5 +5,5 @@ import com.google.gson.annotations.SerializedName
 data class HdfcCreateOrderRequest(
     @field:SerializedName("amount")      val amount: Double,
     @field:SerializedName("description") val description: String,
-    @field:SerializedName("purpose")     val purpose: String = "wallet_topup"
+    @field:SerializedName("purpose")     val purpose: String = com.shreefintech.paytouchconsumer.Constant.HDFC_ORDER_PURPOSE_WALLET_TOPUP
 )

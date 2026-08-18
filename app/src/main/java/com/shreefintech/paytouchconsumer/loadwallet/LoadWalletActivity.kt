@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.loadwallet
 
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,8 +11,6 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.databinding.ObservableBoolean
-import android.app.Dialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shreefintech.paytouchconsumer.BaseActivity
@@ -43,7 +42,6 @@ class LoadWalletActivity : BaseActivity() {
     private lateinit var sheetBinding: SheetMakePaymentBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<View>
 
-    private val showProgressPay = ObservableBoolean(false)
     private var currentWalletBalance: String? = null
 
     companion object {
@@ -107,6 +105,35 @@ class LoadWalletActivity : BaseActivity() {
         fetchRecentHistory()
     }
 
+    override fun onResume() {
+        super.onResume()
+        val orderId = HdfcPaymentHelper.pendingOrderId ?: return
+        val amount  = HdfcPaymentHelper.pendingAmount ?: ""
+        HdfcPaymentHelper.clearPendingState()
+        showLoading()
+        viewModel.checkOrderStatus(
+            orderId   = orderId,
+            onSuccess = { data ->
+                hideLoading()
+                PaymentStatusActivity.start(
+                    mActivity,
+                    PaymentStatusItem(
+                        orderId = data.orderId ?: orderId,
+                        amount  = data.amount ?: amount,
+                        status  = data.status ?: Constant.HDFC_STATUS_NEW
+                    )
+                )
+            },
+            onError = {
+                hideLoading()
+                PaymentStatusActivity.start(
+                    mActivity,
+                    PaymentStatusItem(orderId = orderId, amount = amount, status = Constant.HDFC_STATUS_NEW)
+                )
+            }
+        )
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (intent.getBooleanExtra(Constant.EXTRA_FROM_PAYMENT, false)) {
@@ -123,7 +150,6 @@ class LoadWalletActivity : BaseActivity() {
 
     private fun setupPaymentSheet() {
         sheetBinding = binding.incPaymentSheet
-        sheetBinding.showProgressPay = showProgressPay
         sheetBinding.onClickListener = onClickListener()
         sheetBehavior = BottomSheetBehavior.from(sheetBinding.root)
         sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
@@ -219,7 +245,7 @@ class LoadWalletActivity : BaseActivity() {
                         PaymentStatusItem(
                             orderId = data.orderId ?: "",
                             amount  = data.amount ?: "",
-                            status  = data.status ?: "NEW"
+                            status  = data.status ?: Constant.HDFC_STATUS_NEW
                         )
                     )
                     return@createHdfcOrder
