@@ -47,8 +47,14 @@ class SplashActivity : BaseActivity() {
             navigate(Intent(mActivity, LoginActivity::class.java))
             return
         }
-        val token     = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN, "") ?: ""
-        val tokenType = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN_TYPE, "Bearer") ?: "Bearer"
+        val token =
+            SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN, "")
+                ?: ""
+        val tokenType = SharedPreferenceHelper.getSharedPreferenceString(
+            mActivity,
+            Constant.KEY_TOKEN_TYPE,
+            "Bearer"
+        ) ?: "Bearer"
         binding.progressBar.visibility = View.VISIBLE
         viewModel.validateSession(
             authorization = "$tokenType $token",
@@ -65,10 +71,14 @@ class SplashActivity : BaseActivity() {
 
     private fun routeByFlags(data: UserProfileItem?) {
         val intent = when {
-            data?.requiresKyc == true            -> Intent(mActivity, KycActivity::class.java)
-            data?.requiresMpin == true           -> Intent(mActivity, LoginActivity::class.java)
-            data?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)
-            else                                 -> Intent(mActivity, HomeActivity::class.java)
+            data?.requiresKyc == true -> Intent(mActivity, KycActivity::class.java)
+            data?.requiresMpin == true -> ResetMpinActivity.buildCreateIntent(mActivity)
+            data?.requiresVirtualAccount == true -> Intent(
+                mActivity,
+                CreateVirtualAccountActivity::class.java
+            )
+
+            else -> Intent(mActivity, HomeActivity::class.java)
         }
         navigate(intent)
     }

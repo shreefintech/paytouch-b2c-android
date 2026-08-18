@@ -7,5 +7,6 @@ data class KycStatusItem(
     @field:SerializedName("registration_status") val registrationStatus: String?,
     @field:SerializedName("admin_remark") val adminRemark: String?,
     @field:SerializedName("submission") val submission: KycSubmissionStatusItem?,
+    @field:SerializedName("sections") val sections: KycSectionsItem?,
     @field:SerializedName("virtual_account") val virtualAccount: KycVirtualAccountItem?
 )

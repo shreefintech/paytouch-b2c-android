@@ -17,6 +17,7 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityKycBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.onboarding.kyc.bank.BankDetailsActivity
 import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.IdentityVerificationActivity
+import com.shreefintech.paytouchconsumer.enums.KycSectionStatus
 import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -109,28 +110,19 @@ class KycActivity : BaseActivity() {
 
     private fun applyStatus(statusItem: KycStatusItem) {
         val sub = statusItem.submission
-        if (KycSubmissionStatus.from(sub?.status) == KycSubmissionStatus.KYC_SUBMITTED &&
-            sub?.sectionASubmittedAt != null &&
-            sub.sectionBSubmittedAt != null &&
-            sub.sectionCSubmittedAt != null
-        ) {
+        if (KycSubmissionStatus.from(sub?.status) == KycSubmissionStatus.KYC_SUBMITTED) {
             KycStatusActivity.start(mActivity, statusItem)
             finish()
             return
         }
-        val isRejected = KycSubmissionStatus.from(sub?.status) == KycSubmissionStatus.KYC_REJECTED
-        if (isRejected) {
-            val sectionBDate = sub?.sectionBSubmittedAt
-            val sectionCDate = sub?.sectionCSubmittedAt
-            val identityIsNewer = sectionBDate != null && sectionCDate != null && sectionBDate > sectionCDate
-            identityDone = identityIsNewer
-            bankDone = false
-        } else {
-            identityDone = sub?.sectionBSubmittedAt != null
-            bankDone = sub?.sectionCSubmittedAt != null
-        }
 
-        if (!isRejected && identityDone && bankDone) {
+        val sectionBStatus = KycSectionStatus.from(statusItem.sections?.b?.status)
+        val sectionCStatus = KycSectionStatus.from(statusItem.sections?.c?.status)
+
+        identityDone = sectionBStatus == KycSectionStatus.UNDER_REVIEW
+        bankDone = sectionCStatus == KycSectionStatus.UNDER_REVIEW
+
+        if (identityDone && bankDone) {
             agreeAndNavigateToStatus()
             return
         }
@@ -140,76 +132,56 @@ class KycActivity : BaseActivity() {
     }
 
     private fun updateSectionIcons(statusItem: KycStatusItem) {
-        val isRejected =
-            KycSubmissionStatus.from(statusItem.submission?.status) == KycSubmissionStatus.KYC_REJECTED
-        val sectionBDate = statusItem.submission?.sectionBSubmittedAt
-        val sectionCDate = statusItem.submission?.sectionCSubmittedAt
-        val identityIsNewer = sectionBDate != null && sectionCDate != null && sectionBDate > sectionCDate
-        val bankIsNewer = sectionBDate != null && sectionCDate != null && sectionCDate > sectionBDate
+        val sectionBStatus = KycSectionStatus.from(statusItem.sections?.b?.status)
+        val sectionCStatus = KycSectionStatus.from(statusItem.sections?.c?.status)
 
         // Identity card icon — driven by section B
-        when {
-            isRejected && identityIsNewer -> {
+        when (sectionBStatus) {
+            KycSectionStatus.UNDER_REVIEW -> {
                 binding.ivSectionAStatus.setImageResource(R.drawable.ic_success)
-                binding.ivSectionAStatus.visibility = View.VISIBLE
                 binding.ivSectionAStatus.imageTintList = null
-                binding.mcIdentity.alpha = 0.8f
+                binding.mcIdentity.alpha = 0.5f
+                binding.mcIdentity.isClickable = false
             }
-
-            isRejected -> {
+            KycSectionStatus.REJECTED -> {
                 binding.ivSectionAStatus.setImageResource(R.drawable.ic_reject)
-                binding.ivSectionAStatus.visibility = View.VISIBLE
                 binding.ivSectionAStatus.imageTintList = null
                 binding.mcIdentity.alpha = 1f
+                binding.mcIdentity.isClickable = true
             }
-
-            sectionBDate != null -> {
-                binding.ivSectionAStatus.setImageResource(R.drawable.ic_success)
-                binding.ivSectionAStatus.visibility = View.VISIBLE
-                binding.ivSectionAStatus.imageTintList = null
-                binding.mcIdentity.alpha = 0.8f
-            }
-
             else -> {
                 binding.ivSectionAStatus.setImageResource(R.drawable.ic_right_arrow)
                 binding.ivSectionAStatus.imageTintList =
                     ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sheet_divider))
-                binding.ivSectionAStatus.visibility = View.VISIBLE
                 binding.mcIdentity.alpha = 1f
+                binding.mcIdentity.isClickable = true
             }
         }
+        binding.ivSectionAStatus.visibility = View.VISIBLE
 
         // Bank card icon — driven by section C
-        when {
-            /*isRejected && bankIsNewer -> {
+        when (sectionCStatus) {
+            KycSectionStatus.UNDER_REVIEW -> {
                 binding.ivSectionBStatus.setImageResource(R.drawable.ic_success)
-                binding.ivSectionBStatus.visibility = View.VISIBLE
                 binding.ivSectionBStatus.imageTintList = null
-                binding.mcBank.alpha = 0.8f
-            }*/
-
-            isRejected -> {
+                binding.mcBank.alpha = 0.5f
+                binding.mcBank.isClickable = false
+            }
+            KycSectionStatus.REJECTED -> {
                 binding.ivSectionBStatus.setImageResource(R.drawable.ic_reject)
-                binding.ivSectionBStatus.visibility = View.VISIBLE
                 binding.ivSectionBStatus.imageTintList = null
                 binding.mcBank.alpha = if (identityDone) 1f else 0.7f
+                binding.mcBank.isClickable = identityDone
             }
-
-            sectionCDate != null -> {
-                binding.ivSectionBStatus.setImageResource(R.drawable.ic_success)
-                binding.ivSectionBStatus.visibility = View.VISIBLE
-                binding.ivSectionBStatus.imageTintList = null
-                binding.mcBank.alpha = 0.8f
-            }
-
             else -> {
                 binding.ivSectionBStatus.setImageResource(R.drawable.ic_right_arrow)
                 binding.ivSectionBStatus.imageTintList =
                     ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sheet_divider))
-                binding.ivSectionBStatus.visibility = View.VISIBLE
                 binding.mcBank.alpha = if (identityDone) 1.0f else 0.7f
+                binding.mcBank.isClickable = identityDone
             }
         }
+        binding.ivSectionBStatus.visibility = View.VISIBLE
     }
 
     private fun updateProgress() {

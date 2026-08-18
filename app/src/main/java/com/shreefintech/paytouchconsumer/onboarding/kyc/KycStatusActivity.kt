@@ -21,6 +21,7 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
+import com.shreefintech.paytouchconsumer.auth.ResetMpinActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycStatusBinding
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -135,7 +136,7 @@ class KycStatusActivity : BaseActivity() {
     }
 
     private fun navigateToLogin() {
-        startActivity(Intent(mActivity, LoginActivity::class.java).apply {
+        startActivity(ResetMpinActivity.buildCreateIntent(mActivity).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
     }
