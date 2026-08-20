@@ -18,11 +18,11 @@ object HdfcPaymentHelper {
 
     fun pendingOrderId(context: Context): String? =
         SharedPreferenceHelper.getSharedPreferenceString(context, Constant.KEY_HDFC_PENDING_ORDER_ID, "")
-            .takeIf { it.isNotEmpty() }
+            .takeIf { !it.isNullOrEmpty() }
 
     fun pendingAmount(context: Context): String? =
         SharedPreferenceHelper.getSharedPreferenceString(context, Constant.KEY_HDFC_PENDING_AMOUNT, "")
-            .takeIf { it.isNotEmpty() }
+            .takeIf { !it.isNullOrEmpty() }
 
     fun launchPayment(
         context: Activity,
