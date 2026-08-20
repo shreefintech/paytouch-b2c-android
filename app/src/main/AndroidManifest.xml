@@ -58,6 +58,10 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".onboarding.kyc.KycStatusActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".onboarding.kyc.identity.IdentityVerificationActivity"
             android:exported="false"
             android:screenOrientation="portrait"
@@ -306,10 +310,6 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
-        <activity
-            android:name=".onboarding.kyc.KycStatusActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

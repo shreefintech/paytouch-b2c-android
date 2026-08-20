@@ -2,8 +2,6 @@ package com.shreefintech.paytouchconsumer.onboarding.kyc.identity
 
 import android.app.Application
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.shreefintech.paytouchconsumer.R
@@ -68,7 +66,10 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
     }
 
     fun submitIdentity(
-        onLoading: () -> Unit,
+        panBytes: ByteArray,
+        aadhaarFrontBytes: ByteArray,
+        aadhaarBackBytes: ByteArray,
+        selfieBytes: ByteArray,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
@@ -76,52 +77,35 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
             onError(getApplication<Application>().getString(R.string.msgNoInternet))
             return
         }
-        onLoading()
 
-        val textMediaType   = "text/plain".toMediaTypeOrNull()
-        val imgMediaType    = "image/*".toMediaTypeOrNull()
-        val contentResolver = getApplication<Application>().contentResolver
-        val mainHandler     = Handler(Looper.getMainLooper())
+        val textMediaType = "text/plain".toMediaTypeOrNull()
+        val imgMediaType  = "image/*".toMediaTypeOrNull()
 
         val emailBody   = email.toRequestBody(textMediaType)
         val mobileBody  = mobile.toRequestBody(textMediaType)
         val panBody     = panNumber.toRequestBody(textMediaType)
         val aadhaarBody = aadhaarNumber.toRequestBody(textMediaType)
 
-        Thread {
-            val panBytes          = panFrontUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
-            val aadhaarFrontBytes = aadhaarFrontUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
-            val aadhaarBackBytes  = aadhaarBackUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
-            val selfieBytes       = selfieUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
+        val panFilePart           = MultipartBody.Part.createFormData("pan_file", "pan.jpg", panBytes.toRequestBody(imgMediaType))
+        val aadhaarFrontFilePart  = MultipartBody.Part.createFormData("aadhaar_front_file", "aadhaar_front.jpg", aadhaarFrontBytes.toRequestBody(imgMediaType))
+        val aadhaarBackFilePart   = MultipartBody.Part.createFormData("aadhaar_back_file", "aadhaar_back.jpg", aadhaarBackBytes.toRequestBody(imgMediaType))
+        val passportPhotoFilePart = MultipartBody.Part.createFormData("passport_photo_file", "passport.jpg", selfieBytes.toRequestBody(imgMediaType))
 
-            if (panBytes == null || aadhaarFrontBytes == null || aadhaarBackBytes == null || selfieBytes == null) {
-                mainHandler.post { onError(getApplication<Application>().getString(R.string.errGeneric)) }
-                return@Thread
+        ApiClient.apiService.submitKycSectionB(
+            bearerToken(), emailBody, mobileBody, panBody, aadhaarBody,
+            panFilePart, aadhaarFrontFilePart, aadhaarBackFilePart, passportPhotoFilePart
+        ).enqueue(object : Callback<General<KycSignatoryDataItem>> {
+            override fun onResponse(call: Call<General<KycSignatoryDataItem>>, response: Response<General<KycSignatoryDataItem>>) {
+                if (response.isSuccessful && response.body()?.success == true) {
+                    onSuccess()
+                } else {
+                    onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+                }
             }
 
-            val panFilePart           = MultipartBody.Part.createFormData("pan_file", "pan.jpg", panBytes.toRequestBody(imgMediaType))
-            val aadhaarFrontFilePart  = MultipartBody.Part.createFormData("aadhaar_front_file", "aadhaar_front.jpg", aadhaarFrontBytes.toRequestBody(imgMediaType))
-            val aadhaarBackFilePart   = MultipartBody.Part.createFormData("aadhaar_back_file", "aadhaar_back.jpg", aadhaarBackBytes.toRequestBody(imgMediaType))
-            val passportPhotoFilePart = MultipartBody.Part.createFormData("passport_photo_file", "passport.jpg", selfieBytes.toRequestBody(imgMediaType))
-
-            mainHandler.post {
-                ApiClient.apiService.submitKycSectionB(
-                    bearerToken(), emailBody, mobileBody, panBody, aadhaarBody,
-                    panFilePart, aadhaarFrontFilePart, aadhaarBackFilePart, passportPhotoFilePart
-                ).enqueue(object : Callback<General<KycSignatoryDataItem>> {
-                    override fun onResponse(call: Call<General<KycSignatoryDataItem>>, response: Response<General<KycSignatoryDataItem>>) {
-                        if (response.isSuccessful && response.body()?.success == true) {
-                            onSuccess()
-                        } else {
-                            onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
-                        }
-                    }
-
-                    override fun onFailure(call: Call<General<KycSignatoryDataItem>>, t: Throwable) {
-                        onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
-                    }
-                })
+            override fun onFailure(call: Call<General<KycSignatoryDataItem>>, t: Throwable) {
+                onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
             }
-        }.start()
+        })
     }
 }

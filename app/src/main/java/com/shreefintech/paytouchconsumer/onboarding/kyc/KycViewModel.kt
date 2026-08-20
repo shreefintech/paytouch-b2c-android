@@ -76,6 +76,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
         onRegistrationPending: (String) -> Unit,
         onError: (String) -> Unit
     ) {
+        if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         val entityTypeBody = "individual".toRequestBody(textMediaType)
         ApiClient.apiService.initiateKyc(bearerToken(), entityTypeBody)
             .enqueue(object : Callback<General<KycSubmissionDataItem>> {
@@ -104,6 +105,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun submitSectionAPlaceholder(onReady: () -> Unit, onError: (String) -> Unit) {
+        if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         val hasGstBody = "0".toRequestBody(textMediaType)
         ApiClient.apiService.submitKycSectionA(bearerToken(), hasGstBody)
             .enqueue(object : Callback<General<KycSubmissionDataItem>> {
@@ -155,6 +157,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun fetchFinalStatus(onReady: (KycStatusItem) -> Unit, onError: (String) -> Unit) {
+        if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         ApiClient.apiService.getKycStatus(bearerToken())
             .enqueue(object : Callback<KycStatusItem> {
                 override fun onResponse(call: Call<KycStatusItem>, response: Response<KycStatusItem>) {

@@ -12,7 +12,6 @@ import android.text.TextPaint
 import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
@@ -201,7 +200,6 @@ class LoginActivity : BaseActivity() {
             }
 
             mobile.length != 10 -> {
-
                 msg = getString(R.string.msgMobileInvalid)
                 binding.etMobile.requestFocus()
             }
@@ -226,7 +224,6 @@ class LoginActivity : BaseActivity() {
                 listOf(binding.etMpin1, binding.etMpin2, binding.etMpin3, binding.etMpin4)
                     .firstOrNull { it.text.isNullOrEmpty() }?.requestFocus()
             }
-
 
             else -> handleSignIn(mobile, credential)
         }
