@@ -14,11 +14,11 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - Password must be at least 8 characters
 - Email must pass standard email format validation
 - Both password and MPIN login share the same `/api/login` endpoint; the payload differs
-- On login, the server response includes three boolean flags that drive routing:
+- On login, the server response includes two boolean flags that drive routing:
   - `requires_kyc = true` → send to `KycActivity`
-  - `requires_mpin = true` → send to MPIN creation screen
-  - `requires_virtual_account = true` → send to `CreateVirtualAccountActivity`
-  - All false → send to `HomeActivity`
+  - `requires_mpin = true` → send to `ResetMpinActivity` (create-mode, via `buildCreateIntent()`)
+  - Both false → send to `HomeActivity`
+  - **Note:** `requires_virtual_account` is permanently retired. Virtual account creation is now handled server-side after KYC approval. Do not add routing for this flag.
 
 ### API Endpoints
 | Method | Path | Purpose |

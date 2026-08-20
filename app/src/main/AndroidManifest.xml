@@ -305,7 +305,7 @@
         <activity
             android:name=".onboarding.kyc.KycStatusActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
