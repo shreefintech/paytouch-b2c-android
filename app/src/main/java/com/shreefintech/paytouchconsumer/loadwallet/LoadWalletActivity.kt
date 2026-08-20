@@ -107,9 +107,9 @@ class LoadWalletActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        val orderId = HdfcPaymentHelper.pendingOrderId ?: return
-        val amount  = HdfcPaymentHelper.pendingAmount ?: ""
-        HdfcPaymentHelper.clearPendingState()
+        val orderId = HdfcPaymentHelper.pendingOrderId(mActivity) ?: return
+        val amount  = HdfcPaymentHelper.pendingAmount(mActivity) ?: ""
+        HdfcPaymentHelper.clearPendingState(mActivity)
         showLoading()
         viewModel.checkOrderStatus(
             orderId   = orderId,

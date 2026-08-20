@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
@@ -65,12 +64,8 @@ class KycStatusActivity : BaseActivity() {
         binding.swipeRefresh.setOnRefreshListener { refreshStatus() }
 
         binding.lytToolbar.ivBack.gone()
-        binding.cvRetry.setOnClickListener {
-            if (Utility.stopClick()) return@setOnClickListener
-            onRetry()
-        }
+        binding.cvRetry.setOnClickListener(onClickListener())
 
-        onBack()
         statusItem?.let { renderStatus(it) }
     }
 
@@ -146,12 +141,14 @@ class KycStatusActivity : BaseActivity() {
         finish()
     }
 
-    private fun onBack() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                isEnabled = false
-                onBackPressedDispatcher.onBackPressed()
+    private fun onClickListener(): View.OnClickListener {
+        return View.OnClickListener {
+            when (it) {
+                binding.cvRetry -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    onRetry()
+                }
             }
-        })
+        }
     }
 }
