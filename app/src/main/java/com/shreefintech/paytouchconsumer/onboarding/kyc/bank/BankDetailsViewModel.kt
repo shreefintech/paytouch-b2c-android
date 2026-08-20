@@ -2,9 +2,8 @@ package com.shreefintech.paytouchconsumer.onboarding.kyc.bank
 
 import android.app.Application
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.enums.StatementPeriod
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
@@ -13,6 +12,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -20,7 +22,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-data class BankAccountInput(
+data class BankAccountInputItem(
     val accountNumber: String,
     val bankName: String,
     val ifscCode: String,
@@ -33,7 +35,7 @@ data class BankAccountInput(
 class BankDetailsViewModel(application: Application) : AndroidViewModel(application) {
 
     fun submit(
-        accounts: List<BankAccountInput>,
+        accounts: List<BankAccountInputItem>,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -46,9 +48,8 @@ class BankDetailsViewModel(application: Application) : AndroidViewModel(applicat
 
         val imgMediaType    = "image/*".toMediaTypeOrNull()
         val contentResolver = getApplication<Application>().contentResolver
-        val mainHandler     = Handler(Looper.getMainLooper())
 
-        Thread {
+        viewModelScope.launch(Dispatchers.IO) {
             val parts = mutableListOf<MultipartBody.Part>()
             accounts.forEachIndexed { i, account ->
                 parts += MultipartBody.Part.createFormData("bank_accounts[$i][account_number]", account.accountNumber)
@@ -63,7 +64,7 @@ class BankDetailsViewModel(application: Application) : AndroidViewModel(applicat
                 parts += MultipartBody.Part.createFormData("bank_accounts[$i][bank_proof]", "bank_proof_$i.jpg", proofBytes.toRequestBody(imgMediaType))
             }
 
-            mainHandler.post {
+            withContext(Dispatchers.Main) {
                 ApiClient.apiService.submitKycSectionC(bearerToken(), parts)
                     .enqueue(object : Callback<General<KycSubmissionDataItem>> {
                         override fun onResponse(call: Call<General<KycSubmissionDataItem>>, response: Response<General<KycSubmissionDataItem>>) {
@@ -79,6 +80,6 @@ class BankDetailsViewModel(application: Application) : AndroidViewModel(applicat
                         }
                     })
             }
-        }.start()
+        }
     }
 }

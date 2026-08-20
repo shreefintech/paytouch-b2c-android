@@ -2,10 +2,9 @@ package com.shreefintech.paytouchconsumer.onboarding.kyc.identity
 
 import android.app.Application
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -13,6 +12,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -81,22 +83,21 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
         val textMediaType   = "text/plain".toMediaTypeOrNull()
         val imgMediaType    = "image/*".toMediaTypeOrNull()
         val contentResolver = getApplication<Application>().contentResolver
-        val mainHandler     = Handler(Looper.getMainLooper())
 
         val emailBody   = email.toRequestBody(textMediaType)
         val mobileBody  = mobile.toRequestBody(textMediaType)
         val panBody     = panNumber.toRequestBody(textMediaType)
         val aadhaarBody = aadhaarNumber.toRequestBody(textMediaType)
 
-        Thread {
+        viewModelScope.launch(Dispatchers.IO) {
             val panBytes          = panFrontUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
             val aadhaarFrontBytes = aadhaarFrontUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
             val aadhaarBackBytes  = aadhaarBackUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
             val selfieBytes       = selfieUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
 
             if (panBytes == null || aadhaarFrontBytes == null || aadhaarBackBytes == null || selfieBytes == null) {
-                mainHandler.post { onError(getApplication<Application>().getString(R.string.errGeneric)) }
-                return@Thread
+                withContext(Dispatchers.Main) { onError(getApplication<Application>().getString(R.string.errGeneric)) }
+                return@launch
             }
 
             val panFilePart           = MultipartBody.Part.createFormData("pan_file", "pan.jpg", panBytes.toRequestBody(imgMediaType))
@@ -104,7 +105,7 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
             val aadhaarBackFilePart   = MultipartBody.Part.createFormData("aadhaar_back_file", "aadhaar_back.jpg", aadhaarBackBytes.toRequestBody(imgMediaType))
             val passportPhotoFilePart = MultipartBody.Part.createFormData("passport_photo_file", "passport.jpg", selfieBytes.toRequestBody(imgMediaType))
 
-            mainHandler.post {
+            withContext(Dispatchers.Main) {
                 ApiClient.apiService.submitKycSectionB(
                     bearerToken(), emailBody, mobileBody, panBody, aadhaarBody,
                     panFilePart, aadhaarFrontFilePart, aadhaarBackFilePart, passportPhotoFilePart
@@ -122,6 +123,6 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
                     }
                 })
             }
-        }.start()
+        }
     }
 }

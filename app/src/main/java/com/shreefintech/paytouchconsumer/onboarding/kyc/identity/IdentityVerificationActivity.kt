@@ -18,6 +18,10 @@ import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.shreefintech.paytouchconsumer.BaseActivity
 import java.io.ByteArrayOutputStream
 import com.shreefintech.paytouchconsumer.R
@@ -64,10 +68,10 @@ class IdentityVerificationActivity : BaseActivity() {
         val callback = onSelfieCaptured
         onSelfieCaptured = null
         if (success && file != null && uri != null && callback != null) {
-            Thread {
+            lifecycleScope.launch(Dispatchers.IO) {
                 compressIfNeeded(file)
-                runOnUiThread { callback(uri) }
-            }.start()
+                withContext(Dispatchers.Main) { callback(uri) }
+            }
         }
     }
 

@@ -178,7 +178,7 @@ class BankDetailsActivity : BaseActivity() {
     private fun syncCardState() {
         val count = bankCardBindings.size
         bankCardBindings.forEach { b -> b.ivDelete.visibility = if (count > 1) View.VISIBLE else View.GONE }
-        (binding.llAddAccount.parent as? View)?.visibility = if (count >= MAX_ACCOUNTS) View.GONE else View.VISIBLE
+        binding.llAddAccount.visibility = if (count >= MAX_ACCOUNTS) View.GONE else View.VISIBLE
     }
 
     private fun setupCardFilters(card: ItemBankAccountBinding) {
@@ -248,8 +248,6 @@ class BankDetailsActivity : BaseActivity() {
 
         Glide.with(mActivity)
             .load(uri)
-            .placeholder(R.drawable.ic_file_not_found)
-            .error(R.drawable.ic_file_not_found)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean
@@ -317,7 +315,7 @@ class BankDetailsActivity : BaseActivity() {
         if (!validate()) return
 
         val accounts = bankCardBindings.mapIndexed { index, card ->
-            BankAccountInput(
+            BankAccountInputItem(
                 accountNumber   = card.etAccountNumber.text?.toString()?.trim() ?: "",
                 bankName        = card.etBankName.text?.toString()?.trim()      ?: "",
                 ifscCode        = card.etIfscCode.text?.toString()?.trim()      ?: "",
