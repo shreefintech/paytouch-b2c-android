@@ -92,6 +92,28 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
         })
     }
 
+    fun checkOrderStatus(
+        orderId: String,
+        onSuccess: (HdfcOrderItem) -> Unit,
+        onError: () -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) { onError(); return }
+        ApiClient.apiService.getHdfcOrderStatus(bearerToken(), orderId)
+            .enqueue(object : Callback<HdfcOrderResponseItem> {
+                override fun onResponse(
+                    call: Call<HdfcOrderResponseItem>,
+                    response: Response<HdfcOrderResponseItem>
+                ) {
+                    val data = if (response.isSuccessful && response.body()?.success == true) response.body()?.data else null
+                    if (data != null) onSuccess(data) else onError()
+                }
+
+                override fun onFailure(call: Call<HdfcOrderResponseItem>, t: Throwable) {
+                    onError()
+                }
+            })
+    }
+
     fun fetchRecentHistory(
         onSuccess: (ArrayList<WalletTransactionItem>) -> Unit,
         onError: (String) -> Unit

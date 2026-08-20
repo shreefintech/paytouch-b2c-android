@@ -133,6 +133,7 @@ interface ApiService {
     @FormUrlEncoded
     @POST("${AUTH}register")
     fun register(
+        @Field("name") name: String,
         @Field("mobile") mobile: String,
         @Field("email") email: String,
         @Field("password") password: String,

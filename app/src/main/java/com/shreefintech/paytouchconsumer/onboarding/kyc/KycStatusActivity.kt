@@ -21,10 +21,12 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
+import com.shreefintech.paytouchconsumer.auth.ResetMpinActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycStatusBinding
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.gone
 
 class KycStatusActivity : BaseActivity() {
 
@@ -58,10 +60,11 @@ class KycStatusActivity : BaseActivity() {
             insets
         }
 
+
         binding.swipeRefresh.setColorSchemeColors(ContextCompat.getColor(mActivity, R.color.primary))
         binding.swipeRefresh.setOnRefreshListener { refreshStatus() }
 
-        binding.lytToolbar.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.lytToolbar.ivBack.gone()
         binding.cvRetry.setOnClickListener {
             if (Utility.stopClick()) return@setOnClickListener
             onRetry()
@@ -87,7 +90,7 @@ class KycStatusActivity : BaseActivity() {
 
     private fun renderStatus(item: KycStatusItem) {
         when (KycSubmissionStatus.from(item.submission?.status)) {
-            KycSubmissionStatus.KYC_APPROVED  -> navigateToLogin()
+            KycSubmissionStatus.KYC_APPROVED  -> navigateToMpin()
             KycSubmissionStatus.KYC_REJECTED  -> showRejected()
             KycSubmissionStatus.KYC_SUBMITTED -> showPending()
             KycSubmissionStatus.PENDING_KYC   -> {
@@ -132,8 +135,8 @@ class KycStatusActivity : BaseActivity() {
             .into(binding.iv1)
     }
 
-    private fun navigateToLogin() {
-        startActivity(Intent(mActivity, LoginActivity::class.java).apply {
+    private fun navigateToMpin() {
+        startActivity(ResetMpinActivity.buildCreateIntent(mActivity).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
     }

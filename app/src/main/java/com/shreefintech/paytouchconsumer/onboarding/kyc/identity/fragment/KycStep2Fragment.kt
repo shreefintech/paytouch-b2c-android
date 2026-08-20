@@ -98,7 +98,7 @@ class KycStep2Fragment : BaseKycStepFragment() {
     private fun pickFront() {
         if (Utility.stopClick()) return
         hostActivity().pickDocument { uri ->
-            viewModel.aadhaarFrontUri = uri
+            viewModel.setAadhaarFrontUri(uri)
             showPreview(uri, isFront = true)
         }
     }
@@ -106,14 +106,14 @@ class KycStep2Fragment : BaseKycStepFragment() {
     private fun pickBack() {
         if (Utility.stopClick()) return
         hostActivity().pickDocument { uri ->
-            viewModel.aadhaarBackUri = uri
+            viewModel.setAadhaarBackUri(uri)
             showPreview(uri, isFront = false)
         }
     }
 
     private fun clearSlot(isFront: Boolean) {
         if (Utility.stopClick()) return
-        if (isFront) viewModel.aadhaarFrontUri = null else viewModel.aadhaarBackUri = null
+        if (isFront) viewModel.setAadhaarFrontUri(null) else viewModel.setAadhaarBackUri(null)
 
         val ctx = context ?: return
         val uploadPrompt = if (isFront) binding.llUploadFront else binding.llUploadBack
@@ -174,7 +174,7 @@ class KycStep2Fragment : BaseKycStepFragment() {
             ToastUtil.showDelete(requireActivity(), msg); return false
         }
 
-        viewModel.aadhaarNumber = aadhaar
+        viewModel.setAadhaarNumber(aadhaar)
         return true
     }
 

@@ -17,6 +17,7 @@ class CreateAccountViewModel : ViewModel() {
 
     fun register(
         context: Context,
+        name: String,
         mobile: String,
         email: String,
         referralCode: String,
@@ -31,7 +32,7 @@ class CreateAccountViewModel : ViewModel() {
             return
         }
         onLoading()
-        ApiClient.apiService.register(mobile, email, password, passwordConfirmation, referralCode)
+        ApiClient.apiService.register(name, mobile, email, password, passwordConfirmation, referralCode)
             .enqueue(object : Callback<RegisterItem> {
                 override fun onResponse(call: Call<RegisterItem>, response: Response<RegisterItem>) {
                     if (response.isSuccessful) {

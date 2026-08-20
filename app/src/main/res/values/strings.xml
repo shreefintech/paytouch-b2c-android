@@ -20,6 +20,7 @@
     <string name="msgLoginSuccess">Login successful</string>
 
     <!-- Login validation messages -->
+    <string name="msgNameEmpty">Please enter your name</string>
     <string name="msgMobileEmpty">Please enter your mobile number</string>
     <string name="msgMobileInvalid">Enter a valid 10-digit mobile number</string>
     <string name="msgPasswordEmpty">Please enter your password</string>
@@ -70,7 +71,7 @@
     <string name="msgPasswordWeak">Password must include uppercase, number, and special character</string>
     <string name="msgConfirmNewPasswordEmpty">Please confirm your new password</string>
 
-    <!-- Reset / Create MPIN screen -->
+    <!-- Reset MPIN screen -->
     <string name="titleResetMpin">Reset MPIN</string>
     <string name="subtitleResetMpin">Set a new MPIN to keep your account secure</string>
     <string name="titleCreateMpin">Create MPIN</string>
@@ -97,7 +98,14 @@
     <!-- Shared strings still referenced by CreateVirtualAccountActivity / MyAccountActivity layouts -->
     <string name="labelPersonalInformation">Personal Information</string>
     <string name="labelMemberName">Member Name</string>
+    <string name="hintMemberName">Enter Member name</string>
+    <string name="labelBirthdate">Birthdate</string>
+    <string name="hintBirthdate">Enter your birthdate</string>
+    <string name="labelAge">Age</string>
+    <string name="hintAge">Enter your age</string>
     <string name="labelHomeAddress">Home Address</string>
+    <string name="hintHomeAddress">Enter your address</string>
+    <string name="labelCityName">City Name</string>
     <string name="hintSelectCity">Select City</string>
 
     <!-- Shared identity-document strings (Create Virtual Account + KYC identity verification) -->
@@ -105,12 +113,23 @@
     <string name="hintPanCardNumber">Enter your pan card number</string>
     <string name="labelAadharCardNumber">Aadhar Card Number</string>
     <string name="hintAadharCardNumber">Enter your Aadhar card number</string>
+    <string name="labelGstNumber">GST Number</string>
+    <string name="hintGstNumber">Enter your GST Number</string>
     <string name="btnCreateVirtualAccount">Create Virtual Account</string>
+    <string name="msgMemberNameEmpty">Please enter member name</string>
+    <string name="msgMemberNameInvalid">Member name must contain only letters and spaces</string>
+    <string name="msgBirthdateEmpty">Please select your birthdate</string>
+    <string name="msgAgeInvalid">You must be at least 18 years old</string>
+    <string name="msgHomeAddressEmpty">Please enter your home address</string>
+    <string name="msgHomeAddressShort">Address must be at least 5 characters</string>
     <string name="msgCityEmpty">Please select your city</string>
     <string name="msgPanEmpty">Please enter your PAN card number</string>
     <string name="msgPanInvalid">Please enter a valid PAN card number</string>
     <string name="msgAadharEmpty">Please enter your Aadhar card number</string>
     <string name="msgAadharInvalid">Aadhar number must be exactly 12 digits</string>
+    <string name="msgGstEmpty">Please enter your GST number</string>
+    <string name="msgGstInvalid">Please enter a valid GST number</string>
+    <string name="msgKycSubmitSuccess">KYC details submitted successfully</string>
 
     <!-- Common error messages — msgNoInternet and errGeneric are declared above; no duplicates here -->
 
@@ -469,11 +488,20 @@
     <string name="textRajkotGujarat">Rajkot, Gujarat</string>
     <string name="msgOrderIdCopied">Order ID copied</string>
 
+    <!-- Confirm Payment dialog -->
+    <string name="titleAddMoney">Add Money</string>
+    <string name="subtitleAddMoneyToWallet">Add money to your wallet</string>
+    <string name="titleConfirmPayment">Confirm Payment</string>
+    <string name="labelAvailableBalance">Available Balance:</string>
+    <string name="msgSecurePaymentProcessedBy">Secure Payment Processed By</string>
+    <string name="btnPaySecurely">Pay Securely</string>
+    <string name="msgPoweredByPrefix">Powered by </string>
+    <string name="msgPoweredByCompany">SHREE Fintech Solutions Pvt. Ltd.</string>
+
     <!-- KYC module — hub -->
     <string name="titleKycVerification">KYC Verification</string>
     <string name="labelDocumentProgress">Document Progress</string>
-    <string name="msgKycProgressSubtitle">Complete all sections to enable seamless transactions.</string>
-    <string name="labelRequiredSections">REQUIRED SECTIONS</string>
+    <string name="msgKycProgressSubtitle">Complete all sections to enable seamless transactions.</string>    <string name="labelRequiredSections">REQUIRED SECTIONS</string>
     <string name="labelIdentityVerification">Identity Verification</string>
     <string name="fmtDocumentProgress">%d / 2</string>
 
@@ -522,13 +550,14 @@
     <string name="labelStatementPeriod">Statement Period</string>
     <string name="hintStatementPeriod">Select Statement Period</string>
     <string name="msgStatementPeriodRequired">Please select statement period for account %d</string>
-    <string name="textVerificationPending">Verification Pending</string>
-    <string name="msgVerificationPending">Your KYC is under review. We\'ll notify you once it\'s approved.</string>
+    <string name="textVerificationPending">Wait a While!</string>
+    <string name="msgVerificationPending">Your documents are being verified. Please wait.</string>
     <string name="textVerificationApproved">Verification Approved</string>
     <string name="msgVerificationApproved">Your KYC has been approved successfully.</string>
-    <string name="textVerificationRejected">Verification Rejected</string>
+    <string name="textVerificationRejected">Verification Failed!</string>
     <string name="msgVerificationRejected">We couldn\'t verify your details, Please resubmit to continue</string>
     <string name="btnRetry">Retry</string>
+    <string name="label_name">Name</string>
 
     <!-- KYC Details -->
     <string name="titleKycDetails">KYC Details</string>
