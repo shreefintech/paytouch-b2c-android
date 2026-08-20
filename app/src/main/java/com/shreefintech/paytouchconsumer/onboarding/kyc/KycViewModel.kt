@@ -3,6 +3,7 @@ package com.shreefintech.paytouchconsumer.onboarding.kyc
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.enums.KycSectionStatus
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -45,6 +46,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     if (response.isSuccessful && response.body()?.success == true) {
                         val statusItem = response.body()!!
                         val submission = statusItem.submission
+                        val sectionAStatus = KycSectionStatus.from(statusItem.sections?.a?.status)
                         when {
                             submission == null || submission.entityType.isNullOrEmpty() ->
                                 callInitiate(
@@ -53,7 +55,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                                     onError = onError
                                 )
 
-                            submission.sectionASubmittedAt == null ->
+                            sectionAStatus == KycSectionStatus.PENDING || sectionAStatus == KycSectionStatus.REJECTED ->
                                 submitSectionAPlaceholder(onReady = { onReady(statusItem) }, onError = onError)
 
                             else -> onReady(statusItem)

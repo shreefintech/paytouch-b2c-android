@@ -48,17 +48,6 @@ class PaymentStatusActivity : BaseActivity() {
     companion object {
         private const val EXTRA_ITEM = "extra_item"
 
-        private const val STATUS_CHARGED = "CHARGED"
-        private const val STATUS_AUTHORIZED = "AUTHORIZED"
-        private const val STATUS_NEW = "NEW"
-        private const val STATUS_PENDING_VBV = "PENDING_VBV"
-        private const val STATUS_AUTHORIZING = "AUTHORIZING"
-        private const val STATUS_STARTED = "STARTED"
-        private const val STATUS_JUSPAY_DECLINED = "JUSPAY_DECLINED"
-        private const val STATUS_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED"
-        private const val STATUS_AUTHORIZATION_FAILED = "AUTHORIZATION_FAILED"
-        private const val STATUS_AUTO_REFUNDED = "AUTO_REFUNDED"
-
         fun start(context: Context, item: PaymentStatusItem) {
             context.startActivity(
                 Intent(context, PaymentStatusActivity::class.java).apply {
@@ -114,7 +103,7 @@ class PaymentStatusActivity : BaseActivity() {
 
     private fun resolveStatus(status: String): StatusDisplay {
         return when (status.uppercase()) {
-            STATUS_CHARGED, STATUS_AUTHORIZED -> StatusDisplay(
+            Constant.HDFC_STATUS_CHARGED, Constant.HDFC_STATUS_AUTHORIZED -> StatusDisplay(
                 label = getString(R.string.msgPaymentSuccessful),
                 description = getString(R.string.msgPaymentSuccessDescription),
                 amountLabel = getString(R.string.labelAmountPaid),
@@ -122,7 +111,7 @@ class PaymentStatusActivity : BaseActivity() {
                 gifRes = R.drawable.gif_success
             )
 
-            STATUS_NEW -> StatusDisplay(
+            Constant.HDFC_STATUS_NEW -> StatusDisplay(
                 label = getString(R.string.msgPaymentInitiated),
                 description = getString(R.string.msgPaymentInitiatedDescription),
                 amountLabel = getString(R.string.labelAmountPending),
@@ -130,7 +119,7 @@ class PaymentStatusActivity : BaseActivity() {
                 gifRes = R.drawable.gif_pending
             )
 
-            STATUS_PENDING_VBV, STATUS_AUTHORIZING, STATUS_STARTED -> StatusDisplay(
+            Constant.HDFC_STATUS_PENDING_VBV, Constant.HDFC_STATUS_AUTHORIZING, Constant.HDFC_STATUS_STARTED -> StatusDisplay(
                 label = getString(R.string.msgPaymentProcessing),
                 description = getString(R.string.msgPaymentPendingDescription),
                 amountLabel = getString(R.string.labelAmountPending),
@@ -138,7 +127,7 @@ class PaymentStatusActivity : BaseActivity() {
                 gifRes = R.drawable.gif_pending
             )
 
-            STATUS_JUSPAY_DECLINED, STATUS_AUTHENTICATION_FAILED, STATUS_AUTHORIZATION_FAILED -> StatusDisplay(
+            Constant.HDFC_STATUS_JUSPAY_DECLINED, Constant.HDFC_STATUS_AUTHENTICATION_FAILED, Constant.HDFC_STATUS_AUTHORIZATION_FAILED -> StatusDisplay(
                 label = getString(R.string.msgPaymentFailed),
                 description = getString(R.string.msgPaymentFailedDescription),
                 amountLabel = getString(R.string.labelAmountFailed),
@@ -146,7 +135,7 @@ class PaymentStatusActivity : BaseActivity() {
                 gifRes = R.drawable.gif_rejected
             )
 
-            STATUS_AUTO_REFUNDED -> StatusDisplay(
+            Constant.HDFC_STATUS_AUTO_REFUNDED -> StatusDisplay(
                 label = getString(R.string.msgAmountRefunded),
                 description = getString(R.string.msgPaymentRefundedDescription),
                 amountLabel = getString(R.string.labelAmountRefunded),

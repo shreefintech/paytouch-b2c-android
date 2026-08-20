@@ -28,17 +28,31 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
 
     val currentStep = MutableLiveData(0)
 
-    var mobile = ""
-    var email = ""
+    var mobile = ""; private set
+    var email = ""; private set
 
-    var aadhaarNumber = ""
-    var aadhaarFrontUri: Uri? = null
-    var aadhaarBackUri: Uri? = null
+    var aadhaarNumber = ""; private set
+    var aadhaarFrontUri: Uri? = null; private set
+    var aadhaarBackUri: Uri? = null; private set
 
-    var panNumber = ""
-    var panFrontUri: Uri? = null
+    var panNumber = ""; private set
+    var panFrontUri: Uri? = null; private set
 
-    var selfieUri: Uri? = null
+    var selfieUri: Uri? = null; private set
+
+    fun setStep1(mobile: String, email: String) {
+        this.mobile = mobile
+        this.email = email
+    }
+
+    fun setAadhaarNumber(number: String) { aadhaarNumber = number }
+    fun setAadhaarFrontUri(uri: Uri?) { aadhaarFrontUri = uri }
+    fun setAadhaarBackUri(uri: Uri?) { aadhaarBackUri = uri }
+
+    fun setPanNumber(number: String) { panNumber = number }
+    fun setPanFrontUri(uri: Uri?) { panFrontUri = uri }
+
+    fun setSelfieUri(uri: Uri?) { selfieUri = uri }
 
     fun goToNextStep() {
         val step = currentStep.value ?: 0

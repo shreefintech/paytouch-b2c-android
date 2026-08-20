@@ -3,7 +3,7 @@ package com.shreefintech.paytouchconsumer
 object Constant {
 
     // API Base URLs
-    const val BASE_URL = "https://tablet-frying-shy.ngrok-free.dev/"/*"https://www.paytouch.in/"*/
+    const val BASE_URL = "https://www.paytouch.in/"
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
 
     // AUTH store keys
@@ -13,6 +13,8 @@ object Constant {
     const val KEY_MOBILE = "MOBILE"
     const val KEY_TOKEN_TYPE = "TOKEN_TYPE"
     const val KEY_WALLET_BALANCE = "WALLET_BALANCE"
+
+
     const val KEY_REFERRAL_CODE = "ReferralCode"
 
     // External URLs
@@ -30,7 +32,19 @@ object Constant {
     // Load Wallet / Payment status extras
     const val EXTRA_FROM_PAYMENT = "from_payment"
 
-    // Dashboard storage base URL — used as root for file_url values returned by /my-account
-    const val BASE_URL_DASHBOARD_STORAGE = "https://paytouch-dashboard.local/storage"
+    // HDFC Payment Gateway — order status codes
+    const val HDFC_STATUS_CHARGED = "CHARGED"
+    const val HDFC_STATUS_AUTHORIZED = "AUTHORIZED"
+    const val HDFC_STATUS_NEW = "NEW"
+    const val HDFC_STATUS_PENDING_VBV = "PENDING_VBV"
+    const val HDFC_STATUS_AUTHORIZING = "AUTHORIZING"
+    const val HDFC_STATUS_STARTED = "STARTED"
+    const val HDFC_STATUS_JUSPAY_DECLINED = "JUSPAY_DECLINED"
+    const val HDFC_STATUS_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED"
+    const val HDFC_STATUS_AUTHORIZATION_FAILED = "AUTHORIZATION_FAILED"
+    const val HDFC_STATUS_AUTO_REFUNDED = "AUTO_REFUNDED"
+
+    // HDFC order creation
+    const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
 }

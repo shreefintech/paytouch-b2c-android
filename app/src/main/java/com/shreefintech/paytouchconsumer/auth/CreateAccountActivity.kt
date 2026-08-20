@@ -79,10 +79,12 @@ class CreateAccountActivity : BaseActivity() {
 
     private fun setupInputFilters() {
         val emojiFilter = Utility.EmojiExcludeFilter()
-        binding.etMobile.filters          = arrayOf(InputFilter.LengthFilter(10), Utility.digitFilter(), emojiFilter)
-        binding.etEmail.filters           = arrayOf(InputFilter.LengthFilter(100), emojiFilter)
-        binding.etReferralCode.filters    = arrayOf(InputFilter.LengthFilter(50), emojiFilter)
-        binding.etPassword.filters        = arrayOf(InputFilter.LengthFilter(20), emojiFilter)
+        binding.etName.filters = arrayOf(InputFilter.LengthFilter(150), emojiFilter)
+        binding.etMobile.filters =
+            arrayOf(InputFilter.LengthFilter(10), Utility.digitFilter(), emojiFilter)
+        binding.etEmail.filters = arrayOf(InputFilter.LengthFilter(100), emojiFilter)
+        binding.etReferralCode.filters = arrayOf(InputFilter.LengthFilter(50), emojiFilter)
+        binding.etPassword.filters = arrayOf(InputFilter.LengthFilter(20), emojiFilter)
         binding.etConfirmPassword.filters = arrayOf(InputFilter.LengthFilter(20), emojiFilter)
     }
 
@@ -114,12 +116,18 @@ class CreateAccountActivity : BaseActivity() {
 
     private fun validate(): Boolean {
         Utility.hideKeyboard(binding.clRoot)
+        val name = binding.etName.text?.toString()?.trim() ?: ""
         val mobile = binding.etMobile.text?.toString()?.trim() ?: ""
         val email = binding.etEmail.text?.toString()?.trim() ?: ""
         val password = binding.etPassword.text?.toString() ?: ""
         val confirmPassword = binding.etConfirmPassword.text?.toString() ?: ""
 
         val msg = when {
+            name.isEmpty() -> {
+                binding.etName.requestFocus()
+                getString(R.string.msgNameEmpty)
+            }
+
             mobile.isEmpty() -> {
                 binding.etMobile.requestFocus()
                 getString(R.string.msgMobileEmpty)
@@ -173,20 +181,22 @@ class CreateAccountActivity : BaseActivity() {
 
     private fun onCreateAccount() {
         if (!validate()) return
-        val mobile              = binding.etMobile.text?.toString()?.trim()         ?: ""
-        val email               = binding.etEmail.text?.toString()?.trim()           ?: ""
-        val referralCode        = binding.etReferralCode.text?.toString()?.trim()    ?: ""
-        val password            = binding.etPassword.text?.toString()                ?: ""
-        val passwordConfirmation = binding.etConfirmPassword.text?.toString()        ?: ""
+        val name = binding.etName.text?.toString()?.trim() ?: ""
+        val mobile = binding.etMobile.text?.toString()?.trim() ?: ""
+        val email = binding.etEmail.text?.toString()?.trim() ?: ""
+        val referralCode = binding.etReferralCode.text?.toString()?.trim() ?: ""
+        val password = binding.etPassword.text?.toString() ?: ""
+        val passwordConfirmation = binding.etConfirmPassword.text?.toString() ?: ""
         viewModel.register(
-            context              = mActivity,
-            mobile               = mobile,
-            email                = email,
-            referralCode         = referralCode,
-            password             = password,
+            context = mActivity,
+            name = name,
+            mobile = mobile,
+            email = email,
+            referralCode = referralCode,
+            password = password,
             passwordConfirmation = passwordConfirmation,
-            onLoading            = { showProgress.set(true) },
-            onSuccess            = {
+            onLoading = { showProgress.set(true) },
+            onSuccess = {
                 showProgress.set(false)
                 ToastUtil.showSuccess(mActivity, getString(R.string.msgAccountCreatedSuccessfully))
                 val intent = Intent(mActivity, LoginActivity::class.java).apply {
@@ -195,7 +205,7 @@ class CreateAccountActivity : BaseActivity() {
                 startActivity(intent)
                 finish()
             },
-            onError              = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
+            onError = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
         )
     }
 

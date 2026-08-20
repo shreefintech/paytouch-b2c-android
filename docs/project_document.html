@@ -789,7 +789,7 @@ showProgressFetch.set(<span class="keyword">false</span>)  <span class="comment"
   </tr>
   <tr>
     <td>Load Wallet</td>
-    <td><span class="badge badge-gray">📋 Planned</span></td>
+    <td><span class="badge badge-green">✅ Done</span></td>
     <td>—</td><td>—</td><td>—</td><td>—</td>
   </tr>
 </table>
@@ -841,14 +841,16 @@ HomeActivity       (all flags false)</code></pre>
                           requires_virtual_account ► CreateVirtualAccountActivity
                           All clear ──────────────► HomeActivity
                                                          │
-                         ┌───────────────────────────────┤
-                         ▼                               ▼
-               ElectricityActivity             GasActivity, DthActivity,
-               (canonical reference)           PrepaidActivity, PostpaidActivity,
-                         │                     FasTagActivity, LoanActivity...
-                         │
-              Pay ─ Recent ─ Report ─ Status ─ SMS Receipt
-              ✅     ✅        ✅        ✅         ✅
+                         ┌───────────────────────────────┬──────────────────┤
+                         ▼                               ▼                  ▼
+               ElectricityActivity             GasActivity, DthActivity,  LoadWalletActivity
+               (canonical reference)           PrepaidActivity, PostpaidActivity,     │
+                         │                     FasTagActivity, LoanActivity...  ┌─────┴──────┐
+                         │                                                      ▼            ▼
+              Pay ─ Recent ─ Report ─ Status ─ SMS Receipt     WalletTransactionsActivity  HdfcWebViewActivity
+              ✅     ✅        ✅        ✅         ✅                              └────────────┘
+                                                                                      │
+                                                                            PaymentStatusActivity
 
 All detail taps ──────────────────────────► TransactionDetailActivity (shared)
 
@@ -871,6 +873,9 @@ All detail taps ─────────────────────�
   <tr><td><code>DthPlanSelectionActivity</code></td><td><code>DthActivity</code> (result)</td><td><code>extra_selected_plan</code></td><td>JSON <code>DthPlanItem</code></td></tr>
   <tr><td><code>{Category}Activity</code></td><td><code>{Category}SmsReceiptActivity</code></td><td><code>extra_from_payment</code></td><td>Boolean</td></tr>
   <tr><td>Any module</td><td><code>TransactionDetailActivity</code></td><td><code>extra_item</code></td><td>JSON <code>TransactionItem</code></td></tr>
+  <tr><td><code>LoadWalletActivity</code></td><td><code>HdfcWebViewActivity</code></td><td><code>hdfc_payment_url</code>, <code>hdfc_return_url</code></td><td>String (via <code>HdfcPaymentHelper.launchPayment()</code>)</td></tr>
+  <tr><td><code>PaymentStatusActivity</code></td><td><code>LoadWalletActivity</code></td><td><code>from_payment</code></td><td>Boolean — triggers wallet data + history refresh via <code>onNewIntent()</code></td></tr>
+  <tr><td><code>LoadWalletActivity</code></td><td><code>PaymentStatusActivity</code></td><td><code>extra_item</code></td><td>JSON <code>PaymentStatusItem</code> (orderId, amount, status)</td></tr>
 </table>
 </div>
 

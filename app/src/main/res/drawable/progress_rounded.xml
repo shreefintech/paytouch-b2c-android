@@ -5,7 +5,7 @@
     <item android:id="@android:id/background">
         <shape android:shape="rectangle">
             <corners android:radius="3dp" />
-            <solid android:color="#23000000" />
+            <solid android:color="@color/sheet_divider" />
         </shape>
     </item>
 
