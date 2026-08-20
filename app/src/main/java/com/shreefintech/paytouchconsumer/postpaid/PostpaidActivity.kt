@@ -30,6 +30,8 @@ import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransacti
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidViewModel
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidPlanSelectionActivity
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlanItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -49,20 +51,13 @@ class PostpaidActivity : BaseActivity() {
     private var selectedCircleId: String? = null
     private var selectedCircleName: String? = null
 
-    private var selectedPlan: PrepaidPlanItem? = null
-    private var isPlanSelected = false
+
+    private val showProgressFetch = ObservableBoolean(false)
+    private var fetchedBillItem: PostpaidFetchBillDataItem? = null
+    private var isBillFetched = false
 
     private val showProgressPay = ObservableBoolean(false)
 
-    private val planSelectionLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val json = result.data?.getStringExtra(PrepaidPlanSelectionActivity.EXTRA_SELECTED_PLAN)
-            val plan = json?.let { Gson().fromJson(it, PrepaidPlanItem::class.java) }
-            if (plan != null) onPlanSelected(plan)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,6 +85,7 @@ class PostpaidActivity : BaseActivity() {
         )
 
         binding.onClickListener = onClickListener()
+        binding.showProgressFetch = showProgressFetch
         binding.showProgressPay = showProgressPay
         setupInputFilters()
         setupAmountWatcher()
@@ -127,6 +123,14 @@ class PostpaidActivity : BaseActivity() {
             }
         })
     }
+
+    private fun onClearBill() {
+        isBillFetched = false
+        fetchedBillItem = null
+        binding.cvBillDetails.visibility = View.GONE
+        binding.etAmount.setText("")
+    }
+
 
     private fun setupTermsText() {
         val fullText = getString(R.string.msgTermsAgreement)
@@ -219,7 +223,6 @@ class PostpaidActivity : BaseActivity() {
             selectedOperatorId = operatorItems.getOrNull(index)?.id
             selectedOperatorName = selected
             binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-            clearSelectedPlan()
         }
     }
 
@@ -236,7 +239,6 @@ class PostpaidActivity : BaseActivity() {
             selectedCircleId = Utility.STATE_LIST.getOrNull(index)?.first
             selectedCircleName = selected
             binding.tvState.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-            clearSelectedPlan()
         }
     }
 
@@ -247,23 +249,6 @@ class PostpaidActivity : BaseActivity() {
         binding.flCompanyAnchor.isFocusable = !loading
     }
 
-    private fun showPlanDetails() {
-        val plan = selectedPlan ?: return
-        binding.tvSelectedPlanDescription.text = plan.description ?: "-"
-        binding.tvSelectedValidity.text = plan.validity ?: "-"
-        binding.tvSelectedTalktime.text =
-            if (plan.talktime == null || plan.talktime < 0) "-" else getString(R.string.fmtCurrencyAmount).format(plan.talktime)
-        binding.tvSelectedData.text = if (plan.data.isNullOrEmpty()) "--" else plan.data
-        binding.etAmount.setText(plan.amount?.toString() ?: "")
-        binding.cvPlanDetails.visibility = View.VISIBLE
-    }
-
-    private fun clearSelectedPlan() {
-        isPlanSelected = false
-        selectedPlan = null
-        binding.cvPlanDetails.visibility = View.GONE
-        binding.etAmount.setText("")
-    }
 
     private fun resetFeeDisplay() {
         val hintColor = mActivity.getThemeColor(R.attr.colorTextHint)
@@ -273,28 +258,55 @@ class PostpaidActivity : BaseActivity() {
         binding.tvTotalPayable.setTextColor(hintColor)
     }
 
-    private fun onPlanSelected(plan: PrepaidPlanItem) {
-        selectedPlan = plan
-        isPlanSelected = true
-        showPlanDetails()
+    private fun showBillDetails() {
+        val bill = fetchedBillItem ?: return
+        binding.tvBillCustomerName.text = bill.customerName ?: "-"
+        binding.tvBillDueDate.text = bill.dueDate ?: "-"
+        binding.tvBillDate.text = bill.billDate ?: "-"
+        binding.tvBillAmount.text = bill.billAmount?.toString() ?: "-"
+        binding.tvBillMobileNo.text = binding.etMobileNumber.text?.toString()?.trim() ?: "-"
+        binding.tvBillOperator.text = selectedOperatorName ?: "-"
+        binding.etAmount.setText(bill.billAmount?.toString() ?: "")
+        binding.cvBillDetails.visibility = View.VISIBLE
     }
 
     // ── Actions ───────────────────────────────────────────────────────────────
 
-    private fun onBrowsePlan() {
+    private fun onFetchBill() {
         if (selectedOperatorId.isNullOrEmpty()) {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
             return
         }
-        if (selectedCircleId.isNullOrEmpty()) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgStateEmpty))
+        val connectionNumber = binding.etMobileNumber.text?.toString()?.trim() ?: ""
+        if (connectionNumber.isEmpty()) {
+            binding.etMobileNumber.requestFocus()
+            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
+            return
+        }
+        if (connectionNumber.length < 10) {
+            binding.etMobileNumber.requestFocus()
+            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
             return
         }
         Utility.hideKeyboard(mActivity)
-        // TODO(B2C-59): temporary stand-in — replace with PostpaidPlanSelectionActivity once
-        // mobile-postpaid/plans API is ready; !! is safe — both IDs are checked non-null above
-        PrepaidPlanSelectionActivity.start(
-            mActivity, planSelectionLauncher, selectedOperatorId!!, selectedCircleId!!
+        fetchBill(connectionNumber)
+    }
+
+    private fun fetchBill(mobileNumber: String) {
+        viewModel.fetchBill(
+            mobileNumber = mobileNumber,
+            operatorId = selectedOperatorId ?: "",
+            onLoading = { showProgressFetch.set(true) },
+            onSuccess = { bill ->
+                showProgressFetch.set(false)
+                fetchedBillItem = bill
+                isBillFetched = true
+                showBillDetails()
+            },
+            onError = { msg ->
+                showProgressFetch.set(false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
         )
     }
 
@@ -318,8 +330,9 @@ class PostpaidActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgStateEmpty))
             return
         }
-        if (!isPlanSelected) {
-            onBrowsePlan()
+        if (!isBillFetched) {
+            Utility.hideKeyboard(mActivity)
+            fetchBill(mobileNumber)
             return
         }
         if (!binding.cbTerms.isChecked) {
@@ -346,9 +359,11 @@ class PostpaidActivity : BaseActivity() {
         binding.cbTerms.isChecked = false
         selectedOperatorId = null
         selectedOperatorName = null
+        isBillFetched = false
+        fetchedBillItem=null
+        binding.cvBillDetails.visibility = View.GONE
         selectedCircleId = null
         selectedCircleName = null
-        clearSelectedPlan()
         resetFeeDisplay()
         Utility.hideKeyboard(binding.clRoot)
     }
@@ -390,13 +405,14 @@ class PostpaidActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     showStateDropdown()
                 }
-                binding.llBrowsePlan -> {
+                binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    onBrowsePlan()
+                    if (showProgressFetch.get()) return@OnClickListener
+                    onFetchBill()
                 }
-                binding.cvChangePlan -> {
+                binding.cvClearBill -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    onBrowsePlan()
+                    onClearBill()
                 }
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
