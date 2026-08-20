@@ -24,6 +24,7 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDocPreviewBinding
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
+import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -90,10 +91,11 @@ class DocPreviewActivity : BaseActivity() {
         loadFileFromUrl(fileUrl)
     }
 
-    fun onClickListener(): View.OnClickListener {
+    private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener {
             when (it) {
                 binding.toolbar.ivBack -> {
+                    if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
             }

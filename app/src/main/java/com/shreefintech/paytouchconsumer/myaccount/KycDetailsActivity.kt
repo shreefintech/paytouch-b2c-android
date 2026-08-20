@@ -15,7 +15,6 @@ import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.KycDocumentAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycDetailsBinding
@@ -173,11 +172,7 @@ class KycDetailsActivity : BaseActivity() {
         }
     }
 
-    private fun resolveFileUrl(fileUrl: String?): String? {
-        if (fileUrl.isNullOrBlank()) return null
-        return if (fileUrl.startsWith("http")) fileUrl
-        else "${Constant.BASE_URL_DASHBOARD_STORAGE}/${fileUrl.trimStart('/')}"
-    }
+    private fun resolveFileUrl(fileUrl: String?): String? = fileUrl?.ifBlank { null }
 
     private fun statusLabel(status: String?): String = when {
         status.isNullOrEmpty() -> "--"

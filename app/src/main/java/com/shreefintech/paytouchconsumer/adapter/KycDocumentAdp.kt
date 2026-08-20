@@ -16,6 +16,7 @@ import com.shreefintech.paytouchconsumer.databinding.ItemKycDocumentBinding
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDocumentDetailItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -30,12 +31,22 @@ class KycDocumentAdp(
 ) : RecyclerView.Adapter<KycDocumentAdp.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemKycDocumentBinding) :
-        RecyclerView.ViewHolder(binding.root)
+        RecyclerView.ViewHolder(binding.root) {
+        var pdfJob: Job? = null
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(ItemKycDocumentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        holder.pdfJob?.cancel()
+        holder.pdfJob = null
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.pdfJob?.cancel()
+        holder.pdfJob = null
         val item = items[position]
         val resolvedUrl = urlResolver(item.fileUrl)
 
@@ -44,7 +55,7 @@ class KycDocumentAdp(
         if (resolvedUrl.isNullOrBlank()) {
             holder.binding.pbItemLoading.visibility = View.GONE
             holder.binding.ivDocument.visibility = View.VISIBLE
-            holder.binding.ivDocument.setImageResource(R.drawable.ic_aadhar_placeholder)
+            holder.binding.ivDocument.setImageResource(R.drawable.ic_file_not_found)
             return
         }
 
@@ -60,6 +71,8 @@ class KycDocumentAdp(
             holder.binding.ivDocument.visibility = View.VISIBLE
             Glide.with(holder.binding.ivDocument)
                 .load(resolvedUrl)
+                .placeholder(R.drawable.ic_file_not_found)
+                .error(R.drawable.ic_file_not_found)
                 .centerCrop()
                 .into(holder.binding.ivDocument)
         }
@@ -73,7 +86,7 @@ class KycDocumentAdp(
         holder.binding.pbItemLoading.visibility = View.VISIBLE
         holder.binding.ivDocument.visibility = View.INVISIBLE
 
-        CoroutineScope(Dispatchers.IO).launch {
+        holder.pdfJob = CoroutineScope(Dispatchers.IO).launch {
             val bitmap = try {
                 renderPdfFirstPage(cacheDir, url)
             } catch (e: Exception) {
@@ -86,7 +99,7 @@ class KycDocumentAdp(
                     if (bitmap != null) {
                         holder.binding.ivDocument.setImageBitmap(bitmap)
                     } else {
-                        holder.binding.ivDocument.setImageResource(R.drawable.ic_aadhar_placeholder)
+                        holder.binding.ivDocument.setImageResource(R.drawable.ic_file_not_found)
                     }
                 }
             }

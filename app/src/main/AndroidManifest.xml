@@ -299,6 +299,10 @@
             android:name=".loadwallet.PaymentStatusActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".myaccount.DocPreviewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
