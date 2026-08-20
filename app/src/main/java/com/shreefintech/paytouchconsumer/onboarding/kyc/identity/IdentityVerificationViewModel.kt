@@ -4,7 +4,6 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -12,9 +11,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -70,7 +66,10 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
     }
 
     fun submitIdentity(
-        onLoading: () -> Unit,
+        panBytes: ByteArray,
+        aadhaarFrontBytes: ByteArray,
+        aadhaarBackBytes: ByteArray,
+        selfieBytes: ByteArray,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
@@ -78,51 +77,35 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
             onError(getApplication<Application>().getString(R.string.msgNoInternet))
             return
         }
-        onLoading()
 
-        val textMediaType   = "text/plain".toMediaTypeOrNull()
-        val imgMediaType    = "image/*".toMediaTypeOrNull()
-        val contentResolver = getApplication<Application>().contentResolver
+        val textMediaType = "text/plain".toMediaTypeOrNull()
+        val imgMediaType  = "image/*".toMediaTypeOrNull()
 
         val emailBody   = email.toRequestBody(textMediaType)
         val mobileBody  = mobile.toRequestBody(textMediaType)
         val panBody     = panNumber.toRequestBody(textMediaType)
         val aadhaarBody = aadhaarNumber.toRequestBody(textMediaType)
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val panBytes          = panFrontUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
-            val aadhaarFrontBytes = aadhaarFrontUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
-            val aadhaarBackBytes  = aadhaarBackUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
-            val selfieBytes       = selfieUri?.let { contentResolver.openInputStream(it)?.use { s -> s.readBytes() } }
+        val panFilePart           = MultipartBody.Part.createFormData("pan_file", "pan.jpg", panBytes.toRequestBody(imgMediaType))
+        val aadhaarFrontFilePart  = MultipartBody.Part.createFormData("aadhaar_front_file", "aadhaar_front.jpg", aadhaarFrontBytes.toRequestBody(imgMediaType))
+        val aadhaarBackFilePart   = MultipartBody.Part.createFormData("aadhaar_back_file", "aadhaar_back.jpg", aadhaarBackBytes.toRequestBody(imgMediaType))
+        val passportPhotoFilePart = MultipartBody.Part.createFormData("passport_photo_file", "passport.jpg", selfieBytes.toRequestBody(imgMediaType))
 
-            if (panBytes == null || aadhaarFrontBytes == null || aadhaarBackBytes == null || selfieBytes == null) {
-                withContext(Dispatchers.Main) { onError(getApplication<Application>().getString(R.string.errGeneric)) }
-                return@launch
+        ApiClient.apiService.submitKycSectionB(
+            bearerToken(), emailBody, mobileBody, panBody, aadhaarBody,
+            panFilePart, aadhaarFrontFilePart, aadhaarBackFilePart, passportPhotoFilePart
+        ).enqueue(object : Callback<General<KycSignatoryDataItem>> {
+            override fun onResponse(call: Call<General<KycSignatoryDataItem>>, response: Response<General<KycSignatoryDataItem>>) {
+                if (response.isSuccessful && response.body()?.success == true) {
+                    onSuccess()
+                } else {
+                    onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+                }
             }
 
-            val panFilePart           = MultipartBody.Part.createFormData("pan_file", "pan.jpg", panBytes.toRequestBody(imgMediaType))
-            val aadhaarFrontFilePart  = MultipartBody.Part.createFormData("aadhaar_front_file", "aadhaar_front.jpg", aadhaarFrontBytes.toRequestBody(imgMediaType))
-            val aadhaarBackFilePart   = MultipartBody.Part.createFormData("aadhaar_back_file", "aadhaar_back.jpg", aadhaarBackBytes.toRequestBody(imgMediaType))
-            val passportPhotoFilePart = MultipartBody.Part.createFormData("passport_photo_file", "passport.jpg", selfieBytes.toRequestBody(imgMediaType))
-
-            withContext(Dispatchers.Main) {
-                ApiClient.apiService.submitKycSectionB(
-                    bearerToken(), emailBody, mobileBody, panBody, aadhaarBody,
-                    panFilePart, aadhaarFrontFilePart, aadhaarBackFilePart, passportPhotoFilePart
-                ).enqueue(object : Callback<General<KycSignatoryDataItem>> {
-                    override fun onResponse(call: Call<General<KycSignatoryDataItem>>, response: Response<General<KycSignatoryDataItem>>) {
-                        if (response.isSuccessful && response.body()?.success == true) {
-                            onSuccess()
-                        } else {
-                            onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
-                        }
-                    }
-
-                    override fun onFailure(call: Call<General<KycSignatoryDataItem>>, t: Throwable) {
-                        onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
-                    }
-                })
+            override fun onFailure(call: Call<General<KycSignatoryDataItem>>, t: Throwable) {
+                onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
             }
-        }
+        })
     }
 }

@@ -114,6 +114,8 @@ class KycStatusActivity : BaseActivity() {
         Glide.with(this)
             .asGif()
             .load(res)
+            .placeholder(R.drawable.ic_file_not_found)
+            .error(R.drawable.ic_file_not_found)
             .listener(object : RequestListener<GifDrawable> {
                 override fun onResourceReady(
                     resource: GifDrawable, model: Any, target: Target<GifDrawable>?,

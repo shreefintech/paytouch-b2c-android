@@ -178,7 +178,6 @@ class ResetMpinActivity : BaseActivity() {
             )
         } else {
             viewModel.changeMpin(
-                context   = mActivity,
                 mobile    = mobile,
                 newMpin   = mpin,
                 onLoading = { showProgress.set(true) },

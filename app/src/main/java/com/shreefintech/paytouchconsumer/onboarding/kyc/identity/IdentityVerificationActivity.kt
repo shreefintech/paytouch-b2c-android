@@ -253,17 +253,41 @@ class IdentityVerificationActivity : BaseActivity() {
     }
 
     private fun submitIdentity() {
-        viewModel.submitIdentity(
-            onLoading = { showProgressSubmit.set(true) },
-            onSuccess = {
-                showProgressSubmit.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.msgIdentitySubmitSuccess))
-                resultCode = 1
-                setResult(resultCode)
-                finish()
-            },
-            onError = { msg -> showProgressSubmit.set(false); ToastUtil.showDelete(mActivity, msg) }
-        )
+        val panUri          = viewModel.panFrontUri
+        val aadhaarFrontUri = viewModel.aadhaarFrontUri
+        val aadhaarBackUri  = viewModel.aadhaarBackUri
+        val selfieUri       = viewModel.selfieUri
+
+        showProgressSubmit.set(true)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val cr            = contentResolver
+            val panBytes          = panUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+            val aadhaarFrontBytes = aadhaarFrontUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+            val aadhaarBackBytes  = aadhaarBackUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+            val selfieBytes       = selfieUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+
+            withContext(Dispatchers.Main) {
+                if (panBytes == null || aadhaarFrontBytes == null || aadhaarBackBytes == null || selfieBytes == null) {
+                    showProgressSubmit.set(false)
+                    ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                    return@withContext
+                }
+                viewModel.submitIdentity(
+                    panBytes          = panBytes,
+                    aadhaarFrontBytes = aadhaarFrontBytes,
+                    aadhaarBackBytes  = aadhaarBackBytes,
+                    selfieBytes       = selfieBytes,
+                    onSuccess = {
+                        showProgressSubmit.set(false)
+                        ToastUtil.showSuccess(mActivity, getString(R.string.msgIdentitySubmitSuccess))
+                        resultCode = 1
+                        setResult(resultCode)
+                        finish()
+                    },
+                    onError = { msg -> showProgressSubmit.set(false); ToastUtil.showDelete(mActivity, msg) }
+                )
+            }
+        }
     }
 
     private fun onClickListener(): View.OnClickListener {
