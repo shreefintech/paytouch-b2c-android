@@ -83,14 +83,14 @@ class KycStep3Fragment : BaseKycStepFragment() {
     private fun pickFront() {
         if (Utility.stopClick()) return
         (requireActivity() as IdentityVerificationActivity).pickDocument { uri ->
-            viewModel.panFrontUri = uri
+            viewModel.setPanFrontUri(uri)
             showPreview(uri)
         }
     }
 
     private fun clearFront() {
         if (Utility.stopClick()) return
-        viewModel.panFrontUri = null
+        viewModel.setPanFrontUri(null)
         val ctx = context ?: return
         Glide.with(ctx).clear(binding.ivPreviewPan)
         binding.ivPreviewPan.visibility = View.GONE
@@ -141,7 +141,7 @@ class KycStep3Fragment : BaseKycStepFragment() {
             ToastUtil.showDelete(requireActivity(), msg); return false
         }
 
-        viewModel.panNumber = pan
+        viewModel.setPanNumber(pan)
         return true
     }
 

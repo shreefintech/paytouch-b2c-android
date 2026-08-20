@@ -45,8 +45,7 @@ class KycStep1Fragment : BaseKycStepFragment() {
         }
         if (msg != null) { ToastUtil.showDelete(requireActivity(), msg); return false }
 
-        viewModel.mobile = mobile
-        viewModel.email  = email
+        viewModel.setStep1(mobile, email)
         return true
     }
 

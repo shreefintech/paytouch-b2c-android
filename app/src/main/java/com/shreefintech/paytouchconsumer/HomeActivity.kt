@@ -15,9 +15,9 @@ import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
 import com.shreefintech.paytouchconsumer.fastag.FastagActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.loadwallet.LoadWalletActivity
 import com.shreefintech.paytouchconsumer.loan.LoanActivity
 import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
-import com.shreefintech.paytouchconsumer.loadwallet.LoadWalletActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity

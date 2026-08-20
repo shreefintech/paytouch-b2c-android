@@ -11,7 +11,6 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
-import com.shreefintech.paytouchconsumer.onboarding.CreateVirtualAccountActivity
 import com.shreefintech.paytouchconsumer.onboarding.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
@@ -45,12 +44,18 @@ class SplashActivity : BaseActivity() {
             return
         }
         if (!Utility.isInternetAvailable(mActivity)) {
-            showNoInternet()
+            navigate(Intent(mActivity, LoginActivity::class.java))
             return
         }
         hideNoInternet()
-        val token     = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN, "") ?: ""
-        val tokenType = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN_TYPE, "Bearer") ?: "Bearer"
+        val token =
+            SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN, "")
+                ?: ""
+        val tokenType = SharedPreferenceHelper.getSharedPreferenceString(
+            mActivity,
+            Constant.KEY_TOKEN_TYPE,
+            "Bearer"
+        ) ?: "Bearer"
         binding.progressBar.visibility = View.VISIBLE
         viewModel.validateSession(
             authorization = "$tokenType $token",
@@ -67,10 +72,9 @@ class SplashActivity : BaseActivity() {
 
     private fun routeByFlags(data: UserProfileItem?) {
         val intent = when {
-            data?.requiresKyc == true            -> Intent(mActivity, KycActivity::class.java)
-            data?.requiresMpin == true           -> Intent(mActivity, LoginActivity::class.java)
-            data?.requiresVirtualAccount == true -> Intent(mActivity, CreateVirtualAccountActivity::class.java)
-            else                                 -> Intent(mActivity, HomeActivity::class.java)
+            data?.requiresKyc == true -> Intent(mActivity, KycActivity::class.java)
+            data?.requiresMpin == true -> ResetMpinActivity.buildCreateIntent(mActivity)
+            else -> Intent(mActivity, HomeActivity::class.java)
         }
         navigate(intent)
     }
