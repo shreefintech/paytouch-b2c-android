@@ -78,15 +78,14 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
                 operatorId = operatorId,
                 circleId = CIRCLE_ID_DEFAULT
             )
-        ).enqueue(object : Callback<General<List<GasBillItem>>> {
+        ).enqueue(object : Callback<General<GasBillItem>> {
             override fun onResponse(
-                call: Call<General<List<GasBillItem>>>,
-                response: Response<General<List<GasBillItem>>>
+                call: Call<General<GasBillItem>>,
+                response: Response<General<GasBillItem>>
             ) {
-                if (response.isSuccessful && response.body()?.data != null) {
-                    val bill = response.body()!!.data!!.firstOrNull()
-                    if (bill != null) onSuccess(bill)
-                    else onError(getString(R.string.errGeneric))
+                val bill = response.body()?.data
+                if (response.isSuccessful && bill != null) {
+                    onSuccess(bill)
                 } else {
                     onError(
                         ApiHelper.parseErrorMessage(
@@ -96,7 +95,7 @@ class GasViewModel(application: Application) : BaseBillViewModel(application) {
                 }
             }
 
-            override fun onFailure(call: Call<General<List<GasBillItem>>>, t: Throwable) {
+            override fun onFailure(call: Call<General<GasBillItem>>, t: Throwable) {
                 onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
