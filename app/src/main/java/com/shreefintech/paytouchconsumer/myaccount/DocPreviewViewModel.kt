@@ -72,8 +72,12 @@ class DocPreviewViewModel(application: Application) : AndroidViewModel(applicati
         connection.connectTimeout = 15_000
         connection.readTimeout = 30_000
         connection.doInput = true
-        connection.connect()
-        return connection.inputStream.use { BitmapFactory.decodeStream(it) }
+        try {
+            connection.connect()
+            return connection.inputStream.use { BitmapFactory.decodeStream(it) }
+        } finally {
+            connection.disconnect()
+        }
     }
 
     private fun downloadToCache(url: String): File {
@@ -82,8 +86,12 @@ class DocPreviewViewModel(application: Application) : AndroidViewModel(applicati
         val connection = URL(url).openConnection() as HttpURLConnection
         connection.connectTimeout = 15_000
         connection.readTimeout = 60_000
-        connection.connect()
-        connection.inputStream.use { input -> FileOutputStream(file).use { input.copyTo(it) } }
+        try {
+            connection.connect()
+            connection.inputStream.use { input -> FileOutputStream(file).use { input.copyTo(it) } }
+        } finally {
+            connection.disconnect()
+        }
         return file
     }
 }

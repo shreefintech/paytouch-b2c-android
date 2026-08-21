@@ -74,7 +74,6 @@ open class BaseActivity : AppCompatActivity() {
         binding.root.visibility = View.VISIBLE
         if (!glassAttached) {
             val root = noInternetRoot ?: return
-            glassAttached = true
             LiquidGlassEffect.attach(
                 targetView = binding.flNoInternet,
                 rootView = root,
@@ -84,6 +83,7 @@ open class BaseActivity : AppCompatActivity() {
                 strokeColor = ContextCompat.getColor(mActivity, R.color.white),
                 blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
             )
+            glassAttached = true
         }
         Glide.with(this)
             .asGif()

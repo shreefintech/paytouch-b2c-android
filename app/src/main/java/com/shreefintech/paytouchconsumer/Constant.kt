@@ -54,7 +54,4 @@ object Constant {
     const val KEY_HDFC_PENDING_ORDER_ID = "hdfc_pending_order_id"
     const val KEY_HDFC_PENDING_AMOUNT   = "hdfc_pending_amount"
 
-    // Dashboard storage base URL — used as root for file_url values returned by /my-account
-    const val BASE_URL_DASHBOARD_STORAGE = "https://paytouch-dashboard.local/storage"
-
 }
