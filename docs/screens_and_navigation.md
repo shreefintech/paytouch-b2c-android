@@ -20,7 +20,6 @@
 **Exit points:**
 - Login success, `requires_kyc = true` → `KycActivity`
 - Login success, `requires_mpin = true` → MPIN creation screen (planned)
-- Login success, `requires_virtual_account = true` → `CreateVirtualAccountActivity`
 - Login success, all clear → `HomeActivity`
 - "Register" tap → `CreateAccountActivity`
 - "Forgot Password" tap → `OtpVerificationActivity` (password reset)
@@ -114,7 +113,7 @@
 **Exit points:**
 - "Identity Verification" tap → `IdentityVerificationActivity` (for result)
 - "Bank Details" tap → `BankDetailsActivity` (for result)
-- Both sections done → `CreateVirtualAccountActivity` (KycActivity finishes, no back stack)
+- Both sections under review → `KycStatusActivity` (KycActivity finishes, no back stack)
 
 **Key UI elements:**
 - Document Progress card (count + horizontal progress bar)
@@ -162,22 +161,24 @@
 
 ---
 
-### ✅ CreateVirtualAccountActivity — "Virtual Account Setup"
+### ✅ KycStatusActivity — "KYC Status"
 
-**Purpose:** Register banking details and upload documents to complete onboarding.
+**Purpose:** Shows KYC submission result (pending / approved / rejected). On approval, routes to MPIN creation.
 
 **Entry points:**
-- Onboarding flow (`requires_virtual_account = true`)
+- `KycActivity` (after both sections submitted)
 
 **Exit points:**
-- Successful submission → `HomeActivity`
+- `KYC_APPROVED` → `ResetMpinActivity` (create mode, stack cleared)
+- `KYC_REJECTED` → retry button → `KycActivity`
+- `PENDING_KYC` → `KycActivity`
+- Pull-to-refresh re-fetches status from API
 
 **Key UI elements:**
-- Name, mobile, state (dropdown), city, district (dropdowns)
-- Aadhaar number, PAN number
-- IFSC code, bank account number, UPI ID, branch name
-- Four file upload slots (Aadhaar front, Aadhaar back, PAN, bank proof)
-- Create Virtual Account button
+- Animated GIF (pending / rejected)
+- Status title and description
+- Retry button (visible on rejection only)
+- Pull-to-refresh
 
 ---
 
@@ -186,7 +187,7 @@
 **Purpose:** Central menu — shows all available bill payment categories.
 
 **Entry points:**
-- `CreateVirtualAccountActivity` (onboarding complete)
+- `ResetMpinActivity` (onboarding complete, after MPIN creation)
 - App launch (already onboarded)
 
 **Exit points:**
@@ -407,16 +408,16 @@ Session check (read SharedPreferences)
                                                      Check onboarding flags:
                                                                      │
                                        requires_kyc ────────────► KycActivity ✅
-                                                                     │      │
-                                                                     │      └── Success ──► MpinActivity 📋
                                                                      │
-                                       requires_mpin ───────────────────────────────►────►┐
-                                                                     │                    │
-                                                                     │      └── Success ──► CreateVirtualAccountActivity ✅
+                                                                     └── Both sections done ──► KycStatusActivity ✅
+                                                                                                        │
+                                                                                          KYC_APPROVED ──► ResetMpinActivity ✅
                                                                      │
-                                       requires_virtual_account ─────────────────────────►┐
-                                                                                          │
-                                       All flags false ───────────────────────────────────►┤
+                                       requires_mpin ───────────────────────────────────────────────────►┐
+                                                                     │                                   │
+                                                                     │                   MPIN created ───►┤
+                                                                     │
+                                       All flags false ───────────────────────────────────────────────────►┤
                                                                                            ▼
                                                                                     HomeActivity ✅
                                                                                           │

@@ -218,13 +218,6 @@ class LoadWalletActivity : BaseActivity() {
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
 
-        dialogBinding.cardClose.setOnClickListener { dialog.dismiss() }
-
-        dialogBinding.cardPaySecurely.setOnClickListener {
-            if (Utility.stopClick()) return@setOnClickListener
-            startHdfcFlow()
-        }
-
         dialog.show()
     }
 

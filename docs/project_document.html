@@ -805,7 +805,7 @@ showProgressFetch.set(<span class="keyword">false</span>)  <span class="comment"
   <tr><td>Reset Password</td><td><code>ResetPasswordActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>Reset MPIN</td><td><code>ResetMpinActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>KYC Upload</td><td><code>UploadKycActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
-  <tr><td>Virtual Account Setup</td><td><code>CreateVirtualAccountActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>KYC Status</td><td><code>KycStatusActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>Home / Dashboard</td><td><code>HomeActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>Shared Transaction Detail</td><td><code>TransactionDetailActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
 </table>
@@ -817,13 +817,13 @@ showProgressFetch.set(<span class="keyword">false</span>)  <span class="comment"
 <h3>Onboarding Sequence</h3>
 <pre><code>Register / Login
       ↓
-UploadKycActivity  (requires_kyc = true)
+KycActivity  (requires_kyc = true)
       ↓
-MPIN Creation      (requires_mpin = true)
+KycStatusActivity  (pending / approved / rejected)
+      ↓ approved
+ResetMpinActivity  (requires_mpin = true)
       ↓
-CreateVirtualAccountActivity  (requires_virtual_account = true)
-      ↓
-HomeActivity       (all flags false)</code></pre>
+HomeActivity       (all flags clear)</code></pre>
 
 <h3>Navigation Tree (Abbreviated)</h3>
 <div class="nav-tree">SplashActivity
@@ -836,9 +836,8 @@ HomeActivity       (all flags false)</code></pre>
   │                                                       ▼
   └── Token exists ───────────────────► Check onboarding flags
                                                          │
-                          requires_kyc ──────────► UploadKycActivity
-                          requires_mpin ─────────► MpinActivity (📋)
-                          requires_virtual_account ► CreateVirtualAccountActivity
+                          requires_kyc ──────────► KycActivity ──► KycStatusActivity
+                          requires_mpin ─────────► ResetMpinActivity
                           All clear ──────────────► HomeActivity
                                                          │
                          ┌───────────────────────────────┬──────────────────┤
@@ -923,7 +922,7 @@ All detail taps ─────────────────────�
 <ul>
   <li>Token is checked at Splash — no token → go to Login</li>
   <li>Any 401 response → clear ALL SharedPreferences → launch LoginActivity (stack cleared)</li>
-  <li>Login flags drive routing: <code>requires_kyc</code>, <code>requires_mpin</code>, <code>requires_virtual_account</code></li>
+  <li>Login flags drive routing: <code>requires_kyc</code>, <code>requires_mpin</code> (<code>requires_virtual_account</code> is retired — handled server-side)</li>
   <li>MPIN is never stored locally — only a boolean flag <code>mpin_created</code></li>
 </ul>
 
@@ -937,7 +936,7 @@ All detail taps ─────────────────────�
   <tr><td><code>AUTH</code></td><td><code>MOBILE</code></td><td>String</td><td>Mobile number</td></tr>
   <tr><td><code>AUTH</code></td><td><code>ReferralCode</code></td><td>String</td><td>Referral code</td></tr>
   <tr><td><code>app_prefs</code></td><td><code>mpin_created</code></td><td>Boolean</td><td>MPIN setup complete</td></tr>
-  <tr><td><code>app_prefs</code></td><td><code>virtual_account</code></td><td>Boolean</td><td>VA setup complete</td></tr>
+  <!-- virtual_account pref removed — VA creation is now handled server-side -->
 </table>
 </div>
 

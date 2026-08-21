@@ -56,7 +56,7 @@ Write production-ready Kotlin/MVVM Android code — readable, performant, scalab
 ```
 com.shreefintech.paytouchconsumer/
 ├── auth/           # Login, OTP, password/MPIN flows, create-account
-├── onboarding/     # Virtual Account creation (CreateVirtualAccountActivity); onboarding/kyc/ — KYC hub (KycActivity), identity verification, bank details
+├── onboarding/     # onboarding/kyc/ — KYC hub (KycActivity), identity verification (IdentityVerificationActivity), bank details (BankDetailsActivity), KYC status (KycStatusActivity); virtual account is handled server-side — no client Activity
 ├── home/           # Home/Dashboard screen (HomeActivity — currently at root level, will move here)
 ├── electricity/    # Electricity bill payment + transaction history (canonical module template)
 ├── gas/            # Gas bill payment + transaction history
@@ -129,8 +129,9 @@ com.shreefintech.paytouchconsumer/
 
     | Location | Apparent anomaly | Confirmed behaviour |
     |---|---|---|
-    | `ApiService.kt` — `getMunicipalTaxTransactionStatus` | Uses `@POST("${AUTH}mobile-recharge/transaction-status")` (not `municipal-taxes/...`) | **Backend-side intentional routing.** Do not change this URL. |
-    | `MunicipalTaxLatestPaymentDataItem.subService` | `@field:SerializedName("subservice")` has no underscore | **Confirmed from API contract.** Do not rename. |
+    | `ApiService.kt` — `getMunicipalTaxTransactionStatus` | Uses `@POST("${AUTH}mobile-recharge/transaction-status")` (not `municipal-taxes/...`) | **Backend-side intentional routing.** The mobile-recharge transaction-status endpoint serves municipal tax queries too. Do not change this URL. |
+    | `MunicipalTaxLatestPaymentDataItem.subService` | `@field:SerializedName("subservice")` has no underscore (unlike every other field) | **Confirmed from API contract.** The backend sends the key as `subservice`, not `sub_service`. Do not rename. |
+    | `KycViewModel.callInitiate()` — HTTP 422 from `initiateKyc` | 422 is treated the same as success (proceeds to `submitSectionAPlaceholder`) | **Intentional contract.** 422 means KYC was already initiated for this user. The backend returns 422 instead of 200 on re-initiation; the correct response is to proceed as if initiation succeeded. Do not treat 422 as an error here. |
 
 ---
 
