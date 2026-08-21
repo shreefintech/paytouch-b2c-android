@@ -564,14 +564,14 @@
     <string name="msgDocumentNotAvailable">Document not available for preview</string>
 
 
-    <string name="error_no_url_provided">No URL provided</string>
-    <string name="error_failed_to_decode_image">Failed to decode image</string>
-    <string name="error_failed_to_load_image">Failed to load image: %s</string>
-    <string name="error_pdf_no_pages">PDF has no pages</string>
-    <string name="error_cannot_render_pdf">Cannot render PDF: %s</string>
-    <string name="error_failed_to_load">Failed to load: %s</string>
-    <string name="label_page_indicator">%1$d / %2$d</string>
-    <string name="loading">Loading...</string>
+    <string name="errNoUrlProvided">No URL provided</string>
+    <string name="errFailedToDecodeImage">Failed to decode image</string>
+    <string name="errFailedToLoadImage">Failed to load image: %s</string>
+    <string name="errPdfNoPages">PDF has no pages</string>
+    <string name="errCannotRenderPdf">Cannot render PDF: %s</string>
+    <string name="errFailedToLoad">Failed to load: %s</string>
+    <string name="labelPageIndicator">%1$d / %2$d</string>
+    <string name="msgLoading">Loading...</string>
     <string name="textYouLostConnection">You Lost Connection!</string>
     <string name="msgNoInternetDes">No Internet Connection Found. Check Your Connection or Try Again!</string>
     <string name="textTryAgain">Try Again</string>

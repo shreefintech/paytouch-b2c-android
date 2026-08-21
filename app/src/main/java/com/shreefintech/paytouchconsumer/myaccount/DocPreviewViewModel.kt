@@ -1,49 +1,18 @@
 package com.shreefintech.paytouchconsumer.myaccount
 
 import android.app.Application
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.utill.PdfThumbnailRepository
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.getString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
 
 class DocPreviewViewModel(application: Application) : AndroidViewModel(application) {
-
-    fun loadImage(
-        url: String,
-        onLoading: () -> Unit,
-        onReady: (Bitmap) -> Unit,
-        onError: (String) -> Unit
-    ) {
-        if (!Utility.isInternetAvailable(getApplication())) {
-            onError(getString(R.string.msgNoInternet))
-            return
-        }
-        onLoading()
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val bitmap = downloadBitmap(url)
-                withContext(Dispatchers.Main) {
-                    if (bitmap != null) onReady(bitmap)
-                    else onError(getApplication<Application>().getString(R.string.error_failed_to_decode_image))
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                withContext(Dispatchers.Main) {
-                    onError(getApplication<Application>().getString(R.string.error_failed_to_load_image, e.message))
-                }
-            }
-        }
-    }
 
     fun loadPdf(
         url: String,
@@ -58,7 +27,7 @@ class DocPreviewViewModel(application: Application) : AndroidViewModel(applicati
         onLoading()
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val file = downloadToCache(url)
+                val file = PdfThumbnailRepository.downloadToCache(url, getApplication<Application>().cacheDir)
                 withContext(Dispatchers.Main) { onReady(file) }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -67,31 +36,4 @@ class DocPreviewViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private fun downloadBitmap(url: String): Bitmap? {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.connectTimeout = 15_000
-        connection.readTimeout = 30_000
-        connection.doInput = true
-        try {
-            connection.connect()
-            return connection.inputStream.use { BitmapFactory.decodeStream(it) }
-        } finally {
-            connection.disconnect()
-        }
-    }
-
-    private fun downloadToCache(url: String): File {
-        val file = File(getApplication<Application>().cacheDir, "kyc_preview_${url.hashCode()}.pdf")
-        if (file.exists() && file.length() > 0) return file
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.connectTimeout = 15_000
-        connection.readTimeout = 60_000
-        try {
-            connection.connect()
-            connection.inputStream.use { input -> FileOutputStream(file).use { input.copyTo(it) } }
-        } finally {
-            connection.disconnect()
-        }
-        return file
-    }
 }

@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.drawable.Drawable
 import android.graphics.pdf.PdfRenderer
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
@@ -20,6 +21,11 @@ import android.webkit.WebViewClient
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
@@ -151,12 +157,41 @@ class DocPreviewActivity : BaseActivity() {
                 onReady = { file -> showLoading(false); openPdfRenderer(file) },
                 onError = { loadInWebView(Constant.URL_GOOGLE_DOC_VIEWER + url) }
             )
-            isImageUrl(lower) -> viewModel.loadImage(
-                url = url,
-                onLoading = { showLoading(true) },
-                onReady = { bitmap -> showLoading(false); showImagePreview(bitmap) },
-                onError = { msg -> showLoading(false); showError(msg) }
-            )
+            isImageUrl(lower) -> {
+                showLoading(true)
+                Glide.with(this)
+                    .load(url)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            showLoading(false)
+                            showError(getString(R.string.errFailedToLoadImage, e?.message ?: ""))
+                            return true
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            model: Any,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            showLoading(false)
+                            scaleFactor = 1f
+                            binding.imagePreview.scaleX = 1f
+                            binding.imagePreview.scaleY = 1f
+                            binding.imagePreview.visibility = View.VISIBLE
+                            binding.webViewPreview.visibility = View.GONE
+                            binding.layoutPdfControls.visibility = View.GONE
+                            return false
+                        }
+                    })
+                    .into(binding.imagePreview)
+            }
             else -> loadInWebView(url)
         }
     }
@@ -169,18 +204,6 @@ class DocPreviewActivity : BaseActivity() {
         return exts.any { url.contains(it) }
     }
 
-    // ─── IMAGE ─────────────────────────────────────────────────────────────────
-
-    private fun showImagePreview(bitmap: Bitmap) {
-        scaleFactor = 1f
-        binding.imagePreview.scaleX = 1f
-        binding.imagePreview.scaleY = 1f
-        binding.imagePreview.setImageBitmap(bitmap)
-        binding.imagePreview.visibility = View.VISIBLE
-        binding.webViewPreview.visibility = View.GONE
-        binding.layoutPdfControls.visibility = View.GONE
-    }
-
     // ─── PDF ───────────────────────────────────────────────────────────────────
 
     private fun openPdfRenderer(file: File) {
@@ -190,7 +213,7 @@ class DocPreviewActivity : BaseActivity() {
             totalPages = pdfRenderer!!.pageCount
 
             if (totalPages == 0) {
-                showError(getString(R.string.error_pdf_no_pages))
+                showError(getString(R.string.errPdfNoPages))
                 return
             }
 
@@ -202,7 +225,7 @@ class DocPreviewActivity : BaseActivity() {
             setupPdfNavigation()
             renderPdfPage(currentPage)
         } catch (e: Exception) {
-            showError(getString(R.string.error_cannot_render_pdf, e.message))
+            showError(getString(R.string.errCannotRenderPdf, e.message))
         }
     }
 
@@ -238,7 +261,7 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     private fun updatePageLabel() {
-        binding.tvPageIndicator.text = getString(R.string.label_page_indicator, currentPage + 1, totalPages)
+        binding.tvPageIndicator.text = getString(R.string.labelPageIndicator, currentPage + 1, totalPages)
     }
 
     // ─── WebView fallback ──────────────────────────────────────────────────────
@@ -272,7 +295,7 @@ class DocPreviewActivity : BaseActivity() {
                     error: WebResourceError
                 ) {
                     showLoading(false)
-                    showError(getString(R.string.error_failed_to_load, error.description))
+                    showError(getString(R.string.errFailedToLoad, error.description))
                 }
             }
 
