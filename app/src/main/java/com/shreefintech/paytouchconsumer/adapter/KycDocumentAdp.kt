@@ -12,10 +12,17 @@ import com.shreefintech.paytouchconsumer.utill.PdfThumbnailRepository
 import kotlinx.coroutines.Job
 
 class KycDocumentAdp(
-    private val items: List<KycDocumentDetailItem>,
     private val urlResolver: (String?) -> String? = { it },
     private val onItemClick: ((url: String, label: String) -> Unit)? = null
 ) : RecyclerView.Adapter<KycDocumentAdp.ViewHolder>() {
+
+    private val items = mutableListOf<KycDocumentDetailItem>()
+
+    fun updateList(newItems: List<KycDocumentDetailItem>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
 
     inner class ViewHolder(val binding: ItemKycDocumentBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -49,7 +56,7 @@ class KycDocumentAdp(
 
         holder.binding.root.setOnClickListener {
             val pos = holder.bindingAdapterPosition
-            if (pos == RecyclerView.NO_ID.toInt()) return@setOnClickListener
+            if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
             val clickUrl = urlResolver(items[pos].fileUrl) ?: return@setOnClickListener
             onItemClick?.invoke(clickUrl, items[pos].label ?: "")
         }

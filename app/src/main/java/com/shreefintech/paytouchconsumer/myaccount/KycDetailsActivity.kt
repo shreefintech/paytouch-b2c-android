@@ -57,7 +57,6 @@ class KycDetailsActivity : BaseActivity() {
 
     private fun setupDocumentSlider() {
         documentAdp = KycDocumentAdp(
-            items = documents,
             urlResolver = ::resolveFileUrl,
             onItemClick = { url, label -> DocPreviewActivity.start(this, url, label) }
         )
@@ -83,7 +82,6 @@ class KycDetailsActivity : BaseActivity() {
             },
             onError = { msg ->
                 binding.pbLoading.isVisible = false
-                binding.nsvContent.isVisible = true
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )
@@ -135,7 +133,7 @@ class KycDetailsActivity : BaseActivity() {
         val docList = docs.items ?: emptyList()
         documents.clear()
         documents.addAll(docList)
-        documentAdp.notifyDataSetChanged()
+        documentAdp.updateList(docList)
 
         if (docList.isEmpty()) {
             binding.llDocumentsContent.isVisible = false

@@ -3,7 +3,6 @@ package com.shreefintech.paytouchconsumer.myaccount
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
@@ -18,26 +17,19 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDocPreviewBinding
-import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 
 class DocPreviewActivity : BaseActivity() {
 
     private lateinit var binding: ActivityDocPreviewBinding
+    private val viewModel: DocPreviewViewModel by viewModels()
 
     private var pdfRenderer: PdfRenderer? = null
     private var fileDescriptor: ParcelFileDescriptor? = null
@@ -50,16 +42,16 @@ class DocPreviewActivity : BaseActivity() {
     private lateinit var scaleDetector: ScaleGestureDetector
 
     companion object {
-        const val EXTRA_FILE_URL = "extra_file_url"
-        const val EXTRA_FILE_TITLE = "extra_file_title"
-        private const val TAG = "DocPreviewActivity"
+        private const val EXTRA_FILE_URL = "extra_file_url"
+        private const val EXTRA_FILE_TITLE = "extra_file_title"
 
         fun start(context: Context, fileUrl: String, title: String = "") {
-            val intent = Intent(context, DocPreviewActivity::class.java).apply {
-                putExtra(EXTRA_FILE_URL, fileUrl)
-                putExtra(EXTRA_FILE_TITLE, title)
-            }
-            context.startActivity(intent)
+            context.startActivity(
+                Intent(context, DocPreviewActivity::class.java).apply {
+                    putExtra(EXTRA_FILE_URL, fileUrl)
+                    putExtra(EXTRA_FILE_TITLE, title)
+                }
+            )
         }
     }
 
@@ -76,9 +68,7 @@ class DocPreviewActivity : BaseActivity() {
         }
 
         val fileUrl = intent.getStringExtra(EXTRA_FILE_URL)?.trim()
-
         if (fileUrl.isNullOrEmpty()) {
-                ToastUtil.showDelete(this, getString(R.string.error_no_url_provided))
             finish()
             return
         }
@@ -94,6 +84,22 @@ class DocPreviewActivity : BaseActivity() {
                 binding.toolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
+                }
+                binding.btnPrevPage -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (currentPage > 0) {
+                        currentPage--
+                        renderPdfPage(currentPage)
+                        updatePageLabel()
+                    }
+                }
+                binding.btnNextPage -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (currentPage < totalPages - 1) {
+                        currentPage++
+                        renderPdfPage(currentPage)
+                        updatePageLabel()
+                    }
                 }
             }
         }
@@ -126,9 +132,19 @@ class DocPreviewActivity : BaseActivity() {
     private fun loadFileFromUrl(url: String) {
         val lower = url.lowercase()
         when {
-            isPdfUrl(lower)   -> downloadAndShowPdf(url)
-            isImageUrl(lower) -> downloadAndShowImage(url)
-            else              -> loadInWebView(url)
+            isPdfUrl(lower) -> viewModel.loadPdf(
+                url = url,
+                onLoading = { showLoading(true) },
+                onReady = { file -> showLoading(false); openPdfRenderer(file) },
+                onError = { loadInWebView("https://docs.google.com/gviewer?embedded=true&url=$url") }
+            )
+            isImageUrl(lower) -> viewModel.loadImage(
+                url = url,
+                onLoading = { showLoading(true) },
+                onReady = { bitmap -> showLoading(false); showImagePreview(bitmap) },
+                onError = { msg -> showLoading(false); showError(msg) }
+            )
+            else -> loadInWebView(url)
         }
     }
 
@@ -142,41 +158,6 @@ class DocPreviewActivity : BaseActivity() {
 
     // ─── IMAGE ─────────────────────────────────────────────────────────────────
 
-    private fun downloadAndShowImage(url: String) {
-        showLoading(true)
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val bitmap = downloadBitmap(url)
-                withContext(Dispatchers.Main) {
-                    showLoading(false)
-                    if (bitmap != null) {
-                        showImagePreview(bitmap)
-                    } else {
-                        showError(getString(R.string.error_failed_to_decode_image))
-                    }
-                }
-            } catch (e: Exception) {
-
-                withContext(Dispatchers.Main) {
-                    showLoading(false)
-                    showError(getString(R.string.error_failed_to_load_image, e.message))
-                }
-            }
-        }
-    }
-
-    private fun downloadBitmap(url: String): Bitmap? {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.apply {
-            connectTimeout = 15_000
-            readTimeout = 30_000
-            doInput = true
-            connect()
-        }
-        return connection.inputStream.use { BitmapFactory.decodeStream(it) }
-    }
-
     private fun showImagePreview(bitmap: Bitmap) {
         scaleFactor = 1f
         binding.imagePreview.scaleX = 1f
@@ -188,26 +169,6 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     // ─── PDF ───────────────────────────────────────────────────────────────────
-
-    private fun downloadAndShowPdf(url: String) {
-        showLoading(true)
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val file = downloadToCache(url, "kyc_preview_${System.currentTimeMillis()}.pdf")
-                withContext(Dispatchers.Main) {
-                    showLoading(false)
-                    openPdfRenderer(file)
-                }
-            } catch (e: Exception) {
-
-                withContext(Dispatchers.Main) {
-                    showLoading(false)
-                    loadInWebView("https://docs.google.com/gviewer?embedded=true&url=$url")
-                }
-            }
-        }
-    }
 
     private fun openPdfRenderer(file: File) {
         try {
@@ -233,44 +194,25 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     private fun setupPdfNavigation() {
+        val listener = onClickListener()
+        binding.btnPrevPage.setOnClickListener(listener)
+        binding.btnNextPage.setOnClickListener(listener)
         updatePageLabel()
-
-        binding.btnPrevPage.setOnClickListener {
-            if (currentPage > 0) {
-                currentPage--
-                renderPdfPage(currentPage)
-                updatePageLabel()
-            }
-        }
-
-        binding.btnNextPage.setOnClickListener {
-            if (currentPage < totalPages - 1) {
-                currentPage++
-                renderPdfPage(currentPage)
-                updatePageLabel()
-            }
-        }
     }
 
     private fun renderPdfPage(pageIndex: Int) {
         val renderer = pdfRenderer ?: return
-
         val screenWidth = resources.displayMetrics.widthPixels
         val page = renderer.openPage(pageIndex)
 
         val scale = screenWidth.toFloat() / page.width
-        val bitmapWidth = (page.width * scale).toInt()
-        val bitmapHeight = (page.height * scale).toInt()
-
-        val bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888)
-
-        val canvas = Canvas(bitmap)
-        canvas.drawColor(Color.WHITE)
-
-        val matrix = Matrix()
-        matrix.setScale(scale, scale)
-
-        page.render(bitmap, null, matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+        val bitmap = Bitmap.createBitmap(
+            (page.width * scale).toInt(),
+            (page.height * scale).toInt(),
+            Bitmap.Config.ARGB_8888
+        )
+        Canvas(bitmap).drawColor(Color.WHITE)
+        page.render(bitmap, null, Matrix().apply { setScale(scale, scale) }, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
         page.close()
 
         scaleFactor = 1f
@@ -333,39 +275,15 @@ class DocPreviewActivity : BaseActivity() {
         }
     }
 
-    // ─── File download helper ──────────────────────────────────────────────────
-
-    private fun downloadToCache(url: String, fileName: String): File {
-        val file = File(cacheDir, fileName)
-        if (file.exists() && file.length() > 0) return file
-
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.apply {
-            connectTimeout = 15_000
-            readTimeout = 60_000
-            connect()
-        }
-
-        connection.inputStream.use { input: InputStream ->
-            FileOutputStream(file).use { output ->
-                val buffer = ByteArray(8 * 1024)
-                var bytesRead: Int
-                while (input.read(buffer).also { bytesRead = it } != -1) {
-                    output.write(buffer, 0, bytesRead)
-                }
-            }
-        }
-        return file
-    }
-
     // ─── UI helpers ────────────────────────────────────────────────────────────
 
     private fun showLoading(show: Boolean) {
         binding.progressBarLoad.visibility = if (show) View.VISIBLE else View.GONE
-        binding.layoutContent.visibility   = if (show) View.GONE   else View.VISIBLE
+        binding.layoutContent.visibility = if (show) View.GONE else View.VISIBLE
     }
 
     private fun showError(message: String) {
+        binding.progressBarLoad.visibility = View.GONE
         binding.tvError.text = message
         binding.tvError.visibility = View.VISIBLE
     }
