@@ -1,6 +1,6 @@
 # PayTouch Consumer — Plain English Overview
 
-> **Current phase:** UI implementation. Most screens are being built without live API calls. API wiring and business logic finalization happen in a later phase. Everything in this document describes the intended final behaviour of the app.
+> **Current phase:** API wiring in progress. Core modules (Auth, Electricity, Gas, Prepaid, Postpaid, DTH, FASTag, Loan, Municipal Tax, My Account, Load Wallet) have live API integration. Newly added modules may begin with UI stubs marked `TODO(PAYTOUCH-xxx):`. This document describes the intended final behaviour of the app.
 
 ---
 
@@ -98,7 +98,10 @@ People in India pay 10+ different bills every month — electricity, phone, gas,
 | Loan Repayment — Pay | `LoanActivity` + transactions | ✅ Implemented (UI + API) |
 | Municipal Tax — Pay | `MunicipalTaxActivity` + transactions | ✅ Implemented (UI + API) |
 | My Account | `MyAccountActivity` | ✅ Implemented (UI + API) |
-| Load Wallet | TBD | 📋 Planned |
+| Load Wallet — Balance + Top-up | `LoadWalletActivity` | ✅ Implemented (UI + API) |
+| Load Wallet — Transaction History | `WalletTransactionsActivity` | ✅ Implemented (UI + API) |
+| Load Wallet — HDFC WebView | `HdfcWebViewActivity` | ✅ Implemented (UI + API) |
+| Load Wallet — Payment Status | `PaymentStatusActivity` | ✅ Implemented (UI + API) |
 | Cable TV module | TBD | 📋 Planned |
 
 ---
@@ -156,13 +159,13 @@ A user who skips any step cannot access payment features. The server drives this
    - ₹5,001–₹40,000 → ₹20
    - Above ₹40,000 → ₹30
 
-3. **Transaction ID format:** `PYTCH[DDMMYYYYHHMMSS]M` — generated client-side before the API call (e.g., `PYTCH19012026091530M`).
+3. **Transaction ID ownership:** Transaction IDs are generated and returned by the backend in the payment response. Do not generate transaction IDs client-side. `Utility.generateTransactionId()` was removed — do not recreate it.
 
-4. **Local transaction storage:** Every completed or attempted transaction is stored locally so the user can view history even without internet.
+4. **Transaction history:** Full payment history per category is available via API (`/api/{category}/payment-reports`, `/api/{category}/payment-history`). No local database is used for transaction storage.
 
 5. **Payment sound feedback:** A success or failure sound plays after every payment attempt.
 
-6. **Single payment gateway:** All payments are routed through the HDFC SmartGateway. Dynamic QR payment is also supported as an alternative.
+6. **Payment gateways:** Bill payments use the PayTouch platform. Wallet top-up uses the HDFC SmartGateway (WebView flow via `LoadWalletActivity` → `HdfcWebViewActivity`).
 
 7. **Referral code:** New users can enter a referral code during registration (optional).
 

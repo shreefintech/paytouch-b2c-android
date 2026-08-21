@@ -60,7 +60,7 @@ class BankDetailsViewModel(application: Application) : AndroidViewModel(applicat
         ApiClient.apiService.submitKycSectionC(bearerToken(), parts)
             .enqueue(object : Callback<General<KycSubmissionDataItem>> {
                 override fun onResponse(call: Call<General<KycSubmissionDataItem>>, response: Response<General<KycSubmissionDataItem>>) {
-                    if (response.isSuccessful && response.body()?.success == true) {
+                    if (response.isSuccessful && response.body()?.data != null) {
                         onSuccess()
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))

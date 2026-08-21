@@ -1,6 +1,7 @@
 # PayTouch Consumer — Screens & Navigation
 
-> **Status legend:** ✅ Implemented (UI + API) | 🔧 UI pending | 📋 Planned (not started)
+> **Status legend:** ✅ Implemented (UI + API) | 🔧 UI only (API pending) | 📋 Planned (not started)
+> **Current phase:** API wiring in progress. Core modules have live API integration.
 
 ---
 
@@ -377,6 +378,18 @@ The following screens are defined in the navigation plan but not yet implemented
 
 ---
 
+### 📋 KycDetailsActivity
+
+**Purpose:** Show submitted KYC documents (Aadhaar, PAN, Selfie, bank proofs) in a ViewPager2 slider.
+
+**Entry points:** `MyAccountActivity` ("View KYC Details" button — `TODO(B2C-81)`)
+
+**Package:** `myaccount/`
+
+**ViewModel:** `KycStatusViewModel` (reuses existing KYC status endpoint)
+
+---
+
 ### 📋 Cable TV Module
 
 Bill-fetch pattern (mirrors Gas/Electricity).
@@ -439,10 +452,15 @@ Session check (read SharedPreferences)
 
                            │                              │
                LoanActivity ✅             MunicipalTaxActivity ✅    MyAccountActivity ✅
-                           │                              │
-               Recent Report Status Receipt  Recent Report Status Receipt  (Account Info + Refer & Earn tabs)
-                Txns                          Txns
+                           │                              │                    │
+               Recent Report Status Receipt  Recent Report Status Receipt   Account Info + Refer & Earn
+                Txns                          Txns                           TODO(B2C-81): KycDetailsActivity 📋
                 ✅    ✅    ✅    ✅             ✅    ✅    ✅    ✅
+
+               LoadWalletActivity ✅ ("Load Wallet" button)
+                    │
+               HdfcWebViewActivity ✅ → PaymentStatusActivity ✅
+               WalletTransactionsActivity ✅ ("View All" transactions)
 
                ... (Cable TV 📋)
 

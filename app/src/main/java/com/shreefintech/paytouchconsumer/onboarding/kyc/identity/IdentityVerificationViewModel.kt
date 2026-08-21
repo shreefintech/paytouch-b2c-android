@@ -96,7 +96,7 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
             panFilePart, aadhaarFrontFilePart, aadhaarBackFilePart, passportPhotoFilePart
         ).enqueue(object : Callback<General<KycSignatoryDataItem>> {
             override fun onResponse(call: Call<General<KycSignatoryDataItem>>, response: Response<General<KycSignatoryDataItem>>) {
-                if (response.isSuccessful && response.body()?.success == true) {
+                if (response.isSuccessful && response.body()?.data != null) {
                     onSuccess()
                 } else {
                     onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
