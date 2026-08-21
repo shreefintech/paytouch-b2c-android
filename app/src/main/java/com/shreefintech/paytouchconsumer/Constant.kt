@@ -21,6 +21,7 @@ object Constant {
 
     // External URLs
     const val URL_PLATFORM_TERMS = "https://www.paytouch.in/terms/platform"
+    const val URL_GOOGLE_DOC_VIEWER = "https://docs.google.com/gviewer?embedded=true&url="
 
     // Circle IDs for bill payment modules
     const val LOAN_CIRCLE_ID = "0"

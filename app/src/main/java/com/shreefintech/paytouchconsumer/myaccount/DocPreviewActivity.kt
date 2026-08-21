@@ -21,6 +21,7 @@ import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDocPreviewBinding
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -148,7 +149,7 @@ class DocPreviewActivity : BaseActivity() {
                 url = url,
                 onLoading = { showLoading(true) },
                 onReady = { file -> showLoading(false); openPdfRenderer(file) },
-                onError = { loadInWebView("https://docs.google.com/gviewer?embedded=true&url=$url") }
+                onError = { loadInWebView(Constant.URL_GOOGLE_DOC_VIEWER + url) }
             )
             isImageUrl(lower) -> viewModel.loadImage(
                 url = url,

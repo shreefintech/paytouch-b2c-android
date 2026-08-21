@@ -116,7 +116,7 @@ class BankDetailsActivity : BaseActivity() {
         statementPeriods.add(null)
         proofUris.add(null)
 
-        card.flUpload1.attach(card.root as ViewGroup)
+        card.flUpload1.attach(binding.clRoot as ViewGroup)
         attachEditDeleteGlass(card.flEdit1)
         attachEditDeleteGlass(card.flDelete1)
         card.tvCardTitle.text = getString(R.string.fmtBankAccountTitle, index + 1)
@@ -252,6 +252,8 @@ class BankDetailsActivity : BaseActivity() {
 
         Glide.with(mActivity)
             .load(uri)
+            .placeholder(R.drawable.ic_file_not_found)
+            .error(R.drawable.ic_file_not_found)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean

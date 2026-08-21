@@ -88,6 +88,8 @@ open class BaseActivity : AppCompatActivity() {
         Glide.with(this)
             .asGif()
             .load(R.drawable.gif_no_internet)
+            .placeholder(R.drawable.ic_file_not_found)
+            .error(R.drawable.ic_file_not_found)
             .listener(object : RequestListener<GifDrawable> {
                 override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable?>, isFirstResource: Boolean) = false
                 override fun onResourceReady(resource: GifDrawable, model: Any, target: Target<GifDrawable>?, dataSource: DataSource, isFirstResource: Boolean): Boolean {

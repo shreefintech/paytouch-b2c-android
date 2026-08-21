@@ -105,6 +105,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun fireVpsRegistration(id: Int, mobile: String, email: String, referralCode: String) {
+        if (!Utility.isInternetAvailable(getApplication())) return
         ApiAdminClient.apiService.registerUser(id, mobile, email, mobile, referralCode)
             .enqueue(object : Callback<Any> {
                 override fun onResponse(call: Call<Any>, response: Response<Any>) {
