@@ -42,6 +42,7 @@ class KycStatusViewModel(application: Application) : AndroidViewModel(applicatio
             })
     }
 
+    // TODO(B2C-87): wire this when the KYC detail screen is implemented
     fun fetchMyAccount(
         onLoading: () -> Unit,
         onReady: (KycMyAccountItem) -> Unit,

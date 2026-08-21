@@ -64,7 +64,7 @@ People in India pay 10+ different bills every month — electricity, phone, gas,
 | Reset Password | `ResetPasswordActivity` | ✅ Implemented (UI + API) |
 | Reset MPIN | `ResetMpinActivity` | ✅ Implemented (UI + API) |
 | KYC | `KycActivity` (+ `IdentityVerificationActivity`, `BankDetailsActivity`) | ✅ Implemented (UI + API) |
-| Virtual Account | `CreateVirtualAccountActivity` | ✅ Implemented (UI + API) |
+| KYC Status | `KycStatusActivity` | ✅ Implemented (UI + API) |
 | Home / Dashboard | `HomeActivity` | ✅ Implemented (UI + API) |
 | Electricity — Pay | `ElectricityActivity` | ✅ Implemented (UI + API) |
 | Electricity — Recent Transactions | `RecentTransactionActivity` | ✅ Implemented (UI + API) |
@@ -109,14 +109,14 @@ People in India pay 10+ different bills every month — electricity, phone, gas,
 1. User enters phone number, email, full name, password, confirm password, and optional referral code
 2. App calls the register API and receives a Bearer token
 3. Token is saved — user is now logged in
-4. App checks whether KYC, MPIN, and Virtual Account steps are complete and routes accordingly
+4. App checks whether KYC and MPIN steps are complete and routes accordingly
 
 **Login (two modes):**
 - **Password mode:** Enter mobile + password
 - **MPIN mode:** Enter mobile + 4-digit MPIN
 - Both modes call the same login API
 - On success, the Bearer token is saved in SharedPreferences
-- App checks response flags (`requires_kyc`, `requires_mpin`, `requires_virtual_account`) to decide where to route next
+- App checks response flags (`requires_kyc`, `requires_mpin`) to decide where to route next (`requires_virtual_account` is permanently retired — handled server-side)
 
 **Session:**
 - Every API call sends the Bearer token in the `Authorization` header
@@ -135,11 +135,9 @@ People in India pay 10+ different bills every month — electricity, phone, gas,
 ```
 Register / Login
       ↓
-KYC (requires_kyc = true)
-      ↓
+KYC (requires_kyc = true) → KycStatusActivity (pending/approved/rejected)
+      ↓ approved
 MPIN creation (requires_mpin = true)
-      ↓
-Virtual Account (requires_virtual_account = true)
       ↓
 HomeActivity (all steps complete)
 ```
