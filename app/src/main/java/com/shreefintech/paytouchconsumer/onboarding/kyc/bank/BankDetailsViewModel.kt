@@ -10,6 +10,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -36,7 +37,7 @@ class BankDetailsViewModel(application: Application) : AndroidViewModel(applicat
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
-            onError(getApplication<Application>().getString(R.string.msgNoInternet))
+            onError(getString(R.string.msgNoInternet))
             return
         }
         onLoading()
@@ -67,7 +68,7 @@ class BankDetailsViewModel(application: Application) : AndroidViewModel(applicat
                 }
 
                 override fun onFailure(call: Call<General<KycSubmissionDataItem>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }

@@ -49,7 +49,6 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - `user.wallet_balance` (Decimal)
 - `user.requires_kyc` (Boolean)
 - `user.requires_mpin` (Boolean)
-- `user.requires_virtual_account` (Boolean)
 
 ### State Transitions
 ```
@@ -74,7 +73,7 @@ KYC is split into two independently-completable sections, tracked by a 0/2 progr
 1. **Identity Verification** — a 4-step flow (Details → Aadhaar → PAN → Selfie) collecting identity documents and a selfie.
 2. **Bank Details** — 1 to 4 bank accounts with proof-of-account documents.
 
-Both sections must be completed before the user proceeds to `CreateVirtualAccountActivity`.
+Both sections must be completed before KYC can be submitted. Once both are done, the hub auto-agrees and navigates to `KycStatusActivity`.
 
 ### Rules and Constraints
 - PAN card must match regex: `[A-Z]{5}[0-9]{4}[A-Z]{1}`
@@ -82,14 +81,17 @@ Both sections must be completed before the user proceeds to `CreateVirtualAccoun
 - Selfie is captured via the system camera (no CameraX dependency); a captured selfie is required to submit step 4
 - Bank Details supports 1-4 accounts; the delete icon on a card is hidden when only one account remains
 - Terms & Conditions checkbox is mandatory before Bank Details submission
-- Section completion (`identityDone` / `bankDone`) is currently tracked locally via `SharedPreferenceHelper` (`Constant.KEY_KYC_IDENTITY_DONE` / `KEY_KYC_BANK_DONE`) until an account-status API is wired
-- After both sections are complete, route to `CreateVirtualAccountActivity` — never skip to Home
+- Section completion (`identityDone` / `bankDone`) is driven by the API via `KycSectionStatus.UNDER_REVIEW` returned in the KYC status response
+- After both sections are under review, `KycActivity` calls the agree endpoint and navigates to `KycStatusActivity` — never directly to Home
 
-### API Endpoints (pending — currently stubbed with TODO(PAYTOUCH-KYC))
+### API Endpoints
 | Method | Path | Purpose |
 |---|---|---|
-| POST | `api/kyc/identity/submit` | Submit identity verification (mobile, email, Aadhaar, PAN, selfie + document uploads) |
-| POST | `api/kyc/bank-details/submit` | Submit 1-4 bank accounts + proof documents |
+| GET  | `api/dashboard/kyc` | Fetch current KYC status and section states |
+| POST | `api/dashboard/kyc/initiate` | Initiate KYC session |
+| POST | `api/dashboard/kyc/section-b` | Submit identity verification (multipart) |
+| POST | `api/dashboard/kyc/section-c` | Submit bank details (multipart, 1-4 accounts) |
+| POST | `api/dashboard/kyc/agree` | Mark KYC as agreed after all sections submitted |
 
 ### Request Fields — Identity Verification
 - `mobile` (String, required, 10 digits)
@@ -121,7 +123,7 @@ A 4-digit PIN used as an alternative to password login. Created during onboardin
 ### Rules and Constraints
 - MPIN must be exactly 4 digits (numeric only)
 - MPIN and confirmation must match before submission
-- After successful creation, route to `CreateVirtualAccountActivity`
+- After successful creation, route to `HomeActivity`
 - MPIN is never stored locally — only a boolean flag (`mpin_created`) is stored
 
 ### Reset Flow
@@ -142,26 +144,7 @@ A 4-digit PIN used as an alternative to password login. Created during onboardin
 
 ## 4. Virtual Account
 
-**Screen:** `onboarding/CreateVirtualAccountActivity`
-
-### What It Does
-Collects the user's banking details and supporting documents. Completes the onboarding sequence and unlocks all payment features.
-
-### Rules and Constraints
-- Required text fields: name, mobile, state, city, district, Aadhaar, PAN, bank account number, IFSC code, UPI ID, branch name
-- Required file uploads: Aadhaar front, Aadhaar back, PAN image, bank proof image
-- State, city, district are selected from dropdowns
-- All four file uploads are mandatory; submission is blocked if any is missing
-- After successful submission, route to `HomeActivity`
-
-### API Endpoints
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `api/virtual-account/create` | Submit VA details as multipart form |
-
-### Request Fields (Multipart)
-- `name`, `mobile`, `city`, `state`, `district`, `aadhaar`, `pan`, `bank_acc`, `ifsc`, `upi`, `branch` (all String, required)
-- `aadhaar_front`, `aadhaar_back`, `pan_image`, `bank_proof` (File, required)
+**Handled server-side.** `CreateVirtualAccountActivity` has been removed. Virtual account creation now happens automatically on the backend after KYC is approved. There is no client-side virtual account screen. Do not add routing for `requires_virtual_account`.
 
 ---
 
@@ -421,7 +404,6 @@ Example: PYTCH19012026091530M
 | `AUTH` | `TOKEN_TYPE` | String | Token type |
 | `AUTH` | `ReferralCode` | String | Referral code |
 | `app_prefs` | `mpin_created` | Boolean | MPIN setup complete |
-| `app_prefs` | `virtual_account` | Boolean | VA setup complete |
 
 ### Rules
 - Token is checked at Splash; no token → go to Login
@@ -439,7 +421,7 @@ Example: PYTCH19012026091530M
 | KYC submission | Sync KYC fields to VPS |
 | Every payment | Log transaction to VPS |
 | Home screen open | Refresh user profile from VPS |
-| Virtual Account creation | Upload VA documents to VPS |
+| KYC approval | Virtual account created server-side automatically |
 
 ### Rules
 - VPS sync failures are **non-blocking** — the main flow continues even if VPS call fails

@@ -345,30 +345,37 @@ class BankDetailsActivity : BaseActivity() {
 
         showProgressSubmit.set(true)
         lifecycleScope.launch(Dispatchers.IO) {
-            val cr = contentResolver
-            val accounts = snapshots.map { s ->
-                BankAccountInputItem(
-                    accountNumber   = s.accountNumber,
-                    bankName        = s.bankName,
-                    ifscCode        = s.ifscCode,
-                    branchName      = s.branchName,
-                    proofType       = s.proofType,
-                    proofBytes      = cr.openInputStream(s.proofUri)?.use { it.readBytes() } ?: ByteArray(0),
-                    statementPeriod = s.statementPeriod
-                )
-            }
-            withContext(Dispatchers.Main) {
-                viewModel.submit(
-                    accounts  = accounts,
-                    onLoading = {},
-                    onSuccess = {
-                        showProgressSubmit.set(false)
-                        ToastUtil.showSuccess(mActivity, getString(R.string.msgBankDetailsSubmitSuccess))
-                        setResult(1)
-                        finish()
-                    },
-                    onError   = { msg -> showProgressSubmit.set(false); ToastUtil.showDelete(mActivity, msg) }
-                )
+            try {
+                val cr = contentResolver
+                val accounts = snapshots.map { s ->
+                    BankAccountInputItem(
+                        accountNumber   = s.accountNumber,
+                        bankName        = s.bankName,
+                        ifscCode        = s.ifscCode,
+                        branchName      = s.branchName,
+                        proofType       = s.proofType,
+                        proofBytes      = cr.openInputStream(s.proofUri)?.use { it.readBytes() } ?: ByteArray(0),
+                        statementPeriod = s.statementPeriod
+                    )
+                }
+                withContext(Dispatchers.Main) {
+                    viewModel.submit(
+                        accounts  = accounts,
+                        onLoading = {},
+                        onSuccess = {
+                            showProgressSubmit.set(false)
+                            ToastUtil.showSuccess(mActivity, getString(R.string.msgBankDetailsSubmitSuccess))
+                            setResult(1)
+                            finish()
+                        },
+                        onError   = { msg -> showProgressSubmit.set(false); ToastUtil.showDelete(mActivity, msg) }
+                    )
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    showProgressSubmit.set(false)
+                    ToastUtil.showDelete(mActivity, e.localizedMessage ?: getString(R.string.errGeneric))
+                }
             }
         }
     }
