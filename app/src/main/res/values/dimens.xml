@@ -97,4 +97,5 @@
     <dimen name="text_size_15">15sp</dimen>
     <dimen name="filter_status_height">30dp</dimen>
     <dimen name="share_btn_height">40dp</dimen>
+    <dimen name="glass_normal_radius">15dp</dimen>
 </resources>

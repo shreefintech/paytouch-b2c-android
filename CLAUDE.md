@@ -561,7 +561,7 @@ private val myItem: MyItem? by lazy {
 
 ### Bottom Sheet Pattern
 
-Use this pattern whenever a screen needs an in-place form or detail panel that slides up from the bottom. **Never use `Dialog` — always use `BottomSheetBehavior` embedded in the layout.**
+Use this pattern whenever a screen needs an in-place form or detail panel that slides up from the bottom. **Dialogs vs Bottom Sheets: Use `Dialog` for confirmation/alert modals. Use `BottomSheetBehavior` only for UI specifically designed as a bottom sheet. Do not require `BottomSheetBehavior` for confirmation dialogs.**
 
 **Sheet XML** (`sheet_*.xml`) — root ViewGroup (`ConstraintLayout`, `FrameLayout`, etc.) with `BottomSheetBehavior` attributes + `@drawable/bottom_sheet_bg`:
 

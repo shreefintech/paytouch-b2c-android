@@ -13,6 +13,8 @@ object Constant {
     const val KEY_MOBILE = "MOBILE"
     const val KEY_TOKEN_TYPE = "TOKEN_TYPE"
     const val KEY_WALLET_BALANCE = "WALLET_BALANCE"
+    const val KEY_PENDING_ORDER_ID = "PENDING_ORDER_ID"
+    const val KEY_PENDING_AMOUNT = "PENDING_AMOUNT"
 
 
     const val KEY_REFERRAL_CODE = "ReferralCode"
@@ -28,5 +30,23 @@ object Constant {
     const val EXTRA_MOBILE = "EXTRA_MOBILE"
     const val FLOW_RESET_PASSWORD = "RESET_PASSWORD"
     const val FLOW_RESET_MPIN = "RESET_MPIN"
+
+    // Load Wallet / Payment status extras
+    const val EXTRA_FROM_PAYMENT = "from_payment"
+
+    // HDFC Payment Gateway — order status codes
+    const val HDFC_STATUS_CHARGED = "CHARGED"
+    const val HDFC_STATUS_AUTHORIZED = "AUTHORIZED"
+    const val HDFC_STATUS_NEW = "NEW"
+    const val HDFC_STATUS_PENDING_VBV = "PENDING_VBV"
+    const val HDFC_STATUS_AUTHORIZING = "AUTHORIZING"
+    const val HDFC_STATUS_STARTED = "STARTED"
+    const val HDFC_STATUS_JUSPAY_DECLINED = "JUSPAY_DECLINED"
+    const val HDFC_STATUS_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED"
+    const val HDFC_STATUS_AUTHORIZATION_FAILED = "AUTHORIZATION_FAILED"
+    const val HDFC_STATUS_AUTO_REFUNDED = "AUTO_REFUNDED"
+
+    // HDFC order creation
+    const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
 }
