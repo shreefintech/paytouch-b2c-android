@@ -185,7 +185,7 @@ class KycDetailsActivity : BaseActivity() {
                 status?.contains("verified", ignoreCase = true) == true ->
             ContextCompat.getColor(this, R.color.colorStatusSuccess)
         status?.contains("reject", ignoreCase = true) == true ->
-            ContextCompat.getColor(this, R.color.colorPaymentFailed)
+            ContextCompat.getColor(this, R.color.colorStatusFailed)
         else -> ContextCompat.getColor(this, R.color.colorStatusPending)
     }
 
