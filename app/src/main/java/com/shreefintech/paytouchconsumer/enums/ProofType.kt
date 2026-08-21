@@ -1,6 +1,9 @@
 package com.shreefintech.paytouchconsumer.enums
 
-enum class ProofType(val apiValue: String, val displayName: String) {
-    CANCELLED_CHEQUE("cancelled_cheque", "Cancelled Cheque"),
-    BANK_STATEMENT("bank_statement", "Bank Statement")
+import androidx.annotation.StringRes
+import com.shreefintech.paytouchconsumer.R
+
+enum class ProofType(val apiValue: String, @StringRes val displayNameRes: Int) {
+    CANCELLED_CHEQUE("cancelled_cheque", R.string.labelProofCancelledCheque),
+    BANK_STATEMENT("bank_statement", R.string.labelProofBankStatement)
 }

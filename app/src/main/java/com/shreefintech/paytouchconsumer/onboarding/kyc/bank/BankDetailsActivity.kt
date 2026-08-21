@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -26,10 +27,14 @@ import com.shreefintech.paytouchconsumer.databinding.ItemBankAccountBinding
 import com.shreefintech.paytouchconsumer.enums.ProofType
 import com.shreefintech.paytouchconsumer.enums.StatementPeriod
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.onboarding.kyc.bank.model.BankAccountInputItem
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BankDetailsActivity : BaseActivity() {
 
@@ -42,7 +47,7 @@ class BankDetailsActivity : BaseActivity() {
 
     private lateinit var binding: ActivityBankDetailsBinding
     private val viewModel: BankDetailsViewModel by viewModels()
-    private var showProgressSubmit = ObservableBoolean(false)
+    private val showProgressSubmit = ObservableBoolean(false)
 
     private lateinit var filePickerUtil: FilePickerUtil
     private var activeCardIndex = -1
@@ -112,7 +117,7 @@ class BankDetailsActivity : BaseActivity() {
         statementPeriods.add(null)
         proofUris.add(null)
 
-        card.flUpload1.attach(card.root as ViewGroup)
+        card.flUpload1.attach(binding.clRoot as ViewGroup)
         attachEditDeleteGlass(card.flEdit1)
         attachEditDeleteGlass(card.flDelete1)
         card.tvCardTitle.text = getString(R.string.fmtBankAccountTitle, index + 1)
@@ -178,7 +183,7 @@ class BankDetailsActivity : BaseActivity() {
     private fun syncCardState() {
         val count = bankCardBindings.size
         bankCardBindings.forEach { b -> b.ivDelete.visibility = if (count > 1) View.VISIBLE else View.GONE }
-        (binding.llAddAccount.parent as? View)?.visibility = if (count >= MAX_ACCOUNTS) View.GONE else View.VISIBLE
+        binding.llAddAccount.visibility = if (count >= MAX_ACCOUNTS) View.GONE else View.VISIBLE
     }
 
     private fun setupCardFilters(card: ItemBankAccountBinding) {
@@ -200,7 +205,7 @@ class BankDetailsActivity : BaseActivity() {
             anchorView = card.flProofTypeAnchor,
             arrowView  = card.ivProofTypeArrow,
             textView   = card.tvProofType,
-            items      = ProofType.entries.map { it.displayName }
+            items      = ProofType.entries.map { getString(it.displayNameRes) }
         ) { _, position ->
             val selected = ProofType.entries[position]
             val index = bankCardBindings.indexOf(card)
@@ -222,7 +227,7 @@ class BankDetailsActivity : BaseActivity() {
             anchorView = card.flStatementPeriodAnchor,
             arrowView  = card.ivStatementPeriodArrow,
             textView   = card.tvStatementPeriod,
-            items      = StatementPeriod.entries.map { it.displayName }
+            items      = StatementPeriod.entries.map { getString(it.displayNameRes) }
         ) { _, position ->
             statementPeriods[bankCardBindings.indexOf(card)] = StatementPeriod.entries[position]
         }
@@ -248,6 +253,8 @@ class BankDetailsActivity : BaseActivity() {
 
         Glide.with(mActivity)
             .load(uri)
+            .placeholder(R.drawable.ic_file_not_found)
+            .error(R.drawable.ic_file_not_found)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean
@@ -311,6 +318,16 @@ class BankDetailsActivity : BaseActivity() {
         }
     }
 
+    private data class CardSnapshot(
+        val accountNumber: String,
+        val bankName: String,
+        val ifscCode: String,
+        val branchName: String,
+        val proofType: String,
+        val proofUri: Uri,
+        val statementPeriod: StatementPeriod?
+    )
+
     private fun onSubmit() {
         if (!validate()) return
         if (!Utility.isInternetAvailable(mActivity)) {
@@ -318,29 +335,54 @@ class BankDetailsActivity : BaseActivity() {
             return
         }
 
-        val accounts = bankCardBindings.mapIndexed { index, card ->
-            BankAccountInput(
+        val snapshots = bankCardBindings.mapIndexedNotNull { i, card ->
+            val uri = proofUris[i] ?: return@mapIndexedNotNull null
+            CardSnapshot(
                 accountNumber   = card.etAccountNumber.text?.toString()?.trim() ?: "",
                 bankName        = card.etBankName.text?.toString()?.trim()      ?: "",
                 ifscCode        = card.etIfscCode.text?.toString()?.trim()      ?: "",
                 branchName      = card.etBranchName.text?.toString()?.trim()    ?: "",
-                proofType       = proofTypes[index]?.apiValue                   ?: "",
-                proofUri        = proofUris[index]                              ?: return,
-                statementPeriod = statementPeriods[index]
+                proofType       = proofTypes[i]?.apiValue                       ?: "",
+                proofUri        = uri,
+                statementPeriod = statementPeriods[i]
             )
         }
 
-        viewModel.submit(
-            accounts  = accounts,
-            onLoading = { showProgressSubmit.set(true) },
-            onSuccess = {
-                showProgressSubmit.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.msgBankDetailsSubmitSuccess))
-                setResult(1)
-                finish()
-            },
-            onError   = { msg -> showProgressSubmit.set(false); ToastUtil.showDelete(mActivity, msg) }
-        )
+        showProgressSubmit.set(true)
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val cr = contentResolver
+                val accounts = snapshots.map { s ->
+                    BankAccountInputItem(
+                        accountNumber   = s.accountNumber,
+                        bankName        = s.bankName,
+                        ifscCode        = s.ifscCode,
+                        branchName      = s.branchName,
+                        proofType       = s.proofType,
+                        proofBytes      = cr.openInputStream(s.proofUri)?.use { it.readBytes() } ?: ByteArray(0),
+                        statementPeriod = s.statementPeriod
+                    )
+                }
+                withContext(Dispatchers.Main) {
+                    viewModel.submit(
+                        accounts  = accounts,
+                        onLoading = {},
+                        onSuccess = {
+                            showProgressSubmit.set(false)
+                            ToastUtil.showSuccess(mActivity, getString(R.string.msgBankDetailsSubmitSuccess))
+                            setResult(1)
+                            finish()
+                        },
+                        onError   = { msg -> showProgressSubmit.set(false); ToastUtil.showDelete(mActivity, msg) }
+                    )
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    showProgressSubmit.set(false)
+                    ToastUtil.showDelete(mActivity, e.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            }
+        }
     }
 
     private fun onClickListener(): View.OnClickListener {

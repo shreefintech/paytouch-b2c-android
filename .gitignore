@@ -27,3 +27,6 @@ captures/
 app/src/main/java/com/shreefintech/paytouchconsumer/retrofit/CurlInterceptor.kt
 
 design/
+
+# Kotlin compiler session artifacts
+.kotlin/

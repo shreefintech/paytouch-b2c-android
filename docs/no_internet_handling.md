@@ -149,7 +149,37 @@ Use `getString(R.string.msgNoInternet)` for toast messages.
 
 ---
 
-## 6. List Screen (First Load)
+## 6. Splash / Session Validation Screen
+
+`SplashActivity` is a special case: it validates the stored session token via a network call. Two users can open the app offline — a **logged-out** user and a **logged-in** user — and they must be handled differently.
+
+| User state | No internet | Correct response |
+|---|---|---|
+| Not logged in | No internet | Navigate to `LoginActivity` (no session to restore; login anyway) |
+| Logged in | No internet | `showNoInternet()` — show retry overlay, wait for connectivity |
+
+```kotlin
+private fun checkSession() {
+    // Not logged in → send to login regardless of connectivity
+    if (!SharedPreferenceHelper.isLoggedIn(mActivity)) {
+        navigate(Intent(mActivity, LoginActivity::class.java))
+        return
+    }
+    // Logged in but offline → overlay + retry; do NOT dump to login
+    if (!Utility.isInternetAvailable(mActivity)) {
+        showNoInternet()
+        return
+    }
+    hideNoInternet()
+    // ... validate token via API, then route to Home / KYC / MPIN
+}
+```
+
+`retryCallback = { checkSession() }` must be set in `onCreate()` so the Retry button re-runs the full session check once connectivity is restored.
+
+---
+
+## 7. List Screen (First Load)
 
 Used on every screen that loads a list on open.
 
@@ -178,7 +208,7 @@ When the API returns:
 
 ---
 
-## 7. Pagination (Next Pages)
+## 8. Pagination (Next Pages)
 
 Pagination fetches are never the first load — use **toast only**, never the full overlay.
 
@@ -230,7 +260,7 @@ retryCallback = {
 
 ---
 
-## 8. Form / Submit Action
+## 9. Form / Submit Action
 
 On form screens (OTP verify, update, submit), there is no overlay — just toast + early return.
 
@@ -247,7 +277,7 @@ private fun submitForm() {
 
 ---
 
-## 9. Action Inside a List (Toggle / Approve / Reject)
+## 10. Action Inside a List (Toggle / Approve / Reject)
 
 When an action mutates a single item already on screen, revert the local state before showing the toast.
 
@@ -279,7 +309,7 @@ private val onToggle: (Int, Boolean) -> Unit = { position, isChecked ->
 
 ---
 
-## 10. ViewModel Callback Pattern
+## 11. ViewModel Callback Pattern
 
 ViewModels pass `onNoInternet` as a callback — the Activity decides what to show.
 
@@ -314,10 +344,12 @@ viewModel.getList(
 
 ---
 
-## 11. Decision Table
+## 12. Decision Table
 
 | Context | Check | Response |
 |---|---|---|
+| Splash — user **not** logged in | `isInternetAvailable` | Navigate to `LoginActivity` |
+| Splash — user **logged in** | `isInternetAvailable` | `showNoInternet()` |
 | List — first open (`isFirstCall = true`) | `isInternetAvailable` | `showNoInternet()` |
 | List — pagination (`isFirstCall = false`) | `isInternetAvailable` | `ToastUtil.showDelete(msgNoInternet)` |
 | Form submit / button action | `isInternetAvailable` | `ToastUtil.showDelete(msgNoInternet)` |
@@ -327,7 +359,7 @@ viewModel.getList(
 
 ---
 
-## 12. Quick Checklist (new screen)
+## 13. Quick Checklist (new screen)
 
 - [ ] Activity extends `BaseActivity`
 - [ ] `retryCallback = { loadList() }` set in `onCreate()` before first call

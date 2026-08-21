@@ -15,11 +15,9 @@ import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.KycDocumentAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycDetailsBinding
-import com.shreefintech.paytouchconsumer.onboarding.kyc.KycStatusViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDocumentDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -28,7 +26,7 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 class KycDetailsActivity : BaseActivity() {
 
     private lateinit var binding: ActivityKycDetailsBinding
-    private val viewModel: KycStatusViewModel by viewModels()
+    private val viewModel: KycDetailsViewModel by viewModels()
 
     private val documents = mutableListOf<KycDocumentDetailItem>()
     private lateinit var documentAdp: KycDocumentAdp
@@ -58,11 +56,8 @@ class KycDetailsActivity : BaseActivity() {
     }
 
     private fun setupDocumentSlider() {
-        documentAdp = KycDocumentAdp(
-            items = documents,
-            urlResolver = ::resolveFileUrl,
-            onItemClick = { url, label -> DocPreviewActivity.start(this, url, label) }
-        )
+        documentAdp = KycDocumentAdp(urlResolver = ::resolveFileUrl)
+        documentAdp.onItemClick = { url, label -> DocPreviewActivity.start(this, url, label) }
         binding.vpDocuments.adapter = documentAdp
         binding.vpDocuments.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -142,7 +137,7 @@ class KycDetailsActivity : BaseActivity() {
         val docList = docs.items ?: emptyList()
         documents.clear()
         documents.addAll(docList)
-        documentAdp.notifyDataSetChanged()
+        documentAdp.updateList(docList)
 
         if (docList.isEmpty()) {
             binding.llDocumentsContent.isVisible = false
@@ -179,11 +174,7 @@ class KycDetailsActivity : BaseActivity() {
         }
     }
 
-    private fun resolveFileUrl(fileUrl: String?): String? {
-        if (fileUrl.isNullOrBlank()) return null
-        return if (fileUrl.startsWith("http")) fileUrl
-        else "${Constant.BASE_URL_DASHBOARD_STORAGE}/${fileUrl.trimStart('/')}"
-    }
+    private fun resolveFileUrl(fileUrl: String?): String? = fileUrl?.ifBlank { null }
 
     private fun statusLabel(status: String?): String = when {
         status.isNullOrEmpty() -> "--"
@@ -198,7 +189,7 @@ class KycDetailsActivity : BaseActivity() {
                 status?.contains("verified", ignoreCase = true) == true ->
             ContextCompat.getColor(this, R.color.colorStatusSuccess)
         status?.contains("reject", ignoreCase = true) == true ->
-            ContextCompat.getColor(this, R.color.colorPaymentFailed)
+            ContextCompat.getColor(this, R.color.colorStatusFailed)
         else -> ContextCompat.getColor(this, R.color.colorStatusPending)
     }
 

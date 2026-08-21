@@ -58,6 +58,10 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".onboarding.kyc.KycStatusActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".onboarding.kyc.identity.IdentityVerificationActivity"
             android:exported="false"
             android:screenOrientation="portrait"
@@ -67,7 +71,7 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
-<activity
+        <activity
             android:name=".HomeActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -295,6 +299,10 @@
             android:name=".loadwallet.PaymentStatusActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".myaccount.DocPreviewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -306,10 +314,6 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
-        <activity
-            android:name=".onboarding.kyc.KycStatusActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

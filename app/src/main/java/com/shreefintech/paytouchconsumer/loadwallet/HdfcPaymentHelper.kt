@@ -1,14 +1,11 @@
 package com.shreefintech.paytouchconsumer.loadwallet
 
 import android.app.Activity
+import android.content.Context
 import com.shreefintech.paytouchconsumer.Constant
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 
 object HdfcPaymentHelper {
-
-    var pendingOrderId: String? = null
-        private set
-    var pendingAmount: String? = null
-        private set
 
     private val failedStatuses = setOf(
         Constant.HDFC_STATUS_JUSPAY_DECLINED,
@@ -26,13 +23,13 @@ object HdfcPaymentHelper {
         payUrl: String,
         returnUrl: String
     ) {
-        pendingOrderId = orderId
-        pendingAmount  = amount
+        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_PENDING_ORDER_ID, orderId)
+        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_PENDING_AMOUNT, amount)
         context.startActivity(HdfcWebViewActivity.newIntent(context, payUrl, returnUrl))
     }
 
-    fun clearPendingState() {
-        pendingOrderId = null
-        pendingAmount  = null
+    fun clearPendingState(context: Context) {
+        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_PENDING_ORDER_ID, "")
+        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_PENDING_AMOUNT, "")
     }
 }

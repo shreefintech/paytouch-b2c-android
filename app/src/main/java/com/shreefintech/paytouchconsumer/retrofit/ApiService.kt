@@ -87,7 +87,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPay
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderResponseItem
+import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -574,13 +574,13 @@ interface ApiService {
     fun createHdfcOrder(
         @Header("Authorization") authorization: String,
         @Body request: HdfcCreateOrderRequest
-    ): Call<HdfcOrderResponseItem>
+    ): Call<General<HdfcOrderItem>>
 
     @GET("${AUTH}hdfc/orders/{order_id}/status")
     fun getHdfcOrderStatus(
         @Header("Authorization") authorization: String,
         @Path("order_id") orderId: String
-    ): Call<HdfcOrderResponseItem>
+    ): Call<General<HdfcOrderItem>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 
