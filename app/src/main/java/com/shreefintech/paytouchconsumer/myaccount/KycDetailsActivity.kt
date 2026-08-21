@@ -56,10 +56,8 @@ class KycDetailsActivity : BaseActivity() {
     }
 
     private fun setupDocumentSlider() {
-        documentAdp = KycDocumentAdp(
-            urlResolver = ::resolveFileUrl,
-            onItemClick = { url, label -> DocPreviewActivity.start(this, url, label) }
-        )
+        documentAdp = KycDocumentAdp(urlResolver = ::resolveFileUrl)
+        documentAdp.onItemClick = { url, label -> DocPreviewActivity.start(this, url, label) }
         binding.vpDocuments.adapter = documentAdp
         binding.vpDocuments.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {

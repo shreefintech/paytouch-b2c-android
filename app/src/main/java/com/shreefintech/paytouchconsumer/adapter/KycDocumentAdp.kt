@@ -12,9 +12,10 @@ import com.shreefintech.paytouchconsumer.utill.PdfThumbnailRepository
 import kotlinx.coroutines.Job
 
 class KycDocumentAdp(
-    private val urlResolver: (String?) -> String? = { it },
-    private val onItemClick: ((url: String, label: String) -> Unit)? = null
+    private val urlResolver: (String?) -> String? = { it }
 ) : RecyclerView.Adapter<KycDocumentAdp.ViewHolder>() {
+
+    var onItemClick: ((url: String, label: String) -> Unit)? = null
 
     private val items = mutableListOf<KycDocumentDetailItem>()
 

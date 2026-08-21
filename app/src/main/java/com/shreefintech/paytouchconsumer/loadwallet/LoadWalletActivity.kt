@@ -119,6 +119,7 @@ class LoadWalletActivity : BaseActivity() {
             ?.takeIf { it.isNotEmpty() } ?: return
         val amount  = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_PENDING_AMOUNT, null) ?: ""
         HdfcPaymentHelper.clearPendingState(mActivity)
+        hideNoInternet()
         showLoading()
         viewModel.checkOrderStatus(
             orderId   = orderId,

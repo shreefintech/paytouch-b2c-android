@@ -31,8 +31,9 @@ class KycDetailsViewModel(application: Application) : AndroidViewModel(applicati
                     call: Call<KycMyAccountItem>,
                     response: Response<KycMyAccountItem>
                 ) {
-                    if (response.isSuccessful && response.body()?.success == true) {
-                        onReady(response.body()!!)
+                    val body = response.body()
+                    if (response.isSuccessful && body?.success == true) {
+                        onReady(body)
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(
