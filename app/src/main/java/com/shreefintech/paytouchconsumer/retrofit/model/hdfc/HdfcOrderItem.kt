@@ -19,8 +19,3 @@ data class HdfcOrderItem(
     @field:SerializedName("wallet_credited_at") val walletCreditedAt: String?
 )
 
-data class HdfcOrderResponseItem(
-    @field:SerializedName("success") val success: Boolean?,
-    @field:SerializedName("message") val message: String?,
-    @field:SerializedName("data") val data: HdfcOrderItem?
-)
