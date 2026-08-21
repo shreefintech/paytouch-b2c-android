@@ -314,6 +314,7 @@ class LoadWalletActivity : BaseActivity() {
             },
             onError = { msg ->
                 ToastUtil.showDelete(mActivity, msg)
+                updateEmptyState()
             }
         )
     }

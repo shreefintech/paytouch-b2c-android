@@ -46,7 +46,7 @@ class IdentityVerificationActivity : BaseActivity() {
 
     private lateinit var binding: ActivityIdentityVerificationBinding
     private val viewModel: IdentityVerificationViewModel by viewModels()
-    private var showProgressSubmit = ObservableBoolean(false)
+    private val showProgressSubmit = ObservableBoolean(false)
     private var resultCode = 0
 
     private val dotViews = mutableListOf<AppCompatImageView>()

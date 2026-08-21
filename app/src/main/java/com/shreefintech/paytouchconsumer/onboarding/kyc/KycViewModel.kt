@@ -85,7 +85,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     response: Response<General<KycSubmissionDataItem>>
                 ) {
                     when {
-                        response.isSuccessful && response.body()?.success == true ->
+                        response.isSuccessful && response.body()?.data != null ->
                             submitSectionAPlaceholder(onReady, onError)
                         response.code() == 422 ->
                             submitSectionAPlaceholder(onReady, onError)
@@ -113,7 +113,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     call: Call<General<KycSubmissionDataItem>>,
                     response: Response<General<KycSubmissionDataItem>>
                 ) {
-                    if (response.isSuccessful && response.body()?.success == true) {
+                    if (response.isSuccessful && response.body()?.data != null) {
                         onReady()
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
@@ -143,7 +143,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     call: Call<General<KycAgreeDataItem>>,
                     response: Response<General<KycAgreeDataItem>>
                 ) {
-                    if (response.isSuccessful && response.body()?.success == true) {
+                    if (response.isSuccessful && response.body()?.data != null) {
                         fetchFinalStatus(onReady, onError)
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
