@@ -81,6 +81,7 @@
     <color name="colorStatusSuccess">#07974F</color>
     <color name="colorStatusPending">#D89633</color>
     <color name="colorStatusFailed">#D84C55</color>
+    <color name="selfie_card_stroke">#D52662</color>
     <color name="personal_info_label">#6B7280</color>
     <color name="account_card_label">#FFFFF0</color>
     <color name="status_divider">#A299A1</color>

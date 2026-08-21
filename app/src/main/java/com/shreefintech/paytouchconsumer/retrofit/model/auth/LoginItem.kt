@@ -7,8 +7,7 @@ data class LoginItem(
     @field:SerializedName("token_type")               val tokenType: String?,
     @field:SerializedName("user")                     val user: UserItem?,
     @field:SerializedName("requires_kyc")             val requiresKyc: Boolean?,
-    @field:SerializedName("requires_mpin")            val requiresMpin: Boolean?,
-    @field:SerializedName("requires_virtual_account") val requiresVirtualAccount: Boolean?
+    @field:SerializedName("requires_mpin")            val requiresMpin: Boolean?
 )
 
 data class UserItem(

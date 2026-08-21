@@ -21,6 +21,14 @@ object HdfcPaymentHelper {
 
     fun isFailedStatus(status: String) = status.uppercase() in failedStatuses
 
+    fun pendingOrderId(context: Context): String? =
+        SharedPreferenceHelper.getSharedPreferenceString(context, Constant.KEY_HDFC_PENDING_ORDER_ID, "")
+            .takeIf { !it.isNullOrEmpty() }
+
+    fun pendingAmount(context: Context): String? =
+        SharedPreferenceHelper.getSharedPreferenceString(context, Constant.KEY_HDFC_PENDING_AMOUNT, "")
+            .takeIf { !it.isNullOrEmpty() }
+
     fun launchPayment(
         context: Activity,
         orderId: String,

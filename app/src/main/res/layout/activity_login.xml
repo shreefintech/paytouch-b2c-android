@@ -394,33 +394,6 @@
 
                     </LinearLayout>
 
-                    <!-- Terms & Conditions row -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_medium"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.checkbox.MaterialCheckBox
-                            android:id="@+id/cbTerms"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:buttonIconTint="@color/white"
-                            app:buttonTint="@color/primary" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/tvTerms"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/proza_libre_medium"
-                            android:includeFontPadding="false"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/text_size_12" />
-
-                    </LinearLayout>
-
                     <!-- Sign In button -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"

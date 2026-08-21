@@ -49,4 +49,8 @@ object Constant {
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
+    // HDFC pending payment state (persisted across process death)
+    const val KEY_HDFC_PENDING_ORDER_ID = "hdfc_pending_order_id"
+    const val KEY_HDFC_PENDING_AMOUNT   = "hdfc_pending_amount"
+
 }

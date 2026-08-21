@@ -1,6 +1,6 @@
 # PayTouch Consumer — Business Logic Reference
 
-> **Current phase:** UI implementation. API calls are not yet wired. This document describes the **target behaviour** — implement UI first, then wire each section to the API when that phase begins. Field names and endpoint paths here are authoritative; do not invent your own.
+> **Current phase:** API wiring in progress. Core modules have live API integration. Field names and endpoint paths listed here are authoritative; do not invent your own.
 
 ---
 
@@ -14,11 +14,11 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - Password must be at least 8 characters
 - Email must pass standard email format validation
 - Both password and MPIN login share the same `/api/login` endpoint; the payload differs
-- On login, the server response includes three boolean flags that drive routing:
-  - `requires_kyc = true` → send to `UploadKycActivity`
-  - `requires_mpin = true` → send to MPIN creation screen
-  - `requires_virtual_account = true` → send to `CreateVirtualAccountActivity`
-  - All false → send to `HomeActivity`
+- On login, the server response includes two boolean flags that drive routing:
+  - `requires_kyc = true` → send to `KycActivity`
+  - `requires_mpin = true` → send to `ResetMpinActivity` (create-mode, via `buildCreateIntent()`)
+  - Both false → send to `HomeActivity`
+  - **Note:** `requires_virtual_account` is permanently retired. Virtual account creation is now handled server-side after KYC approval. Do not add routing for this flag.
 
 ### API Endpoints
 | Method | Path | Purpose |
@@ -49,7 +49,6 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - `user.wallet_balance` (Decimal)
 - `user.requires_kyc` (Boolean)
 - `user.requires_mpin` (Boolean)
-- `user.requires_virtual_account` (Boolean)
 
 ### State Transitions
 ```
@@ -67,39 +66,52 @@ Logged In → Logged Out (automatic, on any 401 response)
 
 ## 2. KYC (Know Your Customer)
 
-**Screen:** `onboarding/UploadKycActivity`
+**Screens:** `onboarding/kyc/KycActivity` (hub) → `onboarding/kyc/identity/IdentityVerificationActivity` + `onboarding/kyc/bank/BankDetailsActivity`
 
 ### What It Does
-Collects personal identity information and submits it to the server for verification. This unlocks the full account.
+KYC is split into two independently-completable sections, tracked by a 0/2 progress card on the hub:
+1. **Identity Verification** — a 4-step flow (Details → Aadhaar → PAN → Selfie) collecting identity documents and a selfie.
+2. **Bank Details** — 1 to 4 bank accounts with proof-of-account documents.
+
+Both sections must be completed before KYC can be submitted. Once both are done, the hub auto-agrees and navigates to `KycStatusActivity`.
 
 ### Rules and Constraints
 - PAN card must match regex: `[A-Z]{5}[0-9]{4}[A-Z]{1}`
 - Aadhaar number must be exactly 12 digits
-- GST number is **optional** — validate format only when non-empty; never block submission if blank
-- Date of birth is selected via a date picker (not typed)
-- Age is auto-calculated from the selected DOB
-- After successful KYC, route to MPIN creation — never skip to Home
+- Selfie is captured via the system camera (no CameraX dependency); a captured selfie is required to submit step 4
+- Bank Details supports 1-4 accounts; the delete icon on a card is hidden when only one account remains
+- Terms & Conditions checkbox is mandatory before Bank Details submission
+- Section completion (`identityDone` / `bankDone`) is driven by the API via `KycSectionStatus.UNDER_REVIEW` returned in the KYC status response
+- After both sections are under review, `KycActivity` calls the agree endpoint and navigates to `KycStatusActivity` — never directly to Home
 
 ### API Endpoints
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `api/kyc/account-info` | Pre-fill form with existing KYC data if any |
-| POST | `api/kyc/submit` | Submit KYC data |
+| GET  | `api/dashboard/kyc` | Fetch current KYC status and section states |
+| POST | `api/dashboard/kyc/initiate` | Initiate KYC session |
+| POST | `api/dashboard/kyc/section-b` | Submit identity verification (multipart) |
+| POST | `api/dashboard/kyc/section-c` | Submit bank details (multipart, 1-4 accounts) |
+| POST | `api/dashboard/kyc/agree` | Mark KYC as agreed after all sections submitted |
 
-### Request Fields (Submit)
-- `mobile_no` (String, required)
-- `member_name` (String, required)
-- `birth_date` (String, required, from date picker)
-- `age` (Int, required, auto-calculated)
-- `home_address` (String, required)
-- `city_name` (String, required)
-- `email` (String, required)
-- `pan_card_no` (String, required, regex validated)
-- `aadhaar_no` (String, required, 12 digits)
-- `gst_no` (String, optional)
+### Request Fields — Identity Verification
+- `mobile` (String, required, 10 digits)
+- `email` (String, required, email format)
+- `aadhaar_number` (String, required, 12 digits)
+- `aadhaar_front` / `aadhaar_back` (File, required)
+- `pan_number` (String, required, regex validated)
+- `pan_front` (File, required)
+- `selfie` (File, required)
+
+### Request Fields — Bank Details (per account, 1-4 accounts)
+- `account_number` (String, required, 9-18 digits)
+- `bank_name` (String, required)
+- `ifsc_code` (String, required, regex validated)
+- `branch_name` (String, required)
+- `proof_type` (String, required)
+- `bank_proof` (File, required)
 
 ### Edge Cases
-- If KYC was already partially submitted, `account-info` pre-fills the form
+- If either section was already submitted, its hub row should show a completed state (pre-fill pending API wiring)
 
 ---
 
@@ -111,7 +123,7 @@ A 4-digit PIN used as an alternative to password login. Created during onboardin
 ### Rules and Constraints
 - MPIN must be exactly 4 digits (numeric only)
 - MPIN and confirmation must match before submission
-- After successful creation, route to `CreateVirtualAccountActivity`
+- After successful creation, route to `HomeActivity`
 - MPIN is never stored locally — only a boolean flag (`mpin_created`) is stored
 
 ### Reset Flow
@@ -132,26 +144,7 @@ A 4-digit PIN used as an alternative to password login. Created during onboardin
 
 ## 4. Virtual Account
 
-**Screen:** `onboarding/CreateVirtualAccountActivity`
-
-### What It Does
-Collects the user's banking details and supporting documents. Completes the onboarding sequence and unlocks all payment features.
-
-### Rules and Constraints
-- Required text fields: name, mobile, state, city, district, Aadhaar, PAN, bank account number, IFSC code, UPI ID, branch name
-- Required file uploads: Aadhaar front, Aadhaar back, PAN image, bank proof image
-- State, city, district are selected from dropdowns
-- All four file uploads are mandatory; submission is blocked if any is missing
-- After successful submission, route to `HomeActivity`
-
-### API Endpoints
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `api/virtual-account/create` | Submit VA details as multipart form |
-
-### Request Fields (Multipart)
-- `name`, `mobile`, `city`, `state`, `district`, `aadhaar`, `pan`, `bank_acc`, `ifsc`, `upi`, `branch` (all String, required)
-- `aadhaar_front`, `aadhaar_back`, `pan_image`, `bank_proof` (File, required)
+**Handled server-side.** `CreateVirtualAccountActivity` has been removed. Virtual account creation now happens automatically on the backend after KYC is approved. There is no client-side virtual account screen. Do not add routing for `requires_virtual_account`.
 
 ---
 
@@ -184,16 +177,16 @@ Collects the user's banking details and supporting documents. Completes the onbo
 The main menu of the app. Displays category tiles that navigate to each payment flow.
 
 ### Categories Displayed
-1. Electricity
-2. Gas
-3. Prepaid (Mobile)
-4. TV Cable
-5. DTH
-6. Fastag
-7. Loan (TV Cable placeholder)
-8. My Account
-9. Tax (TV Cable placeholder)
-10. Load Wallet (bottom action)
+1. Electricity → `ElectricityActivity`
+2. Gas → `GasActivity`
+3. Prepaid (Mobile) → `PrepaidActivity`
+4. TV Cable → 📋 Planned
+5. DTH → `DthActivity`
+6. FASTag → `FastagActivity`
+7. Loan → `LoanActivity`
+8. My Account → `MyAccountActivity`
+9. Municipal Tax → `MunicipalTaxActivity`
+10. Load Wallet (bottom action) → `LoadWalletActivity`
 
 ### Rules
 - On Home load, fetch dynamic Shreefintech token from server → store in `Constant.TOKEN` or SharedPreferences
@@ -219,12 +212,12 @@ This flow applies to: Electricity, Gas, Mobile Postpaid, Cable TV, Broadband, FA
 3. App calls `fetch-bill` API → displays outstanding amount, due date, consumer name
 4. User confirms and taps Pay
 5. Platform fee is calculated and shown
-6. App generates a local transaction ID (`PYTCH[DDMMYYYYHHMMSS]M`)
-7. Payment processed via `process-payment` API
-8. App calls `transaction-status` to get final result
-9. Transaction saved to Room DB
-10. Success/failure sound plays
-11. Receipt is displayed
+6. Payment processed via `process-payment` API
+7. App calls `transaction-status` to get final result
+8. Success/failure sound plays
+9. Receipt is displayed
+
+> Transaction ID is generated and returned by the backend in the `process-payment` response — never generate it client-side.
 
 ### Platform Fee Calculation
 ```
@@ -342,60 +335,63 @@ amount > 40000           → fee = ₹30
 
 ### Rules
 - Balance is fetched fresh from the API on every Home/dashboard load
-- `Load Wallet` routes to a wallet top-up flow
+- `Load Wallet` opens `LoadWalletActivity` which routes to the HDFC payment WebView
 
 ### API Endpoints
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `api/wallet/balance` | Get current wallet balance |
 | GET | `api/transactions` | Get unified paginated transaction history |
+| POST | `api/hdfc/create-order` | Create HDFC payment order for wallet top-up |
 
 ### Response Fields (Balance)
 - `data.balance` (Decimal) — current wallet balance
 
 ---
 
-## 12. Transaction History & Reporting
+## 11a. Load Wallet (HDFC Gateway Flow)
+
+### What It Does
+User enters a top-up amount, the app creates an HDFC payment order, then opens `HdfcWebViewActivity` with the payment URL. On payment completion, HDFC redirects to a return URL which the WebView intercepts — routing to `PaymentStatusActivity`.
+
+### Screens
+| Screen | Class | Purpose |
+|---|---|---|
+| Wallet Balance + Top-up Form | `LoadWalletActivity` | Shows balance, enter amount, create order |
+| HDFC Payment WebView | `HdfcWebViewActivity` | Renders HDFC payment page |
+| Payment Status | `PaymentStatusActivity` | Shows success/failure, auto-navigates back |
+| Full Transaction History | `WalletTransactionsActivity` | Paginated list of all wallet transactions |
 
 ### Rules
-- Transactions are stored in Room DB immediately after any payment attempt
-- The local DB is the primary source for history and reports
-- Search can be done by transaction ID or consumer number
-- Report filtering: category, consumer number, status (Success/Failed/Processing), from-date, to-date
-
-### Room DB Schema — `recent_transactions`
-| Column | Type | Notes |
-|---|---|---|
-| id | Int (PK, auto) | Auto-generated |
-| txnId | String | PYTCH-format transaction ID |
-| consumerNumber | String | Consumer/account number |
-| consumerName | String | Name of the bill holder |
-| providerName | String | Operator/provider name |
-| category | String | e.g. "Electricity", "DTH" |
-| amount | Double | Payment amount (before fee) |
-| status | String | "Success", "Failed", "Processing" |
-| timestamp | Long | Unix timestamp |
+- `LoadWalletActivity` is `singleTop` (prevents duplicate stacking from HDFC redirect)
+- `HdfcWebViewActivity` intercepts the return URL and finishes, handing control back
+- `PaymentStatusActivity` auto-navigates to `LoadWalletActivity` after 5 s or on back press
+- Wallet transaction history is paginated via `api/wallet/transactions`
 
 ---
 
-## 13. Transaction ID Generation
-
-### Format
-```
-PYTCH[DDMMYYYYHHMMSS]M
-Example: PYTCH19012026091530M
-```
-
-- Prefix: `PYTCH` (always)
-- Date-time: current device date and time in DDMMYYYYHHMMSS format
-- Suffix: `M` (default)
-- Total length: 20 characters
+## 12. Transaction History & Reporting
 
 ### Rules
-- Generated client-side **before** the API call
-- Stored in Room DB with the transaction record
-- Used for status lookup and receipts
-- Do not use `Math.random()` or `UUID` for this — use the timestamp format above
+- Transaction history is fetched from the API — no local database is used
+- Each module has its own paginated report endpoint (`api/{category}/payment-reports`)
+- Recent transactions use `api/{category}/payment-history` (most recent records)
+- Search can be done by transaction ID or consumer number
+- Report filtering: category, consumer number, status (Success/Failed/Processing), from-date, to-date
+- `TransactionDetailActivity` is shared across all modules; detail is passed via `Gson().toJson(TransactionItem)`
+
+---
+
+## 13. Transaction ID
+
+### Ownership
+Transaction IDs are **generated and returned by the backend** in the `process-payment` (or `process-direct`) response. The client must never generate a transaction ID before or during the API call.
+
+### Rules
+- Do not pass a `transaction_id` field in any payment request DTO
+- Read the transaction ID from the API response and store it for status lookup and receipts
+- `Utility.generateTransactionId()` was removed — do not recreate it
+- The ID format (`PYTCH…`) is set by the server; the client treats it as an opaque string
 
 ---
 
@@ -411,7 +407,6 @@ Example: PYTCH19012026091530M
 | `AUTH` | `TOKEN_TYPE` | String | Token type |
 | `AUTH` | `ReferralCode` | String | Referral code |
 | `app_prefs` | `mpin_created` | Boolean | MPIN setup complete |
-| `app_prefs` | `virtual_account` | Boolean | VA setup complete |
 
 ### Rules
 - Token is checked at Splash; no token → go to Login
@@ -429,7 +424,7 @@ Example: PYTCH19012026091530M
 | KYC submission | Sync KYC fields to VPS |
 | Every payment | Log transaction to VPS |
 | Home screen open | Refresh user profile from VPS |
-| Virtual Account creation | Upload VA documents to VPS |
+| KYC approval | Virtual account created server-side automatically |
 
 ### Rules
 - VPS sync failures are **non-blocking** — the main flow continues even if VPS call fails
@@ -461,7 +456,7 @@ Example: PYTCH19012026091530M
 The Dynamic QR payment feature uses a `ngrok-free.dev` tunnel URL. This will break in production. Replace with a stable production URL before any live deployment.
 
 **Issue 2 — Static Shreefintech token field:**
-The dynamic token from `api/shreefintech-token` is currently stored as a static field (`Constant.TOKEN`). This is a race condition risk in multi-thread scenarios. Move this to `SharedPreferenceHelper` or a Repository before the API wiring phase.
+The dynamic token from `api/shreefintech-token` is currently stored as a static field (`Constant.TOKEN`). This is a race condition risk in multi-thread scenarios. Move this to `SharedPreferenceHelper` or a Repository before release.
 
 **Issue 3 — Legacy MobiKwik API:**
 Some payment flows may route through `dashboard.shreefintechsolutions.com/api/mobikwik/`. Audit each endpoint before wiring — determine which are still active and which are replaced by `paytouch.in` equivalents.

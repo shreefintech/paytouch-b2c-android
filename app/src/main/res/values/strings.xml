@@ -20,6 +20,7 @@
     <string name="msgLoginSuccess">Login successful</string>
 
     <!-- Login validation messages -->
+    <string name="msgNameEmpty">Please enter your name</string>
     <string name="msgMobileEmpty">Please enter your mobile number</string>
     <string name="msgMobileInvalid">Enter a valid 10-digit mobile number</string>
     <string name="msgPasswordEmpty">Please enter your password</string>
@@ -73,6 +74,9 @@
     <!-- Reset MPIN screen -->
     <string name="titleResetMpin">Reset MPIN</string>
     <string name="subtitleResetMpin">Set a new MPIN to keep your account secure</string>
+    <string name="titleCreateMpin">Create MPIN</string>
+    <string name="subtitleCreateMpin">Set an MPIN to secure your account</string>
+    <string name="btnCreateMpin">Create MPIN</string>
     <string name="msgMpinRules">MPIN must be a 4-digit number and shouldn\'t match your birth year or repeat the same digit</string>
     <string name="labelNewMpin">New MPIN</string>
     <string name="labelConfirmMpin">Confirm MPIN</string>
@@ -91,8 +95,7 @@
     <string name="msgPasswordMismatch">Passwords do not match</string>
     <string name="msgTermsNotAccepted">Please accept the terms &amp; conditions to continue</string>
 
-    <!-- Upload KYC screen -->
-    <string name="titleKycInfo">KYC Information form</string>
+    <!-- Shared strings still referenced by CreateVirtualAccountActivity / MyAccountActivity layouts -->
     <string name="labelPersonalInformation">Personal Information</string>
     <string name="labelMemberName">Member Name</string>
     <string name="hintMemberName">Enter Member name</string>
@@ -104,6 +107,8 @@
     <string name="hintHomeAddress">Enter your address</string>
     <string name="labelCityName">City Name</string>
     <string name="hintSelectCity">Select City</string>
+
+    <!-- Shared identity-document strings (Create Virtual Account + KYC identity verification) -->
     <string name="labelPanCardNumber">Pan Card Number</string>
     <string name="hintPanCardNumber">Enter your pan card number</string>
     <string name="labelAadharCardNumber">Aadhar Card Number</string>
@@ -458,6 +463,7 @@
     <string name="msgPaymentFailed">Payment Failed</string>
     <string name="msgAmountRefunded">Amount Refunded</string>
     <string name="msgPaymentPending">Payment Pending</string>
+    <string name="btnContinue">Continue</string>
     <string name="msgLeavePaymentTitle">Leave Payment?</string>
     <string name="msgLeavePaymentBody">Are you sure you want to leave the payment page?</string>
     <string name="btnLeave">Leave</string>
@@ -484,5 +490,66 @@
     <string name="btnPaySecurely">Pay Securely</string>
     <string name="msgPoweredByPrefix">Powered by </string>
     <string name="errAppNotInstalled">App not installed. Please install the required payment app.</string>
+
+    <!-- KYC module — hub -->
+    <string name="titleKycVerification">KYC Verification</string>
+    <string name="labelDocumentProgress">Document Progress</string>
+    <string name="msgKycProgressSubtitle">Complete all sections to enable seamless transactions.</string>    <string name="labelRequiredSections">REQUIRED SECTIONS</string>
+    <string name="labelIdentityVerification">Identity Verification</string>
+    <string name="fmtDocumentProgress">%d / 2</string>
+
+    <!-- KYC module — identity verification steps -->
+    <string name="titleDetails">Details</string>
+    <string name="titleUploadAadharCard">Upload Aadhar Card</string>
+    <string name="titleUploadPanCard">Upload PAN Card</string>
+    <string name="titleSelfieCapture">Selfie Capture</string>
+    <string name="labelPanNumber">Permanent Account Number (PAN)</string>
+    <string name="labelFrontSide">Front Side</string>
+    <string name="labelBackSide">Back Side</string>
+    <string name="msgUploadHint">PDF,JPEG or JPG (Max 2MB)</string>
+    <string name="msgSelfieGuide">Keep a neutral face and align inside the grid guide</string>
+    <string name="msgSelfieInstruction1">● Ensure background lighting</string>
+    <string name="msgSelfieInstruction2">● Do not wear glasses or headwear</string>
+    <string name="btnCapture">Capture</string>
+    <string name="btnPrevious">Previous</string>
+
+    <!-- KYC module — identity validation -->
+    <string name="msgAadharFrontRequired">Please upload Aadhaar front side</string>
+    <string name="msgAadharBackRequired">Please upload Aadhaar back side</string>
+    <string name="msgPanFrontRequired">Please upload PAN card front side</string>
+    <string name="msgSelfieRequired">Please capture a selfie</string>
+    <string name="msgIdentitySubmitSuccess">Identity verification submitted successfully</string>
+
+    <!-- KYC module — bank details -->
+    <string name="fmtBankAccountTitle">Bank Account %d</string>
+    <string name="labelAccountNumber">Account Number</string>
+    <string name="hintAccountNumber">Enter Account Number</string>
+    <string name="labelBankName">Bank Name</string>
+    <string name="hintBankName">Enter Bank Name</string>
+    <string name="labelProofType">Proof Type</string>
+    <string name="hintProofType">Select Proof Type</string>
+    <string name="labelBankProof">Bank Proof</string>
+    <string name="btnAddBankAccount">+ Add Another Bank Account</string>
+    <string name="msgAgreeTAndC">I agree to the Terms &amp; Conditions</string>
+    <string name="msgBankDetailsSubmitSuccess">Bank details submitted successfully</string>
+
+    <!-- KYC module — bank validation -->
+    <string name="msgAccountNumberEmpty">Please enter account number</string>
+    <string name="msgAccountNumberInvalid">Please enter a valid account number</string>
+    <string name="msgBankNameEmpty">Please enter bank name</string>
+    <string name="msgAgreeTAndCRequired">Please agree to the Terms &amp; Conditions</string>
+    <string name="msgProofTypeEmpty">Please select proof type for account %d</string>
+    <string name="msgBankProofRequired">Please upload bank proof for account %d</string>
+    <string name="labelStatementPeriod">Statement Period</string>
+    <string name="hintStatementPeriod">Select Statement Period</string>
+    <string name="msgStatementPeriodRequired">Please select statement period for account %d</string>
+    <string name="textVerificationPending">Wait a While!</string>
+    <string name="msgVerificationPending">Your documents are being verified. Please wait.</string>
+    <string name="textVerificationApproved">Verification Approved</string>
+    <string name="msgVerificationApproved">Your KYC has been approved successfully.</string>
+    <string name="textVerificationRejected">Verification Failed!</string>
+    <string name="msgVerificationRejected">We couldn\'t verify your details, Please resubmit to continue</string>
+    <string name="btnRetry">Retry</string>
+    <string name="label_name">Name</string>
 
 </resources>

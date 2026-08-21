@@ -299,6 +299,7 @@ class LoadWalletActivity : BaseActivity() {
             },
             onError = { msg ->
                 ToastUtil.showDelete(mActivity, msg)
+                updateEmptyState()
             }
         )
     }
@@ -334,7 +335,9 @@ class LoadWalletActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(mActivity)
             adapter = transactionAdp
         }
-        updateEmptyState()
+        // Keep both views hidden until fetchRecentHistory() resolves — avoids flashing "No transactions" while loading
+        binding.tvNoTransactions.visibility = View.GONE
+        binding.rvTransactions.visibility = View.GONE
     }
 
     private fun updateEmptyState() {

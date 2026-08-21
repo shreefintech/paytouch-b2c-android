@@ -167,6 +167,7 @@
                                 android:gravity="center"
                                 android:imeOptions="actionNext"
                                 android:includeFontPadding="false"
+                                android:hint="*"
                                 android:inputType="number"
                                 android:maxLength="1"
                                 android:singleLine="true"
@@ -199,6 +200,7 @@
                                 android:gravity="center"
                                 android:imeOptions="actionNext"
                                 android:includeFontPadding="false"
+                                android:hint="*"
                                 android:inputType="number"
                                 android:maxLength="1"
                                 android:singleLine="true"
@@ -231,6 +233,7 @@
                                 android:gravity="center"
                                 android:imeOptions="actionNext"
                                 android:includeFontPadding="false"
+                                android:hint="*"
                                 android:inputType="number"
                                 android:maxLength="1"
                                 android:singleLine="true"
@@ -262,6 +265,7 @@
                                 android:gravity="center"
                                 android:imeOptions="actionNext"
                                 android:includeFontPadding="false"
+                                android:hint="*"
                                 android:inputType="number"
                                 android:maxLength="1"
                                 android:singleLine="true"
@@ -311,6 +315,7 @@
                                 android:background="@android:color/transparent"
                                 android:cursorVisible="false"
                                 android:fontFamily="@font/proza_libre_semi_bold"
+                                android:hint="*"
                                 android:gravity="center"
                                 android:imeOptions="actionNext"
                                 android:includeFontPadding="false"
@@ -343,6 +348,7 @@
                                 android:background="@android:color/transparent"
                                 android:cursorVisible="false"
                                 android:fontFamily="@font/proza_libre_semi_bold"
+                                android:hint="*"
                                 android:gravity="center"
                                 android:imeOptions="actionNext"
                                 android:includeFontPadding="false"
@@ -375,6 +381,7 @@
                                 android:background="@android:color/transparent"
                                 android:cursorVisible="false"
                                 android:fontFamily="@font/proza_libre_semi_bold"
+                                android:hint="*"
                                 android:gravity="center"
                                 android:imeOptions="actionNext"
                                 android:includeFontPadding="false"
@@ -406,6 +413,7 @@
                                 android:background="@android:color/transparent"
                                 android:cursorVisible="false"
                                 android:fontFamily="@font/proza_libre_semi_bold"
+                                android:hint="*"
                                 android:gravity="center"
                                 android:imeOptions="actionDone"
                                 android:includeFontPadding="false"
@@ -442,6 +450,7 @@
                             android:visibility="@{showProgress ? View.INVISIBLE : View.VISIBLE}">
 
                             <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvChangeMpinLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/btnChangeMpin"
@@ -462,42 +471,6 @@
                             tools:visibility="gone" />
 
                     </androidx.cardview.widget.CardView>
-
-                    <!-- Back to sign In Page -->
-                    <LinearLayout
-                        android:id="@+id/tvBackToSignIn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="@dimen/margin_medium"
-                        android:layout_marginBottom="@dimen/margin_small"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?selectableItemBackground"
-                        android:gravity="center_vertical"
-                        android:onClickListener="@{onClickListener}"
-                        android:orientation="horizontal">
-
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:layout_width="@dimen/icon_small"
-                            android:layout_height="@dimen/icon_small"
-                            android:src="@drawable/ic_signin"
-                            android:tint="@color/black" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/margin_small"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/proza_libre_medium"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:text="@string/backToSignIn"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/text_size_13" />
-
-                    </LinearLayout>
 
                 </LinearLayout>
 

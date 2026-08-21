@@ -25,10 +25,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         onSuccess: (LoginItem?) -> Unit,
         onError: (String) -> Unit
     ) {
-        val error = validate(mobile, credential, mode)
-        if (error != null) {
-            onError(error); return
-        }
         if (!Utility.isInternetAvailable(getApplication())) {
             onError(getApplication<Application>().getString(R.string.msgNoInternet))
             return
@@ -119,24 +115,4 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             })
     }
 
-    private fun validate(mobile: String, credential: String, mode: LoginMode): String? {
-        val app = getApplication<Application>()
-        if (mobile.isBlank()) return app.getString(R.string.msgMobileEmpty)
-        if (mobile.length != 10 || !mobile.matches(Regex("[6-9][0-9]{9}"))) {
-            return app.getString(R.string.msgMobileInvalid)
-        }
-        return when (mode) {
-            LoginMode.PASSWORD -> when {
-                credential.isBlank() -> app.getString(R.string.msgPasswordEmpty)
-                credential.length < 8 -> app.getString(R.string.msgPasswordShort)
-                else -> null
-            }
-
-            LoginMode.MPIN -> when {
-                credential.isBlank() -> app.getString(R.string.msgMpinEmpty)
-                !credential.matches(Regex("[0-9]{4}")) -> app.getString(R.string.msgMpinInvalid)
-                else -> null
-            }
-        }
-    }
 }

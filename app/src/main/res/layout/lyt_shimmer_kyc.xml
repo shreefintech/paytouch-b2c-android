@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Document Progress card skeleton -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_shimmer_placeholder" />
+
+    <!-- Required Sections label skeleton -->
+    <View
+        android:layout_width="140dp"
+        android:layout_height="11dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_shimmer_placeholder" />
+
+    <!-- Identity Verification row skeleton -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_shimmer_placeholder" />
+
+    <!-- Bank Details row skeleton -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_shimmer_placeholder" />
+
+</LinearLayout>

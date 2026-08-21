@@ -1,6 +1,7 @@
 # PayTouch Consumer — Screens & Navigation
 
-> **Status legend:** ✅ Implemented (UI + API) | 🔧 UI pending | 📋 Planned (not started)
+> **Status legend:** ✅ Implemented (UI + API) | 🔧 UI only (API pending) | 📋 Planned (not started)
+> **Current phase:** API wiring in progress. Core modules have live API integration.
 
 ---
 
@@ -18,9 +19,8 @@
 - Any screen (explicit logout)
 
 **Exit points:**
-- Login success, `requires_kyc = true` → `UploadKycActivity`
+- Login success, `requires_kyc = true` → `KycActivity`
 - Login success, `requires_mpin = true` → MPIN creation screen (planned)
-- Login success, `requires_virtual_account = true` → `CreateVirtualAccountActivity`
 - Login success, all clear → `HomeActivity`
 - "Register" tap → `CreateAccountActivity`
 - "Forgot Password" tap → `OtpVerificationActivity` (password reset)
@@ -103,45 +103,83 @@
 
 ---
 
-### ✅ UploadKycActivity — "KYC Verification Screen"
+### ✅ KycActivity — "KYC Verification Hub"
 
-**Purpose:** Collect identity information to verify the user.
+**Purpose:** Entry point for KYC; shows a 0/2 document-progress card and launches the two required sections.
 
 **Entry points:**
 - `LoginActivity` (post-login routing, `requires_kyc = true`)
 - App launch (token exists, `requires_kyc = true`)
 
 **Exit points:**
-- Successful KYC submission → MPIN creation (planned)
+- "Identity Verification" tap → `IdentityVerificationActivity` (for result)
+- "Bank Details" tap → `BankDetailsActivity` (for result)
+- Both sections under review → `KycStatusActivity` (KycActivity finishes, no back stack)
 
 **Key UI elements:**
-- Mobile number, full name, address, city fields
-- Date of birth (date picker)
-- Age (auto-calculated, read-only)
-- Email field
-- PAN card number (validated)
-- Aadhaar number (validated, 12 digits)
-- Optional GST field
+- Document Progress card (count + horizontal progress bar)
+- Identity Verification row
+- Bank Details row
+
+---
+
+### ✅ IdentityVerificationActivity — "Identity Verification (4-step)"
+
+**Purpose:** Collect identity information across 4 steps: Details (mobile/email), Aadhaar upload, PAN upload, selfie capture.
+
+**Entry points:**
+- `KycActivity` ("Identity Verification" row)
+
+**Exit points:**
+- Previous on step 0 → back to `KycActivity` (no changes)
+- Submit on step 4 → `setResult(1)` → back to `KycActivity`
+
+**Key UI elements:**
+- Dot step indicator (4 dots) + step title
+- Step 1: Mobile Number, Email Address
+- Step 2: Aadhaar number, front/back upload slots
+- Step 3: PAN number, front upload slot
+- Step 4: Selfie capture (system camera) with circular guide
+- Previous / Continue (Submit on last step) buttons
+
+---
+
+### ✅ BankDetailsActivity — "Bank Details"
+
+**Purpose:** Collect 1-4 bank accounts (account number, bank name, IFSC, branch, proof type + proof upload).
+
+**Entry points:**
+- `KycActivity` ("Bank Details" row)
+
+**Exit points:**
+- Submit → `setResult(1)` → back to `KycActivity`
+
+**Key UI elements:**
+- Dynamically added bank account cards (max 4, min 1, delete per card when > 1)
+- Terms & Conditions checkbox
+- "+ Add Another Bank Account" button
 - Submit button
 
 ---
 
-### ✅ CreateVirtualAccountActivity — "Virtual Account Setup"
+### ✅ KycStatusActivity — "KYC Status"
 
-**Purpose:** Register banking details and upload documents to complete onboarding.
+**Purpose:** Shows KYC submission result (pending / approved / rejected). On approval, routes to MPIN creation.
 
 **Entry points:**
-- Onboarding flow (`requires_virtual_account = true`)
+- `KycActivity` (after both sections submitted)
 
 **Exit points:**
-- Successful submission → `HomeActivity`
+- `KYC_APPROVED` → `ResetMpinActivity` (create mode, stack cleared)
+- `KYC_REJECTED` → retry button → `KycActivity`
+- `PENDING_KYC` → `KycActivity`
+- Pull-to-refresh re-fetches status from API
 
 **Key UI elements:**
-- Name, mobile, state (dropdown), city, district (dropdowns)
-- Aadhaar number, PAN number
-- IFSC code, bank account number, UPI ID, branch name
-- Four file upload slots (Aadhaar front, Aadhaar back, PAN, bank proof)
-- Create Virtual Account button
+- Animated GIF (pending / rejected)
+- Status title and description
+- Retry button (visible on rejection only)
+- Pull-to-refresh
 
 ---
 
@@ -150,7 +188,7 @@
 **Purpose:** Central menu — shows all available bill payment categories.
 
 **Entry points:**
-- `CreateVirtualAccountActivity` (onboarding complete)
+- `ResetMpinActivity` (onboarding complete, after MPIN creation)
 - App launch (already onboarded)
 
 **Exit points:**
@@ -340,6 +378,18 @@ The following screens are defined in the navigation plan but not yet implemented
 
 ---
 
+### 📋 KycDetailsActivity
+
+**Purpose:** Show submitted KYC documents (Aadhaar, PAN, Selfie, bank proofs) in a ViewPager2 slider.
+
+**Entry points:** `MyAccountActivity` ("View KYC Details" button — `TODO(B2C-81)`)
+
+**Package:** `myaccount/`
+
+**ViewModel:** `KycStatusViewModel` (reuses existing KYC status endpoint)
+
+---
+
 ### 📋 Cable TV Module
 
 Bill-fetch pattern (mirrors Gas/Electricity).
@@ -370,17 +420,17 @@ Session check (read SharedPreferences)
                                                                      │
                                                      Check onboarding flags:
                                                                      │
-                                       requires_kyc ────────────► UploadKycActivity ✅
-                                                                     │      │
-                                                                     │      └── Success ──► MpinActivity 📋
+                                       requires_kyc ────────────► KycActivity ✅
                                                                      │
-                                       requires_mpin ───────────────────────────────►────►┐
-                                                                     │                    │
-                                                                     │      └── Success ──► CreateVirtualAccountActivity ✅
+                                                                     └── Both sections done ──► KycStatusActivity ✅
+                                                                                                        │
+                                                                                          KYC_APPROVED ──► ResetMpinActivity ✅
                                                                      │
-                                       requires_virtual_account ─────────────────────────►┐
-                                                                                          │
-                                       All flags false ───────────────────────────────────►┤
+                                       requires_mpin ───────────────────────────────────────────────────►┐
+                                                                     │                                   │
+                                                                     │                   MPIN created ───►┤
+                                                                     │
+                                       All flags false ───────────────────────────────────────────────────►┤
                                                                                            ▼
                                                                                     HomeActivity ✅
                                                                                           │
@@ -402,10 +452,15 @@ Session check (read SharedPreferences)
 
                            │                              │
                LoanActivity ✅             MunicipalTaxActivity ✅    MyAccountActivity ✅
-                           │                              │
-               Recent Report Status Receipt  Recent Report Status Receipt  (Account Info + Refer & Earn tabs)
-                Txns                          Txns
+                           │                              │                    │
+               Recent Report Status Receipt  Recent Report Status Receipt   Account Info + Refer & Earn
+                Txns                          Txns                           TODO(B2C-81): KycDetailsActivity 📋
                 ✅    ✅    ✅    ✅             ✅    ✅    ✅    ✅
+
+               LoadWalletActivity ✅ ("Load Wallet" button)
+                    │
+               HdfcWebViewActivity ✅ → PaymentStatusActivity ✅
+               WalletTransactionsActivity ✅ ("View All" transactions)
 
                ... (Cable TV 📋)
 
