@@ -3,9 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View" />
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgressLogout"
+            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -45,8 +49,20 @@
             android:layout_margin="@dimen/margin_medium"
             android:onClick="@{onClickListener}"
             android:src="@drawable/ic_logout"
-            android:visibility="gone"
+            android:visibility="@{showProgressLogout != null ? (showProgressLogout ? View.GONE : View.VISIBLE) : View.GONE}"
             android:background="?selectableItemBackgroundBorderless"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="@dimen/back_btn_size"
+            android:layout_height="@dimen/back_btn_size"
+            android:layout_margin="@dimen/margin_medium"
+            android:indeterminateTint="@color/white"
+            android:elevation="15dp"
+            android:visibility="@{showProgressLogout != null &amp;&amp; showProgressLogout ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
