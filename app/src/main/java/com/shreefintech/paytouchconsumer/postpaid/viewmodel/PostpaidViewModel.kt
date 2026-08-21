@@ -7,9 +7,6 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillResponseItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillResponseItem

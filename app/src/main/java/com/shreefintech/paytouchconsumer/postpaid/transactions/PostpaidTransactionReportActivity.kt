@@ -113,16 +113,17 @@ class PostpaidTransactionReportActivity : BaseActivity() {
 
     private fun setupFilterSheet() {
         filterHelper = TransactionFilterHelper(
-            activity     = mActivity,
-            sheetBinding = binding.incFilterSheet,
-            bgOverlay    = binding.viewBg,
-            onApply      = { fromDate, toDate, status, mobileNo ->
+            activity         = mActivity,
+            sheetBinding     = binding.incFilterSheet,
+            bgOverlay        = binding.viewBg,
+            onApply          = { fromDate, toDate, status, mobileNo ->
                 callReport(fromDate, toDate, status, mobileNo)
             },
-            onClear      = {
+            onClear          = {
                 binding.etSearch.setText("")
                 callReport(null, null, null, null)
-            }
+            },
+            isMobileCategory = true
         )
         filterHelper.setup()
     }

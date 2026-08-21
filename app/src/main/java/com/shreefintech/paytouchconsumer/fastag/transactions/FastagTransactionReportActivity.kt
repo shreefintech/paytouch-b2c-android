@@ -114,18 +114,17 @@ class FastagTransactionReportActivity : BaseActivity() {
 
     private fun setupFilterSheet() {
         filterHelper = TransactionFilterHelper(
-            activity     = mActivity,
-            sheetBinding = binding.incFilterSheet,
-            bgOverlay    = binding.viewBg,
-            onApply      = { fromDate, toDate, status, vehicleNo ->
+            activity          = mActivity,
+            sheetBinding      = binding.incFilterSheet,
+            bgOverlay         = binding.viewBg,
+            onApply           = { fromDate, toDate, status, vehicleNo ->
                 callReport(fromDate, toDate, status, vehicleNo)
             },
-            onClear      = {
+            onClear           = {
                 binding.etSearch.setText("")
                 callReport(null, null, null, null)
             },
-            searchLabel  = getString(R.string.labelVehicleNumber),
-            searchHint   = getString(R.string.hintVehicleNumber)
+            isVehicleCategory = true
         )
         filterHelper.setup()
     }

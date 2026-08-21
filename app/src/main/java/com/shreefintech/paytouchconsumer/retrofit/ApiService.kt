@@ -413,21 +413,21 @@ interface ApiService {
         @Body request: FastagTransactionStatusRequest
     ): Call<General<List<FastagTransactionReportDataItem>>>
 
-        @GET("${AUTH}fastag")
-        fun getFastagPaymentReport(
-            @Header("Authorization") authorization: String,
-            @Query("from_date")      fromDate:      String?,
-            @Query("to_date")        toDate:        String?,
-            @Query("status")         status:        String?,
-            @Query("vehicle_number") vehicleNumber: String?,
-            @Query("page")           page:          Int,
-            @Query("per_page")       perPage:       Int
-        ): Call<General<FastagTransactionPageItem>>
+    @GET("${AUTH}fastag")
+    fun getFastagPaymentReport(
+        @Header("Authorization") authorization: String,
+        @Query("from_date") fromDate: String?,
+        @Query("to_date") toDate: String?,
+        @Query("status") status: String?,
+        @Query("vehicle_number") vehicleNumber: String?,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): Call<General<FastagTransactionPageItem>>
 
-        @GET("${AUTH}fastag/latest-payment")
-        fun getFastagLatestPayment(
-            @Header("Authorization") authorization: String
-        ): Call<General<FastagLatestPaymentDataItem>>
+    @GET("${AUTH}fastag/latest-payment")
+    fun getFastagLatestPayment(
+        @Header("Authorization") authorization: String
+    ): Call<General<FastagLatestPaymentDataItem>>
 
     // ── Loan ──────────────────────────────────────────────────────────────────
 

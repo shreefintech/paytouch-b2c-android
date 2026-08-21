@@ -2,6 +2,8 @@ package com.shreefintech.paytouchconsumer.utill
 
 import android.app.Activity
 import android.app.DatePickerDialog
+import android.text.InputFilter
+import android.text.InputType
 import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
@@ -19,8 +21,8 @@ class TransactionFilterHelper(
     private val bgOverlay: View,
     private val onApply: (fromDate: String?, toDate: String?, status: String?, consumerNo: String?) -> Unit,
     private val onClear: () -> Unit,
-    private val searchLabel: String? = null,
-    private val searchHint: String? = null
+    private val isMobileCategory: Boolean = false,
+    private val isVehicleCategory: Boolean = false
 ) {
 
     private lateinit var behavior: BottomSheetBehavior<View>
@@ -43,8 +45,41 @@ class TransactionFilterHelper(
     // ─── Setup ───────────────────────────────────────────────────────────────
 
     fun setup() {
-        searchLabel?.let { sheetBinding.tvSearchLabel.text = it }
-        searchHint?.let  { sheetBinding.etSearch.hint      = it }
+        when {
+            isVehicleCategory -> {
+                sheetBinding.tvSearchLabel.text = activity.getString(R.string.labelVehicleNumber)
+                sheetBinding.etSearch.hint      = activity.getString(R.string.hintVehicleNumber)
+                sheetBinding.etSearch.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+                sheetBinding.etSearch.filters   = arrayOf(
+                    InputFilter.LengthFilter(10),
+                    InputFilter { source, start, end, _, _, _ ->
+                        val sub = source.subSequence(start, end).toString()
+                        val result = sub.filter { it.isLetterOrDigit() }.uppercase()
+                        if (result == sub) null else result
+                    },
+                    Utility.EmojiExcludeFilter()
+                )
+            }
+            isMobileCategory -> {
+                sheetBinding.tvSearchLabel.text = activity.getString(R.string.labelMobileNo)
+                sheetBinding.etSearch.hint      = activity.getString(R.string.hintMobileNumber)
+                sheetBinding.etSearch.inputType = InputType.TYPE_CLASS_NUMBER
+                sheetBinding.etSearch.filters   = arrayOf(
+                    InputFilter.LengthFilter(10),
+                    Utility.digitFilter(),
+                    Utility.EmojiExcludeFilter()
+                )
+            }
+            else -> {
+                sheetBinding.tvSearchLabel.text = activity.getString(R.string.labelConsumerNo)
+                sheetBinding.etSearch.hint      = activity.getString(R.string.hintConsumerNumber)
+                sheetBinding.etSearch.inputType = InputType.TYPE_CLASS_NUMBER
+                sheetBinding.etSearch.filters   = arrayOf(
+                    Utility.digitFilter(),
+                    Utility.EmojiExcludeFilter()
+                )
+            }
+        }
 
         behavior = BottomSheetBehavior.from(sheetBinding.root)
         behavior.state = BottomSheetBehavior.STATE_HIDDEN

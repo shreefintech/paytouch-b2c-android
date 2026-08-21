@@ -3,6 +3,7 @@ package com.shreefintech.paytouchconsumer.dth
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
@@ -101,7 +102,7 @@ class DthActivity : BaseActivity() {
 
     private fun setupInputFilters() {
         val emojiFilter = Utility.EmojiExcludeFilter()
-        binding.etMobileNumber.filters = arrayOf(Utility.digitFilter(), emojiFilter)
+        binding.etMobileNumber.filters = arrayOf(InputFilter.LengthFilter(10), Utility.digitFilter(), emojiFilter)
         binding.etAmount.filters = arrayOf(emojiFilter)
     }
 

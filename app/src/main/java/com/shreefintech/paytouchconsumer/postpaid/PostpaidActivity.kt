@@ -3,6 +3,7 @@ package com.shreefintech.paytouchconsumer.postpaid
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
@@ -29,11 +30,8 @@ import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceip
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionReportActivity
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidViewModel
-import com.shreefintech.paytouchconsumer.prepaid.PrepaidPlanSelectionActivity
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
-import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlanItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -99,7 +97,7 @@ class PostpaidActivity : BaseActivity() {
 
     private fun setupInputFilters() {
         val emojiFilter = Utility.EmojiExcludeFilter()
-        binding.etMobileNumber.filters = arrayOf(Utility.digitFilter(), emojiFilter)
+        binding.etMobileNumber.filters = arrayOf(InputFilter.LengthFilter(10), Utility.digitFilter(), emojiFilter)
         binding.etAmount.filters = arrayOf(emojiFilter)
     }
 
@@ -116,9 +114,9 @@ class PostpaidActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
+                binding.tvPlatformFee.text = Utility.formatAmount(fee.toString())
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
+                binding.tvTotalPayable.text = Utility.formatAmount(total.toString())
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
@@ -263,7 +261,7 @@ class PostpaidActivity : BaseActivity() {
         binding.tvBillCustomerName.text = bill.customerName ?: "-"
         binding.tvBillDueDate.text = bill.dueDate ?: "-"
         binding.tvBillDate.text = bill.billDate ?: "-"
-        binding.tvBillAmount.text = bill.billAmount?.toString() ?: "-"
+        binding.tvBillAmount.text = Utility.formatAmount(bill.billAmount?.toString())
         binding.tvBillMobileNo.text = binding.etMobileNumber.text?.toString()?.trim() ?: "-"
         binding.tvBillOperator.text = selectedOperatorName ?: "-"
         binding.etAmount.setText(bill.billAmount?.toString() ?: "")
@@ -280,12 +278,12 @@ class PostpaidActivity : BaseActivity() {
         val connectionNumber = binding.etMobileNumber.text?.toString()?.trim() ?: ""
         if (connectionNumber.isEmpty()) {
             binding.etMobileNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
+            ToastUtil.showDelete(mActivity, getString(R.string.msgMobileNumberEmpty))
             return
         }
         if (connectionNumber.length < 10) {
             binding.etMobileNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
+            ToastUtil.showDelete(mActivity, getString(R.string.msgMobileNumberInvalid))
             return
         }
         Utility.hideKeyboard(mActivity)
