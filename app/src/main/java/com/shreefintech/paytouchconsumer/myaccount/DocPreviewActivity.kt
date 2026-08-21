@@ -25,9 +25,8 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDocPreviewBinding
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -44,8 +43,6 @@ class DocPreviewActivity : BaseActivity() {
     private var fileDescriptor: ParcelFileDescriptor? = null
     private var currentPage = 0
     private var totalPages = 0
-
-    private var downloadJob: Job? = null
 
     private var scaleFactor = 1f
     private val minScale = 0.5f
@@ -148,7 +145,7 @@ class DocPreviewActivity : BaseActivity() {
     private fun downloadAndShowImage(url: String) {
         showLoading(true)
 
-        downloadJob = CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val bitmap = downloadBitmap(url)
                 withContext(Dispatchers.Main) {
@@ -195,7 +192,7 @@ class DocPreviewActivity : BaseActivity() {
     private fun downloadAndShowPdf(url: String) {
         showLoading(true)
 
-        downloadJob = CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val file = downloadToCache(url, "kyc_preview_${System.currentTimeMillis()}.pdf")
                 withContext(Dispatchers.Main) {
@@ -376,7 +373,6 @@ class DocPreviewActivity : BaseActivity() {
     // ─── Lifecycle ─────────────────────────────────────────────────────────────
 
     override fun onDestroy() {
-        downloadJob?.cancel()
         pdfRenderer?.close()
         fileDescriptor?.close()
         binding.webViewPreview.destroy()
