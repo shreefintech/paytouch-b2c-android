@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityHdfcWebViewBinding
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import java.io.ByteArrayInputStream
 
 class HdfcWebViewActivity : BaseActivity() {
@@ -294,6 +295,7 @@ class HdfcWebViewActivity : BaseActivity() {
 
         } catch (e: Exception) {
             e.printStackTrace()
+            ToastUtil.showDelete(mActivity, getString(R.string.errAppNotInstalled))
         }
     }
 }

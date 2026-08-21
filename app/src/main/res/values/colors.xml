@@ -78,15 +78,10 @@
     <color name="wallet_card_bg">#4DFFFFFF</color>
 
     <!-- Payment status screen -->
-    <color name="colorPaymentSuccess">#00C853</color>
-    <color name="colorPaymentInitiated">#0A66FF</color>
-    <color name="colorPaymentProcessing">#FF8F00</color>
-    <color name="colorPaymentFailed">#D32F2F</color>
-    <color name="colorPaymentRefunded">#7A63FF</color>
-    <color name="selfie_card_stroke">#66FDA4AF</color>
     <color name="colorStatusSuccess">#07974F</color>
     <color name="colorStatusPending">#D89633</color>
     <color name="colorStatusFailed">#D84C55</color>
+    <color name="selfie_card_stroke">#D52662</color>
     <color name="personal_info_label">#6B7280</color>
     <color name="account_card_label">#FFFFF0</color>
     <color name="status_divider">#A299A1</color>
