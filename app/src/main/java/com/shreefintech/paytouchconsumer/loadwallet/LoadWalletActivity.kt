@@ -326,8 +326,8 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
-        // TODO(PAYTOUCH-xxx): bind correct QR invoice amount field; liveBankBalance is unrelated to QR Invoice label
-        binding.tvQrInvoiceAmount.text = Utility.formatAmount(data.liveBankBalance)
+        // TODO(B2C-82): hide until backend provides the correct QR invoice amount field
+        binding.tvQrInvoiceAmount.visibility = View.GONE
         binding.tvIfscCode.text = data.ifsc ?: "--"
         val status = data.wallet?.status
         if (!status.isNullOrEmpty()) {
