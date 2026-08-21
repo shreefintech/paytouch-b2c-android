@@ -42,8 +42,8 @@ object PdfThumbnailRepository {
             withContext(Dispatchers.Main) { onResult(bitmap) }
         }
 
-    private fun downloadToCache(url: String, cacheDir: File): File {
-        val file = File(cacheDir, "kyc_thumb_${url.hashCode()}.pdf")
+    internal fun downloadToCache(url: String, cacheDir: File): File {
+        val file = File(cacheDir, "kyc_pdf_${url.hashCode()}.pdf")
         if (file.exists() && file.length() > 0L) return file
         val conn = URL(url).openConnection() as HttpURLConnection
         conn.connectTimeout = 15_000
