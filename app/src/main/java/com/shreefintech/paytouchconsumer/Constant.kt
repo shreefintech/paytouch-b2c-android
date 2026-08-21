@@ -3,7 +3,7 @@ package com.shreefintech.paytouchconsumer
 object Constant {
 
     // API Base URLs
-    const val BASE_URL = /*"https://tablet-frying-shy.ngrok-free.dev/"*/"https://www.paytouch.in/"
+    const val BASE_URL = "https://www.paytouch.in/"
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
 
     // AUTH store keys
@@ -13,6 +13,8 @@ object Constant {
     const val KEY_MOBILE = "MOBILE"
     const val KEY_TOKEN_TYPE = "TOKEN_TYPE"
     const val KEY_WALLET_BALANCE = "WALLET_BALANCE"
+    const val KEY_PENDING_ORDER_ID = "PENDING_ORDER_ID"
+    const val KEY_PENDING_AMOUNT = "PENDING_AMOUNT"
 
 
     const val KEY_REFERRAL_CODE = "ReferralCode"

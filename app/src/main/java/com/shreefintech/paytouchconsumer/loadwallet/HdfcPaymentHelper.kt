@@ -1,7 +1,9 @@
 package com.shreefintech.paytouchconsumer.loadwallet
 
 import android.app.Activity
+import android.content.Context
 import com.shreefintech.paytouchconsumer.Constant
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 
 object HdfcPaymentHelper {
 
@@ -28,11 +30,15 @@ object HdfcPaymentHelper {
     ) {
         pendingOrderId = orderId
         pendingAmount  = amount
+        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_PENDING_ORDER_ID, orderId)
+        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_PENDING_AMOUNT, amount)
         context.startActivity(HdfcWebViewActivity.newIntent(context, payUrl, returnUrl))
     }
 
-    fun clearPendingState() {
+    fun clearPendingState(context: Context) {
         pendingOrderId = null
         pendingAmount  = null
+        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_PENDING_ORDER_ID, "")
+        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_PENDING_AMOUNT, "")
     }
 }

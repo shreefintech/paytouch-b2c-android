@@ -10,7 +10,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
-import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderResponseItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -69,13 +68,13 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
         ApiClient.apiService.createHdfcOrder(
             authorization = bearerToken(),
             request = HdfcCreateOrderRequest(amount = amount, description = description)
-        ).enqueue(object : Callback<HdfcOrderResponseItem> {
+        ).enqueue(object : Callback<General<HdfcOrderItem>> {
             override fun onResponse(
-                call: Call<HdfcOrderResponseItem>,
-                response: Response<HdfcOrderResponseItem>
+                call: Call<General<HdfcOrderItem>>,
+                response: Response<General<HdfcOrderItem>>
             ) {
                 val body = response.body()
-                if (response.isSuccessful && body?.success == true && body.data != null) {
+                if (response.isSuccessful && body?.data != null) {
                     onSuccess(body.data!!)
                 } else {
                     onError(
@@ -86,7 +85,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 }
             }
 
-            override fun onFailure(call: Call<HdfcOrderResponseItem>, t: Throwable) {
+            override fun onFailure(call: Call<General<HdfcOrderItem>>, t: Throwable) {
                 onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
@@ -99,16 +98,16 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(); return }
         ApiClient.apiService.getHdfcOrderStatus(bearerToken(), orderId)
-            .enqueue(object : Callback<HdfcOrderResponseItem> {
+            .enqueue(object : Callback<General<HdfcOrderItem>> {
                 override fun onResponse(
-                    call: Call<HdfcOrderResponseItem>,
-                    response: Response<HdfcOrderResponseItem>
+                    call: Call<General<HdfcOrderItem>>,
+                    response: Response<General<HdfcOrderItem>>
                 ) {
-                    val data = if (response.isSuccessful && response.body()?.success == true) response.body()?.data else null
+                    val data = if (response.isSuccessful && response.body()?.data != null) response.body()?.data else null
                     if (data != null) onSuccess(data) else onError()
                 }
 
-                override fun onFailure(call: Call<HdfcOrderResponseItem>, t: Throwable) {
+                override fun onFailure(call: Call<General<HdfcOrderItem>>, t: Throwable) {
                     onError()
                 }
             })
