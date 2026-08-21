@@ -31,7 +31,7 @@ Only present the solution after this check passes.
 
 ## Code Generation Rule
 
-Always prioritize optimized, maintainable, and production-ready code. Generate solutions as if you are a senior Android developer with extensive experience in Kotlin, Android Architecture Components, MVVM, Coroutines, Flow, Jetpack libraries, and clean architecture. Favor readability, performance, scalability, and testability over quick fixes. Avoid unnecessary object creation, redundant computations, duplicate code, and over-engineering. Reuse existing components where appropriate, follow SOLID principles, minimize memory allocations, and consider lifecycle, threading, and performance implications in every implementation. When multiple approaches are possible, choose the one that is most efficient, idiomatic, and maintainable for a long-term production codebase. Never sacrifice code quality for brevity.
+Write production-ready Kotlin/MVVM Android code — readable, performant, scalable, testable. Reuse existing components, follow SOLID principles, consider lifecycle and threading in every implementation. Never sacrifice code quality for brevity.
 
 ---
 
@@ -93,9 +93,9 @@ com.shreefintech.paytouchconsumer/
 7. Network errors must be parsed via **ApiHelper.parseErrorMessage()**.
 8. Adapters must not contain business logic or network calls.
 9. ViewModels must not store Activity/Context references.
-10. **All API endpoints must be declared in `ApiService` or `ApiAdminService`** — never construct `OkHttpClient` or `Retrofit` directly inside a ViewModel or Activity. Each backend URL has exactly one registered client: `ApiClient` for `paytouch.in`, `ApiAdminClient` for `admin.paytouch.in`. Add a new endpoint to the appropriate service interface; do not bypass it with a raw HTTP call.
-11. **`mapToTransactionItem()` must use `item.id?.toString() ?: "--"` for `userId`** — never use `(index + 1).toString()` or any iteration index. The API response DTO always carries an `id` field; using the loop index produces duplicate `userId` values on paginated appends (page 2+ resets index to 0) and loses the server-side identity of the record.
-12. **Never generate `transaction_id` client-side** — the backend owns transaction ID generation. Do not call `Utility.generateTransactionId()` or any equivalent before a payment API call. Do not include a `transaction_id` field in any process-payment request DTO (`ElectricityProcessPaymentRequest`, `GasProcessPaymentRequest`, or any future module). The server returns the transaction ID in the response; read it from there. (`Utility.generateTransactionId()` was removed in review — flagged as incorrect ownership of ID generation.)
+10. **All API endpoints must be declared in `ApiService` or `ApiAdminService`** — never construct `OkHttpClient` or `Retrofit` directly inside a ViewModel or Activity. Each backend URL has exactly one registered client: `ApiClient` for `paytouch.in`, `ApiAdminClient` for `admin.paytouch.in`.
+11. **`mapToTransactionItem()` must use `item.id?.toString() ?: "--"` for `userId`** — never use `(index + 1).toString()` or any iteration index. Using the loop index produces duplicate `userId` values on paginated appends (page 2+ resets index to 0) and loses the server-side record identity.
+12. **Never generate `transaction_id` client-side** — the backend owns transaction ID generation. Do not call `Utility.generateTransactionId()` or include a `transaction_id` field in any process-payment request DTO. The server returns the transaction ID in the response; read it from there.
 13. **ViewModel base class is determined by role, not by module** — follow this table exactly; never use `BaseBillViewModel` for a ViewModel that does not need balance checks:
 
 | ViewModel role | Base class |
@@ -106,24 +106,24 @@ com.shreefintech.paytouchconsumer/
 | Transaction status (`{Category}TransactionStatusViewModel`) | `AndroidViewModel` |
 | SMS receipt (`{Category}SmsReceiptViewModel`) | `AndroidViewModel` |
 
-`BaseBillViewModel` provides `checkVpsBalance()` and `checkWalletBalance()` — methods only needed by payment-flow ViewModels. Report/status/receipt ViewModels use `bearerToken()` and `getString()` from `ViewModelExt.kt` instead. Do not flag the report/status ViewModels as inconsistent for extending `AndroidViewModel` directly.
+`BaseBillViewModel` provides balance-check methods only needed by payment ViewModels; others use `bearerToken()` and `getString()` from `ViewModelExt.kt`. Do not flag report/status ViewModels for extending `AndroidViewModel` directly.
 
-14. **`isMobileCategory` flag must be set in every `mapToTransactionItem()` and `mapToDisplayItem()`** — never hard-coded in the adapter. Set `isMobileCategory = true` for Mobile Prepaid, Mobile Postpaid, and DTH modules; `isMobileCategory = false` for all others (Electricity, Gas, etc.). The adapter uses this flag to switch between "Mobile No" and "Consumer No" labels — if it is missing the flag defaults to `false` (consumer label) which is silently wrong for mobile modules.
+14. **`isMobileCategory` flag must be set in every `mapToTransactionItem()` and `mapToDisplayItem()`** — never hard-coded in the adapter. Set `isMobileCategory = true` for Mobile Prepaid, Mobile Postpaid, and DTH modules; `isMobileCategory = false` for all others. The adapter uses this flag to switch between "Mobile No" and "Consumer No" labels.
 
-    **SMS Receipt (`{Category}SmsReceiptActivity`)** — set `binding.tvConsumerNoLabel.text` dynamically in `populateReceiptFromApi()`. Never rely on the XML default alone. Consumer-number modules → `getString(R.string.labelConsumerNo)`; mobile-number modules → `getString(R.string.labelMobileNo)`.
+    **SMS Receipt (`{Category}SmsReceiptActivity`)** — set `binding.tvConsumerNoLabel.text` dynamically in `populateReceiptFromApi()`. Consumer-number modules → `getString(R.string.labelConsumerNo)`; mobile-number modules → `getString(R.string.labelMobileNo)`.
 
-15. **Use `Utility.maskNumber()` for the account number shown in transaction list rows** — `TransactionAdp` calls `Utility.maskNumber(item.mobileNumber)` for `tvMobile`. The format is `9876*****0` (first 4 chars + five asterisks + last 1 char). Never display the raw unmasked number in a list row; the full number is only shown in `TransactionDetailActivity`.
+15. **Use `Utility.maskNumber()` for the account number shown in transaction list rows** — `TransactionAdp` calls `Utility.maskNumber(item.mobileNumber)` for `tvMobile`. Format: `9876*****0` (first 4 + five asterisks + last 1). Never display the raw number in a list row; only in `TransactionDetailActivity`.
 
 16. **`Utility.formatAmount()` has two overloads — use the correct one for the DTO field type:**
     - `formatAmount(raw: String?)` — for all DTOs whose amount fields are `String?` (Gas, Prepaid, Postpaid, and future modules)
-    - `formatAmount(raw: Double?)` — delegates to the String overload via `raw?.toString()`; use only for Electricity DTOs (`ElectricityTransactionReportDataItem`) whose amount fields are `Double?`
+    - `formatAmount(raw: Double?)` — use only for Electricity DTOs (`ElectricityTransactionReportDataItem`) whose amount fields are `Double?`
     - Never use `"₹%.2f".format(value)` or any raw string template for currency — always go through `Utility.formatAmount()`
 
 17. **`Utility.formatDate()` is the only date formatter** — never call `SimpleDateFormat` directly in a ViewModel. Use:
-    - `Utility.formatDate(raw, "dd MMM yyyy")` in Recent Transaction `mapToDisplayItem()` (e.g. `11 Jul 2026`)
+    - `Utility.formatDate(raw, "dd MMM yyyy")` in Recent Transaction `mapToDisplayItem()`
     - `Utility.formatDate(raw, "dd/MM/yyyy")` in `TransactionDetailActivity` for date-only display
     - `Utility.formatDate(raw)` (default `"dd/MM/yyyy hh:mm a"`) for full datetime fields
-    - In `mapToTransactionItem()` pass `item.createdAt ?: "--"` raw — do not pre-format; `TransactionDetailActivity` formats it at display time
+    - In `mapToTransactionItem()` pass `item.createdAt ?: "--"` raw — do not pre-format
 
 18. **Confirmed backend quirks — do NOT "fix" these:**
 
@@ -150,16 +150,13 @@ com.shreefintech.paytouchconsumer/
 ### Naming Hard Rules (non-negotiable)
 
 - **Models/DTOs MUST end in `Item`** — never `Response`, `Model`, `Dto`, `Data`, or `Entity`.
-  - ✅ `LoginItem`, `UserProfileItem`, `MessageItem`, `TransactionItem`
-  - ❌ `LoginResponse`, `UserModel`, `MessageDto`
 - **Adapters MUST end in `Adp`** — never `Adapter`.
-  - ✅ `TransactionAdp` ❌ `TransactionAdapter`
 - **Activities MUST end in `Activity`** — never `Screen`, `Page`, `View`.
 - **ViewModels MUST end in `ViewModel`**.
 - **Layouts MUST use the correct prefix** — `activity_`, `item_`, `lyt_`, `sheet_`, `dialog_`.
 - **Drawables MUST use `ic_` / `bg_` / `img_`** — never bare names or other prefixes.
-- **String IDs MUST use camelCase context prefixes**: `msg` (messages/toasts), `title` (screen titles), `label` (field labels), `hint` (input hints), `btn` (button text), `err` (error strings), `category` (category names).
-- When two `Item` classes would share the same name, qualify the outer context: `UserProfileItem` (user from GET /user) vs `UserItem` (user nested in login response).
+- **String IDs MUST use camelCase context prefixes**: `msg` (toasts), `title` (screen titles), `label` (field labels), `hint` (input hints), `btn` (button text), `err` (errors), `category` (category names).
+- When two `Item` classes share the same name, qualify by context: `UserProfileItem` vs `UserItem`.
 
 ---
 
@@ -186,7 +183,7 @@ ApiClient.apiService.someEndpoint(body).enqueue(object : Callback<SomeItem> {
 
 ## LiquidGlassButton Attachment Rule
 
-Every `LiquidGlassButton` in an Activity **must** call `.attach(root as ViewGroup)` in `onCreate()` after `setContentView()`. This initialises the live glass-blur effect. Without it the button renders without any background.
+Every `LiquidGlassButton` in an Activity **must** call `.attach(root as ViewGroup)` in `onCreate()` after `setContentView()`. Without it the button renders without any background.
 
 ```kotlin
 // In onCreate(), after setContentView():
@@ -194,7 +191,7 @@ binding.flUpload1.attach(binding.clRoot as ViewGroup)
 binding.flSubmit.attach(binding.clRoot as ViewGroup)
 ```
 
-This applies to **every** `LiquidGlassButton` — upload triggers (`flUpload1`, `flUpload2`, …), submit/update buttons (`flSubmit`, `flSignIn`, …), and any other `LiquidGlassButton` in the layout. Call `.attach()` for each one individually. Do **not** use `LiquidGlassEffect.attach()` for these — use the widget's own `.attach()` method.
+Call `.attach()` on each `LiquidGlassButton` individually — never `LiquidGlassEffect.attach()`.
 
 ---
 
@@ -215,14 +212,10 @@ Always follow existing project patterns and minimize code changes.
 For all tasks:
 
 * Analyze existing code before making changes.
-* Follow existing project architecture, coding style, naming conventions, folder structure, and patterns.
-* Reuse existing Activities, ViewModels, Adapters, Models, Custom Views, Utilities, and Extensions whenever possible.
-* Follow existing UI, XML, navigation, Activity Result, validation, loader, observer, and API handling patterns.
-* Prefer consistency over introducing new approaches.
+* Follow existing architecture, patterns, naming conventions, and folder structure.
+* Reuse existing Activities, ViewModels, Adapters, utilities, and XML layouts; find similar implementations first.
 * Do not refactor unrelated code.
-* Keep changes minimal and focused.
-* Create new classes/files only when necessary.
-* Find and follow similar implementations already present in the project.
+* Keep changes minimal and focused; create new classes/files only when necessary.
 
 ---
 
@@ -236,9 +229,7 @@ Response structure depends on the actual API contract — there is no single man
 
 **Flat / direct response** — use when the API returns a top-level object with no `data` key:
 - Declare: `Call<YourItem>` with the fields your endpoint returns
-- Success check depends on fields present:
-  - Has `success: Boolean` field → `response.isSuccessful && response.body()?.success == true`
-  - No `success` field → `response.isSuccessful` is sufficient
+- Success check: `response.isSuccessful && response.body()?.success == true` (if has `success` field), else `response.isSuccessful`
 
 **Auth endpoints** (`/api/login`, `/api/register`, `/api/user`, `/api/password/*`, `/api/mpin/*`) always return flat/unwrapped JSON:
 
@@ -253,11 +244,11 @@ Response structure depends on the actual API contract — there is no single man
 
 **Nullability rules differ by DTO type:**
 
-- **API response DTOs — every field must be nullable (`?`), no exceptions.** Gson silently sets any missing field to `null`; a non-nullable field crashes at runtime when the API omits it. Declare every field with `?` and apply `?: fallback` at the call site, never at the model definition. This covers numeric types too (`Int?`, `Double?`, `Long?`).
+- **API response DTOs — every field must be nullable (`?`), no exceptions.** Gson silently sets any missing field to `null`; a non-nullable field crashes at runtime. Apply `?: fallback` at the call site, never at the model definition. This covers numeric types too (`Int?`, `Double?`, `Long?`).
 
-- **Local DTOs (activity-to-activity passing) — make a field nullable only if it can genuinely be absent.** There is no Gson parsing risk for local DTOs; the sender and receiver share the same compiled class. Declare fields as non-nullable (`val name: String`) when the value is always provided, and nullable (`val name: String?`) only when the field is legitimately optional.
+- **Local DTOs (activity-to-activity passing) — make a field nullable only if it can genuinely be absent.** Declare non-nullable when the value is always provided; nullable only when legitimately optional.
 
-**`@field:SerializedName` is required on API response DTOs only.** Every field in an `*Item` class that is parsed directly from a Retrofit/Gson API response must carry `@field:SerializedName("snake_case_key")` — this protects against ProGuard/R8 field-name obfuscation in release builds. **Local DTOs** used solely for activity-to-activity data passing (serialised with `Gson().toJson()` / `Gson().fromJson()` inside the app, never crossing a network boundary) do **not** require `@field:SerializedName`; plain field names are sufficient since both sender and receiver share the same compiled class.
+**`@field:SerializedName` is required on API response DTOs only.** Every field parsed from a Retrofit/Gson response must carry `@field:SerializedName("snake_case_key")` to protect against ProGuard/R8 obfuscation. Local DTOs used only for activity-to-activity passing do **not** require it.
 
 ```kotlin
 // API response DTO — all fields nullable + @field:SerializedName required
@@ -269,15 +260,9 @@ data class SomeItem(
 
 // Local activity-to-activity DTO — no annotation; nullable only where genuinely optional
 data class SomeLocalItem(
-    val id: Int,           // always present — non-nullable is correct
-    val amount: Double,    // always present — non-nullable is correct
-    val note: String?      // optional field — nullable is correct
-)
-
-// Wrong — non-nullable fields on an API response DTO crash when the server omits the field
-data class SomeItem(
-    @field:SerializedName("id")     val id: Int,
-    @field:SerializedName("amount") val amount: Double
+    val id: Int,
+    val amount: Double,
+    val note: String?      // optional field
 )
 ```
 
@@ -300,33 +285,23 @@ Placeholder naming examples: `ic_edit_placeholder`, `bg_card_placeholder`, `img_
 
 **Always use `MaterialCardView` for card/container backgrounds. Never create a new `drawable` shape file for backgrounds that `MaterialCardView` can achieve.**
 
-`MaterialCardView` handles:
-- White or solid-color card backgrounds → `app:cardBackgroundColor`
-- Rounded corners → `app:cardCornerRadius`
-- Bordered stroke → `app:strokeColor` + `app:strokeWidth`
-- Pill / badge shapes → `app:cardCornerRadius="20dp"` (or any large value)
-- Elevation / shadow → `app:cardElevation`
+`MaterialCardView` handles: solid-color backgrounds (`app:cardBackgroundColor`), rounded corners (`app:cardCornerRadius`), stroke borders (`app:strokeColor` + `app:strokeWidth`), pill shapes (large `cardCornerRadius`), and elevation/shadow.
 
-Only create a `drawable` shape file when `MaterialCardView` genuinely cannot fulfill the requirement — e.g., gradient fills, complex multi-layer shapes, or vector path shapes. Default to `MaterialCardView` first; reach for a drawable shape only as a last resort.
+Only create a `drawable` shape file for gradient fills, complex multi-layer shapes, or vector path shapes.
 
-**Exception — status badge chips:** Small inline status indicators (Success / Failed / Pending chips) may use a custom `drawable` shape file instead of `MaterialCardView`. These are typically `<shape>` ovals or rectangles with a solid fill and are acceptable as drawables since wrapping them in `MaterialCardView` adds unnecessary view hierarchy depth for a purely decorative, non-interactive element.
+**Exception — status badge chips:** Small inline status indicators (Success / Failed / Pending) may use `<shape>` drawables since wrapping in `MaterialCardView` adds unnecessary hierarchy depth for non-interactive elements.
 
 ---
 
 ## Bill Payment Modules — Shared UI Pattern
 
-The **Electricity Bill Payment** screen is the canonical design reference for all bill payment modules (Gas, Water, Broadband, Mobile, DTH, Cable, FASTag, Loans, Taxes, etc.).
+The **Electricity Bill Payment** screen is the canonical design reference for all bill payment modules.
 
-**What "reusable UI" means here:**
+- Each module gets its **own Activity** and `activity_*.xml` — do not share Activities across modules.
+- **RecyclerView item layouts** (`item_*.xml`) are **shared across modules** — check if `item_operator.xml`, `item_plan.xml`, etc. already exist before creating new ones.
+- **In short:** different Activity + same item layouts. Never copy-paste item XML; reuse directly.
 
-- Each module gets its **own Activity** and its own `activity_*.xml` — do not share Activities across modules.
-- **RecyclerView item layouts** (`item_*.xml`) and other shared XML components (operator selector items, plan card items, etc.) are **shared across modules** — do not duplicate XML files. Reference the same layout from each module's adapter.
-- When implementing a new bill payment module, always check if the required item layout already exists (e.g., `item_operator.xml`, `item_plan.xml`) before creating a new one.
-- If the design is identical to an existing item layout, reuse it directly. Only create a new layout file when the structure genuinely differs.
-
-**In short:** different Activity + same item layouts. Never copy-paste XML from one module's item file into another — always `include` or reuse the existing layout.
-
-**No cross-module Activity navigation — ever.** Never start one module's Activity from another module, even as a temporary stand-in. If the target module's Activity is not yet built, leave the click handler empty and add a `TODO(PAYTOUCH-xxx): navigate to XxxActivity when implemented` comment at that call site. Starting `ElectricityActivity` from the Gas module, for example, is a review blocker.
+**No cross-module Activity navigation — ever.** If the target Activity is not yet built, leave the click handler empty with a `TODO(PAYTOUCH-xxx): navigate to XxxActivity when implemented` comment.
 
 ```kotlin
 // ✅ Correct — pending module, placeholder with TODO
@@ -342,13 +317,13 @@ binding.cardGas -> {
 }
 ```
 
-**Per-module README timing — add the doc only once the module is complete.** Do not create a `{module}/README.md` (and do not add its row to the "Module READMEs" table in the root `README.md`) while a module is still missing pieces — e.g. its transaction history screens (Recent/Report/Status/SMS Receipt) haven't been built yet, or the payment flow is still stubbed. Documenting a half-built module produces a README that goes stale the moment the remaining screens land. It is fine — and expected — to update the root `README.md`'s Implemented/Planned module table as soon as the module's main Activity is wired from `HomeActivity`; only the dedicated per-module README file waits for full completion.
+**Per-module README timing:** Add `{module}/README.md` only once the module is fully complete (payment flow + all transaction screens). Updating the root `README.md` module table is fine as soon as `HomeActivity` wires the module.
 
 ---
 
 ## Transaction Screens — Shared Structure Across All Modules
 
-Every bill payment module (Electricity, Gas, Water, DTH, Mobile, etc.) has three transaction screens: **Status**, **Report**, and **Detail**. The UI is identical across all modules — only the API endpoint and category icon differ.
+Every bill payment module has three transaction screens: **Status**, **Report**, and **Detail**. The UI is identical across all modules — only the API endpoint and category icon differ.
 
 ### What is shared (never duplicate)
 
@@ -364,7 +339,7 @@ Every bill payment module (Electricity, Gas, Water, DTH, Mobile, etc.) has three
 
 ### What is created per module
 
-Each new module (e.g. Gas) needs only:
+Each new module needs only:
 - `{Category}TransactionStatusActivity` + `activity_{category}_transaction_status.xml`
 - `{Category}TransactionReportActivity` + `activity_{category}_transaction_report.xml`
 - `{Category}TransactionStatusViewModel` — calls `api/{category}/transaction-status`
@@ -375,12 +350,10 @@ Each new module (e.g. Gas) needs only:
 
 ### Rules
 
-- **Never create a new `TransactionDetailActivity` per module** — all modules share the one in `transactions/`.
-- **Never create a new adapter or item layout per module** — `TransactionAdp` and `item_transaction.xml` are category-agnostic.
+- **Never create a per-module `TransactionDetailActivity`, adapter, or item layout** — share the ones in `transactions/` and `adapter/`.
 - **`TransactionDetailActivity` has no SMS Receipt button** — it was removed. Do not add it back.
-- The activity layouts for status and report are **copied from the electricity versions** with only the title string changed. Do not redesign them.
+- Copy status/report layouts from the Electricity versions (title string only changes); mirror `ElectricityTransactionStatusActivity` and `TransactionReportActivity` exactly.
 - The category icon is set in the ViewModel's `mapToTransactionItem()` — pass `R.drawable.ic_{category}` there.
-- Electricity is the canonical reference — when implementing any module's transaction screens, mirror `ElectricityTransactionStatusActivity` and `TransactionReportActivity` exactly.
 
 ---
 
@@ -388,10 +361,10 @@ Each new module (e.g. Gas) needs only:
 
 ### Hub / Dashboard Tap Handling
 
-Every tappable entry on a hub screen (Home, Dashboard, category grid) must have an **explicit, intentional outcome** — never a silent no-op.
+Every tappable entry on a hub screen must have an **explicit, intentional outcome** — never a silent no-op.
 
 - **Module implemented** → navigate to its Activity.
-- **Module pending** → leave the handler body empty and add a `TODO(PAYTOUCH-xxx): navigate to XxxActivity when implemented` comment. The TODO must name the ticket number and the target Activity class.
+- **Module pending** → leave handler empty with a `TODO(PAYTOUCH-xxx): navigate to XxxActivity when implemented` comment.
 
 ```kotlin
 // ✅ Correct — pending module
@@ -400,16 +373,11 @@ binding.cardPrepaid -> {
     // TODO(PAYTOUCH-520): navigate to PrepaidActivity when implemented
 }
 
-binding.cardDth -> {
-    if (Utility.stopClick()) return@OnClickListener
-    // TODO(PAYTOUCH-521): navigate to DthActivity when implemented
-}
-
 // ❌ Wrong — silent no-op with no TODO
 binding.cardPrepaid -> { }
 ```
 
-A missing branch or a silent empty handler with no TODO is a review blocker.
+A missing branch or silent empty handler with no TODO is a review blocker.
 
 ---
 
@@ -417,7 +385,7 @@ A missing branch or a silent empty handler with no TODO is a review blocker.
 
 - Use a **single centralized `onClickListener()`** with a `when (it)` block — never scatter individual `setOnClickListener()` calls.
 - Prefer **Data Binding** (`android:onClickListener="@{onClickListener}"`) over programmatic `setOnClickListener()`.
-- Always guard against **rapid double-clicks** before navigation, API calls, form submissions, or screen transitions:
+- Always guard against **rapid double-clicks** with `Utility.stopClick()`.
 
 ```kotlin
 private fun onClickListener(): View.OnClickListener {
@@ -440,9 +408,9 @@ private fun onClickListener(): View.OnClickListener {
 
 ### Keyboard Handling
 
-Apply this whenever a screen contains an `EditText` or any keyboard interaction.
+Apply whenever a screen contains an `EditText`.
 
-**1. Manifest** — add `adjustResize` to the activity entry:
+**1. Manifest** — add `adjustResize`:
 
 ```xml
 <activity
@@ -450,33 +418,24 @@ Apply this whenever a screen contains an `EditText` or any keyboard interaction.
     android:windowSoftInputMode="adjustResize" />
 ```
 
-**2. Window insets** — handle both system bars and IME so content is never obscured:
+**2. Window insets** — handle system bars and IME:
 
 ```kotlin
 ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
     val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
     val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
-    v.setPadding(
-        systemBars.left,
-        systemBars.top,
-        systemBars.right,
-        maxOf(imeInsets.bottom, systemBars.bottom)
-    )
+    v.setPadding(systemBars.left, systemBars.top, systemBars.right, maxOf(imeInsets.bottom, systemBars.bottom))
     insets
 }
 ```
 
-**3. Dismiss keyboard** before executing a button action when appropriate:
-
-```kotlin
-Utility.hideKeyboard(mActivity)
-```
+**3. Dismiss keyboard** before button actions: `Utility.hideKeyboard(mActivity)`
 
 ---
 
 ### Back Handling
 
-When a screen hosts dialogs, bottom sheets, filters, or overlays, **close the topmost layer first** before exiting the screen entirely.
+When a screen hosts dialogs, bottom sheets, or overlays, **close the topmost layer first**.
 
 ```kotlin
 private fun onBack() {
@@ -493,13 +452,13 @@ private fun onBack() {
 }
 ```
 
-Call `onBack()` in `onCreate()` so the callback is registered immediately.
+Call `onBack()` in `onCreate()`.
 
 ---
 
 ### Result Handling
 
-Use this pattern when changes on the current screen should trigger a data refresh on the previous screen.
+Use when changes on the current screen should trigger a refresh on the previous screen.
 
 **Current screen:**
 
@@ -532,8 +491,6 @@ private val launcher = registerForActivityResult(
 
 **Always pass a single object between Activities as a JSON string — never as individual `putExtra` fields.**
 
-Serialize with `Gson().toJson(item)` into one `putExtra(EXTRA_ITEM, json)`. Deserialize lazily in the receiving Activity. This avoids fragile multi-field extraction and keeps the companion `start()` contract clean as the model evolves.
-
 ```kotlin
 // Sender — companion object of the receiving Activity
 private const val EXTRA_ITEM = "extra_item"
@@ -558,13 +515,15 @@ private val myItem: MyItem? by lazy {
 - Access the lazy property in `onCreate()` or later — never before `super.onCreate()`.
 - Guard every function that uses the item with `val item = myItem ?: return`.
 
+**Exception — simple primitive-only screens:** When an Activity only receives 1–2 plain primitive values (e.g. a URL string and a display title) that do not represent a domain object, individual `putExtra` fields are acceptable. Use `private const` keys in the companion object and declare each as a `by lazy` property in the receiver. Create a Gson-wrapped DTO only when the data is a structured domain entity (an account, a transaction, a plan, etc.).
+
 ---
 
 ### Bottom Sheet Pattern
 
 Use this pattern whenever a screen needs an in-place form or detail panel that slides up from the bottom. **Dialogs vs Bottom Sheets: Use `Dialog` for confirmation/alert modals. Use `BottomSheetBehavior` only for UI specifically designed as a bottom sheet. Do not require `BottomSheetBehavior` for confirmation dialogs.**
 
-**Sheet XML** (`sheet_*.xml`) — root ViewGroup (`ConstraintLayout`, `FrameLayout`, etc.) with `BottomSheetBehavior` attributes + `@drawable/bottom_sheet_bg`:
+**Sheet XML** (`sheet_*.xml`):
 
 ```xml
 <androidx.constraintlayout.widget.ConstraintLayout
@@ -622,7 +581,7 @@ Also apply insets so the sheet sits above the navigation bar:
 binding.incSheet.root.setPadding(0, 0, 0, systemBars.bottom)
 ```
 
-> `sheet_filter.xml` (TransactionReportActivity) is the canonical reference implementation for this pattern.
+> `sheet_filter.xml` (TransactionReportActivity) is the canonical reference implementation.
 
 ---
 
@@ -632,11 +591,11 @@ binding.incSheet.root.setPadding(0, 0, 0, systemBars.bottom)
 
 ### Button-triggered API calls
 
-Every button that triggers an API call must show a `ProgressBar` **inside the button itself** while the call is in flight. Never use a full-screen loader, never use only alpha dimming for button actions.
+Every button that triggers an API call must show a `ProgressBar` **inside the button itself**. Never use a full-screen loader or only alpha dimming.
 
 **Pattern:**
 
-1. Add `ObservableBoolean` variables per button in the layout `<data>` block, plus `import android.view.View`:
+1. Add `ObservableBoolean` variables per button in the layout `<data>` block:
 
 ```xml
 <data>
@@ -647,7 +606,7 @@ Every button that triggers an API call must show a `ProgressBar` **inside the bu
 </data>
 ```
 
-2. Inside the button container, add both the label/icon and a `ProgressBar`. Toggle them with the `ObservableBoolean`:
+2. Inside the button container, toggle label and `ProgressBar` with the `ObservableBoolean`:
 
 ```xml
 <LinearLayout
@@ -692,7 +651,7 @@ showProgressFetch.set(true)
 showProgressFetch.set(false)
 ```
 
-4. Guard the click handler so the button cannot be tapped while its progress is showing:
+4. Guard the click handler so the button cannot be tapped while loading:
 
 ```kotlin
 binding.llFetchBill -> {
@@ -704,12 +663,10 @@ binding.llFetchBill -> {
 
 ### List / dropdown field loading
 
-When a field's data is loaded via API (e.g. an operator dropdown), show a small `ProgressBar` **inside the field slot** — replacing the arrow or trailing icon — while loading. Do NOT show a full-screen overlay or affect any other part of the screen.
+Show a small `ProgressBar` **inside the field slot** — replacing the arrow icon — while loading.
 
 ```xml
-<!-- inside the field row, wrap the trailing icon in a FrameLayout -->
 <FrameLayout android:layout_width="16dp" android:layout_height="16dp">
-
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivCompanyArrow"
         android:layout_width="14dp"
@@ -744,20 +701,16 @@ private fun setOperatorLoading(loading: Boolean) {
 | Full-screen progress dialog / overlay | In-button ProgressBar |
 | `view.alpha = 0.5f` as the only loading signal | In-button ProgressBar (alpha may be used additionally, never alone) |
 | Single shared `isLoading` flag for multiple buttons | One `ObservableBoolean` per button |
-| Showing a spinner that covers the whole screen for a button tap | Show only inside that button |
 
 ---
+
 ### Temporary Cross-Module Navigation Exception
 
-Cross-module Activity navigation is prohibited by default.
-
-Exception:
-- Temporary reuse is allowed only when Product explicitly requires an existing screen until the module-specific screen is implemented.
-- The code must include a `TODO(ticket-id)` referencing the follow-up work.
-- The temporary navigation must be removed before the module-specific Activity is released.
+Cross-module Activity navigation is prohibited by default. Temporary reuse is allowed only when Product explicitly requires it — include `TODO(ticket-id)` and remove before releasing the module-specific Activity.
 
 **Active exception — Postpaid plan selection (B2C-59):**
-`PostpaidActivity.onBrowsePlan()` currently launches `PrepaidPlanSelectionActivity` as a temporary stand-in because the `mobile-postpaid/plans` API is under construction. Once that API is ready, replace with a dedicated `PostpaidPlanSelectionActivity` + `PostpaidPlanSelectionViewModel` that calls the postpaid plans endpoint. The temporary call is marked with `TODO(B2C-59)` in `PostpaidActivity.kt`.
+`PostpaidActivity.onBrowsePlan()` currently launches `PrepaidPlanSelectionActivity` as a stand-in. Replace with a dedicated `PostpaidPlanSelectionActivity` once `mobile-postpaid/plans` API is ready. Marked `TODO(B2C-59)` in `PostpaidActivity.kt`.
+
 ---
 
 ## RecyclerView Update Rules
@@ -777,13 +730,13 @@ Always prefer targeted adapter updates over full list refreshes.
 
 ## Project Documentation
 
-All project docs live in `docs/`. **Read the relevant files before starting any task — not after.** Assumptions made without reading the docs will contradict established rules.
+All project docs live in `docs/`. **Read the relevant files before starting any task — not after.**
 
 | File | What it contains | Read when |
 |---|---|---|
-| `docs/caveman.md` | Plain-English system overview — what the app does, who uses it, how the pieces connect | **Always first**, on every new task |
-| `docs/business_logic.md` | Domain rules: fee tiers, onboarding sequence, routing flags, validation rules | Before any feature, flow, or data-related code |
-| `docs/dos_and_donts.md` | Explicit DOs and DON'Ts for architecture, API, naming, RecyclerView, UI patterns | Before any structural or architectural decision |
+| `docs/caveman.md` | Plain-English system overview | **Always first**, on every new task |
+| `docs/business_logic.md` | Domain rules: fee tiers, onboarding, routing, validation | Before any feature or data-related code |
+| `docs/dos_and_donts.md` | Explicit DOs and DON'Ts for architecture, API, naming, UI | Before any structural or architectural decision |
 | `docs/screens_and_navigation.md` | Screen list, navigation graph, back-stack rules, intent extras | Before implementing a new screen or navigation flow |
 
 If a task touches something not covered by any doc, **ask before proceeding**.

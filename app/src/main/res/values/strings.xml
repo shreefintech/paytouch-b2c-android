@@ -552,4 +552,25 @@
     <string name="btnRetry">Retry</string>
     <string name="label_name">Name</string>
 
+    <!-- KYC Details -->
+    <string name="titleKycDetails">KYC Details</string>
+    <string name="labelIdentityDetails">Identity Details</string>
+    <string name="labelUploadedDocuments">Uploaded Documents</string>
+    <string name="labelVerified">Verified</string>
+    <string name="labelPending">Pending</string>
+    <string name="labelRejected">Rejected</string>
+    <string name="btnPreview">Preview</string>
+    <string name="msgNoKycDocuments">No documents uploaded</string>
+    <string name="msgDocumentNotAvailable">Document not available for preview</string>
+
+
+    <string name="errNoUrlProvided">No URL provided</string>
+    <string name="errFailedToDecodeImage">Failed to decode image</string>
+    <string name="errFailedToLoadImage">Failed to load image: %s</string>
+    <string name="errPdfNoPages">PDF has no pages</string>
+    <string name="errCannotRenderPdf">Cannot render PDF: %s</string>
+    <string name="errFailedToLoad">Failed to load: %s</string>
+    <string name="labelPageIndicator">%1$d / %2$d</string>
+    <string name="msgLoading">Loading...</string>
+
 </resources>
