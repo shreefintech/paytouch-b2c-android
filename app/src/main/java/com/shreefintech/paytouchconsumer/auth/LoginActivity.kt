@@ -233,7 +233,6 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun handleSignIn(mobile: String, credential: String) {
-
         viewModel.login(
             mobile = mobile,
             credential = credential,

@@ -462,7 +462,7 @@
 
 <pre><code>com.shreefintech.paytouchconsumer/
 <span class="comment">├── auth/           # Login, OTP, password/MPIN flows, create-account</span>
-├── onboarding/     <span class="comment"># KYC (UploadKycActivity), Virtual Account (CreateVirtualAccountActivity)</span>
+├── onboarding/     <span class="comment"># onboarding/kyc/ — KycActivity, IdentityVerificationActivity, BankDetailsActivity, KycStatusActivity</span>
 ├── home/           <span class="comment"># Home/Dashboard screen (HomeActivity)</span>
 ├── electricity/    <span class="comment"># Electricity bill payment (canonical reference module)</span>
 │   └── transactions/
@@ -804,7 +804,9 @@ showProgressFetch.set(<span class="keyword">false</span>)  <span class="comment"
   <tr><td>OTP Verification</td><td><code>OtpVerificationActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>Reset Password</td><td><code>ResetPasswordActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>Reset MPIN</td><td><code>ResetMpinActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
-  <tr><td>KYC Upload</td><td><code>UploadKycActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>KYC Hub</td><td><code>KycActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>KYC Identity Verification</td><td><code>IdentityVerificationActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>KYC Bank Details</td><td><code>BankDetailsActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>KYC Status</td><td><code>KycStatusActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>Home / Dashboard</td><td><code>HomeActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>Shared Transaction Detail</td><td><code>TransactionDetailActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>

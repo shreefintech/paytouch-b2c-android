@@ -46,7 +46,7 @@ class BankDetailsActivity : BaseActivity() {
 
     private lateinit var binding: ActivityBankDetailsBinding
     private val viewModel: BankDetailsViewModel by viewModels()
-    private var showProgressSubmit = ObservableBoolean(false)
+    private val showProgressSubmit = ObservableBoolean(false)
 
     private lateinit var filePickerUtil: FilePickerUtil
     private var activeCardIndex = -1

@@ -1,6 +1,6 @@
 # PayTouch Consumer — Business Logic Reference
 
-> **Current phase:** UI implementation. API calls are not yet wired. This document describes the **target behaviour** — implement UI first, then wire each section to the API when that phase begins. Field names and endpoint paths here are authoritative; do not invent your own.
+> **Current phase:** API wiring in progress. Core modules have live API integration. Field names and endpoint paths listed here are authoritative; do not invent your own.
 
 ---
 
@@ -177,16 +177,16 @@ A 4-digit PIN used as an alternative to password login. Created during onboardin
 The main menu of the app. Displays category tiles that navigate to each payment flow.
 
 ### Categories Displayed
-1. Electricity
-2. Gas
-3. Prepaid (Mobile)
-4. TV Cable
-5. DTH
-6. Fastag
-7. Loan (TV Cable placeholder)
-8. My Account
-9. Tax (TV Cable placeholder)
-10. Load Wallet (bottom action)
+1. Electricity → `ElectricityActivity`
+2. Gas → `GasActivity`
+3. Prepaid (Mobile) → `PrepaidActivity`
+4. TV Cable → 📋 Planned
+5. DTH → `DthActivity`
+6. FASTag → `FastagActivity`
+7. Loan → `LoanActivity`
+8. My Account → `MyAccountActivity`
+9. Municipal Tax → `MunicipalTaxActivity`
+10. Load Wallet (bottom action) → `LoadWalletActivity`
 
 ### Rules
 - On Home load, fetch dynamic Shreefintech token from server → store in `Constant.TOKEN` or SharedPreferences
@@ -212,12 +212,12 @@ This flow applies to: Electricity, Gas, Mobile Postpaid, Cable TV, Broadband, FA
 3. App calls `fetch-bill` API → displays outstanding amount, due date, consumer name
 4. User confirms and taps Pay
 5. Platform fee is calculated and shown
-6. App generates a local transaction ID (`PYTCH[DDMMYYYYHHMMSS]M`)
-7. Payment processed via `process-payment` API
-8. App calls `transaction-status` to get final result
-9. Transaction saved to Room DB
-10. Success/failure sound plays
-11. Receipt is displayed
+6. Payment processed via `process-payment` API
+7. App calls `transaction-status` to get final result
+8. Success/failure sound plays
+9. Receipt is displayed
+
+> Transaction ID is generated and returned by the backend in the `process-payment` response — never generate it client-side.
 
 ### Platform Fee Calculation
 ```
@@ -335,60 +335,63 @@ amount > 40000           → fee = ₹30
 
 ### Rules
 - Balance is fetched fresh from the API on every Home/dashboard load
-- `Load Wallet` routes to a wallet top-up flow
+- `Load Wallet` opens `LoadWalletActivity` which routes to the HDFC payment WebView
 
 ### API Endpoints
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `api/wallet/balance` | Get current wallet balance |
 | GET | `api/transactions` | Get unified paginated transaction history |
+| POST | `api/hdfc/create-order` | Create HDFC payment order for wallet top-up |
 
 ### Response Fields (Balance)
 - `data.balance` (Decimal) — current wallet balance
 
 ---
 
-## 12. Transaction History & Reporting
+## 11a. Load Wallet (HDFC Gateway Flow)
+
+### What It Does
+User enters a top-up amount, the app creates an HDFC payment order, then opens `HdfcWebViewActivity` with the payment URL. On payment completion, HDFC redirects to a return URL which the WebView intercepts — routing to `PaymentStatusActivity`.
+
+### Screens
+| Screen | Class | Purpose |
+|---|---|---|
+| Wallet Balance + Top-up Form | `LoadWalletActivity` | Shows balance, enter amount, create order |
+| HDFC Payment WebView | `HdfcWebViewActivity` | Renders HDFC payment page |
+| Payment Status | `PaymentStatusActivity` | Shows success/failure, auto-navigates back |
+| Full Transaction History | `WalletTransactionsActivity` | Paginated list of all wallet transactions |
 
 ### Rules
-- Transactions are stored in Room DB immediately after any payment attempt
-- The local DB is the primary source for history and reports
-- Search can be done by transaction ID or consumer number
-- Report filtering: category, consumer number, status (Success/Failed/Processing), from-date, to-date
-
-### Room DB Schema — `recent_transactions`
-| Column | Type | Notes |
-|---|---|---|
-| id | Int (PK, auto) | Auto-generated |
-| txnId | String | PYTCH-format transaction ID |
-| consumerNumber | String | Consumer/account number |
-| consumerName | String | Name of the bill holder |
-| providerName | String | Operator/provider name |
-| category | String | e.g. "Electricity", "DTH" |
-| amount | Double | Payment amount (before fee) |
-| status | String | "Success", "Failed", "Processing" |
-| timestamp | Long | Unix timestamp |
+- `LoadWalletActivity` is `singleTop` (prevents duplicate stacking from HDFC redirect)
+- `HdfcWebViewActivity` intercepts the return URL and finishes, handing control back
+- `PaymentStatusActivity` auto-navigates to `LoadWalletActivity` after 5 s or on back press
+- Wallet transaction history is paginated via `api/wallet/transactions`
 
 ---
 
-## 13. Transaction ID Generation
-
-### Format
-```
-PYTCH[DDMMYYYYHHMMSS]M
-Example: PYTCH19012026091530M
-```
-
-- Prefix: `PYTCH` (always)
-- Date-time: current device date and time in DDMMYYYYHHMMSS format
-- Suffix: `M` (default)
-- Total length: 20 characters
+## 12. Transaction History & Reporting
 
 ### Rules
-- Generated client-side **before** the API call
-- Stored in Room DB with the transaction record
-- Used for status lookup and receipts
-- Do not use `Math.random()` or `UUID` for this — use the timestamp format above
+- Transaction history is fetched from the API — no local database is used
+- Each module has its own paginated report endpoint (`api/{category}/payment-reports`)
+- Recent transactions use `api/{category}/payment-history` (most recent records)
+- Search can be done by transaction ID or consumer number
+- Report filtering: category, consumer number, status (Success/Failed/Processing), from-date, to-date
+- `TransactionDetailActivity` is shared across all modules; detail is passed via `Gson().toJson(TransactionItem)`
+
+---
+
+## 13. Transaction ID
+
+### Ownership
+Transaction IDs are **generated and returned by the backend** in the `process-payment` (or `process-direct`) response. The client must never generate a transaction ID before or during the API call.
+
+### Rules
+- Do not pass a `transaction_id` field in any payment request DTO
+- Read the transaction ID from the API response and store it for status lookup and receipts
+- `Utility.generateTransactionId()` was removed — do not recreate it
+- The ID format (`PYTCH…`) is set by the server; the client treats it as an opaque string
 
 ---
 
@@ -453,7 +456,7 @@ Example: PYTCH19012026091530M
 The Dynamic QR payment feature uses a `ngrok-free.dev` tunnel URL. This will break in production. Replace with a stable production URL before any live deployment.
 
 **Issue 2 — Static Shreefintech token field:**
-The dynamic token from `api/shreefintech-token` is currently stored as a static field (`Constant.TOKEN`). This is a race condition risk in multi-thread scenarios. Move this to `SharedPreferenceHelper` or a Repository before the API wiring phase.
+The dynamic token from `api/shreefintech-token` is currently stored as a static field (`Constant.TOKEN`). This is a race condition risk in multi-thread scenarios. Move this to `SharedPreferenceHelper` or a Repository before release.
 
 **Issue 3 — Legacy MobiKwik API:**
 Some payment flows may route through `dashboard.shreefintechsolutions.com/api/mobikwik/`. Audit each endpoint before wiring — determine which are still active and which are replaced by `paytouch.in` equivalents.

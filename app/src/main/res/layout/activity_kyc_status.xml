@@ -3,7 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data />
+    <data>
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
@@ -76,6 +80,7 @@
                 android:id="@+id/cvRetry"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height"
+                android:onClickListener="@{onClickListener}"
                 app:cardBackgroundColor="@color/primary"
                 app:cardCornerRadius="@dimen/button_corner_radius"
                 app:cardElevation="0dp"

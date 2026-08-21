@@ -64,7 +64,7 @@ class KycStatusActivity : BaseActivity() {
         binding.swipeRefresh.setOnRefreshListener { refreshStatus() }
 
         binding.lytToolbar.ivBack.gone()
-        binding.cvRetry.setOnClickListener(onClickListener())
+        binding.onClickListener = onClickListener()
 
         statusItem?.let { renderStatus(it) }
     }
