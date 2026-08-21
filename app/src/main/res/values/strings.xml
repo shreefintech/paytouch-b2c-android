@@ -436,10 +436,6 @@
 
     <!-- Load Wallet screen -->
     <string name="titleMyWallet">My Wallet</string>
-    <string name="tabTotalBalance">Total Balance</string>
-    <string name="tabReferralWallet">Referral Wallet</string>
-    <string name="tabMyWallet">My Wallet</string>
-    <string name="tabEarn">Earn</string>
     <string name="labelSuccessTransactions">Success</string>
     <string name="labelPendingTransactions">Pending</string>
     <string name="labelTransactionsZero">Transactions: 0</string>
@@ -458,7 +454,6 @@
     <string name="errEnterAmount">Please enter a valid amount</string>
     <string name="hintPaymentDescription">Payment Description</string>
     <string name="btnProceedPayment">Proceed Payment</string>
-    <string name="msgSecurePayment">100% secure payment powered by PayTouch</string>
 
     <!-- HDFC Payment flow -->
     <string name="titlePaymentStatus">Payment Status</string>
@@ -469,8 +464,6 @@
     <string name="msgAmountRefunded">Amount Refunded</string>
     <string name="msgPaymentPending">Payment Pending</string>
     <string name="btnContinue">Continue</string>
-    <string name="btnContinueCountdown">Continue (%d)</string>
-    <string name="btnCheckPaymentStatus">Check Payment Status</string>
     <string name="msgLeavePaymentTitle">Leave Payment?</string>
     <string name="msgLeavePaymentBody">Are you sure you want to leave the payment page?</string>
     <string name="btnLeave">Leave</string>
@@ -496,7 +489,7 @@
     <string name="msgSecurePaymentProcessedBy">Secure Payment Processed By</string>
     <string name="btnPaySecurely">Pay Securely</string>
     <string name="msgPoweredByPrefix">Powered by </string>
-    <string name="msgPoweredByCompany">SHREE Fintech Solutions Pvt. Ltd.</string>
+    <string name="errAppNotInstalled">App not installed. Please install the required payment app.</string>
 
     <!-- KYC module — hub -->
     <string name="titleKycVerification">KYC Verification</string>

@@ -23,8 +23,8 @@ This is a critical UX requirement. Never make an API call without this check. Sh
 **DO generate transaction IDs client-side before submitting a payment.**
 The format `PYTCH[DDMMYYYYHHMMSS]M` is correct and must be preserved. This ID is the link between local DB records and server records.
 
-**DO enforce the mandatory onboarding sequence: KYC → MPIN → Virtual Account.**
-The server drives this via flags (`requires_kyc`, `requires_mpin`, `requires_virtual_account`). Always check these flags after login and route accordingly. Never allow a user to skip a step.
+**DO enforce the mandatory onboarding sequence: KYC → MPIN.**
+The server drives this via flags (`requires_kyc`, `requires_mpin`). Always check these flags after login and route accordingly. Never allow a user to skip a step. `requires_virtual_account` is permanently retired — virtual account creation is handled server-side after KYC approval; do not add client-side routing for it.
 
 **DO apply platform fee calculation before showing the final payment amount.**
 Fee tiers (₹4 / ₹8 / ₹20 / ₹30 based on amount range) must be calculated and displayed before the user confirms payment. This logic belongs in a ViewModel, not an Activity.

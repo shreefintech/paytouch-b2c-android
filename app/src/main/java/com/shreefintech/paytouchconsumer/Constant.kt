@@ -13,6 +13,8 @@ object Constant {
     const val KEY_MOBILE = "MOBILE"
     const val KEY_TOKEN_TYPE = "TOKEN_TYPE"
     const val KEY_WALLET_BALANCE = "WALLET_BALANCE"
+    const val KEY_PENDING_ORDER_ID = "PENDING_ORDER_ID"
+    const val KEY_PENDING_AMOUNT = "PENDING_AMOUNT"
 
 
     const val KEY_REFERRAL_CODE = "ReferralCode"
@@ -47,6 +49,11 @@ object Constant {
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
+    // HDFC pending payment state (persisted across process death)
+    const val KEY_HDFC_PENDING_ORDER_ID = "hdfc_pending_order_id"
+    const val KEY_HDFC_PENDING_AMOUNT   = "hdfc_pending_amount"
+
     // Dashboard storage base URL — used as root for file_url values returned by /my-account
     const val BASE_URL_DASHBOARD_STORAGE = "https://paytouch-dashboard.local/storage"
+
 }
