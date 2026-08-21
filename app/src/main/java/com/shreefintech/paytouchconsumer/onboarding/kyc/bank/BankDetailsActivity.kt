@@ -28,6 +28,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityBankDetailsBinding
 import com.shreefintech.paytouchconsumer.databinding.ItemBankAccountBinding
 import com.shreefintech.paytouchconsumer.enums.ProofType
+import com.shreefintech.paytouchconsumer.onboarding.kyc.bank.model.BankAccountInputItem
 import com.shreefintech.paytouchconsumer.enums.StatementPeriod
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil

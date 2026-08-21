@@ -229,6 +229,10 @@ class LoadWalletActivity : BaseActivity() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(true)
+        dialog.setOnDismissListener {
+            confirmDialog = null
+            confirmDialogBinding = null
+        }
 
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)

@@ -34,7 +34,7 @@ open class BaseActivity : AppCompatActivity() {
     private var noInternetRoot: FrameLayout? = null
     private var glassAttached = false
 
-    var retryCallback: (() -> Unit)? = null
+    protected var retryCallback: (() -> Unit)? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +64,7 @@ open class BaseActivity : AppCompatActivity() {
         noInternetView = LytNoInternetBinding.inflate(layoutInflater)
         noInternetView?.btnRetry?.setOnClickListener { retryCallback?.invoke() }
         noInternetView?.root?.visibility = View.GONE
-        root.addView(noInternetView!!.root)
+        noInternetView?.root?.let { root.addView(it) }
 
         super.setContentView(root)
     }

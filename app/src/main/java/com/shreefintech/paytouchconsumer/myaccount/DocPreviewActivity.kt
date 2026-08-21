@@ -53,6 +53,7 @@ class DocPreviewActivity : BaseActivity() {
     private val minScale = 0.5f
     private val maxScale = 5f
     private lateinit var scaleDetector: ScaleGestureDetector
+    private val clickListener: View.OnClickListener by lazy { onClickListener() }
 
     companion object {
         private const val EXTRA_FILE_URL = "extra_file_url"
@@ -120,7 +121,7 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     private fun setupToolbar() {
-        binding.toolbar.onClickListener = onClickListener()
+        binding.toolbar.onClickListener = clickListener
     }
 
     private fun setupPinchToZoom() {
@@ -230,9 +231,8 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     private fun setupPdfNavigation() {
-        val listener = onClickListener()
-        binding.btnPrevPage.setOnClickListener(listener)
-        binding.btnNextPage.setOnClickListener(listener)
+        binding.btnPrevPage.setOnClickListener(clickListener)
+        binding.btnNextPage.setOnClickListener(clickListener)
         updatePageLabel()
     }
 

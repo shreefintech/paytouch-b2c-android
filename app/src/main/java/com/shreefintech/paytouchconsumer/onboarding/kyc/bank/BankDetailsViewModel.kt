@@ -3,7 +3,7 @@ package com.shreefintech.paytouchconsumer.onboarding.kyc.bank
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.enums.StatementPeriod
+import com.shreefintech.paytouchconsumer.onboarding.kyc.bank.model.BankAccountInputItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -17,16 +17,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
-data class BankAccountInputItem(
-    val accountNumber: String,
-    val bankName: String,
-    val ifscCode: String,
-    val branchName: String,
-    val proofType: String,
-    val proofBytes: ByteArray,
-    val statementPeriod: StatementPeriod?
-)
 
 class BankDetailsViewModel(application: Application) : AndroidViewModel(application) {
 

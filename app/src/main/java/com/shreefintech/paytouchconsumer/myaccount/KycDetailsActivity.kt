@@ -18,7 +18,6 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.KycDocumentAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycDetailsBinding
-import com.shreefintech.paytouchconsumer.onboarding.kyc.KycStatusViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDocumentDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -27,7 +26,7 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 class KycDetailsActivity : BaseActivity() {
 
     private lateinit var binding: ActivityKycDetailsBinding
-    private val viewModel: KycStatusViewModel by viewModels()
+    private val viewModel: KycDetailsViewModel by viewModels()
 
     private val documents = mutableListOf<KycDocumentDetailItem>()
     private lateinit var documentAdp: KycDocumentAdp
@@ -88,6 +87,7 @@ class KycDetailsActivity : BaseActivity() {
             },
             onError = { msg ->
                 binding.pbLoading.isVisible = false
+                binding.nsvContent.isVisible = true
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )
