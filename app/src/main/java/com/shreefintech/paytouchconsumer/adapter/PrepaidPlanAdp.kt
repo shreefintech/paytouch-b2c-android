@@ -68,7 +68,7 @@ class PrepaidPlanAdp(
                 val fullLayout = StaticLayout.Builder.obtain(fullText, 0, fullText.length, paint, w).build()
                 if (fullLayout.lineCount <= 3) return@post
 
-                val suffix = " View more"
+                val suffix = mContext.getString(R.string.labelViewMore)
                 val suffixWidth = paint.measureText(suffix)
                 val line3Start = fullLayout.getLineStart(2)
                 val line3End = fullLayout.getLineVisibleEnd(2)

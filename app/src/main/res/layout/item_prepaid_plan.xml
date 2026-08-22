@@ -58,7 +58,7 @@
             tools:text="Data: 1.5 GB/day | Voice: Unlimited Calls | SMS: 100 SMS/day | Validity: 22 Days" />
 
 
-<!-- Talktime | Data footer -->
+        <!-- Talktime | Data footer -->
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvPlanFooter"
             android:layout_width="match_parent"

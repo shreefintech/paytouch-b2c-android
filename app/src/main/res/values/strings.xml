@@ -198,6 +198,7 @@
     <string name="labelDataBenefit">Data</string>
     <string name="labelTalktime">Talktime</string>
     <string name="fmtPlanTalktimeData">Talktime: %1$s    Data: %2$s</string>
+    <string name="labelViewMore"> View more</string>
 
     <!-- Electricity screen -->
     <string name="titleElectricityBill">Electricity Bill</string>

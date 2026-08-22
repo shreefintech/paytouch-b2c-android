@@ -24,7 +24,6 @@ class SplashActivity : BaseActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
 
-    // Stores API response; null until received (default = not yet arrived)
     private var sessionData: UserProfileItem? = null
     private var apiFinished = false
     private var timerFinished = false
@@ -48,7 +47,6 @@ class SplashActivity : BaseActivity() {
     private val timerRunnable = Runnable {
         timerFinished = true
         if (apiFinished) redirect()
-        // else: API is still in flight — redirect will be called from onApiDone()
     }
 
     private fun startFlow() {
@@ -66,7 +64,7 @@ class SplashActivity : BaseActivity() {
             return
         }
         if (!Utility.isInternetAvailable(mActivity)) {
-            onApiDone(null)
+            showNoInternet()
             return
         }
         hideNoInternet()
@@ -83,7 +81,6 @@ class SplashActivity : BaseActivity() {
         sessionData = data
         apiFinished = true
         if (timerFinished) redirect()
-        // else: timer hasn't fired yet — redirect will be called from timerRunnable
     }
 
     private fun redirect() {
