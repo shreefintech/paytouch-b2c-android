@@ -277,6 +277,10 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".myaccount.DocPreviewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".loadwallet.LoadWalletActivity"
             android:exported="false"
             android:launchMode="singleTop"

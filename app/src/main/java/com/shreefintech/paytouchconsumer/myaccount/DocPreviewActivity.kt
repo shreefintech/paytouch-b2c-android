@@ -55,7 +55,6 @@ class DocPreviewActivity : BaseActivity() {
     companion object {
         const val EXTRA_FILE_URL = "extra_file_url"
         const val EXTRA_FILE_TITLE = "extra_file_title"
-        private const val TAG = "DocPreviewActivity"
 
         fun start(context: Context, fileUrl: String, title: String = "") {
             val intent = Intent(context, DocPreviewActivity::class.java).apply {
