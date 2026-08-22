@@ -1,5 +1,7 @@
 package com.shreefintech.paytouchconsumer.onboarding.kyc.identity
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -18,8 +20,8 @@ import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import androidx.lifecycle.lifecycleScope
 import com.shreefintech.paytouchconsumer.BaseActivity
-import java.io.ByteArrayOutputStream
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityIdentityVerificationBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -31,18 +33,22 @@ import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.fragment.KycSte
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 class IdentityVerificationActivity : BaseActivity() {
 
     companion object {
-        fun buildIntent(context: android.content.Context): android.content.Intent =
-            android.content.Intent(context, IdentityVerificationActivity::class.java)
+        fun buildIntent(context: Context): Intent =
+            Intent(context, IdentityVerificationActivity::class.java)
     }
 
     private lateinit var binding: ActivityIdentityVerificationBinding
     private val viewModel: IdentityVerificationViewModel by viewModels()
-    private var showProgressSubmit = ObservableBoolean(false)
+    private val showProgressSubmit = ObservableBoolean(false)
     private var resultCode = 0
 
     private val dotViews = mutableListOf<AppCompatImageView>()
@@ -64,10 +70,10 @@ class IdentityVerificationActivity : BaseActivity() {
         val callback = onSelfieCaptured
         onSelfieCaptured = null
         if (success && file != null && uri != null && callback != null) {
-            Thread {
+            lifecycleScope.launch(Dispatchers.IO) {
                 compressIfNeeded(file)
-                runOnUiThread { callback(uri) }
-            }.start()
+                withContext(Dispatchers.Main) { callback(uri) }
+            }
         }
     }
 
@@ -253,17 +259,49 @@ class IdentityVerificationActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
             return
         }
-        viewModel.submitIdentity(
-            onLoading = { showProgressSubmit.set(true) },
-            onSuccess = {
-                showProgressSubmit.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.msgIdentitySubmitSuccess))
-                resultCode = 1
-                setResult(resultCode)
-                finish()
-            },
-            onError = { msg -> showProgressSubmit.set(false); ToastUtil.showDelete(mActivity, msg) }
-        )
+
+        val panUri          = viewModel.panFrontUri
+        val aadhaarFrontUri = viewModel.aadhaarFrontUri
+        val aadhaarBackUri  = viewModel.aadhaarBackUri
+        val selfieUri       = viewModel.selfieUri
+
+        showProgressSubmit.set(true)
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val cr                = contentResolver
+                val panBytes          = panUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+                val aadhaarFrontBytes = aadhaarFrontUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+                val aadhaarBackBytes  = aadhaarBackUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+                val selfieBytes       = selfieUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+
+                withContext(Dispatchers.Main) {
+                    if (panBytes == null || aadhaarFrontBytes == null || aadhaarBackBytes == null || selfieBytes == null) {
+                        showProgressSubmit.set(false)
+                        ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                        return@withContext
+                    }
+                    viewModel.submitIdentity(
+                        panBytes          = panBytes,
+                        aadhaarFrontBytes = aadhaarFrontBytes,
+                        aadhaarBackBytes  = aadhaarBackBytes,
+                        selfieBytes       = selfieBytes,
+                        onSuccess = {
+                            showProgressSubmit.set(false)
+                            ToastUtil.showSuccess(mActivity, getString(R.string.msgIdentitySubmitSuccess))
+                            resultCode = 1
+                            setResult(resultCode)
+                            finish()
+                        },
+                        onError = { msg -> showProgressSubmit.set(false); ToastUtil.showDelete(mActivity, msg) }
+                    )
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    showProgressSubmit.set(false)
+                    ToastUtil.showDelete(mActivity, e.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            }
+        }
     }
 
     private fun onClickListener(): View.OnClickListener {

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
@@ -18,11 +17,10 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
-import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.auth.ResetMpinActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycStatusBinding
+import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -65,12 +63,8 @@ class KycStatusActivity : BaseActivity() {
         binding.swipeRefresh.setOnRefreshListener { refreshStatus() }
 
         binding.lytToolbar.ivBack.gone()
-        binding.cvRetry.setOnClickListener {
-            if (Utility.stopClick()) return@setOnClickListener
-            onRetry()
-        }
+        binding.onClickListener = onClickListener()
 
-        onBack()
         statusItem?.let { renderStatus(it) }
     }
 
@@ -119,6 +113,8 @@ class KycStatusActivity : BaseActivity() {
         Glide.with(this)
             .asGif()
             .load(res)
+            .placeholder(R.drawable.ic_file_not_found)
+            .error(R.drawable.ic_file_not_found)
             .listener(object : RequestListener<GifDrawable> {
                 override fun onResourceReady(
                     resource: GifDrawable, model: Any, target: Target<GifDrawable>?,
@@ -146,12 +142,14 @@ class KycStatusActivity : BaseActivity() {
         finish()
     }
 
-    private fun onBack() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                isEnabled = false
-                onBackPressedDispatcher.onBackPressed()
+    private fun onClickListener(): View.OnClickListener {
+        return View.OnClickListener {
+            when (it) {
+                binding.cvRetry -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    onRetry()
+                }
             }
-        })
+        }
     }
 }

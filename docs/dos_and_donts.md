@@ -20,11 +20,11 @@ Never hardcode a string that is used in more than one place. Every URL, API key,
 **DO call `Utility.isInternetAvailable()` before every network request.**
 This is a critical UX requirement. Never make an API call without this check. Show a user-facing message via `ToastUtil` if there is no internet.
 
-**DO generate transaction IDs client-side before submitting a payment.**
-The format `PYTCH[DDMMYYYYHHMMSS]M` is correct and must be preserved. This ID is the link between local DB records and server records.
+**DO read the transaction ID from the payment API response — never generate it client-side.**
+The backend generates and returns the transaction ID in the `process-payment` / `process-direct` response. `Utility.generateTransactionId()` was removed; do not recreate it. Do not include a `transaction_id` field in any payment request DTO.
 
-**DO enforce the mandatory onboarding sequence: KYC → MPIN → Virtual Account.**
-The server drives this via flags (`requires_kyc`, `requires_mpin`, `requires_virtual_account`). Always check these flags after login and route accordingly. Never allow a user to skip a step.
+**DO enforce the mandatory onboarding sequence: KYC → MPIN.**
+The server drives this via flags (`requires_kyc`, `requires_mpin`). Always check these flags after login and route accordingly. Never allow a user to skip a step. `requires_virtual_account` is permanently retired — virtual account creation is handled server-side after KYC approval; do not add client-side routing for it.
 
 **DO apply platform fee calculation before showing the final payment amount.**
 Fee tiers (₹4 / ₹8 / ₹20 / ₹30 based on amount range) must be calculated and displayed before the user confirms payment. This logic belongs in a ViewModel, not an Activity.
@@ -66,8 +66,8 @@ Never make users manually enter their age. Calculate it from the DOB picker resu
 **DO use `notifyItemChanged(position)` for single-item RecyclerView updates.**
 Never call `notifyDataSetChanged()` for a single item change. Use targeted updates.
 
-**DO store every payment attempt in Room DB immediately after attempting.**
-Write to Room on every payment attempt — success or failure — so history is always available offline.
+**DO rely on API endpoints for transaction history — there is no local database.**
+Transaction history per module comes from `api/{category}/payment-history` (recent) and `api/{category}/payment-reports` (filtered). Do not add a Room DB; the server is the source of truth for all payment records.
 
 **DO play audio feedback after every payment.**
 `payment_success.mp3` and `payment_failed.mp3` must play after every transaction result. Clean up the MediaPlayer in `onDestroy()`.
@@ -146,8 +146,8 @@ Convention: `TransactionAdp`, not `TransactionAdapter`. Consistent naming makes 
 **DON'T name models with suffixes like `Response` or `Model` — use `Item`.**
 Convention: `TransactionItem`, not `TransactionResponse` or `TransactionModel`.
 
-**DON'T access Room DB on the main thread.**
-Room must always be accessed via coroutines (`Dispatchers.IO`) or RxJava. Direct access from Activity callbacks causes `IllegalStateException` and ANRs.
+**DON'T add a Room DB for transaction storage.**
+There is no local database in this project. Transaction history is fetched from the API. Do not introduce Room, SQLite, or any local persistence layer for payment records.
 
 **DON'T mix multiple API backends for the same feature.**
 Each feature must use exactly one base URL for all its calls. Do not call `paytouch.in` for step A and `admin.paytouch.in` for step B of the same payment flow.

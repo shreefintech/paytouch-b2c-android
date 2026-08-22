@@ -42,8 +42,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReport
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasVerifyPaymentDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderResponseItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycAgreeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
@@ -68,8 +66,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTa
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionStatusRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillResponseItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidLatestPaymentDataItem
@@ -87,6 +83,10 @@ import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransacti
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
+import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -579,13 +579,13 @@ interface ApiService {
     fun createHdfcOrder(
         @Header("Authorization") authorization: String,
         @Body request: HdfcCreateOrderRequest
-    ): Call<HdfcOrderResponseItem>
+    ): Call<General<HdfcOrderItem>>
 
     @GET("${AUTH}hdfc/orders/{order_id}/status")
     fun getHdfcOrderStatus(
         @Header("Authorization") authorization: String,
         @Path("order_id") orderId: String
-    ): Call<HdfcOrderResponseItem>
+    ): Call<General<HdfcOrderItem>>
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 

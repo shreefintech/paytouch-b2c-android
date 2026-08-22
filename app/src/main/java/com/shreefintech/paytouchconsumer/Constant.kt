@@ -13,12 +13,15 @@ object Constant {
     const val KEY_MOBILE = "MOBILE"
     const val KEY_TOKEN_TYPE = "TOKEN_TYPE"
     const val KEY_WALLET_BALANCE = "WALLET_BALANCE"
+    const val KEY_PENDING_ORDER_ID = "PENDING_ORDER_ID"
+    const val KEY_PENDING_AMOUNT = "PENDING_AMOUNT"
 
 
     const val KEY_REFERRAL_CODE = "ReferralCode"
 
     // External URLs
     const val URL_PLATFORM_TERMS = "https://www.paytouch.in/terms/platform"
+    const val URL_GOOGLE_DOC_VIEWER = "https://docs.google.com/gviewer?embedded=true&url="
 
     // Circle IDs for bill payment modules
     const val LOAN_CIRCLE_ID = "0"
@@ -47,6 +50,4 @@ object Constant {
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
-    // Dashboard storage base URL — used as root for file_url values returned by /my-account
-    const val BASE_URL_DASHBOARD_STORAGE = "https://paytouch-dashboard.local/storage"
 }
