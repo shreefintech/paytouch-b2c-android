@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        tools:context=".admin.kyc.DocPreviewActivity">
+        tools:context=".myaccount.DocPreviewActivity">
 
         <!-- AppBar -->
         <include
@@ -106,7 +106,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:padding="24dp"
-                    android:textColor="#B00020"
+                    android:textColor="@color/form_wizard_reject"
                     android:textSize="14sp"
                     android:visibility="gone"
                     tools:text="Failed to load document"

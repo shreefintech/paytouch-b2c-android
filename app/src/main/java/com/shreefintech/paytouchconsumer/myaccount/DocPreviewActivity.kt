@@ -32,11 +32,6 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDocPreviewBinding
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 class DocPreviewActivity : BaseActivity() {
@@ -55,8 +50,8 @@ class DocPreviewActivity : BaseActivity() {
     private lateinit var scaleDetector: ScaleGestureDetector
 
     companion object {
-        const val EXTRA_FILE_URL = "extra_file_url"
-        const val EXTRA_FILE_TITLE = "extra_file_title"
+        private const val EXTRA_FILE_URL = "extra_file_url"
+        private const val EXTRA_FILE_TITLE = "extra_file_title"
 
         fun start(context: Context, fileUrl: String, title: String = "") {
             context.startActivity(
@@ -232,6 +227,9 @@ class DocPreviewActivity : BaseActivity() {
 
     private fun setupPdfNavigation() {
         updatePageLabel()
+        val listener = onClickListener()
+        binding.btnPrevPage.setOnClickListener(listener)
+        binding.btnNextPage.setOnClickListener(listener)
     }
 
     private fun renderPdfPage(pageIndex: Int) {
