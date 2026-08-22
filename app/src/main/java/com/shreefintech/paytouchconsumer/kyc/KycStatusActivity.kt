@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc
+package com.shreefintech.paytouchconsumer.kyc
 
 import android.content.Context
 import android.content.Intent

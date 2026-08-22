@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc.identity
+package com.shreefintech.paytouchconsumer.kyc.identity
 
 import android.content.Context
 import android.content.Intent
@@ -25,11 +25,11 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityIdentityVerificationBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.fragment.BaseKycStepFragment
-import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.fragment.KycStep1Fragment
-import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.fragment.KycStep2Fragment
-import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.fragment.KycStep3Fragment
-import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.fragment.KycStep4Fragment
+import com.shreefintech.paytouchconsumer.kyc.identity.fragment.BaseKycStepFragment
+import com.shreefintech.paytouchconsumer.kyc.identity.fragment.KycStep1Fragment
+import com.shreefintech.paytouchconsumer.kyc.identity.fragment.KycStep2Fragment
+import com.shreefintech.paytouchconsumer.kyc.identity.fragment.KycStep3Fragment
+import com.shreefintech.paytouchconsumer.kyc.identity.fragment.KycStep4Fragment
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility

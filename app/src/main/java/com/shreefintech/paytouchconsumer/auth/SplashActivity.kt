@@ -12,7 +12,7 @@ import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
-import com.shreefintech.paytouchconsumer.onboarding.kyc.KycActivity
+import com.shreefintech.paytouchconsumer.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility

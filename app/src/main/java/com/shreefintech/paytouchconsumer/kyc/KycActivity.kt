@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc
+package com.shreefintech.paytouchconsumer.kyc
 
 import android.content.Context
 import android.content.Intent
@@ -15,8 +15,8 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.onboarding.kyc.bank.BankDetailsActivity
-import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.IdentityVerificationActivity
+import com.shreefintech.paytouchconsumer.kyc.bank.BankDetailsActivity
+import com.shreefintech.paytouchconsumer.kyc.identity.IdentityVerificationActivity
 import com.shreefintech.paytouchconsumer.enums.KycSectionStatus
 import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem

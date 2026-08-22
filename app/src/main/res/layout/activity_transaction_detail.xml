@@ -120,16 +120,6 @@
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_13"
                                     tools:text="Mobile No. 9876*****0" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvInfoAmount"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/proza_libre_bold"
-                                    android:includeFontPadding="false"
-                                    android:textColor="@color/primary"
-                                    android:textSize="@dimen/text_size_18"
-                                    tools:text="₹149.00" />
                             </LinearLayout>
 
                             <!-- Row 2: Username + Amount -->
@@ -151,28 +141,6 @@
                                     android:textSize="@dimen/text_size_13"
                                     tools:text="Username : Testuser" />
 
-                                <!-- Status pill badge — CardView replaces drawable shape -->
-                                <com.google.android.material.card.MaterialCardView
-                                    android:id="@+id/cvStatus"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    app:cardCornerRadius="20dp"
-                                    app:cardElevation="0dp"
-                                    app:strokeWidth="0dp">
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tvStatus"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/proza_libre_semi_bold"
-                                        android:includeFontPadding="false"
-                                        android:paddingStart="10dp"
-                                        android:paddingTop="3dp"
-                                        android:paddingEnd="10dp"
-                                        android:paddingBottom="3dp"
-                                        android:textSize="@dimen/text_size_10"
-                                        tools:text="Failed" />
-                                </com.google.android.material.card.MaterialCardView>
                             </LinearLayout>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
@@ -208,14 +176,39 @@
                                     android:tint="@color/primary" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="@dimen/margin_extra_small"
                                     android:fontFamily="@font/proza_libre_bold"
                                     android:includeFontPadding="false"
                                     android:text="@string/labelPayment"
+                                    android:layout_marginEnd="@dimen/margin_small"
+                                    android:layout_weight="1"
                                     android:textColor="@color/primary"
                                     android:textSize="@dimen/text_size_16" />
+
+                                <!-- Status pill badge — CardView replaces drawable shape -->
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cvStatus"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    app:cardCornerRadius="20dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvStatus"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:paddingStart="10dp"
+                                        android:paddingTop="3dp"
+                                        android:paddingEnd="10dp"
+                                        android:paddingBottom="3dp"
+                                        android:textSize="@dimen/text_size_10"
+                                        tools:text="Failed" />
+                                </com.google.android.material.card.MaterialCardView>
                             </LinearLayout>
 
                             <!-- Divider -->

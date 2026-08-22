@@ -704,15 +704,6 @@ private fun setOperatorLoading(loading: Boolean) {
 
 ---
 
-### Temporary Cross-Module Navigation Exception
-
-Cross-module Activity navigation is prohibited by default. Temporary reuse is allowed only when Product explicitly requires it — include `TODO(ticket-id)` and remove before releasing the module-specific Activity.
-
-**Active exception — Postpaid plan selection (B2C-59):**
-`PostpaidActivity.onBrowsePlan()` currently launches `PrepaidPlanSelectionActivity` as a stand-in. Replace with a dedicated `PostpaidPlanSelectionActivity` once `mobile-postpaid/plans` API is ready. Marked `TODO(B2C-59)` in `PostpaidActivity.kt`.
-
----
-
 ## RecyclerView Update Rules
 
 Always prefer targeted adapter updates over full list refreshes.

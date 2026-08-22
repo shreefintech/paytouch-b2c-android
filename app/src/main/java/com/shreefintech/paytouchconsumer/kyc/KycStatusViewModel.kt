@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc
+package com.shreefintech.paytouchconsumer.kyc
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

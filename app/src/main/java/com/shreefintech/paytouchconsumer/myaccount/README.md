@@ -65,7 +65,7 @@ Displays KYC-verified profile data. Shows a shimmer placeholder while the API ca
 | Activation Date | `AccountInfoDataItem.activationDate` — formatted `dd-MM-yyyy` |
 | Balance | `AccountInfoDataItem.balance` — server format: `"100.00 [ Rupees One Hundred Only ]"`. Amount (before `[`) and words (inside `[ ]`) are split and displayed separately. |
 
-**"View KYC Details" button:** `TODO(B2C-81)` — navigates to `KycDetailsActivity` when implemented.
+**"View KYC Details" button:** Navigates to `KycDetailsActivity` (in this package) — fetches `GET /api/kyc/my-account` via `KycDetailsViewModel`. Document taps open `DocPreviewActivity` with `extra_file_url` + `extra_file_title`.
 
 ---
 
@@ -117,5 +117,4 @@ Displays referral code and link with copy and share actions. Shows a shimmer pla
 
 | Ticket | What is missing |
 |---|---|
-| `TODO(B2C-81)` | "View KYC Details" button should navigate to `KycDetailsActivity` (not yet built) |
 | `TODO(PAYTOUCH-523)` | Expose `totalEarnings` and `earningPotential` fields on Refer & Earn tab |

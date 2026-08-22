@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc.identity.fragment
+package com.shreefintech.paytouchconsumer.kyc.identity.fragment
 
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -16,8 +16,8 @@ import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.FragmentKycStep4Binding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.IdentityVerificationActivity
-import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.IdentityVerificationViewModel
+import com.shreefintech.paytouchconsumer.kyc.identity.IdentityVerificationActivity
+import com.shreefintech.paytouchconsumer.kyc.identity.IdentityVerificationViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 

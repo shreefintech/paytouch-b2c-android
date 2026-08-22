@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc.identity
+package com.shreefintech.paytouchconsumer.kyc.identity
 
 import android.app.Application
 import android.net.Uri

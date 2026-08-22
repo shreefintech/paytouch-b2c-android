@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc.identity.fragment
+package com.shreefintech.paytouchconsumer.kyc.identity.fragment
 
 import android.os.Bundle
 import android.util.Patterns
@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.FragmentKycStep1Binding
-import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.IdentityVerificationViewModel
+import com.shreefintech.paytouchconsumer.kyc.identity.IdentityVerificationViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 
 class KycStep1Fragment : BaseKycStepFragment() {

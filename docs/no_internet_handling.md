@@ -27,58 +27,61 @@ fun isInternetAvailable(mActivity: Context): Boolean {
 
 ## 2. BaseActivity — How the Overlay Is Created and Wired
 
-`BaseActivity` overrides `setContentView()` to **inject the no-internet overlay into every screen automatically**. No Activity has to add it to its own layout.
+`BaseActivity` overrides `setContentView()` to **inject the no-internet overlay into every screen automatically**. No Activity has to add it to its own layout. The glass blur effect is attached **lazily on first show** to avoid the cost on screens that never go offline.
 
 ```kotlin
 // BaseActivity.kt
 
 private var noInternetView: LytNoInternetBinding? = null
-var retryCallback: (() -> Unit)? = null
+private var noInternetRoot: FrameLayout? = null
+private var glassAttached = false
+protected var retryCallback: (() -> Unit)? = null
 
 override fun setContentView(view: View?) {
-
     // 1. Create a FrameLayout as the new root
     val root = FrameLayout(this)
+    noInternetRoot = root
 
     // 2. Add the Activity's own layout as the first child (sits underneath)
     view?.let { root.addView(it) }
 
-    // 3. Inflate lyt_no_internet.xml and attach the glass-blur background effect
+    // 3. Inflate lyt_no_internet.xml; wire the Retry button; hide by default
     noInternetView = LytNoInternetBinding.inflate(layoutInflater)
-    LiquidGlassEffect.attach(
-        targetView   = noInternetView!!.frameBg,
-        rootView     = noInternetView!!.root as ViewGroup,
-        cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-        distortion   = 0f,
-        blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
-    )
+    noInternetView?.btnRetry?.setOnClickListener { retryCallback?.invoke() }
+    noInternetView?.root?.visibility = View.GONE
+    noInternetView?.root?.let { root.addView(it) }
 
-    // 4. Attach LiquidGlassButton's own blur effect (required for every LiquidGlassButton)
-    noInternetView?.let { it.btnRetry.attach(it.root as ViewGroup) }
-
-    // 5. Wire the Retry button to whatever retryCallback the Activity sets
-    noInternetView?.btnRetry?.setOnClickListener {
-        retryCallback?.invoke()
-    }
-
-    // 6. Hide it by default — shown only on demand
-    noInternetView?.root?.gone()
-
-    // 7. Add the overlay on top of the Activity's layout (Z-order: overlay is on top)
-    root.addView(noInternetView!!.root)
-
-    // 8. Pass the combined FrameLayout to the system instead of the original view
+    // 4. Pass the combined FrameLayout to the system
     super.setContentView(root)
 }
 
-// Called by any Activity when the first network load finds no internet
+// Called by any Activity when the first network load finds no internet.
+// Glass blur is attached the first time the overlay is shown (lazy).
 fun showNoInternet() {
-    noInternetView?.root?.visible()
+    val binding = noInternetView ?: return
+    binding.root.visibility = View.VISIBLE
+    if (!glassAttached) {
+        val root = noInternetRoot ?: return
+        LiquidGlassEffect.attach(
+            targetView   = binding.flNoInternet,
+            rootView     = root,
+            cornerRadius = resources.getDimensionPixelSize(R.dimen.no_internet_bg_radius),
+            distortion   = 0f,
+            strokeWidth  = 1,
+            strokeColor  = ContextCompat.getColor(mActivity, R.color.white),
+            blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
+        )
+        glassAttached = true
+    }
+    // Load the animated GIF into the overlay (plays once)
+    Glide.with(this).asGif().load(R.drawable.gif_no_internet)
+        .placeholder(R.drawable.ic_file_not_found)
+        .into(binding.ivNoInternet)
 }
 
 // Called before every successful network attempt to dismiss the overlay
 fun hideNoInternet() {
-    noInternetView?.root?.gone()
+    noInternetView?.root?.visibility = View.GONE
 }
 ```
 
@@ -311,36 +314,45 @@ private val onToggle: (Int, Boolean) -> Unit = { position, isChecked ->
 
 ## 11. ViewModel Callback Pattern
 
-ViewModels pass `onNoInternet` as a callback — the Activity decides what to show.
+ViewModels use a **three-callback** convention: `onLoading`, `onSuccess`, `onError`. The ViewModel checks internet internally and calls `onError(msgNoInternet)` if offline. The Activity layer does its own pre-check to decide whether to show the full overlay or just a toast.
 
 ```kotlin
-// ViewModel
-fun getList(
-    activity: Activity,
-    onNoInternet: () -> Unit,
-    onStart: () -> Unit,
-    onSuccess: () -> Unit,
-    onError: (String) -> Unit,
-    onFailure: () -> Unit
+// ViewModel — internet checked inside, error surfaced via onError
+fun loadData(
+    onLoading: () -> Unit,
+    onSuccess: (DataItem) -> Unit,
+    onError: (String) -> Unit
 ) {
-    if (!Utility.isInternetAvailable(activity)) {
-        onNoInternet()
+    if (!Utility.isInternetAvailable(getApplication())) {
+        onError(getString(R.string.msgNoInternet))
         return
     }
-    onStart()
-    // ... API call ...
+    onLoading()
+    ApiClient.apiService.getData(bearerToken()).enqueue(object : Callback<General<DataItem>> {
+        override fun onResponse(...) {
+            if (response.isSuccessful && response.body()?.data != null) onSuccess(response.body()!!.data!!)
+            else onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+        }
+        override fun onFailure(...) { onError(t.localizedMessage ?: getString(R.string.errGeneric)) }
+    })
 }
 
-// Activity — first load
-viewModel.getList(
-    activity = mActivity,
-    onNoInternet = { showNoInternet() },           // overlay
-    onStart     = { hideNoInternet(); showProgress.set(true) },
-    onSuccess   = { showProgress.set(false); mAdapter.notifyDataSetChanged() },
-    onError     = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) },
-    onFailure   = { showProgress.set(false); ToastUtil.showDelete(mActivity, getString(R.string.err_generic)) }
-)
+// Activity — first load: check internet here first to pick the right UX response
+private fun loadData() {
+    if (!Utility.isInternetAvailable(mActivity)) {
+        showNoInternet()   // full-screen overlay for first load
+        return
+    }
+    hideNoInternet()
+    viewModel.loadData(
+        onLoading = { showProgress.set(true) },
+        onSuccess = { data -> showProgress.set(false); populate(data) },
+        onError   = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
+    )
+}
 ```
+
+**Why two checks?** The Activity check happens *before* calling the ViewModel so it can decide `showNoInternet()` vs toast. The ViewModel check is a defensive guard for direct calls (e.g. from pagination scroll events where the Activity passes the page number in directly).
 
 ---
 
@@ -362,9 +374,9 @@ viewModel.getList(
 ## 13. Quick Checklist (new screen)
 
 - [ ] Activity extends `BaseActivity`
-- [ ] `retryCallback = { loadList() }` set in `onCreate()` before first call
-- [ ] First call passes `isFirstCall = true` → `showNoInternet()`
-- [ ] Every subsequent call (pagination, retry) uses `ToastUtil.showDelete`
-- [ ] Form submits: `ToastUtil.showDelete` + `return` before `showProgress`
-- [ ] ViewModel methods accept `onNoInternet: () -> Unit` and call it before any API work
+- [ ] `retryCallback = { loadData() }` set in `onCreate()` before first call
+- [ ] First-load function: check `isInternetAvailable` → `showNoInternet()` if offline, `hideNoInternet()` then call ViewModel if online
+- [ ] Pagination / form submit / button actions: check `isInternetAvailable` → `ToastUtil.showDelete` (no overlay)
+- [ ] ViewModel functions: check `isInternetAvailable` → call `onError(msgNoInternet)` if offline; call `onLoading()` only after the check passes
+- [ ] `onError` callback in Activity always calls `showProgress.set(false)` (or equivalent loading reset) before showing a toast
 - [ ] `hideNoInternet()` called at the start of every successful network attempt

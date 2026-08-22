@@ -26,6 +26,7 @@ import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
+import com.shreefintech.paytouchconsumer.utill.Utility.visible
 
 class HomeActivity : BaseActivity() {
 
@@ -54,6 +55,7 @@ class HomeActivity : BaseActivity() {
 
         binding.lytToolbar.ivBack.gone()
         binding.lytToolbar.showProgressLogout = showProgressLogout
+        binding.lytToolbar.flLogout.visible()
         val listener = onClickListener()
         binding.onClickListener = listener
         binding.lytToolbar.onClickListener = listener
