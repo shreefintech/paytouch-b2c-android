@@ -217,7 +217,7 @@
                                         app:cardBackgroundColor="@color/white"
                                         app:cardCornerRadius="28dp"
                                         app:cardElevation="0dp"
-                                        app:strokeWidth="1dp">
+                                        app:strokeWidth="0dp">
 
                                         <androidx.appcompat.widget.AppCompatImageView
                                             android:layout_width="match_parent"
@@ -289,6 +289,7 @@
                                                 android:fontFamily="@font/proza_libre_medium"
                                                 android:includeFontPadding="false"
                                                 android:text="@string/idColon"
+                                                android:layout_marginEnd="@dimen/margin_tiny"
                                                 android:textColor="@color/account_card_label"
                                                 android:textSize="@dimen/text_size_12" />
 
@@ -301,112 +302,33 @@
                                                 android:textColor="@color/account_card_label"
                                                 android:textSize="@dimen/text_size_12" />
                                         </LinearLayout>
-                                    </LinearLayout>
-                                </LinearLayout>
 
-                                <!-- Divider -->
-                                <View
-                                    android:layout_width="match_parent"
-                                    android:layout_height="1dp"
-                                    android:layout_marginBottom="@dimen/margin_medium"
-                                    android:layout_marginTop="@dimen/margin_medium"
-                                    android:background="@color/sheet_divider" />
-
-                                <!-- Bottom: Member Code | Member No | City -->
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal">
-
-                                    <LinearLayout
-                                        android:layout_width="0dp"
-                                        android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:gravity="center_horizontal"
-                                        android:orientation="vertical">
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
+                                        <!-- Member Code -->
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:fontFamily="@font/proza_libre_medium"
-                                            android:includeFontPadding="false"
-                                            android:maxLines="2"
-                                            android:ellipsize="end"
-                                            android:text="@string/labelMemberCode"
-                                            android:textColor="@color/account_card_label"
-                                            android:textSize="@dimen/text_size_11" />
+                                            android:layout_marginTop="4dp"
+                                            android:orientation="horizontal">
 
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:id="@+id/tvMemberCode"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginTop="2dp"
-                                            android:maxLines="2"
-                                            android:ellipsize="end"
-                                            android:fontFamily="@font/proza_libre_bold"
-                                            android:includeFontPadding="false"
-                                            android:textColor="@color/white"
-                                            android:textSize="@dimen/text_size_13" />
-                                    </LinearLayout>
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_medium"
+                                                android:includeFontPadding="false"
+                                                android:layout_marginEnd="@dimen/margin_tiny"
+                                                android:text="@string/labelMemberCode"
+                                                android:textColor="@color/account_card_label"
+                                                android:textSize="@dimen/text_size_12" />
 
-                                    <LinearLayout
-                                        android:layout_width="0dp"
-                                        android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:orientation="vertical">
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:fontFamily="@font/proza_libre_medium"
-                                            android:includeFontPadding="false"
-                                            android:text="@string/labelMemberNo"
-                                            android:maxLines="2"
-                                            android:ellipsize="end"
-                                            android:textColor="@color/account_card_label"
-                                            android:textSize="@dimen/text_size_11" />
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:id="@+id/tvMemberNo"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginTop="2dp"
-                                            android:fontFamily="@font/proza_libre_bold"
-                                            android:includeFontPadding="false"
-                                            android:maxLines="2"
-                                            android:ellipsize="end"
-                                            android:textColor="@color/white"
-                                            android:textSize="@dimen/text_size_13" />
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:layout_width="0dp"
-                                        android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:orientation="vertical">
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:fontFamily="@font/proza_libre_medium"
-                                            android:includeFontPadding="false"
-                                            android:text="@string/labelCity"
-                                            android:maxLines="2"
-                                            android:ellipsize="end"
-                                            android:textColor="@color/account_card_label"
-                                            android:textSize="@dimen/text_size_11" />
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:id="@+id/tvCity"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginTop="2dp"
-                                            android:fontFamily="@font/proza_libre_bold"
-                                            android:includeFontPadding="false"
-                                            android:textColor="@color/white"
-                                            android:maxLines="2"
-                                            android:ellipsize="end"
-                                            android:textSize="@dimen/text_size_13" />
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:id="@+id/tvMemberCode"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_medium"
+                                                android:includeFontPadding="false"
+                                                android:textColor="@color/account_card_label"
+                                                android:textSize="@dimen/text_size_12" />
+                                        </LinearLayout>
                                     </LinearLayout>
                                 </LinearLayout>
                             </LinearLayout>

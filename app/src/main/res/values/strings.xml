@@ -401,7 +401,7 @@
     <string name="tabReferEarn">Refer&amp;Earn</string>
     <string name="labelMemberId">Member ID</string>
     <string name="labelMemberNo">Member No</string>
-    <string name="labelMemberCode">Member Code</string>
+    <string name="labelMemberCode">Member Code:</string>
     <string name="hintMemberId">Enter ID</string>
     <string name="hintMemberNo">Enter number</string>
     <string name="hintMemberCode">Enter code</string>

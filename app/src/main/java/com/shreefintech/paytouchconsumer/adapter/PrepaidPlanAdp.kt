@@ -1,7 +1,10 @@
 package com.shreefintech.paytouchconsumer.adapter
 
 import android.content.Context
-import android.graphics.Color
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.StaticLayout
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -44,12 +47,53 @@ class PrepaidPlanAdp(
         holder.binding.apply {
             tvPlanAmount.text = mContext.getString(R.string.fmtCurrencyAmount).format((item.amount ?: 0).toDouble())
             tvPlanValidity.text = item.validity ?: "--"
-            tvPlanDescription.text = item.description ?: "--"
             tvPlanFooter.text = mContext.getString(
                 R.string.fmtPlanTalktimeData,
                 formatTalktime(item.talktime),
-                 if(item.data.isNullOrEmpty()) "--" else item.data
+                if (item.data.isNullOrEmpty()) "--" else item.data
             )
+
+            tvPlanDescription.maxLines = 3
+            tvPlanDescription.text = item.description ?: "--"
+            tvPlanDescription.setOnClickListener(null)
+            tvPlanDescription.isClickable = false
+
+            tvPlanDescription.post {
+                val pos = holder.bindingAdapterPosition
+                if (pos == RecyclerView.NO_POSITION) return@post
+                val w = tvPlanDescription.width - tvPlanDescription.paddingLeft - tvPlanDescription.paddingRight
+                if (w <= 0) return@post
+                val fullText = mArrayList[pos].description ?: "--"
+                val paint = tvPlanDescription.paint
+                val fullLayout = StaticLayout.Builder.obtain(fullText, 0, fullText.length, paint, w).build()
+                if (fullLayout.lineCount <= 3) return@post
+
+                val suffix = " View more"
+                val suffixWidth = paint.measureText(suffix)
+                val line3Start = fullLayout.getLineStart(2)
+                val line3End = fullLayout.getLineVisibleEnd(2)
+                val line3Text = fullText.substring(line3Start, line3End)
+                val keepCount = paint.breakText(line3Text, true, w - suffixWidth, null)
+                val truncateAt = line3Start + keepCount
+
+                val display = fullText.substring(0, truncateAt) + suffix
+                val spannable = SpannableString(display)
+                spannable.setSpan(
+                    ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.primary)),
+                    truncateAt,
+                    display.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                tvPlanDescription.maxLines = Int.MAX_VALUE
+                tvPlanDescription.text = spannable
+                tvPlanDescription.isClickable = true
+                tvPlanDescription.setOnClickListener {
+                    tvPlanDescription.text = fullText
+                    tvPlanDescription.setOnClickListener(null)
+                    tvPlanDescription.isClickable = false
+                }
+            }
         }
 
         holder.binding.root.setOnClickListener {
