@@ -157,6 +157,8 @@ class PaymentStatusActivity : BaseActivity() {
         Glide.with(mActivity)
             .asGif()
             .load(gifRes)
+            .placeholder(R.drawable.ic_file_not_found)
+            .error(R.drawable.ic_file_not_found)
             .listener(object : RequestListener<GifDrawable> {
                 override fun onLoadFailed(
                     p0: GlideException?,

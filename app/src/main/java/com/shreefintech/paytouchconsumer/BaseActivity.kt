@@ -34,7 +34,7 @@ open class BaseActivity : AppCompatActivity() {
     private var noInternetRoot: FrameLayout? = null
     private var glassAttached = false
 
-    var retryCallback: (() -> Unit)? = null
+    protected var retryCallback: (() -> Unit)? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +64,7 @@ open class BaseActivity : AppCompatActivity() {
         noInternetView = LytNoInternetBinding.inflate(layoutInflater)
         noInternetView?.btnRetry?.setOnClickListener { retryCallback?.invoke() }
         noInternetView?.root?.visibility = View.GONE
-        root.addView(noInternetView!!.root)
+        noInternetView?.root?.let { root.addView(it) }
 
         super.setContentView(root)
     }
@@ -74,7 +74,6 @@ open class BaseActivity : AppCompatActivity() {
         binding.root.visibility = View.VISIBLE
         if (!glassAttached) {
             val root = noInternetRoot ?: return
-            glassAttached = true
             LiquidGlassEffect.attach(
                 targetView = binding.flNoInternet,
                 rootView = root,
@@ -84,10 +83,13 @@ open class BaseActivity : AppCompatActivity() {
                 strokeColor = ContextCompat.getColor(mActivity, R.color.white),
                 blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
             )
+            glassAttached = true
         }
         Glide.with(this)
             .asGif()
             .load(R.drawable.gif_no_internet)
+            .placeholder(R.drawable.ic_file_not_found)
+            .error(R.drawable.ic_file_not_found)
             .listener(object : RequestListener<GifDrawable> {
                 override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable?>, isFirstResource: Boolean) = false
                 override fun onResourceReady(resource: GifDrawable, model: Any, target: Target<GifDrawable>?, dataSource: DataSource, isFirstResource: Boolean): Boolean {

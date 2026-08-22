@@ -1,7 +1,6 @@
 package com.shreefintech.paytouchconsumer.auth.viewmodel
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
@@ -18,15 +17,14 @@ import retrofit2.Response
 class ResetMpinViewModel(application: Application) : AndroidViewModel(application) {
 
     fun changeMpin(
-        context: Context,
         mobile: String,
         newMpin: String,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        if (!Utility.isInternetAvailable(context)) {
-            onError(context.getString(R.string.msgNoInternet))
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getApplication<Application>().getString(R.string.msgNoInternet))
             return
         }
         onLoading()
@@ -36,12 +34,12 @@ class ResetMpinViewModel(application: Application) : AndroidViewModel(applicatio
                     if (response.isSuccessful && response.body()?.success == true) {
                         onSuccess()
                     } else {
-                        onError(ApiHelper.parseErrorMessage(context, response.code(), response.errorBody()?.string()))
+                        onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                     }
                 }
 
                 override fun onFailure(call: Call<MessageItem>, t: Throwable) {
-                    onError(t.localizedMessage ?: context.getString(R.string.errGeneric))
+                    onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
                 }
             })
     }

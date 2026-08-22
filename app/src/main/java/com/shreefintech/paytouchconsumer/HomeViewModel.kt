@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -22,10 +23,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         ApiClient.apiService.logout(bearerToken())
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
-                    onComplete()
+                    if (response.isSuccessful) {
+                        onComplete()
+                    } else {
+                        onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+                    }
                 }
                 override fun onFailure(call: Call<MessageItem>, t: Throwable) {
-                    onComplete()
+                    onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
                 }
             })
     }

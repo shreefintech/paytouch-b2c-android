@@ -302,6 +302,7 @@ class HdfcWebViewActivity : BaseActivity() {
 
         } catch (e: Exception) {
             e.printStackTrace()
+            ToastUtil.showDelete(mActivity, getString(R.string.errAppNotInstalled))
         }
     }
 }

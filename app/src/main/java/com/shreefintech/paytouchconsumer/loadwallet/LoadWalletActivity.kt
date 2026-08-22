@@ -2,6 +2,7 @@ package com.shreefintech.paytouchconsumer.loadwallet
 
 import android.app.Dialog
 import android.content.Context
+import androidx.databinding.ObservableBoolean
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -25,6 +26,7 @@ import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -43,6 +45,12 @@ class LoadWalletActivity : BaseActivity() {
     private lateinit var sheetBehavior: BottomSheetBehavior<View>
 
     private var currentWalletBalance: String? = null
+
+    private var confirmDialog: Dialog? = null
+    private var confirmDialogBinding: DialogConfirmPaymentBinding? = null
+    private var pendingPayAmount: Double = 0.0
+    private var pendingPayDescription: String = ""
+    private val showProgressPay = ObservableBoolean(false)
 
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
@@ -107,9 +115,11 @@ class LoadWalletActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        val orderId = HdfcPaymentHelper.pendingOrderId ?: return
-        val amount  = HdfcPaymentHelper.pendingAmount ?: ""
-        HdfcPaymentHelper.clearPendingState()
+        val orderId = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_PENDING_ORDER_ID, null)
+            ?.takeIf { it.isNotEmpty() } ?: return
+        val amount  = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_PENDING_AMOUNT, null) ?: ""
+        HdfcPaymentHelper.clearPendingState(mActivity)
+        hideNoInternet()
         showLoading()
         viewModel.checkOrderStatus(
             orderId   = orderId,
@@ -202,8 +212,17 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun showConfirmDialog(amount: Double, description: String) {
+        pendingPayAmount = amount
+        pendingPayDescription = description
+        showProgressPay.set(false)
+
         val dialogBinding = DialogConfirmPaymentBinding.inflate(layoutInflater)
+        confirmDialogBinding = dialogBinding
+        dialogBinding.onClickListener = onClickListener()
+        dialogBinding.showProgressPay = showProgressPay
+
         val dialog = Dialog(mActivity)
+        confirmDialog = dialog
         dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.window?.setLayout(
@@ -211,50 +230,27 @@ class LoadWalletActivity : BaseActivity() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(true)
+        dialog.setOnDismissListener {
+            confirmDialog = null
+            confirmDialogBinding = null
+        }
 
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
 
-        dialogBinding.cardClose.setOnClickListener { dialog.dismiss() }
-
-        dialogBinding.cardPaySecurely.setOnClickListener {
-            if (Utility.stopClick()) return@setOnClickListener
-            startHdfcFlow(
-                amount = amount,
-                description = description,
-                onShowProgress = {
-                    dialogBinding.tvPaySecurelyText.visibility = View.GONE
-                    dialogBinding.pbPaySecurely.visibility = View.VISIBLE
-                    dialogBinding.cardPaySecurely.isClickable = false
-                },
-                onHideProgress = {
-                    dialogBinding.tvPaySecurelyText.visibility = View.VISIBLE
-                    dialogBinding.pbPaySecurely.visibility = View.GONE
-                    dialogBinding.cardPaySecurely.isClickable = true
-                },
-                onDismiss = { dialog.dismiss() }
-            )
-        }
-
         dialog.show()
     }
 
-    private fun startHdfcFlow(
-        amount: Double,
-        description: String,
-        onShowProgress: () -> Unit,
-        onHideProgress: () -> Unit,
-        onDismiss: () -> Unit
-    ) {
+    private fun startHdfcFlow() {
         viewModel.createHdfcOrder(
-            amount = amount,
-            description = description,
-            onLoading = onShowProgress,
+            amount = pendingPayAmount,
+            description = pendingPayDescription,
+            onLoading = { showProgressPay.set(true) },
             onSuccess = { data ->
-                onHideProgress()
+                showProgressPay.set(false)
                 val status = data.status?.uppercase().orEmpty()
                 if (HdfcPaymentHelper.isFailedStatus(status)) {
-                    onDismiss()
+                    confirmDialog?.dismiss()
                     PaymentStatusActivity.start(
                         mActivity,
                         PaymentStatusItem(
@@ -267,12 +263,11 @@ class LoadWalletActivity : BaseActivity() {
                 }
                 val payUrl = data.paymentLinks?.web.orEmpty()
                 if (payUrl.isEmpty()) {
-                    onHideProgress()
                     ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
                     return@createHdfcOrder
                 }
                 Utility.hideKeyboard(mActivity)
-                onDismiss()
+                confirmDialog?.dismiss()
                 HdfcPaymentHelper.launchPayment(
                     context   = mActivity,
                     orderId   = data.orderId ?: "",
@@ -282,7 +277,7 @@ class LoadWalletActivity : BaseActivity() {
                 )
             },
             onError = { msg ->
-                onHideProgress()
+                showProgressPay.set(false)
                 ToastUtil.showDelete(mActivity, msg)
             }
         )
@@ -324,6 +319,7 @@ class LoadWalletActivity : BaseActivity() {
             },
             onError = { msg ->
                 ToastUtil.showDelete(mActivity, msg)
+                updateEmptyState()
             }
         )
     }
@@ -344,7 +340,8 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
-        binding.tvQrInvoiceAmount.text = Utility.formatAmount(data.liveBankBalance)
+        // TODO(B2C-82): hide until backend provides the correct QR invoice amount field
+        binding.tvQrInvoiceAmount.visibility = View.GONE
         binding.tvIfscCode.text = data.ifsc ?: "--"
         val status = data.wallet?.status
         if (!status.isNullOrEmpty()) {
@@ -358,7 +355,9 @@ class LoadWalletActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(mActivity)
             adapter = transactionAdp
         }
-        updateEmptyState()
+        // Keep both views hidden until fetchRecentHistory() resolves — avoids flashing "No transactions" while loading
+        binding.tvNoTransactions.visibility = View.GONE
+        binding.rvTransactions.visibility = View.GONE
     }
 
     private fun updateEmptyState() {
@@ -414,6 +413,16 @@ class LoadWalletActivity : BaseActivity() {
                 sheetBinding.btnProceedPayment -> {
                     if (Utility.stopClick()) return@OnClickListener
                     validateAndShowConfirmDialog()
+                }
+
+                confirmDialogBinding?.cardClose -> {
+                    confirmDialog?.dismiss()
+                }
+
+                confirmDialogBinding?.cardPaySecurely -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressPay.get()) return@OnClickListener
+                    startHdfcFlow()
                 }
             }
         }

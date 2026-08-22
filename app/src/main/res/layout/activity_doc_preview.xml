@@ -32,7 +32,7 @@
                 android:layout_margin="12dp"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="4dp"
-                android:text="@string/loading"
+                android:text="@string/msgLoading"
                 android:textSize="12sp"
                 android:visibility="gone"
                 android:fontFamily="@font/proza_libre_semi_bold"

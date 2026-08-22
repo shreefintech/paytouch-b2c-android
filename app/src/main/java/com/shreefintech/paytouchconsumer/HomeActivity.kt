@@ -22,14 +22,16 @@ import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
+import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import com.shreefintech.paytouchconsumer.utill.Utility.visible
+import com.shreefintech.paytouchconsumer.utill.Utility.gone
 
 class HomeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private val viewModel: HomeViewModel by viewModels()
+    private val showProgressLogout = ObservableBoolean(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,9 +52,11 @@ class HomeActivity : BaseActivity() {
             blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
-        binding.lytToolbar.ivLogout.visible()
-        binding.onClickListener = onClickListener()
-        binding.lytToolbar.onClickListener = onClickListener()
+        binding.lytToolbar.ivBack.gone()
+        binding.lytToolbar.showProgressLogout = showProgressLogout
+        val listener = onClickListener()
+        binding.onClickListener = listener
+        binding.lytToolbar.onClickListener = listener
         onBack()
     }
 
@@ -71,7 +75,7 @@ class HomeActivity : BaseActivity() {
                 binding.lytToolbar.ivLogout -> {
                     if (Utility.stopClick()) return@OnClickListener
                     viewModel.logout(
-                        onLoading = { binding.lytToolbar.ivLogout.isEnabled = false },
+                        onLoading = { showProgressLogout.set(true) },
                         onComplete = {
                             SharedPreferenceHelper.clearSharedPreference(mActivity)
                             startActivity(Intent(mActivity, LoginActivity::class.java).apply {
@@ -79,8 +83,8 @@ class HomeActivity : BaseActivity() {
                             })
                         },
                         onError = { msg ->
-                            binding.lytToolbar.ivLogout.isEnabled = true
-                            ToastUtil.showDelete(mActivity, msg)
+                            showProgressLogout.set(false)
+                            ToastUtil.showWarning(mActivity, msg)
                         }
                     )
                 }

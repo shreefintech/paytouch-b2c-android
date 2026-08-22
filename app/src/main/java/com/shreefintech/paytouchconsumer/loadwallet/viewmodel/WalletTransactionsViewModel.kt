@@ -22,10 +22,8 @@ class WalletTransactionsViewModel(application: Application) : AndroidViewModel(a
     }
 
     private var currentPage = 0
-    var isLastPage = false
-        private set
-    var isLoading = false
-        private set
+    private var isLastPage = false
+    private var isLoading  = false
 
     fun canLoadMore() = !isLoading && !isLastPage
 

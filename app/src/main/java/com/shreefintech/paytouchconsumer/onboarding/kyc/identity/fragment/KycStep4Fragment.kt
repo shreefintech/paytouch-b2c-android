@@ -90,6 +90,8 @@ class KycStep4Fragment : BaseKycStepFragment() {
 
         Glide.with(ctx)
             .load(uri)
+            .placeholder(R.drawable.ic_file_not_found)
+            .error(R.drawable.ic_file_not_found)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,

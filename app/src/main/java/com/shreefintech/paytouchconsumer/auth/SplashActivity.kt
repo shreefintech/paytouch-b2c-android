@@ -44,7 +44,7 @@ class SplashActivity : BaseActivity() {
             return
         }
         if (!Utility.isInternetAvailable(mActivity)) {
-            navigate(Intent(mActivity, LoginActivity::class.java))
+            showNoInternet()
             return
         }
         hideNoInternet()

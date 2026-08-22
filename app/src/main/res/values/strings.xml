@@ -437,10 +437,6 @@
 
     <!-- Load Wallet screen -->
     <string name="titleMyWallet">My Wallet</string>
-    <string name="tabTotalBalance">Total Balance</string>
-    <string name="tabReferralWallet">Referral Wallet</string>
-    <string name="tabMyWallet">My Wallet</string>
-    <string name="tabEarn">Earn</string>
     <string name="labelSuccessTransactions">Success</string>
     <string name="labelPendingTransactions">Pending</string>
     <string name="labelTransactionsZero">Transactions: 0</string>
@@ -459,7 +455,6 @@
     <string name="errEnterAmount">Please enter a valid amount</string>
     <string name="hintPaymentDescription">Payment Description</string>
     <string name="btnProceedPayment">Proceed Payment</string>
-    <string name="msgSecurePayment">100% secure payment powered by PayTouch</string>
 
     <!-- HDFC Payment flow -->
     <string name="titlePaymentStatus">Payment Status</string>
@@ -470,8 +465,6 @@
     <string name="msgAmountRefunded">Amount Refunded</string>
     <string name="msgPaymentPending">Payment Pending</string>
     <string name="btnContinue">Continue</string>
-    <string name="btnContinueCountdown">Continue (%d)</string>
-    <string name="btnCheckPaymentStatus">Check Payment Status</string>
     <string name="msgLeavePaymentTitle">Leave Payment?</string>
     <string name="msgLeavePaymentBody">Are you sure you want to leave the payment page?</string>
     <string name="btnLeave">Leave</string>
@@ -497,7 +490,7 @@
     <string name="msgSecurePaymentProcessedBy">Secure Payment Processed By</string>
     <string name="btnPaySecurely">Pay Securely</string>
     <string name="msgPoweredByPrefix">Powered by </string>
-    <string name="msgPoweredByCompany">SHREE Fintech Solutions Pvt. Ltd.</string>
+    <string name="errAppNotInstalled">App not installed. Please install the required payment app.</string>
 
     <!-- KYC module — hub -->
     <string name="titleKycVerification">KYC Verification</string>
@@ -536,6 +529,8 @@
     <string name="hintBankName">Enter Bank Name</string>
     <string name="labelProofType">Proof Type</string>
     <string name="hintProofType">Select Proof Type</string>
+    <string name="labelProofCancelledCheque">Cancelled Cheque</string>
+    <string name="labelProofBankStatement">Bank Statement</string>
     <string name="labelBankProof">Bank Proof</string>
     <string name="btnAddBankAccount">+ Add Another Bank Account</string>
     <string name="msgAgreeTAndC">I agree to the Terms &amp; Conditions</string>
@@ -550,6 +545,8 @@
     <string name="msgBankProofRequired">Please upload bank proof for account %d</string>
     <string name="labelStatementPeriod">Statement Period</string>
     <string name="hintStatementPeriod">Select Statement Period</string>
+    <string name="labelStatementPeriod3Months">3 Months</string>
+    <string name="labelStatementPeriod6Months">6 Months</string>
     <string name="msgStatementPeriodRequired">Please select statement period for account %d</string>
     <string name="textVerificationPending">Wait a While!</string>
     <string name="msgVerificationPending">Your documents are being verified. Please wait.</string>
@@ -572,14 +569,14 @@
     <string name="msgDocumentNotAvailable">Document not available for preview</string>
 
 
-    <string name="error_no_url_provided">No URL provided</string>
-    <string name="error_failed_to_decode_image">Failed to decode image</string>
-    <string name="error_failed_to_load_image">Failed to load image: %s</string>
-    <string name="error_pdf_no_pages">PDF has no pages</string>
-    <string name="error_cannot_render_pdf">Cannot render PDF: %s</string>
-    <string name="error_failed_to_load">Failed to load: %s</string>
-    <string name="label_page_indicator">%1$d / %2$d</string>
-    <string name="loading">Loading...</string>
+    <string name="errNoUrlProvided">No URL provided</string>
+    <string name="errFailedToDecodeImage">Failed to decode image</string>
+    <string name="errFailedToLoadImage">Failed to load image: %s</string>
+    <string name="errPdfNoPages">PDF has no pages</string>
+    <string name="errCannotRenderPdf">Cannot render PDF: %s</string>
+    <string name="errFailedToLoad">Failed to load: %s</string>
+    <string name="labelPageIndicator">%1$d / %2$d</string>
+    <string name="msgLoading">Loading...</string>
     <string name="textYouLostConnection">You Lost Connection!</string>
     <string name="msgNoInternetDes">No Internet Connection Found. Check Your Connection or Try Again!</string>
     <string name="textTryAgain">Try Again</string>

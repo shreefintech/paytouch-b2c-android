@@ -29,7 +29,7 @@ SplashActivity (2s logo delay)
     └── Logged in + internet ─► GET /api/user
             │
             ├── requires_kyc = true    ──────────────► KycActivity
-            ├── requires_virtual_account = true ─────► CreateVirtualAccountActivity
+            ├── requires_mpin = true   ──────────────► ResetMpinActivity (create mode)
             └── (none) ──────────────────────────────► HomeActivity
 ```
 
@@ -49,7 +49,7 @@ LoginActivity
                             └── onSuccess ─► navigateAfterLogin()
 ```
 
-`navigateAfterLogin()` applies the same `requires_kyc / requires_mpin / requires_virtual_account` routing as SplashActivity.
+`navigateAfterLogin()` applies the same `requires_kyc / requires_mpin` routing as SplashActivity. `requires_virtual_account` is retired — virtual account creation is now handled server-side after KYC approval.
 
 After a successful login, `LoginViewModel` also fires a **non-blocking** VPS registration call to `ApiAdminClient` (separate base URL). Failure is logged but never shown to the user.
 

@@ -358,7 +358,7 @@ class PostpaidActivity : BaseActivity() {
         selectedOperatorId = null
         selectedOperatorName = null
         isBillFetched = false
-        fetchedBillItem=null
+        fetchedBillItem = null
         binding.cvBillDetails.visibility = View.GONE
         selectedCircleId = null
         selectedCircleName = null
