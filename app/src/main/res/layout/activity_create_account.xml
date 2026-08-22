@@ -359,6 +359,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_medium"
                         android:gravity="center_vertical"
+                        android:layout_marginStart="-10dp"
                         android:orientation="horizontal">
 
                         <androidx.appcompat.widget.AppCompatCheckBox

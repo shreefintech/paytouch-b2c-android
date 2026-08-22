@@ -139,7 +139,6 @@ class MyAccountActivity : BaseActivity() {
 
     private fun populateAccountInfo(data: AccountInfoItem) {
         binding.tvMemberName.text = data.name ?: "--"
-        binding.tvMemberId.text = "--"
         binding.tvStatus.text = data.member?.status ?: "--"
         binding.tvMemberCode.text = data.member?.memberCode ?: "--"
         binding.tvMobileNo.text = data.contact?.mobile ?: "--"

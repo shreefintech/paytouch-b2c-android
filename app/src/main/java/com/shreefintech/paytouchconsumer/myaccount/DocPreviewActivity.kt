@@ -55,7 +55,6 @@ class DocPreviewActivity : BaseActivity() {
     companion object {
         const val EXTRA_FILE_URL = "extra_file_url"
         const val EXTRA_FILE_TITLE = "extra_file_title"
-        private const val TAG = "DocPreviewActivity"
 
         fun start(context: Context, fileUrl: String, title: String = "") {
             val intent = Intent(context, DocPreviewActivity::class.java).apply {
@@ -92,10 +91,11 @@ class DocPreviewActivity : BaseActivity() {
         loadFileFromUrl(fileUrl)
     }
 
-    fun onClickListener(): View.OnClickListener {
+    private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener {
             when (it) {
                 binding.toolbar.ivBack -> {
+                    if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
             }
