@@ -121,6 +121,7 @@ class DocPreviewActivity : BaseActivity() {
 
     private fun setupToolbar() {
         binding.toolbar.onClickListener = onClickListener()
+
     }
 
     private fun setupPinchToZoom() {
@@ -263,6 +264,7 @@ class DocPreviewActivity : BaseActivity() {
 
     // ─── WebView fallback ──────────────────────────────────────────────────────
 
+    @Suppress("SetJavaScriptEnabled")
     private fun loadInWebView(url: String) {
         showLoading(true)
 
