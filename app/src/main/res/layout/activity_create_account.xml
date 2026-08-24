@@ -130,7 +130,7 @@
                         android:background="@drawable/bg_input_field"
                         android:ellipsize="end"
                         android:fontFamily="@font/proza_libre_medium"
-                        android:hint="@string/hint_mobile"
+                        android:hint="@string/hintName"
                         android:includeFontPadding="false"
                         android:inputType="text"
                         android:maxLength="150"
@@ -359,7 +359,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_medium"
                         android:gravity="center_vertical"
-                        android:layout_marginStart="-10dp"
+                        android:layout_marginStart="@dimen/checkbox_start_offset"
                         android:orientation="horizontal">
 
                         <androidx.appcompat.widget.AppCompatCheckBox
