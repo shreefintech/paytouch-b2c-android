@@ -41,31 +41,34 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivLogout"
+        <FrameLayout
+            android:id="@+id/flLogout"
             android:layout_width="@dimen/back_btn_size"
             android:layout_height="@dimen/back_btn_size"
-            android:elevation="15dp"
             android:layout_margin="@dimen/margin_medium"
-            android:onClick="@{onClickListener}"
-            android:src="@drawable/ic_logout"
-            android:visibility="@{showProgressLogout ? View.GONE : View.VISIBLE}"
-            android:background="?selectableItemBackgroundBorderless"
+            android:elevation="15dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent">
 
-        <ProgressBar
-            style="?android:attr/progressBarStyleSmall"
-            android:layout_width="@dimen/back_btn_size"
-            android:layout_height="@dimen/back_btn_size"
-            android:layout_margin="@dimen/margin_medium"
-            android:indeterminateTint="@color/white"
-            android:elevation="15dp"
-            android:visibility="@{showProgressLogout ? View.VISIBLE : View.GONE}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivLogout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:onClick="@{onClickListener}"
+                android:src="@drawable/ic_logout"
+                android:visibility="@{showProgressLogout ? View.GONE : View.VISIBLE}"
+                android:background="?selectableItemBackgroundBorderless"/>
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:indeterminateTint="@color/white"
+                android:visibility="@{showProgressLogout ? View.VISIBLE : View.GONE}"/>
+
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
