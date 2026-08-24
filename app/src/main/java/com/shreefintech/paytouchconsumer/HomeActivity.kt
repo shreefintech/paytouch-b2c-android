@@ -54,6 +54,7 @@ class HomeActivity : BaseActivity() {
         )
 
         binding.lytToolbar.ivBack.gone()
+        binding.lytToolbar.flLogout.visibility = View.VISIBLE
         binding.lytToolbar.showProgressLogout = showProgressLogout
         binding.lytToolbar.flLogout.visible()
         val listener = onClickListener()

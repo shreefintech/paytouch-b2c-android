@@ -1,6 +1,5 @@
 package com.shreefintech.paytouchconsumer.dth.transactions
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -76,7 +75,7 @@ class DthTransactionReportActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         onBack()
 
-        retryCallback = { callReport(null, null, null, null) }
+        retryCallback = { callReport(filterFromDate, filterToDate, filterStatus, filterSubscriberNo) }
         callReport(null, null, null, null)
     }
 
