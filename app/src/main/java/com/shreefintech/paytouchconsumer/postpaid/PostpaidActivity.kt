@@ -261,10 +261,10 @@ class PostpaidActivity : BaseActivity() {
         binding.tvBillCustomerName.text = bill.customerName ?: "-"
         binding.tvBillDueDate.text = bill.dueDate ?: "-"
         binding.tvBillDate.text = bill.billDate ?: "-"
-        binding.tvBillAmount.text = Utility.formatAmount(bill.billAmount?.toString())
+        binding.tvBillAmount.text = Utility.formatAmount(bill.billAmount)
         binding.tvBillMobileNo.text = binding.etMobileNumber.text?.toString()?.trim() ?: "-"
         binding.tvBillOperator.text = selectedOperatorName ?: "-"
-        binding.etAmount.setText(bill.billAmount?.toString() ?: "")
+        binding.etAmount.setText(bill.billAmount ?: "")
         binding.cvBillDetails.visibility = View.VISIBLE
     }
 
