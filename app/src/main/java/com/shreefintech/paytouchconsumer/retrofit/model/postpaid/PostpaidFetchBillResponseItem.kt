@@ -18,7 +18,7 @@ data class PostpaidFetchBillResponseItem (
 data class PostpaidFetchBillDataItem(
 
     @field:SerializedName("bill_amount")
-    val billAmount: Int? = null,
+    val billAmount: String? = null,
 
     @field:SerializedName("bill_period")
     val billPeriod: String? = null,
