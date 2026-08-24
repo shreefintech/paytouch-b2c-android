@@ -2,6 +2,7 @@ package com.shreefintech.paytouchconsumer.myaccount
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -153,7 +154,7 @@ class DocPreviewActivity : BaseActivity() {
                 url = url,
                 onLoading = { showLoading(true) },
                 onReady = { file -> showLoading(false); openPdfRenderer(file) },
-                onError = { loadInWebView(Constant.URL_GOOGLE_DOC_VIEWER + url) }
+                onError = { loadInWebView(Constant.URL_GOOGLE_DOC_VIEWER + Uri.encode(url)) }
             )
             isImageUrl(lower) -> {
                 showLoading(true)

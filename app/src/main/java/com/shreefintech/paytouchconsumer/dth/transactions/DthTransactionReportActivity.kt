@@ -76,7 +76,7 @@ class DthTransactionReportActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         onBack()
 
-        retryCallback = { callReport(null, null, null, null) }
+        retryCallback = { callReport(filterFromDate, filterToDate, filterStatus, filterSubscriberNo) }
         callReport(null, null, null, null)
     }
 

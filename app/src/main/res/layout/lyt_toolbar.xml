@@ -49,7 +49,7 @@
             android:layout_margin="@dimen/margin_medium"
             android:onClick="@{onClickListener}"
             android:src="@drawable/ic_logout"
-            android:visibility="@{showProgressLogout != null ? (showProgressLogout ? View.GONE : View.VISIBLE) : View.GONE}"
+            android:visibility="@{showProgressLogout ? View.GONE : View.VISIBLE}"
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -62,7 +62,7 @@
             android:layout_margin="@dimen/margin_medium"
             android:indeterminateTint="@color/white"
             android:elevation="15dp"
-            android:visibility="@{showProgressLogout != null &amp;&amp; showProgressLogout ? View.VISIBLE : View.GONE}"
+            android:visibility="@{showProgressLogout ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
