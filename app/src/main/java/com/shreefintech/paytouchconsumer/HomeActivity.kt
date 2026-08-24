@@ -57,7 +57,7 @@ class HomeActivity : BaseActivity() {
         binding.lytToolbar.showProgressLogout = showProgressLogout
         val listener = onClickListener()
         binding.onClickListener = listener
-        binding.lytToolbar.onClickListener
+        binding.lytToolbar.onClickListener = listener
         onBack()
     }
 
