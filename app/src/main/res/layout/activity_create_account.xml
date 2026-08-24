@@ -117,7 +117,7 @@
                         android:ellipsize="end"
                         android:fontFamily="@font/proza_libre_semi_bold"
                         android:includeFontPadding="false"
-                        android:text="@string/label_name"
+                        android:text="@string/labelFullName"
                         android:textColor="@color/primary"
                         android:textSize="@dimen/text_size_13" />
 

@@ -79,7 +79,7 @@ class CreateAccountActivity : BaseActivity() {
 
     private fun setupInputFilters() {
         val emojiFilter = Utility.EmojiExcludeFilter()
-        binding.etName.filters = arrayOf(InputFilter.LengthFilter(150), emojiFilter)
+        binding.etName.filters = arrayOf(InputFilter.LengthFilter(150), Utility.alphaSpaceFilter(), emojiFilter)
         binding.etMobile.filters =
             arrayOf(InputFilter.LengthFilter(10), Utility.digitFilter(), emojiFilter)
         binding.etEmail.filters = arrayOf(InputFilter.LengthFilter(100), emojiFilter)
@@ -126,6 +126,11 @@ class CreateAccountActivity : BaseActivity() {
             name.isEmpty() -> {
                 binding.etName.requestFocus()
                 getString(R.string.msgNameEmpty)
+            }
+
+            name.any { !it.isLetter() && !it.isWhitespace() } -> {
+                binding.etName.requestFocus()
+                getString(R.string.msgNameInvalid)
             }
 
             mobile.isEmpty() -> {
