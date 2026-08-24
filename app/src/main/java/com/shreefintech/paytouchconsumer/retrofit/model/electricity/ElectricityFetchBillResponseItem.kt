@@ -6,7 +6,7 @@ data class ElectricityFetchBillResponseItem(
     @field:SerializedName("success") val success: Boolean?,
     @field:SerializedName("data")    val data: List<ElectricityBillItem>?,
     @field:SerializedName("message") val message: ElectricityFetchBillMessageItem?,
-    @field:SerializedName("bill_id") val billId: Int? // needed for processPayment request
+    @field:SerializedName("bill_id") val billId: Int?
 )
 
 data class ElectricityFetchBillMessageItem(

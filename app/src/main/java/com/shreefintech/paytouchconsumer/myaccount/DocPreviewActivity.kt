@@ -118,8 +118,7 @@ class DocPreviewActivity : BaseActivity() {
     private fun setupToolbar() {
         val listener = onClickListener()
         binding.toolbar.onClickListener = listener
-        binding.btnPrevPage.setOnClickListener(listener)
-        binding.btnNextPage.setOnClickListener(listener)
+        binding.onClickListener = listener
     }
 
     private fun setupPinchToZoom() {
@@ -230,9 +229,6 @@ class DocPreviewActivity : BaseActivity() {
 
     private fun setupPdfNavigation() {
         updatePageLabel()
-        val listener = onClickListener()
-        binding.btnPrevPage.setOnClickListener(listener)
-        binding.btnNextPage.setOnClickListener(listener)
     }
 
     private fun renderPdfPage(pageIndex: Int) {
