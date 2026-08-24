@@ -83,7 +83,7 @@ class TransactionReportActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         onBack()
 
-        retryCallback = { callReport(null, null, null, null) }
+        retryCallback = { callReport(filterFromDate, filterToDate, filterStatus, filterConsumerNo) }
         callReport(null, null, null, null)
     }
 

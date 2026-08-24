@@ -220,5 +220,4 @@ All endpoints declared in `ApiService.kt` under the `// ── DTH ──` secti
 
 ## Known TODOs
 
-- `TODO(PAYTOUCH-570)` in `DthRecentTransactionActivity`: Add `showNoInternet()` / `hideNoInternet()` / retry callback once the no-internet placeholder design is finalised.
 - `DthPlansListItem.requiresManualAmount`: field present in DTO but not yet wired to UI.
