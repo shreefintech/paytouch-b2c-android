@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
@@ -19,11 +21,17 @@ import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
+import androidx.databinding.ObservableBoolean
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.gone
 
 class HomeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHomeBinding
+    private val viewModel: HomeViewModel by viewModels()
+    private val showProgressLogout = ObservableBoolean(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +52,12 @@ class HomeActivity : BaseActivity() {
             blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
-        binding.onClickListener = onClickListener()
-        // TODO(PAYTOUCH-585): Fetch shreefintech token from api/shreefintech-token and store in SharedPreferences
-        // TODO(PAYTOUCH-585): Fetch and display wallet balance from api/wallet/balance
+        binding.lytToolbar.ivBack.gone()
+        binding.lytToolbar.flLogout.visibility = View.VISIBLE
+        binding.lytToolbar.showProgressLogout = showProgressLogout
+        val listener = onClickListener()
+        binding.onClickListener = listener
+        binding.lytToolbar.onClickListener = listener
         onBack()
     }
 
@@ -62,9 +73,21 @@ class HomeActivity : BaseActivity() {
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->
             when (view) {
-                binding.lytToolbar.ivBack -> {
+                binding.lytToolbar.ivLogout -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    onBackPressedDispatcher.onBackPressed()
+                    viewModel.logout(
+                        onLoading = { showProgressLogout.set(true) },
+                        onComplete = {
+                            SharedPreferenceHelper.clearSharedPreference(mActivity)
+                            startActivity(Intent(mActivity, LoginActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            })
+                        },
+                        onError = { msg ->
+                            showProgressLogout.set(false)
+                            ToastUtil.showWarning(mActivity, msg)
+                        }
+                    )
                 }
 
                 binding.llElectricity -> {

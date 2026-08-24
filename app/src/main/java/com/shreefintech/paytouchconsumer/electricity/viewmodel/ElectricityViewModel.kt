@@ -9,6 +9,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillResponseItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityProcessPaymentRequest
@@ -74,25 +75,26 @@ class ElectricityViewModel(application: Application) : BaseBillViewModel(applica
                 operatorId = operatorId,
                 circleId = "00"
             )
-        ).enqueue(object : Callback<General<List<ElectricityBillItem>>> {
+        ).enqueue(object : Callback<ElectricityFetchBillResponseItem> {
             override fun onResponse(
-                call: Call<General<List<ElectricityBillItem>>>,
-                response: Response<General<List<ElectricityBillItem>>>
+                call: Call<ElectricityFetchBillResponseItem>,
+                response: Response<ElectricityFetchBillResponseItem>
             ) {
-                if (response.isSuccessful && response.body()?.data != null) {
-                    val bill = response.body()!!.data!!.firstOrNull()
+                val body = response.body()
+                if (response.isSuccessful && body?.success == true) {
+                    val bill = body.data?.firstOrNull()
                     if (bill != null) onSuccess(bill)
                     else onError(getString(R.string.errGeneric))
                 } else {
-                    onError(
-                        ApiHelper.parseErrorMessage(
+                    val msg = body?.message?.text
+                        ?: ApiHelper.parseErrorMessage(
                             getApplication(), response.code(), response.errorBody()?.string()
                         )
-                    )
+                    onError(msg)
                 }
             }
 
-            override fun onFailure(call: Call<General<List<ElectricityBillItem>>>, t: Throwable) {
+            override fun onFailure(call: Call<ElectricityFetchBillResponseItem>, t: Throwable) {
                 onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })

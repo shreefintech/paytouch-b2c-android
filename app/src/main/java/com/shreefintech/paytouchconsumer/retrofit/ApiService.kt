@@ -24,6 +24,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionReport
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillResponseItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityProcessPaymentRequest
@@ -113,6 +114,11 @@ interface ApiService {
     fun getUser(
         @Header("Authorization") authorization: String
     ): Call<UserProfileItem>
+
+    @POST("${AUTH}logout")
+    fun logout(
+        @Header("Authorization") authorization: String
+    ): Call<MessageItem>
 
     // ── Authentication ────────────────────────────────────────────────────────
 
@@ -218,7 +224,7 @@ interface ApiService {
     fun fetchElectricityBill(
         @Header("Authorization") authorization: String,
         @Body request: ElectricityFetchBillRequest
-    ): Call<General<List<ElectricityBillItem>>>
+    ): Call<ElectricityFetchBillResponseItem>
 
     @POST("${AUTH}electricity/process-payment")
     fun processElectricityPayment(
@@ -254,7 +260,7 @@ interface ApiService {
     fun fetchGasBill(
         @Header("Authorization") authorization: String,
         @Body request: GasFetchBillRequest
-    ): Call<General<List<GasBillItem>>>
+    ): Call<General<GasBillItem>>
 
     @POST("${AUTH}gas/process-payment")
     fun processGasPayment(
