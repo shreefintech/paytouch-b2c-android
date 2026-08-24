@@ -98,10 +98,16 @@ class DthSmsReceiptActivity : BaseActivity() {
         binding.showProgressReceipt = showProgressReceipt
         binding.onClickListener = onClickListener()
         onBack()
+        retryCallback = { loadLatestPayment() }
         loadLatestPayment()
     }
 
     private fun loadLatestPayment() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.getLatestPayment(
             onLoading = { showProgressReceipt.set(true) },
             onSuccess = { item ->

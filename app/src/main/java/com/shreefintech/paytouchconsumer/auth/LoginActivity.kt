@@ -233,6 +233,10 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun handleSignIn(mobile: String, credential: String) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         viewModel.login(
             mobile = mobile,
             credential = credential,

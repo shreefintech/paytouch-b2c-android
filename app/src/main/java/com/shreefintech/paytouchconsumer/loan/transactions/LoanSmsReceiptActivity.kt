@@ -98,15 +98,19 @@ class LoanSmsReceiptActivity : BaseActivity() {
         }
         binding.showProgressReceipt = showProgressReceipt
         binding.onClickListener = onClickListener()
+        retryCallback = { loadLatestPayment() }
         onBack()
         loadLatestPayment()
     }
 
     // ── API Call ──────────────────────────────────────────────
 
-    // TODO(PAYTOUCH-XXX): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadLatestPayment() }
-    //  once the no-internet placeholder design is finalised.
     private fun loadLatestPayment() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.getLatestPayment(
             onLoading = { showReceiptLoading(true) },
             onSuccess = { item ->

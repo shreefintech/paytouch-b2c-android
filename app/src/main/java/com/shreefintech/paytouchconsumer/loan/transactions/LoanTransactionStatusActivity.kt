@@ -71,6 +71,7 @@ class LoanTransactionStatusActivity : BaseActivity() {
         }
 
         setupRecyclerView()
+        retryCallback = { loadPage(1) }
         onBack()
 
         loadPage(1)
@@ -110,6 +111,11 @@ class LoanTransactionStatusActivity : BaseActivity() {
     }
 
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.loadStatus(
             query     = activeQuery,
             page      = page,

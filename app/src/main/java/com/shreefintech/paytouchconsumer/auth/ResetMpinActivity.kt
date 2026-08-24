@@ -166,6 +166,10 @@ class ResetMpinActivity : BaseActivity() {
 
     private fun onSubmit() {
         if (!validate()) return
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         val mpin = collectMpin(
             listOf(binding.etNewMpin1, binding.etNewMpin2, binding.etNewMpin3, binding.etNewMpin4)
         )

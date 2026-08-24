@@ -58,6 +58,7 @@ class LoanRecentTransactionActivity : BaseActivity() {
 
         setupRecyclerView()
         binding.onClickListener = onClickListener()
+        retryCallback = { loadInitialData() }
         onBack()
         loadInitialData()
     }
@@ -81,9 +82,12 @@ class LoanRecentTransactionActivity : BaseActivity() {
         })
     }
 
-    // TODO(PAYTOUCH-XXX): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadInitialData() }
-    //  once the no-internet placeholder design is finalised.
     private fun loadInitialData() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.loadOperatorsThenData(
             onLoading = {
                 binding.shimmerLayout.visibility = View.VISIBLE
@@ -111,6 +115,10 @@ class LoanRecentTransactionActivity : BaseActivity() {
     }
 
     private fun loadNextPage() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         viewModel.loadNextPage(
             onLoading = {
                 binding.pbLoadMore.visibility = View.VISIBLE

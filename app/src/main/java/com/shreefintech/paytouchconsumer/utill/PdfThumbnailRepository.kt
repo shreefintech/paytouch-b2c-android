@@ -19,6 +19,7 @@ import java.net.URL
 
 object PdfThumbnailRepository {
 
+    // NOTE: module-scope never cancelled; tag-guard prevents stale UI updates. Upgrade to ViewModelScope if thumbnail load moves to a VM.
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private const val MAX_CACHE = 20
 

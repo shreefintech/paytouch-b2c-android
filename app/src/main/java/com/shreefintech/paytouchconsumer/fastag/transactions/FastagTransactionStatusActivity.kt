@@ -73,7 +73,7 @@ class FastagTransactionStatusActivity : BaseActivity() {
         setupRecyclerView()
         onBack()
 
-        // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadPage(1) }
+        retryCallback = { loadPage(1) }
         loadPage(1)
     }
 
@@ -111,6 +111,11 @@ class FastagTransactionStatusActivity : BaseActivity() {
     }
 
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.loadStatus(
             query     = activeQuery,
             page      = page,

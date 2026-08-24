@@ -528,6 +528,8 @@
     <string name="hintBankName">Enter Bank Name</string>
     <string name="labelProofType">Proof Type</string>
     <string name="hintProofType">Select Proof Type</string>
+    <string name="labelProofCancelledCheque">Cancelled Cheque</string>
+    <string name="labelProofBankStatement">Bank Statement</string>
     <string name="labelBankProof">Bank Proof</string>
     <string name="btnAddBankAccount">+ Add Another Bank Account</string>
     <string name="msgAgreeTAndC">I agree to the Terms &amp; Conditions</string>
@@ -542,6 +544,8 @@
     <string name="msgBankProofRequired">Please upload bank proof for account %d</string>
     <string name="labelStatementPeriod">Statement Period</string>
     <string name="hintStatementPeriod">Select Statement Period</string>
+    <string name="labelStatementPeriod3Months">3 Months</string>
+    <string name="labelStatementPeriod6Months">6 Months</string>
     <string name="msgStatementPeriodRequired">Please select statement period for account %d</string>
     <string name="textVerificationPending">Wait a While!</string>
     <string name="msgVerificationPending">Your documents are being verified. Please wait.</string>
@@ -572,5 +576,9 @@
     <string name="errFailedToLoad">Failed to load: %s</string>
     <string name="labelPageIndicator">%1$d / %2$d</string>
     <string name="msgLoading">Loading...</string>
+    <string name="textYouLostConnection">You Lost Connection!</string>
+    <string name="msgNoInternetDes">No Internet Connection Found. Check Your Connection or Try Again!</string>
+    <string name="textTryAgain">Try Again</string>
+    <string name="textRetry">Retry</string>
 
 </resources>

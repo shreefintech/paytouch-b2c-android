@@ -18,7 +18,6 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.KycDocumentAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycDetailsBinding
-import com.shreefintech.paytouchconsumer.onboarding.kyc.KycStatusViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDocumentDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -27,7 +26,7 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 class KycDetailsActivity : BaseActivity() {
 
     private lateinit var binding: ActivityKycDetailsBinding
-    private val viewModel: KycStatusViewModel by viewModels()
+    private val viewModel: KycDetailsViewModel by viewModels()
 
     private val documents = mutableListOf<KycDocumentDetailItem>()
     private lateinit var documentAdp: KycDocumentAdp
@@ -52,14 +51,13 @@ class KycDetailsActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         setupDocumentSlider()
         onBack()
+        retryCallback = { loadKycDetails() }
         loadKycDetails()
     }
 
     private fun setupDocumentSlider() {
-        documentAdp = KycDocumentAdp(
-            urlResolver = ::resolveFileUrl,
-            onItemClick = { url, label -> DocPreviewActivity.start(this, url, label) }
-        )
+        documentAdp = KycDocumentAdp(urlResolver = ::resolveFileUrl)
+        documentAdp.onItemClick = { url, label -> DocPreviewActivity.start(this, url, label) }
         binding.vpDocuments.adapter = documentAdp
         binding.vpDocuments.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -70,6 +68,11 @@ class KycDetailsActivity : BaseActivity() {
     }
 
     private fun loadKycDetails() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.fetchMyAccount(
             onLoading = {
                 binding.pbLoading.isVisible = true
@@ -82,6 +85,7 @@ class KycDetailsActivity : BaseActivity() {
             },
             onError = { msg ->
                 binding.pbLoading.isVisible = false
+                binding.nsvContent.isVisible = true
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )

@@ -76,7 +76,7 @@ class FastagTransactionReportActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         onBack()
 
-        // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { callReport(null, null, null, null) }
+        retryCallback = { callReport(filterFromDate, filterToDate, filterStatus, filterVehicleNo) }
         callReport(null, null, null, null)
     }
 
@@ -139,6 +139,11 @@ class FastagTransactionReportActivity : BaseActivity() {
     }
 
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.loadReport(
             fromDate      = filterFromDate,
             toDate        = filterToDate,

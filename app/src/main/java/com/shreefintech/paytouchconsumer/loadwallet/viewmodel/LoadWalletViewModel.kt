@@ -18,6 +18,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+// NOTE: extends AndroidViewModel — wallet screen IS the balance source; BaseBillViewModel's balance-check methods do not apply here
 class LoadWalletViewModel(application: Application) : AndroidViewModel(application) {
 
     fun fetchUserWalletData(

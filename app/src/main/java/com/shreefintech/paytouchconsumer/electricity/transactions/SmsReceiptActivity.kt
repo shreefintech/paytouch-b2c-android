@@ -101,14 +101,18 @@ class SmsReceiptActivity : BaseActivity() {
 
         // Always fetch the latest completed payment from the API — both the Receipt tab and the
         // SMS Display tab need server-side fields (operatorName, ccf, createdAt).
+        retryCallback = { loadLatestPayments() }
         loadLatestPayments()
     }
 
     // ── API Call ──────────────────────────────────────────────
 
-    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { loadLatestPayments() }
-    //  once the no-internet placeholder design is finalised.
     private fun loadLatestPayments() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.getLatestPayments(
             onLoading = { showReceiptLoading(true) },
             onSuccess = { item ->

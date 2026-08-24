@@ -29,6 +29,7 @@ class SplashActivity : BaseActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        retryCallback = { checkSession() }
         handler.postDelayed(checkSessionRunnable, 2000L)
     }
 
@@ -43,9 +44,10 @@ class SplashActivity : BaseActivity() {
             return
         }
         if (!Utility.isInternetAvailable(mActivity)) {
-            navigate(Intent(mActivity, LoginActivity::class.java))
+            showNoInternet()
             return
         }
+        hideNoInternet()
         val token =
             SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN, "")
                 ?: ""

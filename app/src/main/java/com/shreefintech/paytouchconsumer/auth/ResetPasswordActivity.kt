@@ -114,6 +114,10 @@ class ResetPasswordActivity : BaseActivity() {
 
     private fun onChangePassword() {
         if (!validate()) return
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         val newPassword = binding.etNewPassword.text?.toString() ?: ""
         viewModel.changePassword(
             context     = mActivity,

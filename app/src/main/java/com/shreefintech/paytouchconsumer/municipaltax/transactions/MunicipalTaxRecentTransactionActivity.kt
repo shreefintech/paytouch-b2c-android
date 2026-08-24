@@ -58,6 +58,7 @@ class MunicipalTaxRecentTransactionActivity : BaseActivity() {
         setupRecyclerView()
         binding.onClickListener = onClickListener()
         onBack()
+        retryCallback = { loadInitialData() }
         loadInitialData()
     }
 
@@ -79,6 +80,8 @@ class MunicipalTaxRecentTransactionActivity : BaseActivity() {
     }
 
     private fun loadInitialData() {
+        if (!Utility.isInternetAvailable(mActivity)) { showNoInternet(); return }
+        hideNoInternet()
         viewModel.loadData(
             onLoading = {
                 binding.shimmerLayout.visibility  = View.VISIBLE
@@ -106,6 +109,7 @@ class MunicipalTaxRecentTransactionActivity : BaseActivity() {
     }
 
     private fun loadNextPage() {
+        if (!Utility.isInternetAvailable(mActivity)) { ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet)); return }
         viewModel.loadNextPage(
             onLoading = { binding.pbLoadMore.visibility = View.VISIBLE },
             onSuccess = { items ->

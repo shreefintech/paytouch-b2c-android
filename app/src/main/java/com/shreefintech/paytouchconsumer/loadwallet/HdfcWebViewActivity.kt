@@ -21,6 +21,7 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityHdfcWebViewBinding
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
+import com.shreefintech.paytouchconsumer.utill.Utility
 import java.io.ByteArrayInputStream
 
 class HdfcWebViewActivity : BaseActivity() {
@@ -37,6 +38,7 @@ class HdfcWebViewActivity : BaseActivity() {
 
     @Volatile
     private var hasReturned = false
+    private var gatewayHost: String? = null  // host of the initial HDFC payment URL
 
     companion object {
         private const val EXTRA_URL = "hdfc_payment_url"
@@ -73,6 +75,11 @@ class HdfcWebViewActivity : BaseActivity() {
         onBack()
 
         if (paymentUrl.isNotEmpty()) {
+            if (!Utility.isInternetAvailable(mActivity)) {
+                ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+                finish()
+                return
+            }
             binding.webView.loadUrl(paymentUrl)
         } else {
             finish()

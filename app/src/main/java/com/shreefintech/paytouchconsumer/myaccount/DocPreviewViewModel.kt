@@ -35,4 +35,5 @@ class DocPreviewViewModel(application: Application) : AndroidViewModel(applicati
             }
         }
     }
+
 }

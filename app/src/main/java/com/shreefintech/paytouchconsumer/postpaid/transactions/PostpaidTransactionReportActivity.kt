@@ -75,7 +75,7 @@ class PostpaidTransactionReportActivity : BaseActivity() {
 
         binding.onClickListener = onClickListener()
         onBack()
-
+        retryCallback = { callReport(filterFromDate, filterToDate, filterStatus, filterMobileNo) }
         callReport(null, null, null, null)
     }
 
@@ -136,6 +136,11 @@ class PostpaidTransactionReportActivity : BaseActivity() {
     }
 
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.loadReport(
             fromDate  = filterFromDate,
             toDate    = filterToDate,

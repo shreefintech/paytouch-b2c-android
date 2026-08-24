@@ -64,11 +64,21 @@ class MyAccountActivity : BaseActivity() {
         selectTab(TAB_ACCOUNT_INFO)
         onBack()
 
-        loadAccountInfo()
-        loadReferralInfo()
+        retryCallback = { loadData() }
+        loadData()
     }
 
     // ── API Calls ─────────────────────────────────────────────
+
+    private fun loadData() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
+        loadAccountInfo()
+        loadReferralInfo()
+    }
 
     private fun loadAccountInfo() {
         viewModel.getAccountInfo(

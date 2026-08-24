@@ -181,6 +181,10 @@ class CreateAccountActivity : BaseActivity() {
 
     private fun onCreateAccount() {
         if (!validate()) return
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
         val name = binding.etName.text?.toString()?.trim() ?: ""
         val mobile = binding.etMobile.text?.toString()?.trim() ?: ""
         val email = binding.etEmail.text?.toString()?.trim() ?: ""

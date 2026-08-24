@@ -83,6 +83,7 @@ class TransactionReportActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         onBack()
 
+        retryCallback = { callReport(filterFromDate, filterToDate, filterStatus, filterConsumerNo) }
         callReport(null, null, null, null)
     }
 
@@ -138,8 +139,6 @@ class TransactionReportActivity : BaseActivity() {
 
     // ── Data Loading ──────────────────────────────────────────────────────────
 
-    // TODO(PAYTOUCH-570): Add showNoInternet() / hideNoInternet() / setNoInternetRetryCallback { callReport(null, null, null, null) }
-    //  once the no-internet placeholder design is finalised.
     private fun callReport(
         fromDate: String?,
         toDate: String?,
@@ -154,6 +153,11 @@ class TransactionReportActivity : BaseActivity() {
     }
 
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.getTransactionReport(
             fromDate   = filterFromDate,
             toDate     = filterToDate,

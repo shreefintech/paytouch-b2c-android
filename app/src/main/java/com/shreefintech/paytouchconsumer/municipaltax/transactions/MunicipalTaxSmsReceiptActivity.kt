@@ -99,12 +99,15 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
         binding.showProgressReceipt = showProgressReceipt
         binding.onClickListener     = onClickListener()
         onBack()
+        retryCallback = { loadLatestPayments() }
         loadLatestPayments()
     }
 
     // ── API Call ──────────────────────────────────────────────
 
     private fun loadLatestPayments() {
+        if (!Utility.isInternetAvailable(mActivity)) { showNoInternet(); return }
+        hideNoInternet()
         viewModel.getLatestPayments(
             onLoading = { showReceiptLoading(true) },
             onSuccess = { item ->

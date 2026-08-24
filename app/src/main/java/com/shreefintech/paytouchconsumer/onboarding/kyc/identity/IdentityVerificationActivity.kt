@@ -1,5 +1,7 @@
 package com.shreefintech.paytouchconsumer.onboarding.kyc.identity
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -19,11 +21,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import com.shreefintech.paytouchconsumer.BaseActivity
-import java.io.ByteArrayOutputStream
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityIdentityVerificationBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -35,13 +33,17 @@ import com.shreefintech.paytouchconsumer.onboarding.kyc.identity.fragment.KycSte
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 class IdentityVerificationActivity : BaseActivity() {
 
     companion object {
-        fun buildIntent(context: android.content.Context): android.content.Intent =
-            android.content.Intent(context, IdentityVerificationActivity::class.java)
+        fun buildIntent(context: Context): Intent =
+            Intent(context, IdentityVerificationActivity::class.java)
     }
 
     private lateinit var binding: ActivityIdentityVerificationBinding
@@ -253,6 +255,11 @@ class IdentityVerificationActivity : BaseActivity() {
     }
 
     private fun submitIdentity() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+
         val panUri          = viewModel.panFrontUri
         val aadhaarFrontUri = viewModel.aadhaarFrontUri
         val aadhaarBackUri  = viewModel.aadhaarBackUri

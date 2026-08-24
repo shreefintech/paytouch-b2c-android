@@ -109,8 +109,8 @@ class LoadWalletActivity : BaseActivity() {
         setupPaymentSheet()
         selectTab(TAB_TOTAL_BALANCE)
         onBack()
-        fetchWalletData()
-        fetchRecentHistory()
+        retryCallback = { loadData() }
+        loadData()
     }
 
     override fun onResume() {
@@ -119,6 +119,7 @@ class LoadWalletActivity : BaseActivity() {
             ?.takeIf { it.isNotEmpty() } ?: return
         val amount  = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_PENDING_AMOUNT, null) ?: ""
         HdfcPaymentHelper.clearPendingState(mActivity)
+        hideNoInternet()
         showLoading()
         viewModel.checkOrderStatus(
             orderId   = orderId,
@@ -179,7 +180,22 @@ class LoadWalletActivity : BaseActivity() {
         })
     }
 
+    private fun loadData() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
+        fetchWalletData()
+        fetchRecentHistory()
+    }
+
     private fun validateAndShowConfirmDialog() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+
         val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
         val description = sheetBinding.etDescription.text?.toString()?.trim() ?: ""
         if (amountStr.isEmpty()) {
@@ -214,6 +230,10 @@ class LoadWalletActivity : BaseActivity() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(true)
+        dialog.setOnDismissListener {
+            confirmDialog = null
+            confirmDialogBinding = null
+        }
 
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)

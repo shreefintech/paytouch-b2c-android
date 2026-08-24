@@ -16,9 +16,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -30,10 +27,14 @@ import com.shreefintech.paytouchconsumer.databinding.ItemBankAccountBinding
 import com.shreefintech.paytouchconsumer.enums.ProofType
 import com.shreefintech.paytouchconsumer.enums.StatementPeriod
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.onboarding.kyc.bank.model.BankAccountInputItem
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BankDetailsActivity : BaseActivity() {
 
@@ -116,7 +117,7 @@ class BankDetailsActivity : BaseActivity() {
         statementPeriods.add(null)
         proofUris.add(null)
 
-        card.flUpload1.attach(card.root as ViewGroup)
+        card.flUpload1.attach(binding.clRoot as ViewGroup)
         attachEditDeleteGlass(card.flEdit1)
         attachEditDeleteGlass(card.flDelete1)
         card.tvCardTitle.text = getString(R.string.fmtBankAccountTitle, index + 1)
@@ -204,7 +205,7 @@ class BankDetailsActivity : BaseActivity() {
             anchorView = card.flProofTypeAnchor,
             arrowView  = card.ivProofTypeArrow,
             textView   = card.tvProofType,
-            items      = ProofType.entries.map { it.displayName }
+            items      = ProofType.entries.map { getString(it.displayNameRes) }
         ) { _, position ->
             val selected = ProofType.entries[position]
             val index = bankCardBindings.indexOf(card)
@@ -226,7 +227,7 @@ class BankDetailsActivity : BaseActivity() {
             anchorView = card.flStatementPeriodAnchor,
             arrowView  = card.ivStatementPeriodArrow,
             textView   = card.tvStatementPeriod,
-            items      = StatementPeriod.entries.map { it.displayName }
+            items      = StatementPeriod.entries.map { getString(it.displayNameRes) }
         ) { _, position ->
             statementPeriods[bankCardBindings.indexOf(card)] = StatementPeriod.entries[position]
         }
@@ -329,6 +330,10 @@ class BankDetailsActivity : BaseActivity() {
 
     private fun onSubmit() {
         if (!validate()) return
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
 
         val snapshots = bankCardBindings.mapIndexedNotNull { i, card ->
             val uri = proofUris[i] ?: return@mapIndexedNotNull null

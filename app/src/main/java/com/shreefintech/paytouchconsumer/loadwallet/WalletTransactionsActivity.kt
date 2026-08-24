@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -60,7 +59,7 @@ class WalletTransactionsActivity : BaseActivity() {
 
         binding.onClickListener = onClickListener()
         setupRecyclerView()
-        onBack()
+        retryCallback = { loadPage(1) }
         loadPage(1)
     }
 
@@ -88,6 +87,11 @@ class WalletTransactionsActivity : BaseActivity() {
     // ── Data Loading ──────────────────────────────────────────────────────────
 
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.loadHistory(
             page      = page,
             onLoading = {
@@ -144,14 +148,6 @@ class WalletTransactionsActivity : BaseActivity() {
     }
 
     // ── Navigation ────────────────────────────────────────────────────────────
-
-    private fun onBack() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-            }
-        })
-    }
 
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->

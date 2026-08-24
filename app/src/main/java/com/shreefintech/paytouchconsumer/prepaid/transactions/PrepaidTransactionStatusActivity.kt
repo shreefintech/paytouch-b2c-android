@@ -73,7 +73,7 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
 
         setupRecyclerView()
         onBack()
-        
+        retryCallback = { loadPage(1) }
         loadPage(1)
     }
 
@@ -117,6 +117,11 @@ class PrepaidTransactionStatusActivity : BaseActivity() {
     // ── Data Loading ──────────────────────────────────────────────────────────
 
     private fun loadPage(page: Int) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        if (page == 1) hideNoInternet()
         viewModel.loadStatus(
             query     = activeQuery,
             page      = page,

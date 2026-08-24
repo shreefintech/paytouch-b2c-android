@@ -12,9 +12,10 @@ import com.shreefintech.paytouchconsumer.utill.PdfThumbnailRepository
 import kotlinx.coroutines.Job
 
 class KycDocumentAdp(
-    private val urlResolver: (String?) -> String? = { it },
-    private val onItemClick: ((url: String, label: String) -> Unit)? = null
+    private val urlResolver: (String?) -> String? = { it }
 ) : RecyclerView.Adapter<KycDocumentAdp.ViewHolder>() {
+
+    var onItemClick: ((url: String, label: String) -> Unit)? = null
 
     private val items = mutableListOf<KycDocumentDetailItem>()
 
@@ -50,7 +51,7 @@ class KycDocumentAdp(
         if (resolvedUrl.isNullOrBlank()) {
             holder.binding.pbItemLoading.visibility = View.GONE
             holder.binding.ivDocument.visibility = View.VISIBLE
-            holder.binding.ivDocument.setImageResource(R.drawable.ic_file_not_found)
+            holder.binding.ivDocument.setImageDrawable(null)
             return
         }
 

@@ -2,6 +2,7 @@ package com.shreefintech.paytouchconsumer.myaccount
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -27,9 +28,16 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDocPreviewBinding
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class DocPreviewActivity : BaseActivity() {
@@ -46,6 +54,7 @@ class DocPreviewActivity : BaseActivity() {
     private val minScale = 0.5f
     private val maxScale = 5f
     private lateinit var scaleDetector: ScaleGestureDetector
+    private val clickListener: View.OnClickListener by lazy { onClickListener() }
 
     companion object {
         private const val EXTRA_FILE_URL = "extra_file_url"
@@ -81,6 +90,7 @@ class DocPreviewActivity : BaseActivity() {
 
         setupToolbar()
         setupPinchToZoom()
+        retryCallback = { loadFileFromUrl(fileUrl) }
         loadFileFromUrl(fileUrl)
     }
 
@@ -112,7 +122,7 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     private fun setupToolbar() {
-        binding.toolbar.onClickListener = onClickListener()
+        binding.toolbar.onClickListener = clickListener
     }
 
     private fun setupPinchToZoom() {
@@ -136,13 +146,18 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     private fun loadFileFromUrl(url: String) {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         val lower = url.lowercase()
         when {
             isPdfUrl(lower) -> viewModel.loadPdf(
                 url = url,
                 onLoading = { showLoading(true) },
                 onReady = { file -> showLoading(false); openPdfRenderer(file) },
-                onError = { msg -> showLoading(false); showError(getString(R.string.errCannotRenderPdf, msg)) }
+                onError = { loadInWebView(Constant.URL_GOOGLE_DOC_VIEWER + Uri.encode(url)) }
             )
             isImageUrl(lower) -> {
                 showLoading(true)
@@ -217,9 +232,8 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     private fun setupPdfNavigation() {
-        val listener = onClickListener()
-        binding.btnPrevPage.setOnClickListener(listener)
-        binding.btnNextPage.setOnClickListener(listener)
+        binding.btnPrevPage.setOnClickListener(clickListener)
+        binding.btnNextPage.setOnClickListener(clickListener)
         updatePageLabel()
     }
 
