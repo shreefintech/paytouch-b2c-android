@@ -301,6 +301,7 @@
                                         android:id="@+id/ivCompanyArrow"
                                         android:layout_width="14dp"
                                         android:layout_height="14dp"
+                                        android:rotation="270"
                                         android:layout_gravity="center"
                                         android:src="@drawable/ic_down_arrow"
                                         android:tint="@color/primary" />

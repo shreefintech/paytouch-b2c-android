@@ -2,7 +2,6 @@ package com.shreefintech.paytouchconsumer.kyc.bank
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
@@ -16,10 +15,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityBankDetailsBinding
@@ -249,26 +244,25 @@ class BankDetailsActivity : BaseActivity() {
         proofUris[index] = uri
 
         val card = bankCardBindings[index]
-        card.llUploadProof.visibility = View.GONE
+        card.llUploadProof.visibility     = View.GONE
+        card.ivPreviewProof.visibility    = View.VISIBLE
+        card.llEditDeleteProof.visibility = View.VISIBLE
 
-        Glide.with(mActivity)
-            .load(uri)
-            .placeholder(R.drawable.ic_file_not_found)
-            .error(R.drawable.ic_file_not_found)
-            .listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean
-                ): Boolean = false
-
-                override fun onResourceReady(
-                    resource: Drawable, model: Any, target: Target<Drawable>?,
-                    dataSource: DataSource, isFirstResource: Boolean
-                ): Boolean = false
-            })
-            .into(card.ivPreviewProof)
-
-        card.ivPreviewProof.visibility     = View.VISIBLE
-        card.llEditDeleteProof.visibility  = View.VISIBLE
+        if (contentResolver.getType(uri) == "application/pdf") {
+            card.ivPreviewProof.setImageResource(R.drawable.ic_file_not_found)
+            lifecycleScope.launch(Dispatchers.IO) {
+                val bmp = Utility.renderPdfFirstPage(mActivity, uri)
+                withContext(Dispatchers.Main) {
+                    if (bmp != null) Glide.with(mActivity).load(bmp).into(card.ivPreviewProof)
+                }
+            }
+        } else {
+            Glide.with(mActivity)
+                .load(uri)
+                .placeholder(R.drawable.ic_file_not_found)
+                .error(R.drawable.ic_file_not_found)
+                .into(card.ivPreviewProof)
+        }
     }
 
     private fun clearProof(card: ItemBankAccountBinding, index: Int) {

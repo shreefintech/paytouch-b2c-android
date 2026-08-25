@@ -1,6 +1,5 @@
 package com.shreefintech.paytouchconsumer.kyc.identity.fragment
 
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
@@ -9,11 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.FragmentKycStep3Binding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -21,6 +17,9 @@ import com.shreefintech.paytouchconsumer.kyc.identity.IdentityVerificationActivi
 import com.shreefintech.paytouchconsumer.kyc.identity.IdentityVerificationViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class KycStep3Fragment : BaseKycStepFragment() {
 
@@ -101,28 +100,25 @@ class KycStep3Fragment : BaseKycStepFragment() {
     private fun showPreview(uri: Uri) {
         val ctx = context ?: return
         binding.llUploadPan.visibility = View.GONE
-
-        Glide.with(ctx)
-            .load(uri)
-            .placeholder(R.drawable.ic_file_not_found)
-            .error(R.drawable.ic_file_not_found)
-            .listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>,
-                    isFirstResource: Boolean
-                ): Boolean = false
-
-                override fun onResourceReady(
-                    resource: Drawable, model: Any, target: Target<Drawable>?,
-                    dataSource: DataSource, isFirstResource: Boolean
-                ): Boolean = false
-            })
-            .into(binding.ivPreviewPan)
-
         binding.ivPreviewPan.visibility = View.VISIBLE
         binding.llEditDeletePan.visibility = View.VISIBLE
+
+        if (ctx.contentResolver.getType(uri) == "application/pdf") {
+            binding.ivPreviewPan.setImageResource(R.drawable.ic_file_not_found)
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                val bmp = Utility.renderPdfFirstPage(ctx, uri)
+                withContext(Dispatchers.Main) {
+                    if (_binding == null) return@withContext
+                    if (bmp != null) Glide.with(ctx).load(bmp).into(binding.ivPreviewPan)
+                }
+            }
+        } else {
+            Glide.with(ctx)
+                .load(uri)
+                .placeholder(R.drawable.ic_file_not_found)
+                .error(R.drawable.ic_file_not_found)
+                .into(binding.ivPreviewPan)
+        }
     }
 
     override fun validate(): Boolean {

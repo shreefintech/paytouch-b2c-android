@@ -23,7 +23,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         ApiClient.apiService.logout(bearerToken())
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
-                    if (response.isSuccessful && response.body()?.success == true) {
+                    if (response.isSuccessful) {
                         onComplete()
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))

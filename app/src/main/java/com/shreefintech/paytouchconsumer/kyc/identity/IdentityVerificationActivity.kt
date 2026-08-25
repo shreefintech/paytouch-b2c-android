@@ -49,6 +49,7 @@ class IdentityVerificationActivity : BaseActivity() {
     private lateinit var binding: ActivityIdentityVerificationBinding
     private val viewModel: IdentityVerificationViewModel by viewModels()
     private val showProgressSubmit = ObservableBoolean(false)
+    private val showCaptureButton  = ObservableBoolean(false)
     private var resultCode = 0
 
     private val dotViews = mutableListOf<AppCompatImageView>()
@@ -107,6 +108,7 @@ class IdentityVerificationActivity : BaseActivity() {
 
         binding.onClickListener    = onClickListener()
         binding.showProgressSubmit = showProgressSubmit
+        binding.showCaptureButton  = showCaptureButton
 
         onBack()
         setupDots()
@@ -144,11 +146,9 @@ class IdentityVerificationActivity : BaseActivity() {
             updateDots(step)
             updateTitle(step)
             showFragment(step)
-            binding.tvContinueLabel.text = if (step == IdentityVerificationViewModel.TOTAL_STEPS - 1) {
-                getString(R.string.btnSubmit)
-            } else {
-                getString(R.string.btnContinue)
-            }
+            val isLastStep = step == IdentityVerificationViewModel.TOTAL_STEPS - 1
+            binding.tvContinueLabel.text = if (isLastStep) getString(R.string.btnSubmit) else getString(R.string.btnContinue)
+            showCaptureButton.set(isLastStep)
         }
     }
 
@@ -310,6 +310,11 @@ class IdentityVerificationActivity : BaseActivity() {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
+                }
+
+                binding.btnCapture -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    (currentFragment() as? KycStep4Fragment)?.triggerCapture()
                 }
 
                 binding.btnContinue -> {

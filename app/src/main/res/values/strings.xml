@@ -357,6 +357,8 @@
     <string name="btnClear">Clear</string>
     <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 digits</string>
     <string name="msgLoadingOperators">Loading operators, please wait…</string>
+    <string name="hintSearchOperator">Search operator…</string>
+    <string name="msgNoOperatorsFound">No operators found</string>
 
     <!-- Bill Details card -->
     <string name="titleBillDetailsFetched">Electricity Bill Details Fetched</string>

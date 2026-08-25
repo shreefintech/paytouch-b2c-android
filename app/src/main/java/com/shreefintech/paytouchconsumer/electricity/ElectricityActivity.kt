@@ -14,11 +14,13 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
@@ -29,12 +31,13 @@ import com.shreefintech.paytouchconsumer.electricity.transactions.ElectricityTra
 import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.electricity.viewmodel.ElectricityViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
+import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
-import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 
 class ElectricityActivity : BaseActivity() {
 
@@ -49,6 +52,23 @@ class ElectricityActivity : BaseActivity() {
 
     private val showProgressFetch = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
+
+    private val operatorSelectionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        val json = result.data?.getStringExtra(OperatorSelectionActivity.EXTRA_SELECTED) ?: return@registerForActivityResult
+        val item = Gson().fromJson(json, OperatorSelectionItem::class.java)
+        selectedOperatorId = item.id
+        selectedOperatorName = item.name
+        binding.tvCompany.text = item.name
+        binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
+        if (isBillFetched) {
+            isBillFetched = false
+            fetchedBillItem = null
+            binding.cvBillDetails.visibility = View.GONE
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -223,30 +243,15 @@ class ElectricityActivity : BaseActivity() {
 
     // ── UI Helpers ────────────────────────────────────────────────────────────
 
-    private fun showCompanyDropdown() {
+    private fun showOperatorSelection() {
         Utility.hideKeyboard(binding.clRoot)
         if (operatorItems.isEmpty()) {
             loadOperators()
             ToastUtil.showWarning(mActivity, getString(R.string.msgLoadingOperators))
             return
         }
-        val names = operatorItems.map { it.name ?: "" }
-        CustomDropdown.showDropdown(
-            activity = mActivity,
-            anchorView = binding.flCompanyAnchor,
-            arrowView = binding.ivCompanyArrow,
-            textView = binding.tvCompany,
-            items = names
-        ) { selected, index ->
-            selectedOperatorId = operatorItems.getOrNull(index)?.id
-            selectedOperatorName = selected
-            binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-            if (isBillFetched) {
-                isBillFetched = false
-                fetchedBillItem = null
-                binding.cvBillDetails.visibility = View.GONE
-            }
-        }
+        val items = operatorItems.map { OperatorSelectionItem(id = it.id ?: "", name = it.name ?: "") }
+        operatorSelectionLauncher.launch(OperatorSelectionActivity.newIntent(mActivity, items, selectedOperatorId))
     }
 
     private fun setOperatorLoading(loading: Boolean) {
@@ -392,7 +397,7 @@ class ElectricityActivity : BaseActivity() {
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    showCompanyDropdown()
+                    showOperatorSelection()
                 }
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener

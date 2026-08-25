@@ -30,12 +30,13 @@ import com.shreefintech.paytouchconsumer.dth.transactions.DthTransactionReportAc
 import com.shreefintech.paytouchconsumer.dth.transactions.DthTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.dth.viewmodel.DthViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
+import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPlanItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
-import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 
 class DthActivity : BaseActivity() {
 
@@ -60,6 +61,19 @@ class DthActivity : BaseActivity() {
             val plan = json?.let { Gson().fromJson(it, DthPlanItem::class.java) }
             if (plan != null) onPlanSelected(plan)
         }
+    }
+
+    private val operatorSelectionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        val json = result.data?.getStringExtra(OperatorSelectionActivity.EXTRA_SELECTED) ?: return@registerForActivityResult
+        val item = Gson().fromJson(json, OperatorSelectionItem::class.java)
+        selectedOperatorId = item.id
+        selectedOperatorName = item.name
+        binding.tvCompany.text = item.name
+        binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
+        clearSelectedPlan()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -203,27 +217,15 @@ class DthActivity : BaseActivity() {
 
     // ── UI Helpers ────────────────────────────────────────────────────────────
 
-    private fun showCompanyDropdown() {
+    private fun showOperatorSelection() {
         Utility.hideKeyboard(binding.clRoot)
         if (operatorItems.isEmpty()) {
             loadOperators()
             ToastUtil.showWarning(mActivity, getString(R.string.msgLoadingOperators))
             return
         }
-        val names = operatorItems.map { it.name ?: "" }
-        CustomDropdown.showDropdown(
-            activity = mActivity,
-            anchorView = binding.flCompanyAnchor,
-            arrowView = binding.ivCompanyArrow,
-            textView = binding.tvCompany,
-            items = names
-        ) { selected, index ->
-            val operator = operatorItems.getOrNull(index)
-            selectedOperatorId = operator?.id
-            selectedOperatorName = selected
-            binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-            clearSelectedPlan()
-        }
+        val items = operatorItems.map { OperatorSelectionItem(id = it.id ?: "", name = it.name ?: "") }
+        operatorSelectionLauncher.launch(OperatorSelectionActivity.newIntent(mActivity, items, selectedOperatorId))
     }
 
     private fun setOperatorLoading(loading: Boolean) {
@@ -338,7 +340,7 @@ class DthActivity : BaseActivity() {
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    showCompanyDropdown()
+                    showOperatorSelection()
                 }
                 binding.llBrowsePlan -> {
                     if (Utility.stopClick()) return@OnClickListener

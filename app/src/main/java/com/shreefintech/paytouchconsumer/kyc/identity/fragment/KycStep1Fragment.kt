@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.kyc.identity.fragment
 
 import android.os.Bundle
+import android.text.InputFilter
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.FragmentKycStep1Binding
 import com.shreefintech.paytouchconsumer.kyc.identity.IdentityVerificationViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
+import com.shreefintech.paytouchconsumer.utill.Utility
 
 class KycStep1Fragment : BaseKycStepFragment() {
 
@@ -26,6 +28,11 @@ class KycStep1Fragment : BaseKycStepFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.etMobile.filters = arrayOf(
+            InputFilter.LengthFilter(10),
+            Utility.digitFilter(),
+            Utility.EmojiExcludeFilter()
+        )
         binding.etMobile.setText(viewModel.mobile)
         binding.etEmail.setText(viewModel.email)
     }

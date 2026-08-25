@@ -14,11 +14,13 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
@@ -29,11 +31,12 @@ import com.shreefintech.paytouchconsumer.fastag.transactions.FastagTransactionRe
 import com.shreefintech.paytouchconsumer.fastag.transactions.FastagTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.fastag.viewmodel.FastagViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
+import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagOperatorItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
-import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 
 class FastagActivity : BaseActivity() {
 
@@ -45,6 +48,19 @@ class FastagActivity : BaseActivity() {
     private var selectedOperatorName: String? = null
     private var selectedCircleId: String? = null
     private val showProgressPay = ObservableBoolean(false)
+
+    private val operatorSelectionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        val json = result.data?.getStringExtra(OperatorSelectionActivity.EXTRA_SELECTED) ?: return@registerForActivityResult
+        val item = Gson().fromJson(json, OperatorSelectionItem::class.java)
+        selectedOperatorBillerId = item.id
+        selectedOperatorName = item.name
+        selectedCircleId = item.extra
+        binding.tvCompany.text = item.name
+        binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -183,27 +199,15 @@ class FastagActivity : BaseActivity() {
 
     // ── UI Helpers ────────────────────────────────────────────────────────────
 
-    private fun showCompanyDropdown() {
+    private fun showOperatorSelection() {
         Utility.hideKeyboard(binding.clRoot)
         if (operatorItems.isEmpty()) {
             loadOperators()
             ToastUtil.showWarning(mActivity, getString(R.string.msgLoadingOperators))
             return
         }
-        val names = operatorItems.map { it.name ?: "" }
-        CustomDropdown.showDropdown(
-            activity = mActivity,
-            anchorView = binding.flCompanyAnchor,
-            arrowView = binding.ivCompanyArrow,
-            textView = binding.tvCompany,
-            items = names
-        ) { selected, index ->
-            val op = operatorItems.getOrNull(index)
-            selectedOperatorBillerId = op?.billerId
-            selectedOperatorName = selected
-            selectedCircleId = op?.circleId
-            binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-        }
+        val items = operatorItems.map { OperatorSelectionItem(id = it.billerId ?: "", name = it.name ?: "", extra = it.circleId) }
+        operatorSelectionLauncher.launch(OperatorSelectionActivity.newIntent(mActivity, items, selectedOperatorBillerId))
     }
 
     private fun setOperatorLoading(loading: Boolean) {
@@ -292,7 +296,7 @@ class FastagActivity : BaseActivity() {
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    showCompanyDropdown()
+                    showOperatorSelection()
                 }
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener

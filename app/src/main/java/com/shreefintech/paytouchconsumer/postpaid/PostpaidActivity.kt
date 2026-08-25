@@ -30,6 +30,8 @@ import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceip
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionReportActivity
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidViewModel
+import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
+import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -53,6 +55,18 @@ class PostpaidActivity : BaseActivity() {
     private val showProgressFetch = ObservableBoolean(false)
     private var fetchedBillItem: PostpaidFetchBillDataItem? = null
     private var isBillFetched = false
+
+    private val operatorSelectionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        val json = result.data?.getStringExtra(OperatorSelectionActivity.EXTRA_SELECTED) ?: return@registerForActivityResult
+        val item = Gson().fromJson(json, OperatorSelectionItem::class.java)
+        selectedOperatorId = item.id
+        selectedOperatorName = item.name
+        binding.tvCompany.text = item.name
+        binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
+    }
 
     private val showProgressPay = ObservableBoolean(false)
 
@@ -203,25 +217,15 @@ class PostpaidActivity : BaseActivity() {
 
     // ── UI Helpers ────────────────────────────────────────────────────────────
 
-    private fun showCompanyDropdown() {
+    private fun showOperatorSelection() {
         Utility.hideKeyboard(binding.clRoot)
         if (operatorItems.isEmpty()) {
             loadOperators()
             ToastUtil.showWarning(mActivity, getString(R.string.msgLoadingOperators))
             return
         }
-        val names = operatorItems.map { it.name ?: "" }
-        CustomDropdown.showDropdown(
-            activity = mActivity,
-            anchorView = binding.flCompanyAnchor,
-            arrowView = binding.ivCompanyArrow,
-            textView = binding.tvCompany,
-            items = names
-        ) { selected, index ->
-            selectedOperatorId = operatorItems.getOrNull(index)?.id
-            selectedOperatorName = selected
-            binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-        }
+        val items = operatorItems.map { OperatorSelectionItem(id = it.id ?: "", name = it.name ?: "") }
+        operatorSelectionLauncher.launch(OperatorSelectionActivity.newIntent(mActivity, items, selectedOperatorId))
     }
 
     private fun showStateDropdown() {
@@ -397,7 +401,7 @@ class PostpaidActivity : BaseActivity() {
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    showCompanyDropdown()
+                    showOperatorSelection()
                 }
                 binding.flStateAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
