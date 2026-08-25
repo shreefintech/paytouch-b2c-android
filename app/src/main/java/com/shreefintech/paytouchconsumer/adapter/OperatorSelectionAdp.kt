@@ -1,6 +1,5 @@
 package com.shreefintech.paytouchconsumer.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,6 @@ import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 
 class OperatorSelectionAdp(
-    private val context: Context,
     private val fullList: List<OperatorSelectionItem>
 ) : RecyclerView.Adapter<OperatorSelectionAdp.ViewHolder>() {
 
@@ -36,16 +34,16 @@ class OperatorSelectionAdp(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: OperatorSelectionItem) {
-
+            val ctx = binding.root.context
             LiquidGlassEffect.attach(
                 targetView = binding.frameBg,
                 rootView = binding.root as ViewGroup,
-                cornerRadius = context.resources.getDimensionPixelSize(R.dimen.normal_card_radius),
+                cornerRadius = ctx.resources.getDimensionPixelSize(R.dimen.normal_card_radius),
                 distortion = 0f,
-                strokeColor = if (item.id == selectedId) ContextCompat.getColor(context, R.color.primary) else ContextCompat.getColor(context, R.color.white),
+                strokeColor = if (item.id == selectedId) ContextCompat.getColor(ctx, R.color.primary) else ContextCompat.getColor(ctx, R.color.white),
                 strokeWidth = if (item.id == selectedId) 1 else 0,
-                blur = context.resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
-                tintColor = ContextCompat.getColor(context, R.color.normal_card_bg_glass)
+                blur = ctx.resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
+                tintColor = ContextCompat.getColor(ctx, R.color.normal_card_bg_glass)
             )
 
             binding.tvName.text = item.name
@@ -55,7 +53,7 @@ class OperatorSelectionAdp(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemOperatorSelectionBinding.inflate(LayoutInflater.from(context), parent, false)
+        val binding = ItemOperatorSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 

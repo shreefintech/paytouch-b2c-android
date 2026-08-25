@@ -11,6 +11,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -74,7 +75,7 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
-            onError(getApplication<Application>().getString(R.string.msgNoInternet))
+            onError(getString(R.string.msgNoInternet))
             return
         }
 
@@ -104,7 +105,7 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
             }
 
             override fun onFailure(call: Call<General<KycSignatoryDataItem>>, t: Throwable) {
-                onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }

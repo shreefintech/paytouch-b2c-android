@@ -67,7 +67,7 @@ class OperatorSelectionActivity : BaseActivity() {
     }
 
     private fun setupRecyclerView() {
-        operatorAdp = OperatorSelectionAdp(mActivity, items)
+        operatorAdp = OperatorSelectionAdp(items)
         operatorAdp.selectedId = preSelectedId
         operatorAdp.onSelectItem = { item ->
             setResult(RESULT_OK, Intent().putExtra(EXTRA_SELECTED, Gson().toJson(item)))
