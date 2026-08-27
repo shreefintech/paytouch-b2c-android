@@ -480,11 +480,11 @@
                                                 android:includeFontPadding="false"
                                                 android:maxLines="1"
                                                 android:ellipsize="end"
-                                                android:text="@string/labelQrInvoice"
+                                                android:text="@string/labelBankName"
                                                 android:textSize="@dimen/text_size_10" />
 
                                             <androidx.appcompat.widget.AppCompatTextView
-                                                android:id="@+id/tvQrInvoiceAmount"
+                                                android:id="@+id/tvBankName"
                                                 android:layout_width="match_parent"
                                                 android:layout_height="wrap_content"
                                                 android:fontFamily="@font/proza_libre_semi_bold"

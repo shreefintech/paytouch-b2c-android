@@ -10,6 +10,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -143,6 +144,38 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 }
 
                 override fun onFailure(call: Call<General<WalletHistoryPageItem>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+    }
+
+    fun fetchBankName(
+        onSuccess: (String?) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        ApiClient.apiService.getKycMyAccount(bearerToken())
+            .enqueue(object : Callback<KycMyAccountItem> {
+                override fun onResponse(
+                    call: Call<KycMyAccountItem>,
+                    response: Response<KycMyAccountItem>
+                ) {
+                    val body = response.body()
+                    if (response.isSuccessful && body?.success == true) {
+                        onSuccess(body.bank?.accounts?.firstOrNull()?.bankName)
+                    } else {
+                        onError(
+                            ApiHelper.parseErrorMessage(
+                                getApplication(), response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<KycMyAccountItem>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })

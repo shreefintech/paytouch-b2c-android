@@ -188,6 +188,7 @@ class LoadWalletActivity : BaseActivity() {
         hideNoInternet()
         fetchWalletData()
         fetchRecentHistory()
+        fetchBankName()
     }
 
     private fun validateAndShowConfirmDialog() {
@@ -324,6 +325,13 @@ class LoadWalletActivity : BaseActivity() {
         )
     }
 
+    private fun fetchBankName() {
+        viewModel.fetchBankName(
+            onSuccess = { bankName -> binding.tvBankName.text = bankName ?: "--" },
+            onError = { binding.tvBankName.text = "--" }
+        )
+    }
+
     private fun showLoading() {
         binding.viewDimmer.visibility = View.VISIBLE
         binding.pbLoading.visibility = View.VISIBLE
@@ -341,7 +349,6 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
         // TODO(B2C-82): hide until backend provides the correct QR invoice amount field
-        binding.tvQrInvoiceAmount.visibility = View.GONE
         binding.tvIfscCode.text = data.ifsc ?: "--"
         val status = data.wallet?.status
         if (!status.isNullOrEmpty()) {
