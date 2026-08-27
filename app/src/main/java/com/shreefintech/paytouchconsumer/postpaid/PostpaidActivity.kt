@@ -13,13 +13,11 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
-import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
@@ -273,6 +271,10 @@ class PostpaidActivity : BaseActivity() {
     private fun onFetchBill() {
         if (selectedOperatorId.isNullOrEmpty()) {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
+            return
+        }
+        if (selectedCircleId.isNullOrEmpty()) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgStateEmpty))
             return
         }
         val connectionNumber = binding.etMobileNumber.text?.toString()?.trim() ?: ""
