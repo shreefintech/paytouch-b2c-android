@@ -7,6 +7,9 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillResponseItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidProcessPaymentRequest
@@ -121,4 +124,49 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
             }
         })
     }
+
+    fun fetchBill(
+        mobileNumber: String,
+        operatorId: String,
+        onLoading: () -> Unit,
+        onSuccess: (PostpaidFetchBillDataItem) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        onLoading()
+        ApiClient.apiService.fetchPostpaidBill(
+            bearerToken(),
+            PostpaidFetchBillRequest(
+                connectionNumber = mobileNumber,
+                operatorId = operatorId,
+                circleId = "0"
+            )
+        ).enqueue(object : Callback<PostpaidFetchBillResponseItem> {
+            override fun onResponse(
+                call: Call<PostpaidFetchBillResponseItem>,
+                response: Response<PostpaidFetchBillResponseItem>
+            ) {
+                val body = response.body()
+                if (response.isSuccessful && body?.success == true) {
+                    val bill = body.data
+                    if (bill != null) onSuccess(bill)
+                    else onError(getString(R.string.errGeneric))
+                } else {
+                    val msg = body?.message
+                        ?: ApiHelper.parseErrorMessage(
+                            getApplication(), response.code(), response.errorBody()?.string()
+                        )
+                    onError(msg)
+                }
+            }
+
+            override fun onFailure(call: Call<PostpaidFetchBillResponseItem>, t: Throwable) {
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
+            }
+        })
+    }
+
 }

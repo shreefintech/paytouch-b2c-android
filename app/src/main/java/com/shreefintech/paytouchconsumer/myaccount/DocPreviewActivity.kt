@@ -33,11 +33,6 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDocPreviewBinding
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 class DocPreviewActivity : BaseActivity() {
@@ -54,7 +49,6 @@ class DocPreviewActivity : BaseActivity() {
     private val minScale = 0.5f
     private val maxScale = 5f
     private lateinit var scaleDetector: ScaleGestureDetector
-    private val clickListener: View.OnClickListener by lazy { onClickListener() }
 
     companion object {
         private const val EXTRA_FILE_URL = "extra_file_url"
@@ -122,7 +116,10 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     private fun setupToolbar() {
-        binding.toolbar.onClickListener = clickListener
+        val listener = onClickListener()
+        binding.toolbar.onClickListener = listener
+        binding.btnPrevPage.setOnClickListener(listener)
+        binding.btnNextPage.setOnClickListener(listener)
     }
 
     private fun setupPinchToZoom() {
@@ -232,8 +229,6 @@ class DocPreviewActivity : BaseActivity() {
     }
 
     private fun setupPdfNavigation() {
-        binding.btnPrevPage.setOnClickListener(clickListener)
-        binding.btnNextPage.setOnClickListener(clickListener)
         updatePageLabel()
     }
 
@@ -267,6 +262,7 @@ class DocPreviewActivity : BaseActivity() {
 
     // ─── WebView fallback ──────────────────────────────────────────────────────
 
+    @Suppress("SetJavaScriptEnabled")
     private fun loadInWebView(url: String) {
         showLoading(true)
 

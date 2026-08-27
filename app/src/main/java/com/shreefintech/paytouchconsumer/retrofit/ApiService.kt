@@ -2,13 +2,7 @@ package com.shreefintech.paytouchconsumer.retrofit
 
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycAgreeDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
@@ -22,7 +16,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthProcessPaymentReq
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthTransactionStatusRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityFetchBillResponseItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
@@ -43,6 +36,17 @@ import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagTransaction
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionStatusRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycAgreeDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanLatestPaymentDataItem
@@ -52,12 +56,18 @@ import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanProcessPaymentR
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanTransactionStatusRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasPaymentItem
-import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasProcessPaymentRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionStatusRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxFetchBillDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxLatestPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxOperatorItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxPaymentItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxProcessPaymentRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxRecentPageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionStatusRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillResponseItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidPaymentItem
@@ -72,22 +82,12 @@ import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidProcessDi
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionStatusRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxFetchBillDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxFetchBillRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxLatestPaymentDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxOperatorItem
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxPaymentItem
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxProcessPaymentRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxRecentDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxRecentPageItem
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -329,6 +329,12 @@ interface ApiService {
         @Header("Authorization") authorization: String
     ): Call<General<List<PostpaidOperatorItem>>>
 
+    @POST("${AUTH}mobile-postpaid/fetch-bill")
+    fun fetchPostpaidBill(
+        @Header("Authorization") authorization: String,
+        @Body request: PostpaidFetchBillRequest
+    ): Call<PostpaidFetchBillResponseItem>
+
     @POST("${AUTH}mobile-postpaid/process-payment")
     fun processPostpaidPayment(
         @Header("Authorization") authorization: String,
@@ -407,21 +413,21 @@ interface ApiService {
         @Body request: FastagTransactionStatusRequest
     ): Call<General<List<FastagTransactionReportDataItem>>>
 
-        @GET("${AUTH}fastag")
-        fun getFastagPaymentReport(
-            @Header("Authorization") authorization: String,
-            @Query("from_date")      fromDate:      String?,
-            @Query("to_date")        toDate:        String?,
-            @Query("status")         status:        String?,
-            @Query("vehicle_number") vehicleNumber: String?,
-            @Query("page")           page:          Int,
-            @Query("per_page")       perPage:       Int
-        ): Call<General<FastagTransactionPageItem>>
+    @GET("${AUTH}fastag")
+    fun getFastagPaymentReport(
+        @Header("Authorization") authorization: String,
+        @Query("from_date") fromDate: String?,
+        @Query("to_date") toDate: String?,
+        @Query("status") status: String?,
+        @Query("vehicle_number") vehicleNumber: String?,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): Call<General<FastagTransactionPageItem>>
 
-        @GET("${AUTH}fastag/latest-payment")
-        fun getFastagLatestPayment(
-            @Header("Authorization") authorization: String
-        ): Call<General<FastagLatestPaymentDataItem>>
+    @GET("${AUTH}fastag/latest-payment")
+    fun getFastagLatestPayment(
+        @Header("Authorization") authorization: String
+    ): Call<General<FastagLatestPaymentDataItem>>
 
     // ── Loan ──────────────────────────────────────────────────────────────────
 

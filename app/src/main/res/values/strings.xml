@@ -187,6 +187,7 @@
     <string name="hintMobileNumber">Enter Mobile Number</string>
     <string name="msgMobileNumberEmpty">Please enter mobile number</string>
     <string name="msgMobileNumberInvalid">Please enter a valid 10-digit mobile number</string>
+    <string name="titlePostpaidBillDetailsFetched">Postpaid Bill Details Fetched</string>
     <string name="labelSelectState">Select State</string>
     <string name="btnBrowsePlan">Browse Plan</string>
     <string name="btnChangePlan">Change Plan</string>
