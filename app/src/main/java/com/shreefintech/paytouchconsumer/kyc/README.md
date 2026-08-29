@@ -40,15 +40,15 @@ SplashActivity / LoginActivity
             │
             KycActivity.startKyc()
                     │
-                    GET /api/kyc/status
+                    GET /api/dashboard-kyc/status
                             │
                     ┌───────┴────────────────────────────────────┐
                     │ No entityType yet                          │ entityType present
                     │                                            │
-              POST /api/kyc/initiate                     ┌──────┴────────────────────┐
+              POST /api/dashboard-kyc/initiate            ┌──────┴────────────────────┐
                     │                                     │ Section A PENDING/REJECTED │ Other
                     │ 200 or 422 → section A              │                            │
-                    │ 403 → registration pending msg      POST /api/kyc/submit-a      │
+                    │ 403 → registration pending msg      POST /api/dashboard-kyc/sections/a │
                     │                                     │                            │
                     └──────────────────────────► KycActivity shows hub ◄──────────────┘
                                                          │
@@ -61,8 +61,8 @@ SplashActivity / LoginActivity
                                 setResult(1) ──────── triggers startKyc() refresh
                                                                          │
                                            Both UNDER_REVIEW ──► agreeAndFetchStatus()
-                                                                POST /api/kyc/agree
-                                                                GET  /api/kyc/status
+                                                                POST /api/dashboard-kyc/agree
+                                                                GET  /api/dashboard-kyc/status
                                                                          │
                                                                 KycStatusActivity
                                                                          │
@@ -77,16 +77,16 @@ SplashActivity / LoginActivity
 
 ## KycActivity — Hub Logic
 
-`KycActivity` never navigates directly to `IdentityVerificationActivity` or `BankDetailsActivity` on first launch. It always calls `GET /api/kyc/status` first and derives what's needed from the response:
+`KycActivity` never navigates directly to `IdentityVerificationActivity` or `BankDetailsActivity` on first launch. It always calls `GET /api/dashboard-kyc/status` first and derives what's needed from the response:
 
 | Condition | Action |
 |---|---|
-| No `entityType` | Call `POST /api/kyc/initiate` (entity_type = "individual"), then proceed to section A |
+| No `entityType` | Call `POST /api/dashboard-kyc/initiate` (entity_type = "individual"), then proceed to section A |
 | 422 from `initiateKyc` | Treat as success — KYC was already initiated; proceed to section A |
 | 403 from `initiateKyc` | Show "pending registration" panel with server message |
-| Section A PENDING or REJECTED | Call `POST /api/kyc/submit-a` (has_gst = "0") |
+| Section A PENDING or REJECTED | Call `POST /api/dashboard-kyc/sections/a` (has_gst = "0") |
 | KYC already submitted | Go directly to `KycStatusActivity` |
-| Both B + C are UNDER_REVIEW | Call `POST /api/kyc/agree`, then `GET /api/kyc/status` → `KycStatusActivity` |
+| Both B + C are UNDER_REVIEW | Call `POST /api/dashboard-kyc/agree`, then `GET /api/dashboard-kyc/status` → `KycStatusActivity` |
 
 `KycActivity` uses `ActivityResultLauncher` for both `IdentityVerificationActivity` and `BankDetailsActivity`. `resultCode == 1` from either child triggers a full `startKyc()` refresh.
 
@@ -112,7 +112,7 @@ Back press on steps 1–3 → `goToPreviousStep()`.
 
 **Selfie compression** — captured JPEG is compressed on `Dispatchers.IO` before the callback fires: quality steps down from 85 → 70 → 55 → 40 until the file is ≤2 MB. EXIF rotation is corrected before compression.
 
-**Submit** — on step 3 continue, `submitIdentity()` reads all four byte arrays on `Dispatchers.IO` and calls `viewModel.submitIdentity()` which POSTs a multipart form to `api/kyc/submit-b` (PAN, Aadhaar front/back, selfie). Success → `setResult(1); finish()`.
+**Submit** — on step 3 continue, `submitIdentity()` reads all four byte arrays on `Dispatchers.IO` and calls `viewModel.submitIdentity()` which POSTs a multipart form to `api/dashboard-kyc/sections/b/signatory` (PAN, Aadhaar front/back, selfie). Success → `setResult(1); finish()`.
 
 ---
 
@@ -126,7 +126,7 @@ Supports 1–4 bank accounts (controlled by `MAX_ACCOUNTS = 4`). Cards are dynam
 
 **Validation** per card (in order): account number → bank name → IFSC format → branch name → proof type → statement period (if applicable) → proof URI. First failure shows a toast and returns false.
 
-**Submit** — reads all proof URIs on `Dispatchers.IO` via `contentResolver`, then calls `viewModel.submit()` which POSTs a multipart form to `api/kyc/submit-c`. Success → `setResult(1); finish()`.
+**Submit** — reads all proof URIs on `Dispatchers.IO` via `contentResolver`, then calls `viewModel.submit()` which POSTs a multipart form to `api/dashboard-kyc/sections/c`. Success → `setResult(1); finish()`.
 
 `LiquidGlassEffect.attach()` is called individually on the upload button (`flUpload1`), edit button (`flEdit1`), and delete button (`flDelete1`) for each card — call sites use the card binding's root, not `binding.root`.
 
@@ -134,7 +134,7 @@ Supports 1–4 bank accounts (controlled by `MAX_ACCOUNTS = 4`). Cards are dynam
 
 ## KycStatusActivity
 
-Receives a `KycStatusItem` as JSON via `EXTRA_STATUS` intent extra. Swipe-to-refresh triggers `viewModel.fetchStatus()` which re-fetches `GET /api/kyc/status`.
+Receives a `KycStatusItem` as JSON via `EXTRA_STATUS` intent extra. Swipe-to-refresh triggers `viewModel.fetchStatus()` which re-fetches `GET /api/dashboard-kyc/status`.
 
 | Status | UI | Action |
 |---|---|---|
@@ -153,12 +153,12 @@ All declared in `ApiService.kt` under the `// ── KYC ──` section.
 
 | Method | Path | Purpose | Response model |
 |---|---|---|---|
-| GET | `api/kyc/status` | Fetch full KYC status | `KycStatusItem` (flat, not `General<T>`) |
-| POST | `api/kyc/initiate` | Start KYC for a new user (multipart: `entity_type`) | `General<KycSubmissionDataItem>` |
-| POST | `api/kyc/submit-a` | Submit section A placeholder (multipart: `has_gst = "0"`) | `General<KycSubmissionDataItem>` |
-| POST | `api/kyc/submit-b` | Submit identity documents (multipart: PAN, Aadhaar ×2, selfie) | `General<KycSubmissionDataItem>` |
-| POST | `api/kyc/submit-c` | Submit bank documents (multipart: per-account fields + proof) | `General<KycSubmissionDataItem>` |
-| POST | `api/kyc/agree` | Mark KYC agreement (empty body) | `General<KycAgreeDataItem>` |
+| GET | `api/dashboard-kyc/status` | Fetch full KYC status | `KycStatusItem` (flat, not `General<T>`) |
+| POST | `api/dashboard-kyc/initiate` | Start KYC for a new user (multipart: `entity_type`) | `General<KycSubmissionDataItem>` |
+| POST | `api/dashboard-kyc/sections/a` | Submit section A placeholder (multipart: `has_gst = "0"`) | `General<KycSubmissionDataItem>` |
+| POST | `api/dashboard-kyc/sections/b/signatory` | Submit identity documents (multipart: PAN, Aadhaar ×2, selfie) | `General<KycSubmissionDataItem>` |
+| POST | `api/dashboard-kyc/sections/c` | Submit bank documents (multipart: per-account fields + proof) | `General<KycSubmissionDataItem>` |
+| POST | `api/dashboard-kyc/agree` | Mark KYC agreement (empty body) | `General<KycAgreeDataItem>` |
 
 `KycStatusItem` is a **flat** response (no `General<T>` wrapper) — success check is `response.isSuccessful && body?.success == true`.
 
@@ -170,13 +170,13 @@ All multipart submissions use `@Multipart @POST` with `@Part` for byte arrays an
 
 | Class | Purpose |
 |---|---|
-| `KycStatusItem` | Root response for `GET /api/kyc/status` |
+| `KycStatusItem` | Root response for `GET /api/dashboard-kyc/status` |
 | `KycSubmissionStatusItem` | Nested: overall submission record (status, entityType, dates) |
 | `KycSectionsItem` | Nested: sections A / B / C review records |
 | `KycSectionStatusItem` / `KycSectionReviewItem` | Per-section status and review result |
 | `KycSubmissionDataItem` | Response data for initiate / submit-a/b/c |
 | `KycAgreeDataItem` | Response data for agree endpoint |
-| `KycMyAccountItem` | Flat response for `GET /api/kyc/my-account` — used by `KycDetailsActivity` in `myaccount/` |
+| `KycMyAccountItem` | Flat response for `GET /api/dashboard-kyc/my-account` — used by `KycDetailsActivity` in `myaccount/` |
 | `KycDocumentsInfoItem` / `KycDocumentItem` / `KycDocumentDetailItem` | Document list inside `KycMyAccountItem` |
 | `KycIdentityItem` / `KycBankInfoItem` / `KycBankAccountDetailItem` | Identity and bank fields inside `KycMyAccountItem` |
 | `KycSignatoryDataItem` | Signatory details inside `KycMyAccountItem` |
@@ -203,4 +203,4 @@ After onboarding is complete, the user can view their submitted KYC data from **
 |---|---|---|---|
 | `KycDetailsActivity` | `myaccount/` | `KycDetailsViewModel` | `MyAccountActivity` → "View KYC Details" |
 
-`KycDetailsViewModel` calls `GET /api/kyc/my-account` (flat `KycMyAccountItem`). Document taps launch `DocPreviewActivity` (also in `myaccount/`) with `extra_file_url` and `extra_file_title`.
+`KycDetailsViewModel` calls `GET /api/dashboard-kyc/my-account` (flat `KycMyAccountItem`). Document taps launch `DocPreviewActivity` (also in `myaccount/`) with `extra_file_url` and `extra_file_title`.
