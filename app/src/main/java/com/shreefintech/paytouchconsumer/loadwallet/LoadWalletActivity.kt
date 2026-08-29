@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmPaymentBinding
@@ -188,6 +189,7 @@ class LoadWalletActivity : BaseActivity() {
         hideNoInternet()
         fetchWalletData()
         fetchRecentHistory()
+        fetchBankName()
     }
 
     private fun validateAndShowConfirmDialog() {
@@ -324,6 +326,13 @@ class LoadWalletActivity : BaseActivity() {
         )
     }
 
+    private fun fetchBankName() {
+        viewModel.fetchBankName(
+            onSuccess = { bankName -> binding.tvBankName.text = bankName ?: "--" },
+            onError = { binding.tvBankName.text = "--" }
+        )
+    }
+
     private fun showLoading() {
         binding.viewDimmer.visibility = View.VISIBLE
         binding.pbLoading.visibility = View.VISIBLE
@@ -340,9 +349,12 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
-        // TODO(B2C-82): hide until backend provides the correct QR invoice amount field
-        binding.tvQrInvoiceAmount.visibility = View.GONE
         binding.tvIfscCode.text = data.ifsc ?: "--"
+        Glide.with(mActivity)
+            .load(data.qrCodeUrl)
+            .placeholder(R.drawable.ic_qr)
+            .error(R.drawable.ic_qr)
+            .into(binding.ivQrCode)
         val status = data.wallet?.status
         if (!status.isNullOrEmpty()) {
             binding.tvActiveStatus.text = status.replaceFirstChar { it.uppercaseChar() }

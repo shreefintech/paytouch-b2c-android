@@ -9,6 +9,7 @@ data class WalletDataItem(
     @field:SerializedName("wallet_balance") val walletBalance: String?,
     @field:SerializedName("live_bank_balance") val liveBankBalance: Double?,
     @field:SerializedName("mobile") val mobile: String?,
+    @field:SerializedName("qr_code_url") val qrCodeUrl: String?,
     @field:SerializedName("virtual_account_number") val virtualAccountNumber: String?,
     @field:SerializedName("vpa") val vpa: String?,
     @field:SerializedName("ifsc") val ifsc: String?,
