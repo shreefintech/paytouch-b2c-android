@@ -88,4 +88,5 @@
     <color name="status_divider">#A299A1</color>
     <color name="kyc_icon_bg">#FEEEF1</color>
     <color name="preview_btn_bg">#FFC8DB</color>
+    <color name="normal_card_bg_glass">#66FFFFFF</color>
 </resources>

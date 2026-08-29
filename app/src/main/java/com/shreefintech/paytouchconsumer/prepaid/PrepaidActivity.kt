@@ -30,6 +30,8 @@ import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptA
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransactionReportActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidViewModel
+import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
+import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlanItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -64,6 +66,20 @@ class PrepaidActivity : BaseActivity() {
             val plan = json?.let { Gson().fromJson(it, PrepaidPlanItem::class.java) }
             if (plan != null) onPlanSelected(plan)
         }
+    }
+
+    private val operatorSelectionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        val json = result.data?.getStringExtra(OperatorSelectionActivity.EXTRA_SELECTED) ?: return@registerForActivityResult
+        val item = Gson().fromJson(json, OperatorSelectionItem::class.java)
+        selectedOperatorId = item.id
+        selectedOperatorCode = item.code
+        selectedOperatorName = item.name
+        binding.tvCompany.text = item.name
+        binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
+        clearSelectedPlan()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -204,28 +220,15 @@ class PrepaidActivity : BaseActivity() {
 
     // ── UI Helpers ────────────────────────────────────────────────────────────
 
-    private fun showCompanyDropdown() {
+    private fun showOperatorSelection() {
         Utility.hideKeyboard(binding.clRoot)
         if (operatorItems.isEmpty()) {
             loadOperators()
             ToastUtil.showWarning(mActivity, getString(R.string.msgLoadingOperators))
             return
         }
-        val names = operatorItems.map { it.name ?: "" }
-        CustomDropdown.showDropdown(
-            activity = mActivity,
-            anchorView = binding.flCompanyAnchor,
-            arrowView = binding.ivCompanyArrow,
-            textView = binding.tvCompany,
-            items = names
-        ) { selected, index ->
-            val operator = operatorItems.getOrNull(index)
-            selectedOperatorId = operator?.id
-            selectedOperatorCode = operator?.code
-            selectedOperatorName = selected
-            binding.tvCompany.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-            clearSelectedPlan()
-        }
+        val items = operatorItems.map { OperatorSelectionItem(id = it.id ?: "", name = it.name ?: "", code = it.code) }
+        operatorSelectionLauncher.launch(OperatorSelectionActivity.newIntent(mActivity, items, selectedOperatorId))
     }
 
     private fun showStateDropdown() {
@@ -388,7 +391,7 @@ class PrepaidActivity : BaseActivity() {
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    showCompanyDropdown()
+                    showOperatorSelection()
                 }
                 binding.flStateAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener

@@ -20,7 +20,8 @@
     <string name="msgLoginSuccess">Login successful</string>
 
     <!-- Login validation messages -->
-    <string name="msgNameEmpty">Please enter your name</string>
+    <string name="msgNameEmpty">Please enter your full name</string>
+    <string name="msgNameInvalid">Name can only contain letters and spaces</string>
     <string name="msgMobileEmpty">Please enter your mobile number</string>
     <string name="msgMobileInvalid">Enter a valid 10-digit mobile number</string>
     <string name="msgPasswordEmpty">Please enter your password</string>
@@ -140,7 +141,6 @@
     <!-- Create Virtual Account screen -->
     <string name="titleCreateVirtualAccount">Create Virtual Account</string>
     <string name="subtitleCreateVirtualAccount">Fill up the details to create your virtual account</string>
-    <string name="labelFullName">Full Name</string>
     <string name="hintFullName">Enter your full name</string>
     <string name="msgFullNameEmpty">Please enter your full name</string>
     <string name="labelState">State</string>
@@ -357,6 +357,8 @@
     <string name="btnClear">Clear</string>
     <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 digits</string>
     <string name="msgLoadingOperators">Loading operators, please wait…</string>
+    <string name="hintSearchOperator">Search operator…</string>
+    <string name="msgNoOperatorsFound">No operators found</string>
 
     <!-- Bill Details card -->
     <string name="titleBillDetailsFetched">Electricity Bill Details Fetched</string>
@@ -556,7 +558,7 @@
     <string name="textVerificationRejected">Verification Failed!</string>
     <string name="msgVerificationRejected">We couldn\'t verify your details, Please resubmit to continue</string>
     <string name="btnRetry">Retry</string>
-    <string name="label_name">Name</string>
+    <string name="labelFullName">Full Name</string>
     <string name="hintName">Enter your full name</string>
 
     <!-- KYC Details -->

@@ -159,37 +159,5 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Capture button -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:layout_marginTop="@dimen/margin_extra_large"
-            app:cardBackgroundColor="@color/primary"
-            app:cardCornerRadius="@dimen/button_corner_radius"
-            app:strokeWidth="0dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:id="@+id/btnCapture"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?selectableItemBackground"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/proza_libre_semi_bold"
-                    android:includeFontPadding="false"
-                    android:text="@string/btnCapture"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_14" />
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -2,8 +2,12 @@ package com.shreefintech.paytouchconsumer.utill
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.pdf.PdfRenderer
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.SystemClock
 import android.text.InputFilter
 import android.text.Spanned
@@ -112,6 +116,20 @@ object Utility {
         if (number.length < 5) return number
         return "${number.take(4)}*****${number.takeLast(1)}"
     }
+
+    fun renderPdfFirstPage(context: Context, uri: Uri, widthPx: Int = 800): Bitmap? = try {
+        context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
+            PdfRenderer(pfd).use { renderer ->
+                renderer.openPage(0).use { page ->
+                    val scale = widthPx.toFloat() / page.width
+                    val bmp = Bitmap.createBitmap(widthPx, (page.height * scale).toInt(), Bitmap.Config.ARGB_8888)
+                    bmp.eraseColor(Color.WHITE)
+                    page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                    bmp
+                }
+            }
+        }
+    } catch (_: Exception) { null }
 
     fun calculatePlatformFee(amount: Double): Double {
         return when {

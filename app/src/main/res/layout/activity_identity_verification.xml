@@ -13,6 +13,10 @@
         <variable
             name="showProgressSubmit"
             type="androidx.databinding.ObservableBoolean" />
+
+        <variable
+            name="showCaptureButton"
+            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -64,7 +68,7 @@
                 android:src="@drawable/img_bharat_connect" />
         </LinearLayout>
 
-        <!-- ── Previous / Continue buttons ── -->
+        <!-- ── Capture / Continue / Submit buttons ── -->
         <LinearLayout
             android:id="@+id/llButtons"
             android:layout_width="0dp"
@@ -76,10 +80,47 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
+            <!-- Capture (visible only on selfie step) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:visibility="@{showCaptureButton ? View.VISIBLE : View.GONE}"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/primary"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="@dimen/button_corner_radius"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:id="@+id/btnCapture"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?selectableItemBackground"
+                    android:gravity="center"
+                    android:onClickListener="@{onClickListener}"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/btnCapture"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_size_14" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Continue / Submit -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
                 app:strokeWidth="0dp"
                 app:cardBackgroundColor="@color/primary"
                 app:cardCornerRadius="@dimen/button_corner_radius"

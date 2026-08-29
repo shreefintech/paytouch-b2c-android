@@ -85,7 +85,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     response: Response<General<KycSubmissionDataItem>>
                 ) {
                     when {
-                        response.isSuccessful && response.body()?.data != null ->
+                        response.isSuccessful ->
                             submitSectionAPlaceholder(onReady, onError)
                         response.code() == 422 ->
                             submitSectionAPlaceholder(onReady, onError)

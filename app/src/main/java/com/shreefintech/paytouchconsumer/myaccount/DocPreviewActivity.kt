@@ -23,10 +23,8 @@ import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
@@ -147,60 +145,43 @@ class DocPreviewActivity : BaseActivity() {
             return
         }
         hideNoInternet()
-        val lower = url.lowercase()
-        when {
-            isPdfUrl(lower) -> viewModel.loadPdf(
+        if (isPdfUrl(url.lowercase())) {
+            viewModel.loadPdf(
                 url = url,
                 onLoading = { showLoading(true) },
                 onReady = { file -> showLoading(false); openPdfRenderer(file) },
                 onError = { loadInWebView(Constant.URL_GOOGLE_DOC_VIEWER + Uri.encode(url)) }
             )
-            isImageUrl(lower) -> {
-                showLoading(true)
-                Glide.with(this)
-                    .load(url)
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            showLoading(false)
-                            showError(getString(R.string.errFailedToLoadImage, e?.message ?: ""))
-                            return true
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable,
-                            model: Any,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            showLoading(false)
-                            scaleFactor = 1f
-                            binding.imagePreview.scaleX = 1f
-                            binding.imagePreview.scaleY = 1f
-                            binding.imagePreview.visibility = View.VISIBLE
-                            binding.webViewPreview.visibility = View.GONE
-                            binding.layoutPdfControls.visibility = View.GONE
-                            return false
-                        }
-                    })
-                    .into(binding.imagePreview)
-            }
-            else -> loadInWebView(url)
+        } else {
+            // CustomTarget bypasses Glide's ViewTarget dimension check, which would deadlock
+            // because showLoading(true) hides layoutContent (GONE → zero dimensions on imagePreview).
+            // Glide decodes by content, not URL extension — extension-less URLs work too.
+            // Falls back to WebView if the URL is not an image Glide can decode.
+            showLoading(true)
+            Glide.with(this)
+                .asBitmap()
+                .load(url)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        showLoading(false)
+                        scaleFactor = 1f
+                        binding.imagePreview.scaleX = 1f
+                        binding.imagePreview.scaleY = 1f
+                        binding.imagePreview.setImageBitmap(resource)
+                        binding.imagePreview.visibility = View.VISIBLE
+                        binding.webViewPreview.visibility = View.GONE
+                        binding.layoutPdfControls.visibility = View.GONE
+                    }
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        loadInWebView(url)
+                    }
+                })
         }
     }
 
     private fun isPdfUrl(url: String) =
         url.endsWith(".pdf") || url.contains(".pdf?") || url.contains("type=pdf")
-
-    private fun isImageUrl(url: String): Boolean {
-        val exts = listOf(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp")
-        return exts.any { url.contains(it) }
-    }
 
     // ─── PDF ───────────────────────────────────────────────────────────────────
 

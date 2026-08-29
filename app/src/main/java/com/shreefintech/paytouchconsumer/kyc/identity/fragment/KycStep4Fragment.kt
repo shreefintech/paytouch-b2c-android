@@ -41,10 +41,6 @@ class KycStep4Fragment : BaseKycStepFragment() {
         attachEditDeleteGlass(binding.flDelete1)
         viewModel.selfieUri?.let { showPreview(it) }
 
-        binding.btnCapture.setOnClickListener {
-            Utility.hideKeyboard(requireActivity())
-            capture()
-        }
         binding.ivEditProof1.setOnClickListener {
             Utility.hideKeyboard(requireActivity())
             capture()
@@ -66,12 +62,17 @@ class KycStep4Fragment : BaseKycStepFragment() {
         )
     }
 
-    private fun capture() {
-        if (Utility.stopClick()) return
+    // Called by the activity's Capture button (no stopClick — activity already guards it)
+    fun triggerCapture() {
         (requireActivity() as IdentityVerificationActivity).captureSelfie { uri ->
             viewModel.setSelfieUri(uri)
             showPreview(uri)
         }
+    }
+
+    private fun capture() {
+        if (Utility.stopClick()) return
+        triggerCapture()
     }
 
     private fun clearSelfie() {

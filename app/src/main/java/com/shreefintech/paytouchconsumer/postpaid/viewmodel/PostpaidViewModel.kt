@@ -140,7 +140,7 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
         ApiClient.apiService.fetchPostpaidBill(
             bearerToken(),
             PostpaidFetchBillRequest(
-                connectionNumber = mobileNumber,
+                mobileNumber = mobileNumber,
                 operatorId = operatorId,
                 circleId = "0"
             )
