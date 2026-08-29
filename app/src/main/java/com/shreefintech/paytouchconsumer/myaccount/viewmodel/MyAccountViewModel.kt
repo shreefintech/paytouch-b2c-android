@@ -2,15 +2,12 @@ package com.shreefintech.paytouchconsumer.myaccount.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -22,25 +19,22 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun getAccountInfo(
         onLoading: () -> Unit,
-        onSuccess: (AccountInfoDataItem) -> Unit,
+        onSuccess: (AccountInfoItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
             onError(getString(R.string.msgNoInternet))
             return
         }
-        val userId = SharedPreferenceHelper.getSharedPreferenceString(
-            getApplication(), Constant.KEY_USER_ID, null
-        ) ?: ""
         onLoading()
-        ApiClient.apiService.getKycAccountInfo(bearerToken(), userId)
+        ApiClient.apiService.getAccountOverview(bearerToken())
             .enqueue(object : Callback<AccountInfoItem> {
                 override fun onResponse(
                     call: Call<AccountInfoItem>,
                     response: Response<AccountInfoItem>
                 ) {
                     if (response.isSuccessful && response.body()?.success == true) {
-                        val data = response.body()?.kycData
+                        val data = response.body()
                         if (data != null) {
                             onSuccess(data)
                         } else {

@@ -771,6 +771,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/margin_medium"
+                            android:layout_marginStart="@dimen/checkbox_row_negative_margin"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
@@ -786,6 +787,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
+                                android:textAlignment="viewStart"
                                 android:fontFamily="@font/proza_libre_medium"
                                 android:includeFontPadding="false"
                                 android:textColor="@color/black"

@@ -18,7 +18,7 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityMyAccountBinding
 import com.shreefintech.paytouchconsumer.myaccount.viewmodel.MyAccountViewModel
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -88,7 +88,7 @@ class MyAccountActivity : BaseActivity() {
                 binding.shimmerAccountInfo.startShimmer()
                 binding.llAccountInfoContent.visibility = View.GONE
             },
-            onSuccess = { data ->
+            onSuccess = { data: AccountInfoItem ->
                 isAccountInfoLoading = false
                 binding.shimmerAccountInfo.stopShimmer()
                 binding.shimmerAccountInfo.visibility = View.GONE
@@ -137,26 +137,16 @@ class MyAccountActivity : BaseActivity() {
 
     // ── Populate ──────────────────────────────────────────────
 
-    private fun populateAccountInfo(data: AccountInfoDataItem) {
-        binding.tvMemberId.text = data.memberId ?: "--"
-        binding.tvMemberNo.text = data.memberNo ?: "--"
-        binding.tvMemberCode.text = data.memberCode ?: "--"
-        binding.tvMemberName.text = data.memberName ?: "--"
-        binding.tvMobileNo.text = data.mobileNo ?: "--"
-        binding.tvEmail.text = data.email ?: "--"
-        binding.tvStatus.text = data.status ?: "--"
-        binding.tvCity.text = data.cityName ?: "--"
+    private fun populateAccountInfo(data: AccountInfoItem) {
+        binding.tvMemberName.text = data.name ?: "--"
+        binding.tvStatus.text = data.member?.status ?: "--"
+        binding.tvMemberCode.text = data.member?.memberCode ?: "--"
+        binding.tvMobileNo.text = data.contact?.mobile ?: "--"
+        binding.tvEmail.text = data.contact?.email ?: "--"
         binding.tvHomeAddress.text = data.homeAddress ?: "--"
-        binding.tvRegistrationDate.text = Utility.formatDate(data.registrationDate, "dd-MM-yyyy")
-        binding.tvActivationDate.text = Utility.formatDate(data.activationDate, "dd-MM-yyyy")
-
-        val balanceRaw = data.balance ?: "--"
-        val (amount, words) = parseBalance(balanceRaw)
-        binding.tvBalance.text = if (data.balance != null) Utility.formatAmount(amount) else "--"
-        if (words.isNotEmpty()) {
-            binding.tvBalanceWords.text = "($words)"
-            binding.tvBalanceWords.visibility = View.VISIBLE
-        }
+        binding.tvRegistrationDate.text = Utility.formatDate(data.membership?.registeredOn, "dd-MM-yyyy")
+        binding.tvActivationDate.text = Utility.formatDate(data.membership?.activatedOn, "dd-MM-yyyy")
+        binding.tvBalance.text = if (data.walletBalance != null) Utility.formatAmount(data.walletBalance) else "--"
     }
 
     private fun populateReferralInfo(data: ReferralDataItem) {
@@ -177,18 +167,6 @@ class MyAccountActivity : BaseActivity() {
     }
 
     // ── Helpers ───────────────────────────────────────────────
-
-    // balance API field format: "100.00 [ Rupees One Hundred Only ]"
-    private fun parseBalance(raw: String): Pair<String, String> {
-        val bracketIdx = raw.indexOf('[')
-        return if (bracketIdx > 0) {
-            val amount = raw.substring(0, bracketIdx).trim()
-            val words = raw.substringAfter('[').substringBefore(']').trim()
-            Pair(amount, words)
-        } else {
-            Pair(raw, "")
-        }
-    }
 
     private fun copyToClipboard(label: String, text: String) {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

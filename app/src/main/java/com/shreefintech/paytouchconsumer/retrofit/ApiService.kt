@@ -510,10 +510,9 @@ interface ApiService {
 
     // ── My Account ───────────────────────────────────────────────────────────
 
-    @GET("${AUTH}kyc/account-info")
-    fun getKycAccountInfo(
-        @Header("Authorization") authorization: String,
-        @Query("id") id: String
+    @GET("${AUTH}dashboard-kyc/account-overview")
+    fun getAccountOverview(
+        @Header("Authorization") authorization: String
     ): Call<AccountInfoItem>
 
     @GET("${AUTH}referral-info")

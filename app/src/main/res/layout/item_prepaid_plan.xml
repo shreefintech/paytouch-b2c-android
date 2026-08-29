@@ -52,9 +52,11 @@
             android:layout_marginTop="@dimen/margin_small"
             android:fontFamily="@font/proza_libre_regular"
             android:includeFontPadding="false"
+            android:maxLines="3"
             android:textColor="@color/black"
             android:textSize="@dimen/text_size_13"
             tools:text="Data: 1.5 GB/day | Voice: Unlimited Calls | SMS: 100 SMS/day | Validity: 22 Days" />
+
 
         <!-- Talktime | Data footer -->
         <androidx.appcompat.widget.AppCompatTextView

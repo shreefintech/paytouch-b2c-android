@@ -25,6 +25,8 @@ class RecentTransactionAdp(
         return ViewHolder(binding)
     }
 
+    private var expandedPosition = -1
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         bindItem(holder.binding, item)
@@ -32,8 +34,20 @@ class RecentTransactionAdp(
         holder.binding.llHeader.setOnClickListener {
             val pos = holder.bindingAdapterPosition
             if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
-            mArrayList[pos].isExpanded = !mArrayList[pos].isExpanded
-            notifyItemChanged(pos)
+            if (pos == expandedPosition) {
+                mArrayList[pos].isExpanded = false
+                expandedPosition = -1
+                notifyItemChanged(pos)
+            } else {
+                val prev = expandedPosition
+                if (prev != -1) {
+                    mArrayList[prev].isExpanded = false
+                    notifyItemChanged(prev)
+                }
+                mArrayList[pos].isExpanded = true
+                expandedPosition = pos
+                notifyItemChanged(pos)
+            }
         }
     }
 
@@ -73,6 +87,7 @@ class RecentTransactionAdp(
     }
 
     fun updateList(items: List<RecentTransactionItem>) {
+        expandedPosition = -1
         mArrayList.clear()
         mArrayList.addAll(items)
         notifyDataSetChanged()

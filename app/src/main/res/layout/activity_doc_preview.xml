@@ -4,14 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        tools:context=".admin.kyc.DocPreviewActivity">
+        tools:context=".myaccount.DocPreviewActivity">
 
         <!-- AppBar -->
         <include
@@ -106,7 +108,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:padding="24dp"
-                    android:textColor="#B00020"
+                    android:textColor="@color/form_wizard_reject"
                     android:textSize="14sp"
                     android:visibility="gone"
                     tools:text="Failed to load document"
@@ -134,6 +136,7 @@
                     android:rotation="180"
                     android:src="@drawable/ic_right_arrow"
                     android:background="?attr/selectableItemBackgroundBorderless"
+                    android:onClick="@{onClickListener}"
                     android:enabled="false" />
 
                 <TextView
@@ -151,7 +154,8 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_right_arrow"
-                    android:background="?attr/selectableItemBackgroundBorderless" />
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:onClick="@{onClickListener}" />
 
             </LinearLayout>
 
