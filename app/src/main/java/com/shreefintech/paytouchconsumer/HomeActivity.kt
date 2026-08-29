@@ -1,13 +1,19 @@
 package com.shreefintech.paytouchconsumer
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
@@ -34,10 +40,23 @@ class HomeActivity : BaseActivity() {
     private val viewModel: HomeViewModel by viewModels()
     private val showProgressLogout = ObservableBoolean(false)
 
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
+
+    private val updateResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        if (result.resultCode != Activity.RESULT_OK) {
+            // User dismissed/cancelled a mandatory update — re-trigger immediately so the app remains blocked.
+            checkForForceUpdate()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        checkForForceUpdate()
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -60,6 +79,35 @@ class HomeActivity : BaseActivity() {
         binding.onClickListener = listener
         binding.lytToolbar.onClickListener = listener
         onBack()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // If the app was backgrounded mid-update (e.g. user switched apps during download),
+        // Play Store pauses the flow instead of cancelling it — resume it here.
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+            if (info.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                appUpdateManager.startUpdateFlowForResult(
+                    info,
+                    updateResultLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
+                )
+            }
+        }
+    }
+
+    private fun checkForForceUpdate() {
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+            if (info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+            ) {
+                appUpdateManager.startUpdateFlowForResult(
+                    info,
+                    updateResultLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
+                )
+            }
+        }
     }
 
     private fun onBack() {

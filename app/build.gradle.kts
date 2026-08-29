@@ -12,15 +12,15 @@ android {
         applicationId = "com.shreefintech.paytouchconsumer"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -69,4 +69,7 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation("androidx.fragment:fragment-ktx:1.8.5")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    // In-app updates (force update on Home screen)
+    implementation(libs.play.app.update)
 }

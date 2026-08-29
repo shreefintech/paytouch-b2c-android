@@ -51,7 +51,7 @@ object ApiClient {
             clientBuilder.addInterceptor(
                 HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
             )
-            clientBuilder.addInterceptor(CurlInterceptor())
+//            clientBuilder.addInterceptor(CurlInterceptor())
         }
 
         return Retrofit.Builder()
