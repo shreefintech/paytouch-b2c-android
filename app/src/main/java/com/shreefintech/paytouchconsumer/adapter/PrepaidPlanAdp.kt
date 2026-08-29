@@ -21,8 +21,10 @@ class PrepaidPlanAdp(
 
     var onClickItem: ((PrepaidPlanItem) -> Unit)? = null
 
-    inner class ViewHolder(val binding: ItemPrepaidPlanBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ItemPrepaidPlanBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        var pendingDescriptionRunnable: Runnable? = null
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemPrepaidPlanBinding.inflate(
@@ -58,15 +60,16 @@ class PrepaidPlanAdp(
             tvPlanDescription.setOnClickListener(null)
             tvPlanDescription.isClickable = false
 
-            tvPlanDescription.post {
+            holder.pendingDescriptionRunnable?.let { tvPlanDescription.removeCallbacks(it) }
+            val descriptionRunnable = Runnable {
                 val pos = holder.bindingAdapterPosition
-                if (pos == RecyclerView.NO_POSITION) return@post
+                if (pos == RecyclerView.NO_POSITION) return@Runnable
                 val w = tvPlanDescription.width - tvPlanDescription.paddingLeft - tvPlanDescription.paddingRight
-                if (w <= 0) return@post
+                if (w <= 0) return@Runnable
                 val fullText = mArrayList[pos].description ?: "--"
                 val paint = tvPlanDescription.paint
                 val fullLayout = StaticLayout.Builder.obtain(fullText, 0, fullText.length, paint, w).build()
-                if (fullLayout.lineCount <= 3) return@post
+                if (fullLayout.lineCount <= 3) return@Runnable
 
                 val suffix = mContext.getString(R.string.labelViewMore)
                 val suffixWidth = paint.measureText(suffix)
@@ -94,6 +97,8 @@ class PrepaidPlanAdp(
                     tvPlanDescription.isClickable = false
                 }
             }
+            holder.pendingDescriptionRunnable = descriptionRunnable
+            tvPlanDescription.post(descriptionRunnable)
         }
 
         holder.binding.root.setOnClickListener {
