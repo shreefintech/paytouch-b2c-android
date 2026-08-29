@@ -350,7 +350,7 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
         binding.tvIfscCode.text = data.ifsc ?: "--"
-        Glide.with(binding.ivQrCode)
+        Glide.with(mActivity)
             .load(data.qrCodeUrl)
             .placeholder(R.drawable.ic_qr)
             .error(R.drawable.ic_qr)

@@ -165,6 +165,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 ) {
                     val body = response.body()
                     if (response.isSuccessful && body?.success == true) {
+                        // Only one bank account can be linked per user today, so the 0th index is always the linked account
                         onSuccess(body.bank?.accounts?.firstOrNull()?.bankName)
                     } else {
                         onError(
@@ -180,5 +181,4 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 }
             })
     }
-
 }
