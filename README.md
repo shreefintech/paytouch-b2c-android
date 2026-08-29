@@ -27,8 +27,9 @@ com.shreefintech.paytouchconsumer/
 +-- auth/               Login, OTP, password/MPIN reset, register, splash
 |   \-- viewmodel/
 |
-+-- onboarding/         KYC upload, Virtual Account creation (post-login gates)
-|   \-- viewmodel/
++-- kyc/                KYC hub, identity verification, bank details, KYC status (post-login gate)
+|   +-- identity/
+|   \-- bank/
 |
 +-- electricity/        Electricity bill payment + transaction history (canonical module template)
 |   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt

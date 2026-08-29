@@ -56,7 +56,7 @@ Write production-ready Kotlin/MVVM Android code — readable, performant, scalab
 ```
 com.shreefintech.paytouchconsumer/
 ├── auth/           # Login, OTP, password/MPIN flows, create-account
-├── onboarding/     # onboarding/kyc/ — KYC hub (KycActivity), identity verification (IdentityVerificationActivity), bank details (BankDetailsActivity), KYC status (KycStatusActivity); virtual account is handled server-side — no client Activity
+├── kyc/            # KYC hub (KycActivity), identity verification (kyc/identity/IdentityVerificationActivity), bank details (kyc/bank/BankDetailsActivity), KYC status (KycStatusActivity); virtual account is handled server-side — no client Activity
 ├── home/           # Home/Dashboard screen (HomeActivity — currently at root level, will move here)
 ├── electricity/    # Electricity bill payment + transaction history (canonical module template)
 ├── gas/            # Gas bill payment + transaction history

@@ -10,7 +10,6 @@
     <dimen name="checkbox_row_negative_margin">-10dp</dimen>
     <dimen name="margin_tiny">2dp</dimen>
     <dimen name="margin_extra_small">5dp</dimen>
-    <dimen name="checkbox_start_offset">-5dp</dimen>
     <dimen name="margin_small">8dp</dimen>
     <dimen name="margin_small_medium">10dp</dimen>
     <dimen name="margin_medium">12dp</dimen>

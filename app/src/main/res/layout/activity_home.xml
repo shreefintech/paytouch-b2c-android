@@ -509,7 +509,7 @@
 
                     </LinearLayout>
 
-                    <!-- Load Wallet — pinned at bottom -->
+                    <!-- Load Wallet — scrolls with content, last item in NestedScrollView -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cvLoadWallet"
                         android:layout_width="match_parent"

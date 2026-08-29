@@ -66,7 +66,7 @@ Logged In → Logged Out (automatic, on any 401 response)
 
 ## 2. KYC (Know Your Customer)
 
-**Screens:** `onboarding/kyc/KycActivity` (hub) → `onboarding/kyc/identity/IdentityVerificationActivity` + `onboarding/kyc/bank/BankDetailsActivity`
+**Screens:** `kyc/KycActivity` (hub) → `kyc/identity/IdentityVerificationActivity` + `kyc/bank/BankDetailsActivity`
 
 ### What It Does
 KYC is split into two independently-completable sections, tracked by a 0/2 progress card on the hub:
@@ -345,7 +345,7 @@ amount > 40000           → fee = ₹30
 | POST | `api/hdfc/create-order` | Create HDFC payment order for wallet top-up |
 | GET | `api/wallet/transactions` | Paginated wallet transaction history (Load Wallet screen) |
 | GET | `api/hdfc/order-status/{orderId}` | Check HDFC order status after returning from WebView |
-| GET | `api/kyc/my-account` | Fetch full KYC details for `KycDetailsActivity` |
+| GET | `api/dashboard-kyc/my-account` | Fetch full KYC details for `KycDetailsActivity` |
 
 ### Response Fields (Balance)
 - `data.balance` (Decimal) — current wallet balance
