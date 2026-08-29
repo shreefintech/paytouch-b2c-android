@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc.bank
+package com.shreefintech.paytouchconsumer.kyc.bank
 
 import android.content.Context
 import android.content.Intent
@@ -27,7 +27,7 @@ import com.shreefintech.paytouchconsumer.databinding.ItemBankAccountBinding
 import com.shreefintech.paytouchconsumer.enums.ProofType
 import com.shreefintech.paytouchconsumer.enums.StatementPeriod
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.onboarding.kyc.bank.model.BankAccountInputItem
+import com.shreefintech.paytouchconsumer.kyc.bank.model.BankAccountInputItem
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility

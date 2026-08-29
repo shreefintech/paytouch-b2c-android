@@ -1,8 +1,8 @@
 # Postpaid (Mobile Postpaid Bill Payment) Module
 
-Handles mobile postpaid bill payment: operator selection, circle selection, plan browsing, amount entry, payment processing, and all transaction history screens.
+Handles mobile postpaid bill payment: operator selection, circle selection, mobile number entry, bill fetch, payment processing, and all transaction history screens.
 
-**Postpaid follows the same overall structure as Prepaid** — it reuses `PrepaidPlanSelectionActivity` and `PrepaidPlanItem` directly. Read the Prepaid README for the identical parts; read this file for what's Postpaid-specific.
+**Postpaid follows the fetch-bill pattern of Gas and Electricity** — operator dropdown, mobile number / connection number entry, `fetchBill` call, bill details card, then Proceed. Read the Gas README for the identical parts; read this file for what's Postpaid-specific.
 
 ---
 
@@ -10,22 +10,18 @@ Handles mobile postpaid bill payment: operator selection, circle selection, plan
 
 | Activity | ViewModel | Purpose |
 |---|---|---|
-| `PostpaidActivity` | `PostpaidViewModel` | Operator dropdown, circle picker, mobile number entry, plan selection, amount entry, proceed to pay |
+| `PostpaidActivity` | `PostpaidViewModel` | Operator dropdown, circle picker, mobile number entry, bill fetch, proceed to pay |
 | `PostpaidRecentTransactionActivity` | `PostpaidRecentTransactionViewModel` | Paginated postpaid transaction history |
 | `PostpaidTransactionReportActivity` | `PostpaidTransactionReportViewModel` | Filtered report with date range / status / connection number filter sheet |
 | `PostpaidTransactionStatusActivity` | `PostpaidTransactionStatusViewModel` | Search transactions by transaction ID |
 | `TransactionDetailActivity` | *(none)* | **Shared** — same activity used by every module, in `transactions/`, not duplicated here |
 | `PostpaidSmsReceiptActivity` | `PostpaidSmsReceiptViewModel` | Receipt display (Receipt + Display tabs), image download, share |
 
-**Shared screen (not duplicated):** `PrepaidPlanSelectionActivity` from the `prepaid/` module — Postpaid launches it with the same `ActivityResultLauncher` pattern.
-
 All Activities live in `postpaid/` (root screen) and `postpaid/transactions/` (history screens). All ViewModels live in `postpaid/viewmodel/`.
 
 ---
 
-## Pay Flow
-
-Postpaid has no server bill-fetch step. The user must select a plan (or type an amount), but plan selection is mandatory — `onProceedToPay()` calls `onBrowsePlan()` if no plan is selected.
+## Pay Bill Flow
 
 ```
 PostpaidActivity
@@ -33,13 +29,11 @@ PostpaidActivity
     ├── onCreate ──────────────────────────────────► GET /api/mobile-postpaid/operators
     │                                                 └── populates operator dropdown
     │
-    ├── [Browse Plans] button
-    │       └── PrepaidPlanSelectionActivity  (operator + circle required, shared from prepaid/)
-    │               └── GET /api/recharge/plans/{operatorId}/{circleId}
-    │                       └── user selects plan ──► back to PostpaidActivity
-    │                               └── amount auto-filled from plan
+    ├── llFetchBill (mobile number + operator + circle entered)
+    │       └── POST /api/mobile-postpaid/fetch-bill
+    │               └── onSuccess ──────────────────► shows bill details card (cvBillDetails)
     │
-    └── llProceed (mobile + operator + circle + plan selected + terms checked + amount > 0)
+    └── llProceed (bill fetched + terms checked)
             └── verifyBalanceAndProcessPayment()
                     │
                     ├── BaseBillViewModel.checkVpsBalance() (ApiAdminClient)
@@ -54,21 +48,13 @@ PostpaidActivity
                             └── onSuccess ──────────► PostpaidSmsReceiptActivity (fromPayment=true)
 ```
 
-`PostpaidActivity` validates in this order: mobile number present → mobile number 10 digits → operator selected → circle selected → plan selected (auto-launches plan picker) → terms accepted → amount > 0.
+`PostpaidActivity` validates in this order: mobile number present (10 digits) → operator selected → circle selected → bill fetched. If "Proceed" is tapped without a fetched bill, `fetchBill()` is called automatically instead of showing an error.
 
 ---
 
-## Circle Selection — Shared Static List
+## Circle Selection — Local Static List
 
-The circle list is `Utility.STATE_LIST` (24 entries), the same static list used by Prepaid. There is no API call for circles — the user picks from this list. `circleId` is the numeric string key (e.g. `"05"`).
-
----
-
-## Plan Selection — Shared from Prepaid
-
-`PostpaidActivity` launches `PrepaidPlanSelectionActivity.start(activity, launcher, operatorId, circleId)` using an `ActivityResultLauncher`. The plan endpoint (`GET /api/recharge/plans/{operatorId}/{circleId}`) is shared — the same plans API used by Prepaid. On selection, `PostpaidActivity` receives the `PrepaidPlanItem` via `EXTRA_SELECTED_PLAN` and auto-fills the amount field.
-
-> Do not create a `PostpaidPlanSelectionActivity` — the one in `prepaid/` is shared.
+The circle list is `Utility.STATE_LIST` (24 entries). There is no API call for circles — the user picks from this local list. `circleId` is the numeric string key (e.g. `"05"`).
 
 ---
 
@@ -185,6 +171,7 @@ Postpaid-specific Retrofit request/response DTOs:
 | Class | Endpoint |
 |---|---|
 | `PostpaidOperatorItem` | GET /api/mobile-postpaid/operators |
+| `PostpaidFetchBillRequest` / `PostpaidFetchBillDataItem` | POST /api/mobile-postpaid/fetch-bill |
 | `PostpaidProcessPaymentRequest` / `PostpaidPaymentItem` | POST /api/mobile-postpaid/process-payment |
 | `PostpaidTransactionStatusRequest` / `PostpaidTransactionReportDataItem` | POST /api/mobile-postpaid/transaction-status |
 | `PostpaidTransactionReportRequest` / `PostpaidTransactionReportDataItem` | POST /api/mobile-postpaid/payment-report |
@@ -203,11 +190,11 @@ All endpoints are declared in `ApiService.kt` under the `// ── Mobile Postpa
 
 | Aspect | Gas / Electricity | Prepaid | Postpaid |
 |---|---|---|---|
-| Bill fetch step | Required (server-fetched amount) | None | None |
-| Plan selection | N/A | `PrepaidPlanSelectionActivity` (own launcher) | **Shares `PrepaidPlanSelectionActivity`** |
+| Bill fetch step | Required (server-fetched amount) | None | **Required** (server-fetched amount) |
+| Plan selection | N/A | `PrepaidPlanSelectionActivity` | None |
 | Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from `Utility.STATE_LIST` | User picks from `Utility.STATE_LIST` |
 | Transactions type param | `"electricity"` / `"gas"` | `"mobile_recharge"` | `"mobile_postpaid"` |
-| Status search field | Transaction ID | Mobile number | **Transaction ID** |
+| Status search field | Transaction ID | Mobile number | Transaction ID |
 | SMS ViewModel base | `BaseBillViewModel` subclass | Standalone `AndroidViewModel` | Standalone `AndroidViewModel` |
 | `isMobileCategory` | `false` | `true` | `true` |
 | Report filter label | Consumer number | Mobile number | Connection number |

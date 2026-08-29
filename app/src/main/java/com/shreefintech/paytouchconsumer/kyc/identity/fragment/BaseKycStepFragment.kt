@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc.identity.fragment
+package com.shreefintech.paytouchconsumer.kyc.identity.fragment
 
 import androidx.fragment.app.Fragment
 

@@ -74,7 +74,6 @@ class TransactionDetailActivity : BaseActivity() {
         }
         binding.tvMobileNumber.text  = getString(numberLabelFmt, item.mobileNumber)
         binding.tvUsername.text      = getString(R.string.labelUsernameFmt, item.username)
-        binding.tvInfoAmount.text    = item.amount
         binding.tvStatus.text        = item.status
         binding.tvDate.text          = Utility.formatDate(item.date, "dd/MM/yyyy")
         binding.tvPaymentAmount.text = item.amount

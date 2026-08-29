@@ -26,37 +26,37 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- White categories card -->
-        <FrameLayout
-            android:id="@+id/flCard"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/page_margin_horizontal"
-            android:layout_marginEnd="@dimen/page_margin_horizontal"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:layout_marginBottom="@dimen/margin_large"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="@dimen/dialog_corner_radius"
-            app:cardElevation="4dp"
-            android:clipToOutline="true"
-            android:outlineProvider="background"
+            android:layout_height="0dp"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/lytToolbar">
 
-            <LinearLayout
+            <!-- White categories card -->
+            <FrameLayout
+                android:id="@+id/flCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="@dimen/margin_medium"
-                android:orientation="vertical">
+                android:clipToOutline="true"
+                android:outlineProvider="background"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="@dimen/dialog_corner_radius"
+                app:cardElevation="4dp"
+                android:layout_marginStart="@dimen/page_margin_horizontal"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginEnd="@dimen/page_margin_horizontal"
+                android:layout_marginBottom="@dimen/margin_large">
 
-                <!-- Scrollable category grid -->
-                <androidx.core.widget.NestedScrollView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:scrollbars="none">
+                    android:orientation="vertical"
+                    android:paddingVertical="@dimen/margin_medium">
 
+                    <!-- category grid -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -86,12 +86,12 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/margin_small"
                                 android:layout_weight="1"
-                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@color/white"
+                                app:cardElevation="0dp"
                                 app:strokeColor="?attr/colorPrimary"
-                                app:strokeWidth="1dp"
-                                android:layout_marginEnd="@dimen/margin_small">
+                                app:strokeWidth="1dp">
 
                                 <LinearLayout
                                     android:id="@+id/llElectricity"
@@ -101,17 +101,17 @@
                                     android:gravity="center"
                                     android:onClickListener="@{onClickListener}"
                                     android:orientation="vertical"
-                                    android:paddingTop="@dimen/margin_medium"
-                                    android:paddingBottom="@dimen/margin_medium"
                                     android:paddingStart="@dimen/margin_small"
-                                    android:paddingEnd="@dimen/margin_small">
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingEnd="@dimen/margin_small"
+                                    android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
                                         android:background="@drawable/bg_toggle_selected"
-                                        android:src="@drawable/ic_electricity"/>
+                                        android:src="@drawable/ic_electricity" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="wrap_content"
@@ -131,13 +131,13 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="@color/white"
-                                app:strokeColor="?attr/colorPrimary"
-                                app:strokeWidth="1dp"
                                 android:layout_marginStart="@dimen/margin_small"
-                                android:layout_marginEnd="@dimen/margin_small">
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/white"
+                                app:cardElevation="0dp"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp">
 
                                 <LinearLayout
                                     android:id="@+id/llGas"
@@ -147,17 +147,17 @@
                                     android:gravity="center"
                                     android:onClickListener="@{onClickListener}"
                                     android:orientation="vertical"
-                                    android:paddingTop="@dimen/margin_medium"
-                                    android:paddingBottom="@dimen/margin_medium"
                                     android:paddingStart="@dimen/margin_small"
-                                    android:paddingEnd="@dimen/margin_small">
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingEnd="@dimen/margin_small"
+                                    android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
                                         android:background="@drawable/bg_toggle_selected"
-                                        android:src="@drawable/ic_gas"/>
+                                        android:src="@drawable/ic_gas" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="wrap_content"
@@ -177,12 +177,12 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_small"
                                 android:layout_weight="1"
-                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@color/white"
+                                app:cardElevation="0dp"
                                 app:strokeColor="?attr/colorPrimary"
-                                app:strokeWidth="1dp"
-                                android:layout_marginStart="@dimen/margin_small">
+                                app:strokeWidth="1dp">
 
 
                                 <LinearLayout
@@ -193,17 +193,17 @@
                                     android:gravity="center"
                                     android:onClickListener="@{onClickListener}"
                                     android:orientation="vertical"
-                                    android:paddingTop="@dimen/margin_medium"
-                                    android:paddingBottom="@dimen/margin_medium"
                                     android:paddingStart="@dimen/margin_small"
-                                    android:paddingEnd="@dimen/margin_small">
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingEnd="@dimen/margin_small"
+                                    android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
-                                        android:background="@drawable/bg_toggle_selected"
                                         android:layout_gravity="center"
-                                        android:src="@drawable/ic_prepaid"/>
+                                        android:background="@drawable/bg_toggle_selected"
+                                        android:src="@drawable/ic_prepaid" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="wrap_content"
@@ -233,12 +233,12 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/margin_small"
                                 android:layout_weight="1"
-                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@color/white"
+                                app:cardElevation="0dp"
                                 app:strokeColor="?attr/colorPrimary"
-                                app:strokeWidth="1dp"
-                                android:layout_marginEnd="@dimen/margin_small">
+                                app:strokeWidth="1dp">
 
                                 <LinearLayout
                                     android:id="@+id/llPostpaid"
@@ -248,17 +248,17 @@
                                     android:gravity="center"
                                     android:onClickListener="@{onClickListener}"
                                     android:orientation="vertical"
-                                    android:paddingTop="@dimen/margin_medium"
-                                    android:paddingBottom="@dimen/margin_medium"
                                     android:paddingStart="@dimen/margin_small"
-                                    android:paddingEnd="@dimen/margin_small">
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingEnd="@dimen/margin_small"
+                                    android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
                                         android:background="@drawable/bg_toggle_selected"
-                                        android:src="@drawable/ic_postpaid"/>
+                                        android:src="@drawable/ic_postpaid" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="wrap_content"
@@ -277,13 +277,13 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="@color/white"
-                                app:strokeColor="?attr/colorPrimary"
-                                app:strokeWidth="1dp"
                                 android:layout_marginStart="@dimen/margin_small"
-                                android:layout_marginEnd="@dimen/margin_small">
+                                android:layout_marginEnd="@dimen/margin_small"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/white"
+                                app:cardElevation="0dp"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp">
 
                                 <LinearLayout
                                     android:id="@+id/llDth"
@@ -293,17 +293,17 @@
                                     android:gravity="center"
                                     android:onClickListener="@{onClickListener}"
                                     android:orientation="vertical"
-                                    android:paddingTop="@dimen/margin_medium"
-                                    android:paddingBottom="@dimen/margin_medium"
                                     android:paddingStart="@dimen/margin_small"
-                                    android:paddingEnd="@dimen/margin_small">
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingEnd="@dimen/margin_small"
+                                    android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
                                         android:background="@drawable/bg_toggle_selected"
-                                        android:src="@drawable/ic_broadband"/>
+                                        android:src="@drawable/ic_broadband" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="wrap_content"
@@ -322,12 +322,12 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_small"
                                 android:layout_weight="1"
-                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@color/white"
+                                app:cardElevation="0dp"
                                 app:strokeColor="?attr/colorPrimary"
-                                app:strokeWidth="1dp"
-                                android:layout_marginStart="@dimen/margin_small">
+                                app:strokeWidth="1dp">
 
                                 <LinearLayout
                                     android:id="@+id/llFastag"
@@ -337,17 +337,17 @@
                                     android:gravity="center"
                                     android:onClickListener="@{onClickListener}"
                                     android:orientation="vertical"
-                                    android:paddingTop="@dimen/margin_medium"
-                                    android:paddingBottom="@dimen/margin_medium"
                                     android:paddingStart="@dimen/margin_small"
-                                    android:paddingEnd="@dimen/margin_small">
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingEnd="@dimen/margin_small"
+                                    android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
                                         android:background="@drawable/bg_toggle_selected"
-                                        android:src="@drawable/ic_fastag"/>
+                                        android:src="@drawable/ic_fastag" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="wrap_content"
@@ -376,12 +376,12 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/margin_small"
                                 android:layout_weight="1"
-                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@color/white"
+                                app:cardElevation="0dp"
                                 app:strokeColor="?attr/colorPrimary"
-                                app:strokeWidth="1dp"
-                                android:layout_marginEnd="@dimen/margin_small">
+                                app:strokeWidth="1dp">
 
                                 <LinearLayout
                                     android:id="@+id/llLoan"
@@ -391,17 +391,17 @@
                                     android:gravity="center"
                                     android:onClickListener="@{onClickListener}"
                                     android:orientation="vertical"
-                                    android:paddingTop="@dimen/margin_medium"
-                                    android:paddingBottom="@dimen/margin_medium"
                                     android:paddingStart="@dimen/margin_small"
-                                    android:paddingEnd="@dimen/margin_small">
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingEnd="@dimen/margin_small"
+                                    android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
                                         android:background="@drawable/bg_toggle_selected"
-                                        android:src="@drawable/ic_loan"/>
+                                        android:src="@drawable/ic_loan" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="wrap_content"
@@ -420,13 +420,13 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="@color/white"
-                                app:strokeColor="?attr/colorPrimary"
-                                app:strokeWidth="1dp"
+                                android:layout_marginStart="@dimen/margin_small"
                                 android:layout_marginEnd="@dimen/margin_small"
-                                android:layout_marginStart="@dimen/margin_small">
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/white"
+                                app:cardElevation="0dp"
+                                app:strokeColor="?attr/colorPrimary"
+                                app:strokeWidth="1dp">
 
                                 <LinearLayout
                                     android:id="@+id/llTax"
@@ -436,10 +436,10 @@
                                     android:gravity="center"
                                     android:onClickListener="@{onClickListener}"
                                     android:orientation="vertical"
-                                    android:paddingTop="@dimen/margin_medium"
-                                    android:paddingBottom="@dimen/margin_medium"
                                     android:paddingStart="@dimen/margin_small"
-                                    android:paddingEnd="@dimen/margin_small">
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingEnd="@dimen/margin_small"
+                                    android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="@dimen/category_icon_size"
@@ -465,12 +465,12 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_small"
                                 android:layout_weight="1"
-                                app:cardElevation="0dp"
                                 app:cardBackgroundColor="@color/white"
+                                app:cardElevation="0dp"
                                 app:strokeColor="?attr/colorPrimary"
-                                app:strokeWidth="1dp"
-                                android:layout_marginStart="@dimen/margin_small">
+                                app:strokeWidth="1dp">
 
                                 <LinearLayout
                                     android:id="@+id/llMyAccount"
@@ -480,10 +480,10 @@
                                     android:gravity="center"
                                     android:onClickListener="@{onClickListener}"
                                     android:orientation="vertical"
-                                    android:paddingTop="@dimen/margin_medium"
-                                    android:paddingBottom="@dimen/margin_medium"
                                     android:paddingStart="@dimen/margin_small"
-                                    android:paddingEnd="@dimen/margin_small">
+                                    android:paddingTop="@dimen/margin_medium"
+                                    android:paddingEnd="@dimen/margin_small"
+                                    android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="@dimen/category_icon_size"
@@ -508,79 +508,80 @@
                         </LinearLayout>
 
                     </LinearLayout>
-                </androidx.core.widget.NestedScrollView>
 
-                <!-- Load Wallet — pinned at bottom -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cvLoadWallet"
-                    android:layout_width="match_parent"
-                    android:layout_height="72dp"
-                    android:layout_marginStart="@dimen/margin_large"
-                    android:layout_marginEnd="@dimen/margin_large"
-                    android:layout_marginTop="@dimen/margin_small_medium"
-                    android:layout_marginBottom="@dimen/margin_large"
-                    android:onClickListener="@{onClickListener}"
-                    app:cardBackgroundColor="@color/primary"
-                    app:cardCornerRadius="16dp"
-                    app:strokeWidth="0dp"
-                    app:cardElevation="0dp">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <!-- Load Wallet — scrolls with content, last item in NestedScrollView -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cvLoadWallet"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?selectableItemBackground"
-                        android:clipChildren="true">
+                        android:layout_height="72dp"
+                        android:layout_marginStart="@dimen/margin_large"
+                        android:layout_marginTop="@dimen/margin_small_medium"
+                        android:layout_marginEnd="@dimen/margin_large"
+                        android:layout_marginBottom="@dimen/margin_large"
+                        android:onClickListener="@{onClickListener}"
+                        app:cardBackgroundColor="@color/primary"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
 
-                        <!-- Decorative wallet illustration clipped on right -->
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/ivWalletDecor"
-                            android:layout_width="188dp"
-                            android:layout_height="60dp"
-                            android:layout_marginEnd="-10dp"
-                            android:alpha="0.5"
-                            android:src="@drawable/img_wallet_bg"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="1.0" />
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="?selectableItemBackground"
+                            android:clipChildren="true">
 
-                        <!-- Icon + Label on left -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/margin_large"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
+                            <!-- Decorative wallet illustration clipped on right -->
                             <androidx.appcompat.widget.AppCompatImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/ic_wallet"
-                                android:tint="@color/white" />
+                                android:id="@+id/ivWalletDecor"
+                                android:layout_width="188dp"
+                                android:layout_height="60dp"
+                                android:layout_marginEnd="-10dp"
+                                android:alpha="0.5"
+                                android:src="@drawable/img_wallet_bg"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintVertical_bias="1.0" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
+                            <!-- Icon + Label on left -->
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/margin_small_medium"
-                                android:fontFamily="@font/proza_libre_bold"
-                                android:includeFontPadding="false"
-                                android:text="@string/btnLoadWallet"
-                                android:textColor="@color/white"
-                                android:textSize="@dimen/text_size_16" />
+                                android:layout_marginStart="@dimen/margin_large"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
 
-                        </LinearLayout>
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="28dp"
+                                    android:layout_height="28dp"
+                                    android:src="@drawable/ic_wallet"
+                                    android:tint="@color/white" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_small_medium"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/btnLoadWallet"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/text_size_16" />
 
-                </com.google.android.material.card.MaterialCardView>
+                            </LinearLayout>
 
-            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </FrameLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

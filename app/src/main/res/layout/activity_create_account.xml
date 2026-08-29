@@ -130,7 +130,7 @@
                         android:background="@drawable/bg_input_field"
                         android:ellipsize="end"
                         android:fontFamily="@font/proza_libre_medium"
-                        android:hint="@string/hint_mobile"
+                        android:hint="@string/hintName"
                         android:includeFontPadding="false"
                         android:inputType="text"
                         android:maxLength="150"

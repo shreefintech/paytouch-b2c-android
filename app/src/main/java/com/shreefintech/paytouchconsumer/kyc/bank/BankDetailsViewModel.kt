@@ -1,9 +1,9 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc.bank
+package com.shreefintech.paytouchconsumer.kyc.bank
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.onboarding.kyc.bank.model.BankAccountInputItem
+import com.shreefintech.paytouchconsumer.kyc.bank.model.BankAccountInputItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General

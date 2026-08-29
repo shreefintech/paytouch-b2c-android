@@ -56,7 +56,7 @@ Write production-ready Kotlin/MVVM Android code — readable, performant, scalab
 ```
 com.shreefintech.paytouchconsumer/
 ├── auth/           # Login, OTP, password/MPIN flows, create-account
-├── onboarding/     # onboarding/kyc/ — KYC hub (KycActivity), identity verification (IdentityVerificationActivity), bank details (BankDetailsActivity), KYC status (KycStatusActivity); virtual account is handled server-side — no client Activity
+├── kyc/            # KYC hub (KycActivity), identity verification (kyc/identity/IdentityVerificationActivity), bank details (kyc/bank/BankDetailsActivity), KYC status (KycStatusActivity); virtual account is handled server-side — no client Activity
 ├── home/           # Home/Dashboard screen (HomeActivity — currently at root level, will move here)
 ├── electricity/    # Electricity bill payment + transaction history (canonical module template)
 ├── gas/            # Gas bill payment + transaction history
@@ -701,15 +701,6 @@ private fun setOperatorLoading(loading: Boolean) {
 | Full-screen progress dialog / overlay | In-button ProgressBar |
 | `view.alpha = 0.5f` as the only loading signal | In-button ProgressBar (alpha may be used additionally, never alone) |
 | Single shared `isLoading` flag for multiple buttons | One `ObservableBoolean` per button |
-
----
-
-### Temporary Cross-Module Navigation Exception
-
-Cross-module Activity navigation is prohibited by default. Temporary reuse is allowed only when Product explicitly requires it — include `TODO(ticket-id)` and remove before releasing the module-specific Activity.
-
-**Active exception — Postpaid plan selection (B2C-59):**
-`PostpaidActivity.onBrowsePlan()` currently launches `PrepaidPlanSelectionActivity` as a stand-in. Replace with a dedicated `PostpaidPlanSelectionActivity` once `mobile-postpaid/plans` API is ready. Marked `TODO(B2C-59)` in `PostpaidActivity.kt`.
 
 ---
 

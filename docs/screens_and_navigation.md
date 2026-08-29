@@ -352,7 +352,9 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules �
 
 **Entry points:** `HomeActivity` ("My Account" tile)
 
-**Exit points:** Back → `HomeActivity`
+**Exit points:**
+- Back → `HomeActivity`
+- "View KYC Details" → `KycDetailsActivity`
 
 **Tabs:**
 
@@ -368,25 +370,54 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules �
 | `GET api/kyc/account-info` | Fetch account profile data |
 | `GET api/referral` | Fetch referral code and link |
 
-**Pending:** `TODO(B2C-81)` — "View KYC Details" navigates to `KycDetailsActivity` when built. `TODO(PAYTOUCH-523)` — expose `totalEarnings` and `earningPotential` on Refer & Earn tab.
+**Pending:** `TODO(PAYTOUCH-523)` — expose `totalEarnings` and `earningPotential` on Refer & Earn tab.
+
+---
+
+### ✅ KycDetailsActivity — "KYC Details"
+
+**Purpose:** Show the submitted KYC details (identity, bank, documents) with a ViewPager2 document slider.
+
+**Entry points:** `MyAccountActivity` ("View KYC Details" button)
+
+**Exit points:**
+- Document tap / "Preview" button → `DocPreviewActivity`
+- Back → `MyAccountActivity`
+
+**Package:** `myaccount/`
+
+**ViewModel:** `KycDetailsViewModel` — calls `api/kyc/my-account` (flat response, `KycMyAccountItem`)
+
+**Key UI elements:**
+- Identity section: avatar, mobile, Aadhaar, PAN, email, verification status chip
+- Bank section: account number, bank name, IFSC, branch, status chip
+- Documents section: ViewPager2 slider with dot indicator, document title, "Preview" button; empty state if no documents
+
+---
+
+### ✅ DocPreviewActivity — "Document Preview"
+
+**Purpose:** Preview KYC documents (PDF or image) fetched from a URL. PDFs render page-by-page via `PdfRenderer` with pinch-to-zoom; images load via Glide; unknown types fall back to a Google Docs WebView.
+
+**Entry points:** `KycDetailsActivity` (document tap or "Preview" button)
+
+**Exit points:** Back → `KycDetailsActivity`
+
+**Package:** `myaccount/`
+
+**ViewModel:** `DocPreviewViewModel` — downloads PDFs to cache via `PdfThumbnailRepository` on `Dispatchers.IO`, returns a `File` to the Activity for rendering. Images are loaded directly by Glide without going through the ViewModel.
+
+**Key UI elements:**
+- Full-screen loading spinner while downloading
+- `ImageView` for PDF pages and image files (pinch-to-zoom via `ScaleGestureDetector`)
+- `WebView` fallback for unknown file types
+- PDF navigation bar (Prev / Next / page indicator) — visible only when rendering a PDF
 
 ---
 
 ## Planned Screens
 
 The following screens are defined in the navigation plan but not yet implemented.
-
----
-
-### 📋 KycDetailsActivity
-
-**Purpose:** Show submitted KYC documents (Aadhaar, PAN, Selfie, bank proofs) in a ViewPager2 slider.
-
-**Entry points:** `MyAccountActivity` ("View KYC Details" button — `TODO(B2C-81)`)
-
-**Package:** `myaccount/`
-
-**ViewModel:** `KycStatusViewModel` (reuses existing KYC status endpoint)
 
 ---
 
@@ -462,6 +493,10 @@ Session check (read SharedPreferences)
                HdfcWebViewActivity ✅ → PaymentStatusActivity ✅
                WalletTransactionsActivity ✅ ("View All" transactions)
 
+               MyAccountActivity ✅
+                    │
+               KycDetailsActivity ✅ → DocPreviewActivity ✅
+
                ... (Cable TV 📋)
 
 All detail taps → TransactionDetailActivity ✅ (shared by all modules)
@@ -492,3 +527,6 @@ All object passing between activities uses `Gson().toJson(item)` into a single `
 | `DthPlanSelectionActivity` | `DthActivity` (ActivityResult) | `extra_selected_plan` | String (JSON `DthPlanItem`) | Selected plan returned to caller |
 | `{Category}Activity` | `{Category}SmsReceiptActivity` | `extra_from_payment` | Boolean | `true` = after payment (hides title/tabs); `false` = from tab bar |
 | Any module | `TransactionDetailActivity` | `extra_item` | String (JSON `TransactionItem`) | Full transaction detail to display |
+| `LoadWalletActivity` | `PaymentStatusActivity` | `extra_item` | String (JSON `PaymentStatusItem`) | Order ID, amount, status to display |
+| `KycDetailsActivity` / `KycDocumentAdp` | `DocPreviewActivity` | `extra_file_url` | String | File URL to preview (PDF or image) |
+| `KycDetailsActivity` / `KycDocumentAdp` | `DocPreviewActivity` | `extra_file_title` | String | Document label shown in toolbar |

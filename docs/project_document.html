@@ -810,6 +810,8 @@ showProgressFetch.set(<span class="keyword">false</span>)  <span class="comment"
   <tr><td>KYC Status</td><td><code>KycStatusActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>Home / Dashboard</td><td><code>HomeActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
   <tr><td>Shared Transaction Detail</td><td><code>TransactionDetailActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>KYC Details</td><td><code>KycDetailsActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
+  <tr><td>Document Preview</td><td><code>DocPreviewActivity</code></td><td><span class="badge badge-green">✅ Done</span></td></tr>
 </table>
 </div>
 
@@ -842,15 +844,15 @@ HomeActivity       (all flags clear)</code></pre>
                           requires_mpin ─────────► ResetMpinActivity
                           All clear ──────────────► HomeActivity
                                                          │
-                         ┌───────────────────────────────┬──────────────────┤
-                         ▼                               ▼                  ▼
-               ElectricityActivity             GasActivity, DthActivity,  LoadWalletActivity
-               (canonical reference)           PrepaidActivity, PostpaidActivity,     │
-                         │                     FasTagActivity, LoanActivity...  ┌─────┴──────┐
-                         │                                                      ▼            ▼
-              Pay ─ Recent ─ Report ─ Status ─ SMS Receipt     WalletTransactionsActivity  HdfcWebViewActivity
-              ✅     ✅        ✅        ✅         ✅                              └────────────┘
-                                                                                      │
+                         ┌───────────────────────────────┬──────────────────┬──────────────────┤
+                         ▼                               ▼                  ▼                  ▼
+               ElectricityActivity             GasActivity, DthActivity,  LoadWalletActivity  MyAccountActivity
+               (canonical reference)           PrepaidActivity, PostpaidActivity,     │              │
+                         │                     FasTagActivity, LoanActivity...  ┌─────┴──────┐      ▼
+                         │                                                      ▼            ▼  KycDetailsActivity
+              Pay ─ Recent ─ Report ─ Status ─ SMS Receipt     WalletTransactionsActivity  HdfcWebViewActivity  │
+              ✅     ✅        ✅        ✅         ✅                              └────────────┘      ▼
+                                                                                      │        DocPreviewActivity
                                                                             PaymentStatusActivity
 
 All detail taps ──────────────────────────► TransactionDetailActivity (shared)
@@ -877,6 +879,8 @@ All detail taps ─────────────────────�
   <tr><td><code>LoadWalletActivity</code></td><td><code>HdfcWebViewActivity</code></td><td><code>hdfc_payment_url</code>, <code>hdfc_return_url</code></td><td>String (via <code>HdfcPaymentHelper.launchPayment()</code>)</td></tr>
   <tr><td><code>PaymentStatusActivity</code></td><td><code>LoadWalletActivity</code></td><td><code>from_payment</code></td><td>Boolean — triggers wallet data + history refresh via <code>onNewIntent()</code></td></tr>
   <tr><td><code>LoadWalletActivity</code></td><td><code>PaymentStatusActivity</code></td><td><code>extra_item</code></td><td>JSON <code>PaymentStatusItem</code> (orderId, amount, status)</td></tr>
+  <tr><td><code>KycDetailsActivity</code></td><td><code>DocPreviewActivity</code></td><td><code>extra_file_url</code></td><td>String — remote file URL to preview</td></tr>
+  <tr><td><code>KycDetailsActivity</code></td><td><code>DocPreviewActivity</code></td><td><code>extra_file_title</code></td><td>String — display title shown in toolbar</td></tr>
 </table>
 </div>
 
@@ -938,6 +942,9 @@ All detail taps ─────────────────────�
   <tr><td><code>AUTH</code></td><td><code>MOBILE</code></td><td>String</td><td>Mobile number</td></tr>
   <tr><td><code>AUTH</code></td><td><code>ReferralCode</code></td><td>String</td><td>Referral code</td></tr>
   <tr><td><code>app_prefs</code></td><td><code>mpin_created</code></td><td>Boolean</td><td>MPIN setup complete</td></tr>
+  <tr><td><code>app_prefs</code></td><td><code>WALLET_BALANCE</code></td><td>String</td><td>Cached wallet balance for display</td></tr>
+  <tr><td><code>app_prefs</code></td><td><code>PENDING_ORDER_ID</code></td><td>String</td><td>HDFC order ID saved before launching WebView; cleared after status check</td></tr>
+  <tr><td><code>app_prefs</code></td><td><code>PENDING_AMOUNT</code></td><td>String</td><td>Top-up amount saved before launching WebView; cleared after status check</td></tr>
   <!-- virtual_account pref removed — VA creation is now handled server-side -->
 </table>
 </div>
@@ -1073,6 +1080,9 @@ All detail taps ─────────────────────�
   <tr><td>POST</td><td><code>api/mpin/create</code></td><td>Create MPIN during onboarding</td></tr>
   <tr><td>POST</td><td><code>api/password/send-otp</code></td><td>Begin password reset</td></tr>
   <tr><td>POST</td><td><code>api/kyc/account-info</code></td><td>My Account info</td></tr>
+  <tr><td>GET</td><td><code>api/wallet/transactions</code></td><td>Wallet transaction history (paginated)</td></tr>
+  <tr><td>GET</td><td><code>api/hdfc/order-status/{orderId}</code></td><td>Check HDFC payment order status after WebView return</td></tr>
+  <tr><td>GET</td><td><code>api/dashboard-kyc/my-account</code></td><td>Fetch full KYC details for KycDetailsActivity</td></tr>
 </table>
 </div>
 
@@ -1146,11 +1156,6 @@ binding.flSubmit.attach(binding.clRoot <span class="keyword">as</span> ViewGroup
 <div class="card card-warning no-break">
   <h4>Issue 3 — Legacy MobiKwik API</h4>
   <p>Some payment flows may route through <code>dashboard.shreefintechsolutions.com/api/mobikwik/</code>. Audit each endpoint before wiring — determine which are still active and which have been replaced by <code>paytouch.in</code> equivalents.</p>
-</div>
-
-<div class="card card-warning no-break">
-  <h4>Issue 4 — Postpaid Plan Selection (B2C-59)</h4>
-  <p><code>PostpaidActivity.onBrowsePlan()</code> currently launches <code>PrepaidPlanSelectionActivity</code> as a temporary stand-in. Replace with dedicated <code>PostpaidPlanSelectionActivity</code> once <code>mobile-postpaid/plans</code> API is ready. Marked with <code>TODO(B2C-59)</code>.</p>
 </div>
 
 <!-- ════════════════ FOOTER ════════════════ -->

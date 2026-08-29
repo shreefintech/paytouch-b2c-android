@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.onboarding.kyc.bank.model
+package com.shreefintech.paytouchconsumer.kyc.bank.model
 
 import com.shreefintech.paytouchconsumer.enums.StatementPeriod
 

@@ -54,20 +54,20 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".onboarding.kyc.KycActivity"
+            android:name="com.shreefintech.paytouchconsumer.kyc.KycActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".onboarding.kyc.KycStatusActivity"
+            android:name="com.shreefintech.paytouchconsumer.kyc.KycStatusActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".onboarding.kyc.identity.IdentityVerificationActivity"
+            android:name="com.shreefintech.paytouchconsumer.kyc.identity.IdentityVerificationActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".onboarding.kyc.bank.BankDetailsActivity"
+            android:name="com.shreefintech.paytouchconsumer.kyc.bank.BankDetailsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />

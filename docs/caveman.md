@@ -98,6 +98,8 @@ People in India pay 10+ different bills every month — electricity, phone, gas,
 | Loan Repayment — Pay | `LoanActivity` + transactions | ✅ Implemented (UI + API) |
 | Municipal Tax — Pay | `MunicipalTaxActivity` + transactions | ✅ Implemented (UI + API) |
 | My Account | `MyAccountActivity` | ✅ Implemented (UI + API) |
+| KYC Details | `KycDetailsActivity` | ✅ Implemented (UI + API) |
+| Document Preview | `DocPreviewActivity` | ✅ Implemented (PDF + image + WebView fallback) |
 | Load Wallet — Balance + Top-up | `LoadWalletActivity` | ✅ Implemented (UI + API) |
 | Load Wallet — Transaction History | `WalletTransactionsActivity` | ✅ Implemented (UI + API) |
 | Load Wallet — HDFC WebView | `HdfcWebViewActivity` | ✅ Implemented (UI + API) |

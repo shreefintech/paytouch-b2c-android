@@ -112,7 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="@color/upload_doc_card_bg"
                 android:layout_margin="2dp"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 android:background="@android:color/transparent">
