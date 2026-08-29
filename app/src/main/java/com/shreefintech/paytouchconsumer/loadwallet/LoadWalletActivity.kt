@@ -108,7 +108,7 @@ class LoadWalletActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         setupRecyclerView()
         setupPaymentSheet()
-        TAB_TOTAL_BALANCE.selectTab()
+        selectTab(TAB_TOTAL_BALANCE)
         onBack()
         retryCallback = { loadData() }
         loadData()
@@ -378,9 +378,9 @@ class LoadWalletActivity : BaseActivity() {
         binding.rvTransactions.visibility = if (isEmpty) View.GONE else View.VISIBLE
     }
 
-    private fun Int.selectTab() {
-        currentTab = this
-        val isTotalBalance = this == TAB_TOTAL_BALANCE
+    private fun selectTab(tab: Int) {
+        currentTab = tab
+        val isTotalBalance = tab == TAB_TOTAL_BALANCE
         binding.llTotalBalanceContent.visibility = if (isTotalBalance) View.VISIBLE else View.GONE
         binding.tvComingSoon.visibility = if (isTotalBalance) View.GONE else View.VISIBLE
     }
