@@ -367,17 +367,6 @@
                                         android:ellipsize="end"
                                         android:textColor="@color/black"
                                         android:textSize="@dimen/text_size_18" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tvBalanceWords"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
-                                        android:fontFamily="@font/proza_libre_medium"
-                                        android:includeFontPadding="false"
-                                        android:textColor="@color/personal_info_label"
-                                        android:textSize="@dimen/text_size_11"
-                                        android:visibility="gone" />
                                 </LinearLayout>
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
