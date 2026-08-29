@@ -23,6 +23,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         ApiClient.apiService.logout(bearerToken())
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+                    // /logout response body only ever contains "message" (no "success" key),
+                    // so checking body?.success == true would always be false. isSuccessful alone is correct here.
                     if (response.isSuccessful) {
                         onComplete()
                     } else {
