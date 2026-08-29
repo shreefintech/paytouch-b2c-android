@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmPaymentBinding
@@ -107,7 +108,7 @@ class LoadWalletActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         setupRecyclerView()
         setupPaymentSheet()
-        selectTab(TAB_TOTAL_BALANCE)
+        TAB_TOTAL_BALANCE.selectTab()
         onBack()
         retryCallback = { loadData() }
         loadData()
@@ -348,8 +349,12 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
-        // TODO(B2C-82): hide until backend provides the correct QR invoice amount field
         binding.tvIfscCode.text = data.ifsc ?: "--"
+        Glide.with(binding.ivQrCode)
+            .load(data.qrCodeUrl)
+            .placeholder(R.drawable.ic_qr)
+            .error(R.drawable.ic_qr)
+            .into(binding.ivQrCode)
         val status = data.wallet?.status
         if (!status.isNullOrEmpty()) {
             binding.tvActiveStatus.text = status.replaceFirstChar { it.uppercaseChar() }
@@ -373,9 +378,9 @@ class LoadWalletActivity : BaseActivity() {
         binding.rvTransactions.visibility = if (isEmpty) View.GONE else View.VISIBLE
     }
 
-    private fun selectTab(tab: Int) {
-        currentTab = tab
-        val isTotalBalance = tab == TAB_TOTAL_BALANCE
+    private fun Int.selectTab() {
+        currentTab = this
+        val isTotalBalance = this == TAB_TOTAL_BALANCE
         binding.llTotalBalanceContent.visibility = if (isTotalBalance) View.VISIBLE else View.GONE
         binding.tvComingSoon.visibility = if (isTotalBalance) View.GONE else View.VISIBLE
     }
