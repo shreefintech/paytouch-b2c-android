@@ -27,12 +27,12 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidSmsReceiptBi
 import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidSmsReceiptViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
+import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
 import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
-import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
 
 class PrepaidSmsReceiptActivity : BaseActivity() {

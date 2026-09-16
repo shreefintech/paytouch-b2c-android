@@ -27,12 +27,12 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityPostpaidSmsReceiptB
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidSmsReceiptViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidLatestPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
+import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
 import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
-import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
 
 class PostpaidSmsReceiptActivity : BaseActivity() {

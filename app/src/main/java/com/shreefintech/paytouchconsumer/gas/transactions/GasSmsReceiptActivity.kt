@@ -27,11 +27,11 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityGasSmsReceiptBindin
 import com.shreefintech.paytouchconsumer.gas.viewmodel.GasSmsReceiptViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
+import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
 import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
-import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
-import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
 

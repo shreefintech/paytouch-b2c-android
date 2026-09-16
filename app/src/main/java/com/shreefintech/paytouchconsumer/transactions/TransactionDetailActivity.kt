@@ -88,7 +88,7 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvPlatformFee.text   = item.platformFee
         binding.tvTotalPayable.text  = item.totalPayable
         binding.tvTransactionId.text = item.transactionId
-        binding.llViewReceipt.visibility = if (item.categoryType.isNotEmpty()) View.VISIBLE else View.GONE
+        binding.llViewReceipt.visibility = if (item.categoryType.isNotEmpty() && item.transactionId != "--") View.VISIBLE else View.GONE
 
         val (bgColor, textColor) = when (item.status.lowercase()) {
             "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
