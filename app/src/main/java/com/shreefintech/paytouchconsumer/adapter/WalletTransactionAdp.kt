@@ -29,7 +29,11 @@ class WalletTransactionAdp(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         holder.binding.root.setOnClickListener {
-            if (item.transactionId.isNotEmpty()) onClickItem?.invoke(item.transactionId)
+            val pos = holder.bindingAdapterPosition
+            if (pos != RecyclerView.NO_POSITION) {
+                val id = mArrayList[pos].transactionId
+                if (id.isNotEmpty()) onClickItem?.invoke(id)
+            }
         }
         holder.binding.apply {
             tvTitle.text = item.title
