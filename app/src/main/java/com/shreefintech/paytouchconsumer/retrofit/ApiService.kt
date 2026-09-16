@@ -89,6 +89,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequ
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -213,6 +215,18 @@ interface ApiService {
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Call<General<WalletHistoryPageItem>>
+
+    @POST("${AUTH}wallet/withdraw")
+    fun withdrawWallet(
+        @Header("Authorization") authorization: String,
+        @Body request: WithdrawRequest
+    ): Call<General<WithdrawDataItem>>
+
+    @GET("${AUTH}wallet/withdraw/{id}/status")
+    fun getWithdrawStatus(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: Int
+    ): Call<General<WithdrawDataItem>>
 
     // ── Transaction Detail ────────────────────────────────────────────────────
 
