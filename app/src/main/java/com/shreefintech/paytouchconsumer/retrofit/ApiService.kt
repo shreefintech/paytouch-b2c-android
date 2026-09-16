@@ -222,12 +222,6 @@ interface ApiService {
         @Body request: WithdrawRequest
     ): Call<General<WithdrawDataItem>>
 
-    @GET("${AUTH}wallet/withdraw/{id}/status")
-    fun getWithdrawStatus(
-        @Header("Authorization") authorization: String,
-        @Path("id") id: Int
-    ): Call<General<WithdrawDataItem>>
-
     // ── Transaction Detail ────────────────────────────────────────────────────
 
     @GET("${AUTH}utility-bill/transaction/{id}")

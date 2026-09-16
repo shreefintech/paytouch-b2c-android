@@ -319,7 +319,7 @@ class LoadWalletActivity : BaseActivity() {
             onSuccess = { _ ->
                 showProgressWithdraw.set(false)
                 withdrawConfirmDialog?.dismiss()
-                ToastUtil.showDelete(mActivity, getString(R.string.msgWithdrawInitiated))
+                ToastUtil.showWarning(mActivity, getString(R.string.msgWithdrawInitiated))
                 fetchWalletData()
             },
             onError = { msg ->
