@@ -103,7 +103,8 @@ class LoanTransactionStatusViewModel(application: Application) : AndroidViewMode
             userId           = item.id?.toString() ?: "--",
             accountNumber    = item.connectionNumber ?: "--",
             companyName      = item.operatorName ?: "--",
-            isMobileCategory = false
+            isMobileCategory = false,
+            categoryType     = "loan"
         )
     }
 }

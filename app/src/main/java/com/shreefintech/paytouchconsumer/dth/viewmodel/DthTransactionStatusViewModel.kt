@@ -103,7 +103,8 @@ class DthTransactionStatusViewModel(application: Application) : AndroidViewModel
             userId           = item.id?.toString() ?: "--",
             accountNumber    = item.subscriberNo ?: item.mobileNo ?: "--",
             companyName      = item.operator ?: "--",
-            isMobileCategory = true
+            isMobileCategory = true,
+            categoryType     = "dth"
         )
     }
 }

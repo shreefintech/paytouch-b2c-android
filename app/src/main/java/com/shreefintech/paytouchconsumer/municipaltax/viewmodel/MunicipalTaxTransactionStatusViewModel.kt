@@ -104,7 +104,8 @@ class MunicipalTaxTransactionStatusViewModel(application: Application) : Android
             userId           = item.id?.toString() ?: "--",
             accountNumber    = accountNo,
             companyName      = item.operatorName ?: item.serviceType ?: "--",
-            isMobileCategory = false
+            isMobileCategory = false,
+            categoryType     = "municipaltax"
         )
     }
 }

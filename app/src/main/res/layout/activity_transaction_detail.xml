@@ -366,6 +366,34 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- View Receipt button -->
+                    <LinearLayout
+                        android:id="@+id/llViewReceipt"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/btn_height"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:background="@drawable/bg_toggle_selected"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:onClickListener="@{onClickListener}">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_marginEnd="@dimen/margin_extra_small"
+                            android:src="@drawable/ic_report"
+                            android:tint="@color/white" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/btnViewReceipt"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_14" />
+                    </LinearLayout>
+
                 </LinearLayout>
             </ScrollView>
         </FrameLayout>

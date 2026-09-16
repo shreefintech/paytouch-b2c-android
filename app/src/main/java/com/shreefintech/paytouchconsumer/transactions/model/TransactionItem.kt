@@ -17,5 +17,6 @@ data class TransactionItem(
     val accountNumber: String,
     val companyName: String,
     val isMobileCategory: Boolean = false,
-    val isVehicleCategory: Boolean = false
+    val isVehicleCategory: Boolean = false,
+    val categoryType: String = ""
 )

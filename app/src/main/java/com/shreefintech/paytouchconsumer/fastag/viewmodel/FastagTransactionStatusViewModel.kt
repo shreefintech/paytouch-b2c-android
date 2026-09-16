@@ -104,7 +104,8 @@ class FastagTransactionStatusViewModel(application: Application) : AndroidViewMo
             accountNumber     = item.vehicleNumber ?: "--",
             companyName       = item.operatorName?.takeIf { it.isNotEmpty() } ?: item.operator ?: "--",
             isMobileCategory  = false,
-            isVehicleCategory = true
+            isVehicleCategory = true,
+            categoryType      = "fastag"
         )
     }
 }

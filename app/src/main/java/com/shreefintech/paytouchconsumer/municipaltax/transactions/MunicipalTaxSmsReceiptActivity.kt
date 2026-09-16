@@ -28,6 +28,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityMunicipalTaxSmsRece
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.municipaltax.viewmodel.MunicipalTaxSmsReceiptViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxLatestPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
+import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
 import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -51,8 +53,15 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
         intent.getBooleanExtra(EXTRA_FROM_PAYMENT, false)
     }
 
+    private val transactionId: String? by lazy {
+        intent.getStringExtra(EXTRA_TRANSACTION_ID)
+    }
+
+    private val detailViewModel: TransactionHistoryDetailViewModel by viewModels()
+
     companion object {
-        private const val EXTRA_FROM_PAYMENT = "extra_from_payment"
+        private const val EXTRA_FROM_PAYMENT   = "extra_from_payment"
+        private const val EXTRA_TRANSACTION_ID = "extra_transaction_id"
         private const val TAB_RECEIPT = 0
         private const val TAB_DISPLAY = 1
 
@@ -60,6 +69,14 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
             context.startActivity(
                 Intent(context, MunicipalTaxSmsReceiptActivity::class.java).apply {
                     putExtra(EXTRA_FROM_PAYMENT, fromPayment)
+                }
+            )
+        }
+
+        fun start(context: Context, transactionId: String) {
+            context.startActivity(
+                Intent(context, MunicipalTaxSmsReceiptActivity::class.java).apply {
+                    putExtra(EXTRA_TRANSACTION_ID, transactionId)
                 }
             )
         }
@@ -88,7 +105,7 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
         )
 
         if (isFromPayment) {
-            binding.llTitleRow.visibility    = View.GONE
+            binding.llTitleRow.visibility       = View.GONE
             binding.llReceiptContent.visibility = View.VISIBLE
             binding.llDisplayContent.visibility = View.GONE
             binding.llBtnContainer.visible()
@@ -99,8 +116,8 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
         binding.showProgressReceipt = showProgressReceipt
         binding.onClickListener     = onClickListener()
         onBack()
-        retryCallback = { loadLatestPayments() }
-        loadLatestPayments()
+        retryCallback = { loadData() }
+        loadData()
     }
 
     // ── API Call ──────────────────────────────────────────────
@@ -116,6 +133,30 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
             },
             onError = { msg ->
                 showReceiptLoading(false)
+                if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
+    private fun loadData() {
+        val txnId = transactionId
+        if (txnId != null) loadByTransactionId(txnId)
+        else loadLatestPayments()
+    }
+
+    private fun loadByTransactionId(txnId: String) {
+        if (!Utility.isInternetAvailable(mActivity)) { showNoInternet(); return }
+        hideNoInternet()
+        detailViewModel.loadDetail(
+            transactionId = txnId,
+            onLoading = { showReceiptLoading(true) },
+            onSuccess = { item ->
+                showReceiptLoading(false)
+                populateReceiptFromDetail(item)
+            },
+            onError = { msg ->
+                showReceiptLoading(false)
+                showEmpty()
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )
@@ -155,6 +196,38 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
         binding.tvSmsDate.text        = date
     }
 
+    private fun populateReceiptFromDetail(item: TransactionHistoryDetailItem) {
+        val amount     = Utility.formatAmount(item.totalPayable ?: item.amount)
+        val identifier = item.identifier ?: "--"
+        val txnId      = item.transactionId ?: "--"
+        val date       = Utility.formatDate(item.createdAt)
+        val status     = item.status ?: "Pending"
+
+        binding.tvConsumerNoLabel.text = getString(R.string.labelConsumerNo)
+        binding.tvConsumerNo.text      = identifier
+        binding.tvCustomerName.text    = "--"
+        binding.tvCompanyName.text     = "--"
+        binding.tvReceiptDate.text     = date
+        binding.tvAmountPaid.text      = amount
+        binding.tvPaytouchTxnId.text   = txnId
+        binding.tvBConnectTxnId.text   = txnId
+        binding.tvCcf.text             = Utility.formatAmount(item.platformFee)
+        binding.tvReceiptStatus.text   = getString(R.string.labelStatusBullet, status)
+        ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
+
+        val smsBodyText = getString(R.string.msgMunicipalTaxSmsBody, amount, identifier)
+        val spannable   = SpannableString(smsBodyText)
+        val amountStart = smsBodyText.indexOf(amount)
+        if (amountStart >= 0) {
+            val amountEnd = amountStart + amount.length
+            spannable.setSpan(ForegroundColorSpan(ContextCompat.getColor(mActivity, R.color.primary)), amountStart, amountEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannable.setSpan(StyleSpan(Typeface.BOLD), amountStart, amountEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        binding.tvSmsBody.text        = spannable
+        binding.tvSmsBConnectTxn.text = txnId
+        binding.tvSmsDate.text        = date
+    }
+
     // ── Tab Switching ─────────────────────────────────────────
 
     private fun selectTab(tab: Int) {
@@ -177,6 +250,12 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
 
     private fun showReceiptLoading(show: Boolean) {
         showProgressReceipt.set(show)
+    }
+
+    private fun showEmpty() {
+        binding.llTitleRow.visibility = View.GONE
+        binding.flCard.visibility     = View.GONE
+        binding.tvEmpty.visibility    = View.VISIBLE
     }
 
     // ── Download & Share ──────────────────────────────────────

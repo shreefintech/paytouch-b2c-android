@@ -104,7 +104,8 @@ class ElectricityTransactionStatusViewModel(application: Application) : BaseBill
             userId           = item.id?.toString() ?: "--",
             accountNumber    = item.subscriberNo ?: "--",
             companyName      = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--",
-            isMobileCategory = false
+            isMobileCategory = false,
+            categoryType     = "electricity"
         )
     }
 
