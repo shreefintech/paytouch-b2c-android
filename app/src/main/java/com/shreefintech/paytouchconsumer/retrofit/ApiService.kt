@@ -87,6 +87,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoIte
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
+import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -212,6 +213,12 @@ interface ApiService {
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Call<General<WalletHistoryPageItem>>
+
+    @GET("${AUTH}utility-bill/transaction/{id}")
+    fun getTransactionHistoryDetail(
+        @Header("Authorization") authorization: String,
+        @Path("id") transactionId: String
+    ): Call<General<TransactionHistoryDetailItem>>
 
     // ── Electricity ───────────────────────────────────────────────────────────
 

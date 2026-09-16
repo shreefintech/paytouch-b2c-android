@@ -269,8 +269,12 @@
     <string name="statusPending">Pending</string>
     <string name="btnApplyFilter">Apply Filter</string>
 
-    <!-- Transaction Detail screen -->
+    <!-- Transaction Detail / History Detail screens -->
     <string name="titleTransactionStatus">Transaction Status</string>
+    <string name="titleTransactionDetails">Transaction Details</string>
+    <string name="msgTransactionDetailsNotFound">Transaction details not found</string>
+    <string name="labelPaymentMethod">Payment Method</string>
+    <string name="labelBankReferenceNumber">Bank Reference Number</string>
     <string name="labelUsername">Username :</string>
     <string name="labelPayment">Payment</string>
     <string name="labelDate">Date</string>

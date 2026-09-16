@@ -18,6 +18,7 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityWalletTransactionsB
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.WalletTransactionsViewModel
+import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -67,6 +68,9 @@ class WalletTransactionsActivity : BaseActivity() {
 
     private fun setupRecyclerView() {
         transactionAdp = WalletTransactionAdp(mActivity, transactionList)
+        transactionAdp.onClickItem = { transactionId ->
+            TransactionHistoryDetailActivity.start(mActivity, transactionId)
+        }
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
             adapter = transactionAdp

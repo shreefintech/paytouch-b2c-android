@@ -14,7 +14,9 @@ class WalletTransactionAdp(
     private val mArrayList: ArrayList<WalletTransactionItem>
 ) : RecyclerView.Adapter<WalletTransactionAdp.ViewHolder>() {
 
-    inner class ViewHolder(val binding: ItemWalletTransactionBinding) :
+    var onClickItem: ((transactionId: String) -> Unit)? = null
+
+    class ViewHolder(val binding: ItemWalletTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -26,6 +28,9 @@ class WalletTransactionAdp(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
+        holder.binding.root.setOnClickListener {
+            if (item.transactionId.isNotEmpty()) onClickItem?.invoke(item.transactionId)
+        }
         holder.binding.apply {
             tvTitle.text = item.title
             tvDate.text = item.date

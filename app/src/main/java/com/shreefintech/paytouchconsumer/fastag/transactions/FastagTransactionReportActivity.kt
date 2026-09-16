@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.fastag.transactions
+﻿package com.shreefintech.paytouchconsumer.fastag.transactions
 
 import android.os.Bundle
 import android.text.Editable
@@ -18,7 +18,7 @@ import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityFastagTransactionReportBinding
 import com.shreefintech.paytouchconsumer.fastag.viewmodel.FastagTransactionReportViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.transactions.TransactionDetailActivity
+import com.shreefintech.paytouchconsumer.transactions.TransactionReportDetailActivity
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.TransactionFilterHelper
@@ -82,7 +82,7 @@ class FastagTransactionReportActivity : BaseActivity() {
     private fun setupRecyclerView() {
         transactionAdp = TransactionAdp(mActivity, mDisplayList)
         transactionAdp.onClickItem = { item ->
-            TransactionDetailActivity.start(mActivity, item)
+            TransactionReportDetailActivity.start(mActivity, item.transactionId)
         }
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
@@ -253,3 +253,4 @@ class FastagTransactionReportActivity : BaseActivity() {
         }
     }
 }
+

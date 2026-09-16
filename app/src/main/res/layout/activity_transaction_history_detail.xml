@@ -14,9 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/img_screen_bg"
-        tools:context=".transactions.TransactionDetailActivity">
+        tools:context=".transactions.TransactionHistoryDetailActivity">
 
-        <!-- Toolbar -->
         <include
             android:id="@+id/lytToolbar"
             layout="@layout/lyt_toolbar"
@@ -27,42 +26,26 @@
             app:layout_constraintTop_toTopOf="parent"
             app:onClickListener="@{onClickListener}" />
 
-        <!-- Title row: "Transaction Status" + BharatConnect logo -->
-        <LinearLayout
-            android:id="@+id/llTitle"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/page_margin_horizontal"
-            android:layout_marginEnd="@dimen/page_margin_horizontal"
             android:layout_marginTop="@dimen/margin_medium"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:fontFamily="@font/proza_libre_bold"
+            android:includeFontPadding="false"
+            android:text="@string/titleTransactionDetails"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_20"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/proza_libre_bold"
-                android:includeFontPadding="false"
-                android:text="@string/titleTransactionStatus"
-                android:textColor="@color/primary"
-                android:textSize="@dimen/text_size_20" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:src="@drawable/img_bharat_connect" />
-        </LinearLayout>
-
-        <!-- Glass card — fills remaining space -->
         <FrameLayout
             android:id="@+id/flCard"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="@dimen/page_margin_horizontal"
             android:layout_marginTop="@dimen/margin_medium"
             android:layout_marginEnd="@dimen/page_margin_horizontal"
@@ -70,14 +53,35 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/llTitle"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintTop_toBottomOf="@id/tvTitle">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/proza_libre_regular"
+                android:includeFontPadding="false"
+                android:text="@string/msgTransactionDetailsNotFound"
+                android:textColor="?attr/colorTextSubtitle"
+                android:textSize="@dimen/text_size_14"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/pbLoading"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
 
             <ScrollView
+                android:id="@+id/svContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:overScrollMode="never"
-                android:scrollbars="none">
+                android:scrollbars="none"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -86,11 +90,9 @@
                     android:paddingHorizontal="@dimen/margin_small_medium"
                     android:paddingVertical="@dimen/margin_large">
 
-                    <!-- ── Card 1: Mobile / Status / Amount info ── -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/margin_medium"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="@dimen/normal_card_radius"
                         app:cardElevation="0dp"
@@ -103,7 +105,7 @@
                             android:orientation="vertical"
                             android:padding="@dimen/margin_small_medium">
 
-                            <!-- Row 1: Mobile No. + Status badge -->
+                            <!-- Amount + Status row -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -111,83 +113,16 @@
                                 android:orientation="horizontal">
 
                                 <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvMobileNumber"
+                                    android:id="@+id/tvAmount"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:fontFamily="@font/proza_libre_semi_bold"
-                                    android:includeFontPadding="false"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_13"
-                                    tools:text="Mobile No. 9876*****0" />
-                            </LinearLayout>
-
-                            <!-- Row 2: Username + Amount -->
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_small"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvUsername"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:fontFamily="@font/proza_libre_regular"
-                                    android:includeFontPadding="false"
-                                    android:textColor="?attr/colorTextSubtitle"
-                                    android:textSize="@dimen/text_size_13"
-                                    tools:text="Username : Testuser" />
-
-                            </LinearLayout>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- ── Card 2: Payment details ── -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/margin_medium"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="@dimen/normal_card_radius"
-                        app:cardElevation="0dp"
-                        app:strokeColor="?attr/colorPrimary"
-                        app:strokeWidth="1.5dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="@dimen/margin_small_medium">
-
-                            <!-- Header: rupee icon + "Payment" -->
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="@dimen/icon_small"
-                                    android:layout_height="@dimen/icon_small"
-                                    android:src="@drawable/ic_ruppes"
-                                    android:tint="@color/primary" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="@dimen/margin_extra_small"
                                     android:fontFamily="@font/proza_libre_bold"
                                     android:includeFontPadding="false"
-                                    android:text="@string/labelPayment"
-                                    android:layout_marginEnd="@dimen/margin_small"
-                                    android:layout_weight="1"
                                     android:textColor="@color/primary"
-                                    android:textSize="@dimen/text_size_16" />
+                                    android:textSize="@dimen/text_size_25"
+                                    tools:text="₹10.00" />
 
-                                <!-- Status pill badge — CardView replaces drawable shape -->
                                 <com.google.android.material.card.MaterialCardView
                                     android:id="@+id/cvStatus"
                                     android:layout_width="wrap_content"
@@ -203,27 +138,28 @@
                                         android:fontFamily="@font/proza_libre_semi_bold"
                                         android:includeFontPadding="false"
                                         android:paddingStart="10dp"
-                                        android:paddingTop="3dp"
+                                        android:paddingTop="4dp"
                                         android:paddingEnd="10dp"
-                                        android:paddingBottom="3dp"
-                                        android:textSize="@dimen/text_size_10"
-                                        tools:text="Failed" />
+                                        android:paddingBottom="4dp"
+                                        android:textSize="@dimen/text_size_12"
+                                        tools:text="Success" />
                                 </com.google.android.material.card.MaterialCardView>
                             </LinearLayout>
 
-                            <!-- Divider -->
+                            <!-- Dashed divider -->
                             <View
                                 android:layout_width="match_parent"
                                 android:layout_height="2dp"
-                                android:layout_marginTop="@dimen/margin_small"
-                                android:layout_marginBottom="@dimen/margin_small"
-                                android:background="@color/sheet_divider" />
+                                android:layout_marginTop="@dimen/margin_medium"
+                                android:layout_marginBottom="@dimen/margin_medium"
+                                android:background="@drawable/bg_dashed_divider"
+                                android:layerType="software" />
 
-                            <!-- Transaction ID row (value in primary color) -->
+                            <!-- Transaction ID row -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_extra_small"
+                                android:layout_marginBottom="@dimen/margin_small"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
@@ -241,18 +177,183 @@
                                     android:id="@+id/tvTransactionId"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_medium"
                                     android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:gravity="end"
                                     android:includeFontPadding="false"
                                     android:textColor="@color/primary"
                                     android:textSize="@dimen/text_size_13"
-                                    tools:text="BC88213045" />
+                                    tools:text="HDFC260818130052KCQJ" />
+                            </LinearLayout>
+
+                            <!-- Identifier row (Connection Number / Purpose) -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/margin_small"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvIdentifierLabel"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:textColor="?attr/colorTextSubtitle"
+                                    android:textSize="@dimen/text_size_13"
+                                    tools:text="Purpose" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvIdentifier"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_medium"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:gravity="end"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13"
+                                    tools:text="wallet_topup" />
+                            </LinearLayout>
+
+                            <!-- Payment Method row (HDFC only) -->
+                            <LinearLayout
+                                android:id="@+id/llPaymentMethod"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/margin_small"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelPaymentMethod"
+                                    android:textColor="?attr/colorTextSubtitle"
+                                    android:textSize="@dimen/text_size_13" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvPaymentMethod"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_medium"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:gravity="end"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13"
+                                    tools:text="UPI PAY" />
+                            </LinearLayout>
+
+                            <!-- Bank Reference Number row (HDFC only) -->
+                            <LinearLayout
+                                android:id="@+id/llBankRefNo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/margin_small"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelBankReferenceNumber"
+                                    android:textColor="?attr/colorTextSubtitle"
+                                    android:textSize="@dimen/text_size_13" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvBankRefNo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_medium"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:gravity="end"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13"
+                                    tools:text="623085737077" />
+                            </LinearLayout>
+
+                            <!-- Platform Fee row (PYTCH only) -->
+                            <LinearLayout
+                                android:id="@+id/llPlatformFee"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/margin_small"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelPlatformFee"
+                                    android:textColor="?attr/colorTextSubtitle"
+                                    android:textSize="@dimen/text_size_13" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvPlatformFee"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_medium"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:gravity="end"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13"
+                                    tools:text="₹8.00" />
+                            </LinearLayout>
+
+                            <!-- Total Payable row (PYTCH only) -->
+                            <LinearLayout
+                                android:id="@+id/llTotalPayable"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/margin_small"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelTotalPayable"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvTotalPayable"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_medium"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:gravity="end"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/primary"
+                                    android:textSize="@dimen/text_size_13"
+                                    tools:text="₹2079.00" />
                             </LinearLayout>
 
                             <!-- Date row -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_extra_small"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
@@ -270,104 +371,21 @@
                                     android:id="@+id/tvDate"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_medium"
                                     android:fontFamily="@font/proza_libre_regular"
+                                    android:gravity="end"
                                     android:includeFontPadding="false"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_13"
-                                    tools:text="18-07-2026, 09:15 am" />
+                                    tools:text="18/08/2026, 6:30 PM" />
                             </LinearLayout>
 
-                            <!-- Amount row -->
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_small"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:fontFamily="@font/proza_libre_regular"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/labelAmount"
-                                    android:textColor="?attr/colorTextSubtitle"
-                                    android:textSize="@dimen/text_size_13" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvPaymentAmount"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/proza_libre_regular"
-                                    android:includeFontPadding="false"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_13"
-                                    tools:text="₹149.00" />
-                            </LinearLayout>
-
-                            <!-- Platform Fee row -->
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_small"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:fontFamily="@font/proza_libre_regular"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/labelPlatformFee"
-                                    android:textColor="?attr/colorTextSubtitle"
-                                    android:textSize="@dimen/text_size_13" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvPlatformFee"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/proza_libre_regular"
-                                    android:includeFontPadding="false"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_13"
-                                    tools:text="₹3.00" />
-                            </LinearLayout>
-
-                            <!-- Total Payable row (primary + bold) -->
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/margin_small"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:fontFamily="@font/proza_libre_semi_bold"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/labelTotalPayable"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_13" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvTotalPayable"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/proza_libre_bold"
-                                    android:includeFontPadding="false"
-                                    android:textColor="@color/primary"
-                                    android:textSize="@dimen/text_size_13"
-                                    tools:text="₹152.00" />
-                            </LinearLayout>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
             </ScrollView>
+
         </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

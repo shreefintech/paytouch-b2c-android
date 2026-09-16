@@ -121,6 +121,14 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".transactions.TransactionHistoryDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".transactions.TransactionReportDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".electricity.transactions.TransactionReportActivity"
             android:exported="false"
             android:screenOrientation="portrait"
