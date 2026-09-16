@@ -1,7 +1,6 @@
 package com.shreefintech.paytouchconsumer.auth
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
@@ -16,6 +15,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
@@ -27,7 +27,6 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityCreateAccountBindin
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import androidx.core.net.toUri
 
 class CreateAccountActivity : BaseActivity() {
 
@@ -57,7 +56,7 @@ class CreateAccountActivity : BaseActivity() {
 
         LiquidGlassEffect.attach(
             targetView = binding.flCard,
-            rootView = binding.clRoot as ViewGroup,
+            rootView = binding.root as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion = 0f,
             blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)

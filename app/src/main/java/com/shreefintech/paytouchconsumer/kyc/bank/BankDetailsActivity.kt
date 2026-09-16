@@ -61,15 +61,7 @@ class BankDetailsActivity : BaseActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            binding.flCard.post {
-                val loc = IntArray(2)
-                binding.flCard.getLocationOnScreen(loc)
-                val overlap = if (imeInsets.bottom > 0)
-                    maxOf(0, loc[1] + binding.flCard.height - (binding.flCard.rootView.height - imeInsets.bottom))
-                else 0
-                binding.flCard.setPadding(0, 0, 0, overlap)
-                if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
-            }
+            binding.flCard.post { Utility.applyImeOverlapPadding(binding.flCard, imeInsets.bottom, mActivity) }
             insets
         }
 
@@ -257,11 +249,11 @@ class BankDetailsActivity : BaseActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val bmp = Utility.renderPdfFirstPage(mActivity, uri)
                 withContext(Dispatchers.Main) {
-                    if (bmp != null) Glide.with(mActivity).load(bmp).into(card.ivPreviewProof)
+                    if (bmp != null) Glide.with(mActivity as Context).load(bmp).into(card.ivPreviewProof)
                 }
             }
         } else {
-            Glide.with(mActivity)
+            Glide.with(mActivity as Context)
                 .load(uri)
                 .placeholder(R.drawable.ic_file_not_found)
                 .error(R.drawable.ic_file_not_found)
@@ -272,7 +264,7 @@ class BankDetailsActivity : BaseActivity() {
     private fun clearProof(card: ItemBankAccountBinding, index: Int) {
         if (index !in proofUris.indices) return
         proofUris[index] = null
-        Glide.with(mActivity).clear(card.ivPreviewProof)
+        Glide.with(mActivity as Context).clear(card.ivPreviewProof)
         card.ivPreviewProof.visibility    = View.GONE
         card.llEditDeleteProof.visibility = View.GONE
         card.llUploadProof.visibility     = View.VISIBLE

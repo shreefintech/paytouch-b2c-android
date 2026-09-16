@@ -88,15 +88,7 @@ class IdentityVerificationActivity : BaseActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            binding.fcvStep.post {
-                val loc = IntArray(2)
-                binding.fcvStep.getLocationOnScreen(loc)
-                val overlap = if (imeInsets.bottom > 0)
-                    maxOf(0, loc[1] + binding.fcvStep.height - (binding.fcvStep.rootView.height - imeInsets.bottom))
-                else 0
-                binding.fcvStep.setPadding(0, 0, 0, overlap)
-                if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
-            }
+            binding.fcvStep.post { Utility.applyImeOverlapPadding(binding.fcvStep, imeInsets.bottom, mActivity) }
             insets
         }
 

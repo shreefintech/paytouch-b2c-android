@@ -85,6 +85,16 @@ object Utility {
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
+    fun applyImeOverlapPadding(view: View, imeBottom: Int, activity: Activity) {
+        val loc = IntArray(2)
+        view.getLocationOnScreen(loc)
+        val overlap = if (imeBottom > 0)
+            maxOf(0, loc[1] + view.height - (view.rootView.height - imeBottom))
+        else 0
+        view.setPadding(0, 0, 0, overlap)
+        if (imeBottom > 0) scrollToFocused(activity)
+    }
+
     fun scrollToFocused(activity: Activity) {
         val focused = activity.currentFocus ?: return
         var scrollView: NestedScrollView? = null
@@ -127,7 +137,7 @@ object Utility {
         if (raw.isNullOrBlank()) return "-"
         return try {
             val number = raw.toDouble()
-            val fmt = NumberFormat.getNumberInstance(Locale("en", "IN")).apply {
+            val fmt = NumberFormat.getNumberInstance(Locale.Builder().setLanguage("en").setRegion("IN").build()).apply {
                 maximumFractionDigits = 2
                 minimumFractionDigits = 2
             }
