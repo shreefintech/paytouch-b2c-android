@@ -105,7 +105,8 @@ class TransactionReportViewModel(application: Application) : BaseBillViewModel(a
             userId           = item.id?.toString() ?: "--",
             accountNumber    = item.consumerNo ?: "--",
             companyName      = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--",
-            isMobileCategory = false
+            isMobileCategory = false,
+            categoryType     = "electricity"
         )
     }
 

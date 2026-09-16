@@ -106,7 +106,8 @@ class PostpaidTransactionReportViewModel(application: Application) : AndroidView
             userId           = item.id?.toString() ?: "--",
             accountNumber    = item.connectionNumber ?: "--",
             companyName      = item.serviceType ?: "--",
-            isMobileCategory = true
+            isMobileCategory = true,
+            categoryType     = "postpaid"
         )
     }
 }

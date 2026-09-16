@@ -107,7 +107,8 @@ class GasTransactionReportViewModel(application: Application) : AndroidViewModel
             userId           = item.id?.toString() ?: "--",
             accountNumber    = item.connectionNumber ?: "--",
             companyName      = item.operatorName?.takeIf { it.isNotEmpty() } ?: item.subservice ?: "--",
-            isMobileCategory = false
+            isMobileCategory = false,
+            categoryType     = "gas"
         )
     }
 }

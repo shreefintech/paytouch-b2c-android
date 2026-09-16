@@ -107,7 +107,8 @@ class PrepaidTransactionReportViewModel(application: Application) : AndroidViewM
             userId           = item.id?.toString() ?: "--",
             accountNumber    = item.mobileNo ?: "--",
             companyName      = item.operator?.takeIf { it.isNotEmpty() } ?: item.service ?: "--",
-            isMobileCategory = true
+            isMobileCategory = true,
+            categoryType     = "prepaid"
         )
     }
 }
