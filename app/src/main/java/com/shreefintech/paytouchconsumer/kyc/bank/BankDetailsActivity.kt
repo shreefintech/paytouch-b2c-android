@@ -60,12 +60,16 @@ class BankDetailsActivity : BaseActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                maxOf(imeInsets.bottom, systemBars.bottom)
-            )
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            binding.flCard.post {
+                val loc = IntArray(2)
+                binding.flCard.getLocationOnScreen(loc)
+                val overlap = if (imeInsets.bottom > 0)
+                    maxOf(0, loc[1] + binding.flCard.height - (binding.flCard.rootView.height - imeInsets.bottom))
+                else 0
+                binding.flCard.setPadding(0, 0, 0, overlap)
+                if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
+            }
             insets
         }
 

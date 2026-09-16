@@ -77,7 +77,7 @@ class DthSmsReceiptActivity : BaseActivity() {
 
         LiquidGlassEffect.attach(
             targetView   = binding.flCard,
-            rootView     = binding.clRoot as ViewGroup,
+            rootView     = binding.root as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion   = 0f,
             blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
@@ -164,8 +164,8 @@ class DthSmsReceiptActivity : BaseActivity() {
         val activeTextColor   = ContextCompat.getColor(mActivity, R.color.white)
         val inactiveTextColor = ContextCompat.getColor(mActivity, R.color.primary)
 
-        binding.cvTabReceipt.setCardBackgroundColor(if (isReceipt) activeColor else inactiveColor)
-        binding.cvTabDisplay.setCardBackgroundColor(if (isReceipt) inactiveColor else activeColor)
+        binding.cvTabReceipt.setCardBackgroundColor(if (isReceipt) activeColor else 0)
+        binding.cvTabDisplay.setCardBackgroundColor(if (isReceipt) 0 else activeColor)
         binding.tvTabReceipt.setTextColor(if (isReceipt) activeTextColor else inactiveTextColor)
         binding.tvTabDisplay.setTextColor(if (isReceipt) inactiveTextColor else activeTextColor)
     }

@@ -37,6 +37,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPlanItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
+import androidx.core.net.toUri
 
 class DthActivity : BaseActivity() {
 
@@ -90,6 +91,7 @@ class DthActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
+            if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
             insets
         }
 
@@ -153,7 +155,7 @@ class DthActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(Constant.URL_PLATFORM_TERMS)))
+                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)

@@ -27,6 +27,7 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityCreateAccountBindin
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import androidx.core.net.toUri
 
 class CreateAccountActivity : BaseActivity() {
 
@@ -41,7 +42,7 @@ class CreateAccountActivity : BaseActivity() {
         binding = ActivityCreateAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(
@@ -50,6 +51,7 @@ class CreateAccountActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
+            if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
             insets
         }
 
@@ -99,7 +101,7 @@ class CreateAccountActivity : BaseActivity() {
 
         spannable.setSpan(object : ClickableSpan() {
             override fun onClick(widget: View) {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_PLATFORM_TERMS)))
+                startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
             }
 
             override fun updateDrawState(ds: TextPaint) {

@@ -16,9 +16,12 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.core.widget.NestedScrollView
+import com.shreefintech.paytouchconsumer.R
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.core.graphics.createBitmap
 
 object Utility {
 
@@ -82,6 +85,30 @@ object Utility {
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
+    fun scrollToFocused(activity: Activity) {
+        val focused = activity.currentFocus ?: return
+        var scrollView: NestedScrollView? = null
+        var v: View = focused
+        while (true) {
+            val parent = v.parent ?: break
+            if (parent is NestedScrollView) { scrollView = parent; break }
+            v = parent as? View ?: break
+        }
+        val nsv = scrollView ?: return
+        nsv.post {
+            var absoluteTop = 0
+            var current: View = focused
+            while (current !== nsv) {
+                absoluteTop += current.top
+                current = (current.parent as? View) ?: break
+            }
+            val focusedBottom = absoluteTop + focused.height
+            val visibleHeight = nsv.height - nsv.paddingBottom
+            val target = focusedBottom - visibleHeight + activity.resources.getDimensionPixelSize(R.dimen.margin_medium)
+            if (target > nsv.scrollY) nsv.smoothScrollTo(0, target)
+        }
+    }
+
     fun hideKeyboard(activity: Activity) {
         val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
@@ -105,7 +132,7 @@ object Utility {
                 minimumFractionDigits = 2
             }
             "₹${fmt.format(number)}"
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             "₹$raw"
         }
     }
@@ -122,7 +149,7 @@ object Utility {
             PdfRenderer(pfd).use { renderer ->
                 renderer.openPage(0).use { page ->
                     val scale = widthPx.toFloat() / page.width
-                    val bmp = Bitmap.createBitmap(widthPx, (page.height * scale).toInt(), Bitmap.Config.ARGB_8888)
+                    val bmp = createBitmap(widthPx, (page.height * scale).toInt())
                     bmp.eraseColor(Color.WHITE)
                     page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     bmp
