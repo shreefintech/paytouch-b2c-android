@@ -61,11 +61,6 @@
                 android:textSize="@dimen/text_size_20"
                 tools:text="Details"/>
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:src="@drawable/img_bharat_connect" />
         </LinearLayout>
 
         <!-- ── Capture / Continue / Submit buttons ── -->
