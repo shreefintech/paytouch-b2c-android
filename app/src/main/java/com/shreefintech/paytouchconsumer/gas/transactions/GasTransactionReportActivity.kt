@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.gas.transactions
+package com.shreefintech.paytouchconsumer.gas.transactions
 
 import android.os.Bundle
 import android.text.Editable

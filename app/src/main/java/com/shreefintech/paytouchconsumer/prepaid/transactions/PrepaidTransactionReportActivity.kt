@@ -1,4 +1,4 @@
-﻿package com.shreefintech.paytouchconsumer.prepaid.transactions
+package com.shreefintech.paytouchconsumer.prepaid.transactions
 
 import android.os.Bundle
 import android.text.Editable
