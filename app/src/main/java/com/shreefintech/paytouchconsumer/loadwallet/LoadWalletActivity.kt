@@ -224,7 +224,6 @@ class LoadWalletActivity : BaseActivity() {
                 binding.viewBg.alpha = slideOffset.coerceIn(0f, 1f)
             }
         })
-        selectPaymentMode("IMPS")
     }
 
     private fun showWithdrawSheet() {

@@ -563,7 +563,7 @@
                         android:layout_height="@dimen/btn_height"
                         android:layout_marginTop="@dimen/margin_large"
                         app:cardBackgroundColor="?attr/colorPrimary"
-                        app:cardCornerRadius="10dp"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
 
@@ -603,7 +603,7 @@
                         android:layout_height="@dimen/btn_height"
                         android:layout_marginTop="@dimen/margin_large"
                         app:cardBackgroundColor="?attr/colorPrimary"
-                        app:cardCornerRadius="10dp"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
 
