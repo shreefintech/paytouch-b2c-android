@@ -1,6 +1,5 @@
 package com.shreefintech.paytouchconsumer.electricity.transactions
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,10 +16,10 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionReportBinding
-import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.electricity.viewmodel.TransactionReportViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.transactions.TransactionDetailActivity
+import com.shreefintech.paytouchconsumer.transactions.TransactionReportDetailActivity
+import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.TransactionFilterHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -92,7 +91,7 @@ class TransactionReportActivity : BaseActivity() {
     private fun setupRecyclerView() {
         transactionAdp = TransactionAdp(mActivity, mDisplayList)
         transactionAdp.onClickItem = { item ->
-            TransactionDetailActivity.start(mActivity, item)
+            TransactionReportDetailActivity.start(mActivity, item.transactionId)
         }
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
@@ -277,3 +276,4 @@ class TransactionReportActivity : BaseActivity() {
         }
     }
 }
+

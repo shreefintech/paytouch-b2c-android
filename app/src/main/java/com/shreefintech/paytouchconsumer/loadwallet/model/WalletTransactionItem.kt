@@ -7,14 +7,16 @@ data class WalletTransactionItem(
     val title: String,
     val date: String,
     val amount: String,
-    val isCredit: Boolean
+    val isCredit: Boolean,
+    val transactionId: String
 ) {
     companion object {
         fun from(item: WalletHistoryItem) = WalletTransactionItem(
-            title    = item.serviceName ?: "--",
-            date     = Utility.formatDate(item.createdAt, "dd MMM yyyy"),
-            amount   = Utility.formatAmount(item.amount),
-            isCredit = item.type?.uppercase() == "CREDIT"
+            title         = item.serviceName ?: "--",
+            date          = Utility.formatDate(item.createdAt, "dd MMM yyyy"),
+            amount        = Utility.formatAmount(item.amount),
+            isCredit      = item.type?.uppercase() == "CREDIT",
+            transactionId = item.transactionId ?: ""
         )
     }
 }

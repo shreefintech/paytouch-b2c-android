@@ -27,6 +27,7 @@ import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -351,7 +352,7 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
         binding.tvIfscCode.text = data.ifsc ?: "--"
-        Glide.with(mActivity)
+        Glide.with(mActivity as Context)
             .load(data.qrCodeUrl)
             .placeholder(R.drawable.ic_qr)
             .error(R.drawable.ic_qr)
@@ -364,6 +365,9 @@ class LoadWalletActivity : BaseActivity() {
 
     private fun setupRecyclerView() {
         transactionAdp = WalletTransactionAdp(mActivity, transactionList)
+        transactionAdp.onClickItem = { transactionId ->
+            if (!Utility.stopClick()) TransactionHistoryDetailActivity.start(mActivity, transactionId)
+        }
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
             adapter = transactionAdp
