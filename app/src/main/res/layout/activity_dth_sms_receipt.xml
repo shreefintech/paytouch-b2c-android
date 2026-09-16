@@ -13,12 +13,18 @@
             type="androidx.databinding.ObservableBoolean" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clRoot"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/img_screen_bg"
-        tools:context=".dth.transactions.DthSmsReceiptActivity">
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clRoot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context=".dth.transactions.DthSmsReceiptActivity">
 
         <!-- Toolbar -->
         <include
@@ -906,5 +912,6 @@
             </LinearLayout>
         </FrameLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 </layout>

@@ -84,6 +84,7 @@ class GasActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
+            if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
             insets
         }
 

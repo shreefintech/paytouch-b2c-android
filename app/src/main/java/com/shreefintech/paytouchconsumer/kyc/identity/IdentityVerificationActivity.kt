@@ -5,7 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
+import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -49,7 +49,7 @@ class IdentityVerificationActivity : BaseActivity() {
     private lateinit var binding: ActivityIdentityVerificationBinding
     private val viewModel: IdentityVerificationViewModel by viewModels()
     private val showProgressSubmit = ObservableBoolean(false)
-    private val showCaptureButton  = ObservableBoolean(false)
+    private val showCaptureButton = ObservableBoolean(false)
     private var resultCode = 0
 
     private val dotViews = mutableListOf<AppCompatImageView>()
@@ -65,18 +65,19 @@ class IdentityVerificationActivity : BaseActivity() {
     private var cameraOutputFile: File? = null
     private var cameraOutputUri: Uri? = null
     private var onSelfieCaptured: ((Uri) -> Unit)? = null
-    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        val file = cameraOutputFile
-        val uri = cameraOutputUri
-        val callback = onSelfieCaptured
-        onSelfieCaptured = null
-        if (success && file != null && uri != null && callback != null) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                compressIfNeeded(file)
-                withContext(Dispatchers.Main) { callback(uri) }
+    private val cameraLauncher =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            val file = cameraOutputFile
+            val uri = cameraOutputUri
+            val callback = onSelfieCaptured
+            onSelfieCaptured = null
+            if (success && file != null && uri != null && callback != null) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    compressIfNeeded(file)
+                    withContext(Dispatchers.Main) { callback(uri) }
+                }
             }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,30 +86,26 @@ class IdentityVerificationActivity : BaseActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                maxOf(imeInsets.bottom, systemBars.bottom)
-            )
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            binding.fcvStep.post { Utility.applyImeOverlapPadding(binding.fcvStep, imeInsets.bottom, mActivity) }
             insets
         }
 
         LiquidGlassEffect.attach(
-            targetView   = binding.flCard,
-            rootView     = binding.clRoot as ViewGroup,
+            targetView = binding.flCard,
+            rootView = binding.clRoot as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-            distortion   = 0f,
+            distortion = 0f,
             strokeWidth = 1,
             strokeColor = ContextCompat.getColor(mActivity, R.color.primary),
             solidStroke = true,
-            blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
+            blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
-        binding.onClickListener    = onClickListener()
+        binding.onClickListener = onClickListener()
         binding.showProgressSubmit = showProgressSubmit
-        binding.showCaptureButton  = showCaptureButton
+        binding.showCaptureButton = showCaptureButton
 
         onBack()
         setupDots()
@@ -128,7 +125,7 @@ class IdentityVerificationActivity : BaseActivity() {
     }
 
     private fun setupDots() {
-        val size   = resources.getDimensionPixelSize(R.dimen.kyc_dot_size)
+        val size = resources.getDimensionPixelSize(R.dimen.kyc_dot_size)
         val margin = resources.getDimensionPixelSize(R.dimen.kyc_dot_margin)
         repeat(IdentityVerificationViewModel.TOTAL_STEPS) { index ->
             val dot = AppCompatImageView(mActivity).apply {
@@ -147,7 +144,8 @@ class IdentityVerificationActivity : BaseActivity() {
             updateTitle(step)
             showFragment(step)
             val isLastStep = step == IdentityVerificationViewModel.TOTAL_STEPS - 1
-            binding.tvContinueLabel.text = if (isLastStep) getString(R.string.btnSubmit) else getString(R.string.btnContinue)
+            binding.tvContinueLabel.text =
+                if (isLastStep) getString(R.string.btnSubmit) else getString(R.string.btnContinue)
             showCaptureButton.set(isLastStep)
         }
     }
@@ -182,8 +180,9 @@ class IdentityVerificationActivity : BaseActivity() {
 
     private fun setupFilePicker() {
         filePickerUtil = FilePickerUtil(this)
-        filePickerUtil.onSuccess = { result -> onDocumentPicked?.invoke(result.uri); onDocumentPicked = null }
-        filePickerUtil.onError   = { error ->
+        filePickerUtil.onSuccess =
+            { result -> onDocumentPicked?.invoke(result.uri); onDocumentPicked = null }
+        filePickerUtil.onError = { error ->
             onDocumentPicked = null
             ToastUtil.showDelete(mActivity, filePickerUtil.getErrorMessage(error))
         }
@@ -197,7 +196,8 @@ class IdentityVerificationActivity : BaseActivity() {
     fun captureSelfie(onCaptured: (Uri) -> Unit) {
         val dir = File(cacheDir, "kyc").also { it.mkdirs() }
         val file = File(dir, "selfie_${System.currentTimeMillis()}.jpg")
-        val uri = FileProvider.getUriForFile(mActivity, "${mActivity.packageName}.fileprovider", file)
+        val uri =
+            FileProvider.getUriForFile(mActivity, "${mActivity.packageName}.fileprovider", file)
         cameraOutputFile = file
         cameraOutputUri = uri
         onSelfieCaptured = onCaptured
@@ -212,7 +212,15 @@ class IdentityVerificationActivity : BaseActivity() {
 
         val raw = BitmapFactory.decodeFile(file.absolutePath) ?: return
         val bitmap = if (rotation != 0) {
-            Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
+            Bitmap.createBitmap(
+                raw,
+                0,
+                0,
+                raw.width,
+                raw.height,
+                Matrix().apply { postRotate(rotation.toFloat()) },
+                true
+            )
                 .also { if (it !== raw) raw.recycle() }
         } else raw
 
@@ -231,13 +239,18 @@ class IdentityVerificationActivity : BaseActivity() {
     }
 
     private fun exifRotation(path: String): Int = try {
-        when (ExifInterface(path).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
-            ExifInterface.ORIENTATION_ROTATE_90  -> 90
+        when (ExifInterface(path).getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90
             ExifInterface.ORIENTATION_ROTATE_180 -> 180
             ExifInterface.ORIENTATION_ROTATE_270 -> 270
             else -> 0
         }
-    } catch (e: Exception) { 0 }
+    } catch (_: Exception) {
+        0
+    }
 
     // ─── Navigation ─────────────────────────────────────────────────────────────
 
@@ -260,19 +273,22 @@ class IdentityVerificationActivity : BaseActivity() {
             return
         }
 
-        val panUri          = viewModel.panFrontUri
+        val panUri = viewModel.panFrontUri
         val aadhaarFrontUri = viewModel.aadhaarFrontUri
-        val aadhaarBackUri  = viewModel.aadhaarBackUri
-        val selfieUri       = viewModel.selfieUri
+        val aadhaarBackUri = viewModel.aadhaarBackUri
+        val selfieUri = viewModel.selfieUri
 
         showProgressSubmit.set(true)
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val cr                = contentResolver
-                val panBytes          = panUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
-                val aadhaarFrontBytes = aadhaarFrontUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
-                val aadhaarBackBytes  = aadhaarBackUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
-                val selfieBytes       = selfieUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+                val cr = contentResolver
+                val panBytes = panUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+                val aadhaarFrontBytes =
+                    aadhaarFrontUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+                val aadhaarBackBytes =
+                    aadhaarBackUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+                val selfieBytes =
+                    selfieUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
 
                 withContext(Dispatchers.Main) {
                     if (panBytes == null || aadhaarFrontBytes == null || aadhaarBackBytes == null || selfieBytes == null) {
@@ -281,24 +297,35 @@ class IdentityVerificationActivity : BaseActivity() {
                         return@withContext
                     }
                     viewModel.submitIdentity(
-                        panBytes          = panBytes,
+                        panBytes = panBytes,
                         aadhaarFrontBytes = aadhaarFrontBytes,
-                        aadhaarBackBytes  = aadhaarBackBytes,
-                        selfieBytes       = selfieBytes,
+                        aadhaarBackBytes = aadhaarBackBytes,
+                        selfieBytes = selfieBytes,
                         onSuccess = {
                             showProgressSubmit.set(false)
-                            ToastUtil.showSuccess(mActivity, getString(R.string.msgIdentitySubmitSuccess))
+                            ToastUtil.showSuccess(
+                                mActivity,
+                                getString(R.string.msgIdentitySubmitSuccess)
+                            )
                             resultCode = 1
                             setResult(resultCode)
                             finish()
                         },
-                        onError = { msg -> showProgressSubmit.set(false); ToastUtil.showDelete(mActivity, msg) }
+                        onError = { msg ->
+                            showProgressSubmit.set(false); ToastUtil.showDelete(
+                            mActivity,
+                            msg
+                        )
+                        }
                     )
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     showProgressSubmit.set(false)
-                    ToastUtil.showDelete(mActivity, e.localizedMessage ?: getString(R.string.errGeneric))
+                    ToastUtil.showDelete(
+                        mActivity,
+                        e.localizedMessage ?: getString(R.string.errGeneric)
+                    )
                 }
             }
         }

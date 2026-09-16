@@ -17,98 +17,100 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clRoot"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/img_screen_bg">
+        android:background="@drawable/img_screen_bg"
+        android:fillViewport="true"
+        android:scrollbars="none">
 
-        <!-- ── Wallet illustration (top-right) ── -->
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivWalletIllustration"
-            android:layout_width="170dp"
-            android:layout_height="170dp"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:scaleType="fitEnd"
-            android:src="@drawable/img_wallet_recolored"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clRoot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <!-- ── PayTouch logo ── -->
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivLogo"
-            android:layout_width="0dp"
-            android:layout_height="90dp"
-            android:layout_marginStart="@dimen/page_margin_horizontal"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:scaleType="fitStart"
-            android:src="@drawable/img_paytouch"
-            app:layout_constraintEnd_toStartOf="@id/ivWalletIllustration"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.55" />
+            <!-- ── Wallet illustration (top-right) ── -->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivWalletIllustration"
+                android:layout_width="170dp"
+                android:layout_height="170dp"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:scaleType="fitEnd"
+                android:src="@drawable/img_wallet_recolored"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- ── Welcome! ── -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvWelcome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/page_margin_horizontal"
-            android:layout_marginTop="@dimen/margin_extra_large"
-            android:ellipsize="end"
-            android:fontFamily="@font/proza_libre_bold"
-            android:includeFontPadding="false"
-            android:maxLines="1"
-            android:text="@string/welcomeCreateAccount"
-            android:textColor="?attr/colorTextOnBrand"
-            android:textSize="@dimen/text_size_22"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivLogo" />
+            <!-- ── PayTouch logo ── -->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivLogo"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_marginStart="@dimen/page_margin_horizontal"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:scaleType="fitStart"
+                android:src="@drawable/img_paytouch"
+                app:layout_constraintEnd_toStartOf="@id/ivWalletIllustration"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.55" />
 
-        <!-- ── Subtitle ── -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvSubtitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/page_margin_horizontal"
-            android:layout_marginTop="@dimen/margin_extra_small"
-            android:layout_marginEnd="@dimen/margin_extra_small"
-            android:ellipsize="end"
-            android:fontFamily="@font/proza_libre_medium"
-            android:includeFontPadding="false"
-            android:maxLines="3"
-            android:text="@string/createAccountSubtitle"
-            android:textColor="?attr/colorTextOnBrand"
-            android:textSize="@dimen/text_size_14"
-            app:layout_constraintEnd_toStartOf="@id/ivWalletIllustration"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
+            <!-- ── Welcome! ── -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvWelcome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/page_margin_horizontal"
+                android:layout_marginTop="@dimen/margin_extra_large"
+                android:ellipsize="end"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="@string/welcomeCreateAccount"
+                android:textColor="?attr/colorTextOnBrand"
+                android:textSize="@dimen/text_size_22"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ivLogo" />
 
-        <!-- ── Glass card (fills remaining screen height) ── -->
-        <FrameLayout
-            android:id="@+id/flCard"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="@dimen/margin_xxlarge"
-            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
-            android:layout_marginBottom="@dimen/margin_medium"
-            android:clipToOutline="true"
-            android:outlineProvider="background"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
+            <!-- ── Subtitle ── -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/page_margin_horizontal"
+                android:layout_marginTop="@dimen/margin_extra_small"
+                android:layout_marginEnd="@dimen/margin_extra_small"
+                android:ellipsize="end"
+                android:fontFamily="@font/proza_libre_medium"
+                android:includeFontPadding="false"
+                android:maxLines="3"
+                android:text="@string/createAccountSubtitle"
+                android:textColor="?attr/colorTextOnBrand"
+                android:textSize="@dimen/text_size_14"
+                app:layout_constraintEnd_toStartOf="@id/ivWalletIllustration"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
 
-            <androidx.core.widget.NestedScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbars="none">
+            <!-- ── Glass card ── -->
+            <FrameLayout
+                android:id="@+id/flCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_xxlarge"
+                android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+                android:layout_marginBottom="@dimen/margin_medium"
+                android:clipToOutline="true"
+                android:outlineProvider="background"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
+                tools:targetApi="31">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/page_margin_horizontal">
+                    android:padding="@dimen/page_margin_horizontal"
+                    tools:ignore="UselessParent">
 
                     <!-- name label -->
                     <androidx.appcompat.widget.AppCompatTextView
@@ -449,7 +451,6 @@
                         android:onClickListener="@{onClickListener}"
                         android:orientation="horizontal">
 
-
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="@dimen/icon_small"
                             android:layout_height="@dimen/icon_small"
@@ -472,8 +473,10 @@
 
                 </LinearLayout>
 
-            </androidx.core.widget.NestedScrollView>
-        </FrameLayout>
+            </FrameLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
 </layout>

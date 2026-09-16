@@ -78,7 +78,7 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
 
         LiquidGlassEffect.attach(
             targetView = binding.flCard,
-            rootView = binding.clRoot as ViewGroup,
+            rootView = binding.root as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion = 0f,
             blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur),
@@ -164,12 +164,11 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
         binding.llBtnContainer.visibility = if (isReceipt) View.VISIBLE else View.GONE
 
         val activeColor = ContextCompat.getColor(mActivity, R.color.primary)
-        val inactiveColor = Color.TRANSPARENT
         val activeTextColor = ContextCompat.getColor(mActivity, R.color.white)
         val inactiveTextColor = ContextCompat.getColor(mActivity, R.color.primary)
 
-        binding.cvTabReceipt.setCardBackgroundColor(if (isReceipt) activeColor else inactiveColor)
-        binding.cvTabDisplay.setCardBackgroundColor(if (isReceipt) inactiveColor else activeColor)
+        binding.cvTabReceipt.setCardBackgroundColor(if (isReceipt) activeColor else Color.TRANSPARENT)
+        binding.cvTabDisplay.setCardBackgroundColor(if (isReceipt) Color.TRANSPARENT else activeColor)
         binding.tvTabReceipt.setTextColor(if (isReceipt) activeTextColor else inactiveTextColor)
         binding.tvTabDisplay.setTextColor(if (isReceipt) inactiveTextColor else activeTextColor)
     }

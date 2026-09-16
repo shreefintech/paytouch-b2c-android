@@ -75,6 +75,7 @@ class LoadWalletActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
+            if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
             binding.incPaymentSheet.root.setPadding(
                 0,
                 0,

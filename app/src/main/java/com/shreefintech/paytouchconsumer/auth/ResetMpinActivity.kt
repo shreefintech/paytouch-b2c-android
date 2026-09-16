@@ -7,7 +7,6 @@ import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.ViewCompat
@@ -55,6 +54,7 @@ class ResetMpinActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
+            if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
             insets
         }
 

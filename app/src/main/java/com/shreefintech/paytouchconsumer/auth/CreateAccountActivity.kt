@@ -1,7 +1,6 @@
 package com.shreefintech.paytouchconsumer.auth
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
@@ -16,6 +15,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
@@ -41,7 +41,7 @@ class CreateAccountActivity : BaseActivity() {
         binding = ActivityCreateAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(
@@ -50,12 +50,13 @@ class CreateAccountActivity : BaseActivity() {
                 systemBars.right,
                 maxOf(imeInsets.bottom, systemBars.bottom)
             )
+            if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
             insets
         }
 
         LiquidGlassEffect.attach(
             targetView = binding.flCard,
-            rootView = binding.clRoot as ViewGroup,
+            rootView = binding.root as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion = 0f,
             blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
@@ -99,7 +100,7 @@ class CreateAccountActivity : BaseActivity() {
 
         spannable.setSpan(object : ClickableSpan() {
             override fun onClick(widget: View) {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_PLATFORM_TERMS)))
+                startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
             }
 
             override fun updateDrawState(ds: TextPaint) {
