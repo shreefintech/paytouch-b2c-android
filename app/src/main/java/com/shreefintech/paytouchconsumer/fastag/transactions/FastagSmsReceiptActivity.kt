@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
@@ -164,7 +163,6 @@ class FastagSmsReceiptActivity : BaseActivity() {
         binding.llBtnContainer.visibility   = if (isReceipt) View.VISIBLE else View.GONE
 
         val activeColor       = ContextCompat.getColor(mActivity, R.color.primary)
-        val inactiveColor     = Color.TRANSPARENT
         val activeTextColor   = ContextCompat.getColor(mActivity, R.color.white)
         val inactiveTextColor = ContextCompat.getColor(mActivity, R.color.primary)
 

@@ -20,11 +20,11 @@
         android:fillViewport="true"
         android:scrollbars="none">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clRoot"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context=".gas.transactions.GasSmsReceiptActivity">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clRoot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context=".gas.transactions.GasSmsReceiptActivity">
 
         <!-- Toolbar -->
         <include
@@ -916,6 +916,6 @@
             </LinearLayout>
         </FrameLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>
