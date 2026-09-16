@@ -355,6 +355,17 @@ Each new module needs only:
 - Copy status/report layouts from the Electricity versions (title string only changes); mirror `ElectricityTransactionStatusActivity` and `TransactionReportActivity` exactly.
 - The category icon is set in the ViewModel's `mapToTransactionItem()` — pass `R.drawable.ic_{category}` there.
 
+### Two intentionally separate detail Activities — do NOT merge
+
+`transactions/` contains two API-driven detail Activities that look identical today but must stay separate:
+
+| Activity | Launched from | Entry point |
+|---|---|---|
+| `TransactionHistoryDetailActivity` | `WalletTransactionsActivity` (wallet/HDFC top-up history) | Wallet transaction row tap |
+| `TransactionReportDetailActivity` | Every `{Category}TransactionReportActivity` (bill payment reports) | Report list row tap |
+
+Both share `activity_transaction_history_detail.xml` and `TransactionHistoryDetailViewModel` right now, but they serve different user flows and are expected to diverge (wallet detail will show payment-method/RRN fields; report detail will show bill-specific fields). **Do not flag these as duplication or suggest merging them into one Activity** — the separation is intentional.
+
 ---
 
 ## Android Activity Guidelines

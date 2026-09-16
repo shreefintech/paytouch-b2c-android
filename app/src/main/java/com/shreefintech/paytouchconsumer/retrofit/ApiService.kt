@@ -214,6 +214,8 @@ interface ApiService {
         @Query("per_page") perPage: Int
     ): Call<General<WalletHistoryPageItem>>
 
+    // ── Transaction Detail ────────────────────────────────────────────────────
+
     @GET("${AUTH}utility-bill/transaction/{id}")
     fun getTransactionHistoryDetail(
         @Header("Authorization") authorization: String,

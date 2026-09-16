@@ -69,7 +69,7 @@ class WalletTransactionsActivity : BaseActivity() {
     private fun setupRecyclerView() {
         transactionAdp = WalletTransactionAdp(mActivity, transactionList)
         transactionAdp.onClickItem = { transactionId ->
-            TransactionHistoryDetailActivity.start(mActivity, transactionId)
+            if (!Utility.stopClick()) TransactionHistoryDetailActivity.start(mActivity, transactionId)
         }
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
