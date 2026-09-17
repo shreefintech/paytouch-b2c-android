@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgressWithdraw"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_confirm_dialog_bg"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="24dp">
+
+        <!-- Title -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/titleConfirmWithdrawal"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_18"
+            app:layout_constraintEnd_toStartOf="@id/cardClose"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/proza_libre_medium"
+            android:text="@string/subtitleWithdrawFromWallet"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_12"
+            app:layout_constraintEnd_toStartOf="@id/cardClose"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+        <!-- Close button -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardClose"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:onClickListener="@{onClickListener}"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/primary"
+            app:strokeWidth="1dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                android:src="@drawable/ic_cross"
+                android:tint="@color/primary" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Divider 1 -->
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_divider_gradient"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+
+        <!-- Confirm Withdrawal label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvConfirmWithdrawal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/titleConfirmWithdrawal"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_20"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider1" />
+
+        <!-- Amount -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_25"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvConfirmWithdrawal"
+            tools:text="₹200.00" />
+
+        <!-- Divider 2 -->
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginTop="@dimen/margin_extra_large"
+            android:background="@drawable/bg_divider_gradient"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvAmount" />
+
+        <!-- Payment Mode label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPaymentModeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/proza_libre_medium"
+            android:text="@string/labelPaymentMode"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider2" />
+
+        <!-- Payment Mode value -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPaymentMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvPaymentModeLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="IMPS" />
+
+        <!-- Available Balance label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAvailableBalanceLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/proza_libre_medium"
+            android:text="@string/labelAvailableBalance"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPaymentModeLabel" />
+
+        <!-- Available Balance value -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAvailableBalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvAvailableBalanceLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="₹36.00" />
+
+        <!-- Lock icon + Secure Payment text -->
+        <LinearLayout
+            android:id="@+id/llSecurePayment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvAvailableBalanceLabel">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/ic_lock"
+                android:tint="@color/primary" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:fontFamily="@font/proza_libre_semi_bold"
+                android:text="@string/msgSecurePaymentProcessedBy"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_13" />
+        </LinearLayout>
+
+        <!-- PayTouch logo -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivPaytouchLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginTop="8dp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/img_paytouch"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llSecurePayment" />
+
+        <!-- Withdraw Securely button -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardWithdrawSecurely"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/btn_height"
+            android:layout_marginTop="@dimen/margin_large"
+            android:onClickListener="@{onClickListener}"
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivPaytouchLogo"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:text="@string/btnWithdrawSecurely"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_16"
+                    android:visibility="@{showProgressWithdraw ? View.GONE : View.VISIBLE}" />
+
+                <ProgressBar
+                    android:id="@+id/pbWithdrawSecurely"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:indeterminateTint="@color/white"
+                    android:visibility="@{showProgressWithdraw ? View.VISIBLE : View.GONE}" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Powered by -->
+        <LinearLayout
+            android:id="@+id/llPoweredBy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="top"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardWithdrawSecurely">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:fontFamily="@font/proza_libre_regular"
+                android:text="@string/msgPoweredByPrefix"
+                android:textColor="@color/sub_text_color"
+                android:textSize="@dimen/text_size_11" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/proza_libre_semi_bold"
+                android:text="@string/labelShreefintech"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_size_11" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRajkot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/textRajkotGujarat"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llPoweredBy" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

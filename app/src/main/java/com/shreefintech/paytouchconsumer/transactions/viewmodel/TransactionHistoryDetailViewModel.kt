@@ -28,8 +28,9 @@ class TransactionHistoryDetailViewModel(application: Application) : AndroidViewM
                     call: Call<General<TransactionHistoryDetailItem>>,
                     response: Response<General<TransactionHistoryDetailItem>>
                 ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        onSuccess(response.body()!!.data!!)
+                    val body = response.body()
+                    if (response.isSuccessful && body?.data != null) {
+                        onSuccess(body.data!!)
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(

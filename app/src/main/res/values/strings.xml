@@ -590,5 +590,26 @@
     <string name="msgNoInternetDes">No Internet Connection Found. Check Your Connection or Try Again!</string>
     <string name="textTryAgain">Try Again</string>
     <string name="textRetry">Retry</string>
+    <string name="btnWithdraw">Withdraw</string>
+
+    <!-- Withdraw sheet -->
+    <string name="labelPaymentMode">Payment Mode</string>
+    <string name="labelNarration">Narration</string>
+    <string name="hintNarration">Reason for withdrawal (optional)</string>
+    <string name="btnProceedWithdraw">Proceed Withdraw →</string>
+    <string name="msgSecurePaymentPaytouch">100% secure payment powered by PayTouch</string>
+    <string name="labelImps">IMPS</string>
+    <string name="labelNeft">NEFT</string>
+    <string name="labelRtgs">RTGS</string>
+
+    <!-- Confirm withdrawal dialog -->
+    <string name="titleConfirmWithdrawal">Confirm Withdrawal</string>
+    <string name="subtitleWithdrawFromWallet">Withdraw from your wallet</string>
+    <string name="btnWithdrawSecurely">Withdraw Securely</string>
+
+    <!-- Withdraw validation -->
+    <string name="errMinWithdrawAmount">Minimum withdrawal amount is ₹100</string>
+    <string name="errInsufficientBalance">Insufficient wallet balance</string>
+    <string name="msgWithdrawInitiated">Withdrawal request submitted successfully</string>
 
 </resources>

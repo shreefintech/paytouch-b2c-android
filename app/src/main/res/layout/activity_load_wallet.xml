@@ -602,6 +602,46 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Withdraw  button -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/btn_height"
+                        android:layout_marginTop="@dimen/margin_large"
+                        app:cardBackgroundColor="?attr/colorPrimary"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:id="@+id/llWithdraw"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="?selectableItemBackground"
+                            android:gravity="center"
+                            android:onClickListener="@{onClickListener}"
+                            android:orientation="horizontal"
+                            android:paddingStart="@dimen/margin_large"
+                            android:paddingEnd="@dimen/margin_large">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_bold"
+                                android:gravity="start"
+                                android:includeFontPadding="false"
+                                android:text="@string/btnWithdraw"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/text_size_16" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_arrow_up"
+                                android:tint="@color/white" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
                     <!-- Transaction Report section header -->
                     <LinearLayout
                         android:id="@+id/llTransactionReport"
@@ -721,6 +761,11 @@
         <include
             android:id="@+id/incPaymentSheet"
             layout="@layout/sheet_make_payment" />
+
+        <!-- Withdraw bottom sheet -->
+        <include
+            android:id="@+id/incWithdrawSheet"
+            layout="@layout/sheet_withdraw" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

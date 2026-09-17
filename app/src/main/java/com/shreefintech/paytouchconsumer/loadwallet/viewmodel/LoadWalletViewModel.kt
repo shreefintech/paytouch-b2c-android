@@ -12,6 +12,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequ
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawRequest
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -147,6 +149,49 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
+    }
+
+    fun withdrawWallet(
+        amount: Double,
+        paymentMode: String?,
+        narration: String?,
+        onLoading: () -> Unit,
+        onSuccess: (WithdrawDataItem) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        onLoading()
+        ApiClient.apiService.withdrawWallet(
+            authorization = bearerToken(),
+            request = WithdrawRequest(
+                amount = amount,
+                paymentMode = paymentMode?.takeIf { it.isNotEmpty() },
+                narration = narration?.takeIf { it.isNotEmpty() }
+            )
+        ).enqueue(object : Callback<General<WithdrawDataItem>> {
+            override fun onResponse(
+                call: Call<General<WithdrawDataItem>>,
+                response: Response<General<WithdrawDataItem>>
+            ) {
+                val body = response.body()
+                if (response.isSuccessful && body?.data != null) {
+                    onSuccess(body.data!!)
+                } else {
+                    onError(
+                        body?.message ?: ApiHelper.parseErrorMessage(
+                            getApplication(), response.code(), response.errorBody()?.string()
+                        )
+                    )
+                }
+            }
+
+            override fun onFailure(call: Call<General<WithdrawDataItem>>, t: Throwable) {
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
+            }
+        })
     }
 
     fun fetchBankName(

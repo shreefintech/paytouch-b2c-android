@@ -17,11 +17,13 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmPaymentBinding
+import com.shreefintech.paytouchconsumer.databinding.DialogConfirmWithdrawBinding
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoadWalletBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetMakePaymentBinding
+import com.shreefintech.paytouchconsumer.databinding.SheetWithdrawBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
@@ -46,6 +48,10 @@ class LoadWalletActivity : BaseActivity() {
     private lateinit var sheetBinding: SheetMakePaymentBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<View>
 
+    private lateinit var withdrawSheetBinding: SheetWithdrawBinding
+    private lateinit var withdrawSheetBehavior: BottomSheetBehavior<View>
+    private var selectedPaymentMode = MODE_IMPS
+
     private var currentWalletBalance: String? = null
 
     private var confirmDialog: Dialog? = null
@@ -54,8 +60,18 @@ class LoadWalletActivity : BaseActivity() {
     private var pendingPayDescription: String = ""
     private val showProgressPay = ObservableBoolean(false)
 
+    private var withdrawConfirmDialog: Dialog? = null
+    private var withdrawConfirmDialogBinding: DialogConfirmWithdrawBinding? = null
+    private var pendingWithdrawAmount: Double = 0.0
+    private var pendingWithdrawMode: String = MODE_IMPS
+    private var pendingWithdrawNarration: String = ""
+    private val showProgressWithdraw = ObservableBoolean(false)
+
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
+        private const val MODE_IMPS = "IMPS"
+        private const val MODE_NEFT = "NEFT"
+        private const val MODE_RTGS = "RTGS"
 
         fun start(context: Context) {
             context.startActivity(Intent(context, LoadWalletActivity::class.java))
@@ -78,6 +94,12 @@ class LoadWalletActivity : BaseActivity() {
             )
             if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
             binding.incPaymentSheet.root.setPadding(
+                0,
+                0,
+                0,
+                maxOf(imeInsets.bottom, systemBars.bottom)
+            )
+            binding.incWithdrawSheet.root.setPadding(
                 0,
                 0,
                 0,
@@ -110,6 +132,7 @@ class LoadWalletActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         setupRecyclerView()
         setupPaymentSheet()
+        setupWithdrawSheet()
         selectTab(TAB_TOTAL_BALANCE)
         onBack()
         retryCallback = { loadData() }
@@ -152,6 +175,7 @@ class LoadWalletActivity : BaseActivity() {
         if (intent.getBooleanExtra(Constant.EXTRA_FROM_PAYMENT, false)) {
             Utility.hideKeyboard(mActivity)
             if (isPaymentSheetVisible()) hidePaymentSheet()
+            if (isWithdrawSheetVisible()) hideWithdrawSheet()
             sheetBinding.etAmount.clearFocus()
             sheetBinding.etDescription.clearFocus()
             sheetBinding.etAmount.setText("")
@@ -181,6 +205,139 @@ class LoadWalletActivity : BaseActivity() {
                 binding.viewBg.alpha = slideOffset.coerceIn(0f, 1f)
             }
         })
+    }
+
+    private fun setupWithdrawSheet() {
+        withdrawSheetBinding = binding.incWithdrawSheet
+        withdrawSheetBinding.onClickListener = onClickListener()
+        withdrawSheetBehavior = BottomSheetBehavior.from(withdrawSheetBinding.root)
+        withdrawSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        withdrawSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_EXPANDED -> binding.viewBg.visible()
+                    BottomSheetBehavior.STATE_SETTLING -> binding.viewBg.visible()
+                    BottomSheetBehavior.STATE_HIDDEN -> binding.viewBg.gone()
+                    else -> {}
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                binding.viewBg.alpha = slideOffset.coerceIn(0f, 1f)
+            }
+        })
+        selectPaymentMode(MODE_IMPS)
+    }
+
+    private fun showWithdrawSheet() {
+        withdrawSheetBinding.etAmount.setText("")
+        withdrawSheetBinding.etNarration.setText("")
+        selectPaymentMode(MODE_IMPS)
+        binding.viewBg.visible()
+        withdrawSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    private fun hideWithdrawSheet() {
+        Utility.hideKeyboard(mActivity)
+        withdrawSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+    }
+
+    private fun isWithdrawSheetVisible() = withdrawSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
+
+    private fun selectPaymentMode(mode: String) {
+        selectedPaymentMode = mode
+        val selected = ContextCompat.getDrawable(mActivity, R.drawable.bg_toggle_selected)
+        val unselected = ContextCompat.getDrawable(mActivity, R.drawable.bg_toggle_unselected)
+        val white = ContextCompat.getColor(mActivity, R.color.white)
+        val primary = ContextCompat.getColor(mActivity, R.color.primary)
+
+        withdrawSheetBinding.tvTabImps.background = if (mode == MODE_IMPS) selected else unselected
+        withdrawSheetBinding.tvTabImps.setTextColor(if (mode == MODE_IMPS) white else primary)
+        withdrawSheetBinding.tvTabNeft.background = if (mode == MODE_NEFT) selected else unselected
+        withdrawSheetBinding.tvTabNeft.setTextColor(if (mode == MODE_NEFT) white else primary)
+        withdrawSheetBinding.tvTabRtgs.background = if (mode == MODE_RTGS) selected else unselected
+        withdrawSheetBinding.tvTabRtgs.setTextColor(if (mode == MODE_RTGS) white else primary)
+    }
+
+    private fun validateAndShowWithdrawConfirmDialog() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        val amountStr = withdrawSheetBinding.etAmount.text?.toString()?.trim() ?: ""
+        if (amountStr.isEmpty()) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
+            return
+        }
+        val amount = amountStr.toDoubleOrNull()
+        if (amount == null) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
+            return
+        }
+        if (amount < 100) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errMinWithdrawAmount))
+            return
+        }
+        val balance = currentWalletBalance?.toDoubleOrNull() ?: 0.0
+        if (amount > balance) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errInsufficientBalance))
+            return
+        }
+        val narration = withdrawSheetBinding.etNarration.text?.toString()?.trim() ?: ""
+        hideWithdrawSheet()
+        showWithdrawConfirmDialog(amount, selectedPaymentMode, narration)
+    }
+
+    private fun showWithdrawConfirmDialog(amount: Double, mode: String, narration: String) {
+        pendingWithdrawAmount = amount
+        pendingWithdrawMode = mode
+        pendingWithdrawNarration = narration
+        showProgressWithdraw.set(false)
+
+        val dialogBinding = DialogConfirmWithdrawBinding.inflate(layoutInflater)
+        withdrawConfirmDialogBinding = dialogBinding
+        dialogBinding.onClickListener = onClickListener()
+        dialogBinding.showProgressWithdraw = showProgressWithdraw
+
+        val dialog = Dialog(mActivity)
+        withdrawConfirmDialog = dialog
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.88).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.setCancelable(true)
+        dialog.setOnDismissListener {
+            withdrawConfirmDialog = null
+            withdrawConfirmDialogBinding = null
+        }
+
+        dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
+        dialogBinding.tvPaymentMode.text = mode
+        dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
+
+        dialog.show()
+    }
+
+    private fun startWithdraw() {
+        viewModel.withdrawWallet(
+            amount = pendingWithdrawAmount,
+            paymentMode = pendingWithdrawMode,
+            narration = pendingWithdrawNarration,
+            onLoading = { showProgressWithdraw.set(true) },
+            onSuccess = { _ ->
+                showProgressWithdraw.set(false)
+                withdrawConfirmDialog?.dismiss()
+                ToastUtil.showWarning(mActivity, getString(R.string.msgWithdrawInitiated))
+                fetchWalletData()
+            },
+            onError = { msg ->
+                showProgressWithdraw.set(false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
     }
 
     private fun loadData() {
@@ -393,11 +550,13 @@ class LoadWalletActivity : BaseActivity() {
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (isPaymentSheetVisible()) {
-                    hidePaymentSheet()
-                } else {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
+                when {
+                    isPaymentSheetVisible() -> hidePaymentSheet()
+                    isWithdrawSheetVisible() -> hideWithdrawSheet()
+                    else -> {
+                        isEnabled = false
+                        onBackPressedDispatcher.onBackPressed()
+                    }
                 }
             }
         })
@@ -417,6 +576,11 @@ class LoadWalletActivity : BaseActivity() {
                     showPaymentSheet()
                 }
 
+                binding.llWithdraw -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    showWithdrawSheet()
+                }
+
                 binding.llTransactionReport -> {
                     if (Utility.stopClick()) return@OnClickListener
                     WalletTransactionsActivity.start(mActivity)
@@ -432,6 +596,15 @@ class LoadWalletActivity : BaseActivity() {
                     validateAndShowConfirmDialog()
                 }
 
+                withdrawSheetBinding.tvTabImps -> selectPaymentMode(MODE_IMPS)
+                withdrawSheetBinding.tvTabNeft -> selectPaymentMode(MODE_NEFT)
+                withdrawSheetBinding.tvTabRtgs -> selectPaymentMode(MODE_RTGS)
+
+                withdrawSheetBinding.btnProceedWithdraw -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    validateAndShowWithdrawConfirmDialog()
+                }
+
                 confirmDialogBinding?.cardClose -> {
                     confirmDialog?.dismiss()
                 }
@@ -440,6 +613,16 @@ class LoadWalletActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
                     startHdfcFlow()
+                }
+
+                withdrawConfirmDialogBinding?.cardClose -> {
+                    withdrawConfirmDialog?.dismiss()
+                }
+
+                withdrawConfirmDialogBinding?.cardWithdrawSecurely -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressWithdraw.get()) return@OnClickListener
+                    startWithdraw()
                 }
             }
         }
