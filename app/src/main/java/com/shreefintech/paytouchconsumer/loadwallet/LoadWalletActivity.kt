@@ -50,7 +50,7 @@ class LoadWalletActivity : BaseActivity() {
 
     private lateinit var withdrawSheetBinding: SheetWithdrawBinding
     private lateinit var withdrawSheetBehavior: BottomSheetBehavior<View>
-    private var selectedPaymentMode = "IMPS"
+    private var selectedPaymentMode = MODE_IMPS
 
     private var currentWalletBalance: String? = null
 
@@ -63,12 +63,15 @@ class LoadWalletActivity : BaseActivity() {
     private var withdrawConfirmDialog: Dialog? = null
     private var withdrawConfirmDialogBinding: DialogConfirmWithdrawBinding? = null
     private var pendingWithdrawAmount: Double = 0.0
-    private var pendingWithdrawMode: String = "IMPS"
+    private var pendingWithdrawMode: String = MODE_IMPS
     private var pendingWithdrawNarration: String = ""
     private val showProgressWithdraw = ObservableBoolean(false)
 
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
+        private const val MODE_IMPS = "IMPS"
+        private const val MODE_NEFT = "NEFT"
+        private const val MODE_RTGS = "RTGS"
 
         fun start(context: Context) {
             context.startActivity(Intent(context, LoadWalletActivity::class.java))
@@ -224,13 +227,13 @@ class LoadWalletActivity : BaseActivity() {
                 binding.viewBg.alpha = slideOffset.coerceIn(0f, 1f)
             }
         })
+        selectPaymentMode(MODE_IMPS)
     }
 
     private fun showWithdrawSheet() {
         withdrawSheetBinding.etAmount.setText("")
         withdrawSheetBinding.etNarration.setText("")
-        selectedPaymentMode = "IMPS"
-        selectPaymentMode("IMPS")
+        selectPaymentMode(MODE_IMPS)
         binding.viewBg.visible()
         withdrawSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
@@ -249,12 +252,12 @@ class LoadWalletActivity : BaseActivity() {
         val white = ContextCompat.getColor(mActivity, R.color.white)
         val primary = ContextCompat.getColor(mActivity, R.color.primary)
 
-        withdrawSheetBinding.tvTabImps.background = if (mode == "IMPS") selected else unselected
-        withdrawSheetBinding.tvTabImps.setTextColor(if (mode == "IMPS") white else primary)
-        withdrawSheetBinding.tvTabNeft.background = if (mode == "NEFT") selected else unselected
-        withdrawSheetBinding.tvTabNeft.setTextColor(if (mode == "NEFT") white else primary)
-        withdrawSheetBinding.tvTabRtgs.background = if (mode == "RTGS") selected else unselected
-        withdrawSheetBinding.tvTabRtgs.setTextColor(if (mode == "RTGS") white else primary)
+        withdrawSheetBinding.tvTabImps.background = if (mode == MODE_IMPS) selected else unselected
+        withdrawSheetBinding.tvTabImps.setTextColor(if (mode == MODE_IMPS) white else primary)
+        withdrawSheetBinding.tvTabNeft.background = if (mode == MODE_NEFT) selected else unselected
+        withdrawSheetBinding.tvTabNeft.setTextColor(if (mode == MODE_NEFT) white else primary)
+        withdrawSheetBinding.tvTabRtgs.background = if (mode == MODE_RTGS) selected else unselected
+        withdrawSheetBinding.tvTabRtgs.setTextColor(if (mode == MODE_RTGS) white else primary)
     }
 
     private fun validateAndShowWithdrawConfirmDialog() {
@@ -268,8 +271,17 @@ class LoadWalletActivity : BaseActivity() {
             return
         }
         val amount = amountStr.toDoubleOrNull()
-        if (amount == null || amount < 100) {
+        if (amount == null) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
+            return
+        }
+        if (amount < 100) {
             ToastUtil.showDelete(mActivity, getString(R.string.errMinWithdrawAmount))
+            return
+        }
+        val balance = currentWalletBalance?.toDoubleOrNull() ?: 0.0
+        if (amount > balance) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errInsufficientBalance))
             return
         }
         val narration = withdrawSheetBinding.etNarration.text?.toString()?.trim() ?: ""
@@ -584,9 +596,9 @@ class LoadWalletActivity : BaseActivity() {
                     validateAndShowConfirmDialog()
                 }
 
-                withdrawSheetBinding.tvTabImps -> selectPaymentMode("IMPS")
-                withdrawSheetBinding.tvTabNeft -> selectPaymentMode("NEFT")
-                withdrawSheetBinding.tvTabRtgs -> selectPaymentMode("RTGS")
+                withdrawSheetBinding.tvTabImps -> selectPaymentMode(MODE_IMPS)
+                withdrawSheetBinding.tvTabNeft -> selectPaymentMode(MODE_NEFT)
+                withdrawSheetBinding.tvTabRtgs -> selectPaymentMode(MODE_RTGS)
 
                 withdrawSheetBinding.btnProceedWithdraw -> {
                     if (Utility.stopClick()) return@OnClickListener

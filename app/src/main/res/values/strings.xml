@@ -609,6 +609,7 @@
 
     <!-- Withdraw validation -->
     <string name="errMinWithdrawAmount">Minimum withdrawal amount is ₹100</string>
+    <string name="errInsufficientBalance">Insufficient wallet balance</string>
     <string name="msgWithdrawInitiated">Withdrawal request submitted successfully</string>
 
 </resources>
