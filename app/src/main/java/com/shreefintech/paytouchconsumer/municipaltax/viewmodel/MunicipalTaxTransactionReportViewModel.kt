@@ -8,6 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxTransactionReportRequest
+import com.shreefintech.paytouchconsumer.enums.CategoryType
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -108,7 +109,7 @@ class MunicipalTaxTransactionReportViewModel(application: Application) : Android
             accountNumber    = accountNo,
             companyName      = item.operatorName ?: item.serviceType ?: "--",
             isMobileCategory = false,
-            categoryType     = "municipaltax"
+            categoryType     = CategoryType.MUNICIPALTAX
         )
     }
 }

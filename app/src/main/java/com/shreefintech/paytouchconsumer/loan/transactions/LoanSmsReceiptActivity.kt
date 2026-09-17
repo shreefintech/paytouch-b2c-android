@@ -208,8 +208,8 @@ class LoanSmsReceiptActivity : BaseActivity() {
 
         binding.tvConsumerNoLabel.text = getString(R.string.labelConsumerNo)
         binding.tvConsumerNo.text      = identifier
-        binding.tvCustomerName.text    = "--"
-        binding.tvCompanyName.text     = "--"
+        (binding.tvCustomerName.parent as? View)?.visibility = View.GONE
+        (binding.tvCompanyName.parent as? View)?.visibility  = View.GONE
         binding.tvReceiptDate.text     = date
         binding.tvAmountPaid.text      = amount
         binding.tvPaytouchTxnId.text   = txnId
