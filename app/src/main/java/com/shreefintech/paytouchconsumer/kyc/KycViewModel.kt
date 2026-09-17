@@ -143,11 +143,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     call: Call<General<KycAgreeDataItem>>,
                     response: Response<General<KycAgreeDataItem>>
                 ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        fetchFinalStatus(onReady, onError)
-                    } else {
-                        onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
-                    }
+                    fetchFinalStatus(onReady, onError)
                 }
 
                 override fun onFailure(call: Call<General<KycAgreeDataItem>>, t: Throwable) {
