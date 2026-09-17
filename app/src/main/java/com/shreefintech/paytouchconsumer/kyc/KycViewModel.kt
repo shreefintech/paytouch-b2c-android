@@ -10,6 +10,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycAgreeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -143,6 +144,12 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     call: Call<General<KycAgreeDataItem>>,
                     response: Response<General<KycAgreeDataItem>>
                 ) {
+                    if (!response.isSuccessful) {
+                        ToastUtil.showWarning(
+                            getApplication(),
+                            ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string())
+                        )
+                    }
                     fetchFinalStatus(onReady, onError)
                 }
 

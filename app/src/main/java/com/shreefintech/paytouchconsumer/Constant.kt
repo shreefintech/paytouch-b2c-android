@@ -4,6 +4,7 @@ object Constant {
 
 
     // API Base URLs
+    // swap BASE_URL to LOCAL_URL for local testing only — never commit that swap
     const val LOCAL_URL = "https://tablet-frying-shy.ngrok-free.dev/"
 
     const val LIVE_URL = "https://www.paytouch.in/"
