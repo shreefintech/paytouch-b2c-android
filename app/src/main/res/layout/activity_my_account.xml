@@ -53,11 +53,6 @@
                 android:textColor="@color/primary"
                 android:textSize="@dimen/text_size_18" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:src="@drawable/img_bharat_connect" />
         </LinearLayout>
 
         <!-- Tab segment -->

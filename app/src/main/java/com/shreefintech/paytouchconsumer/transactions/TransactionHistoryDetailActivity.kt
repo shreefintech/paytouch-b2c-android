@@ -70,6 +70,7 @@ class TransactionHistoryDetailActivity : BaseActivity() {
     }
 
     private fun loadDetail() {
+        if (transactionId.isEmpty()) { finish(); return }
         if (!Utility.isInternetAvailable(mActivity)) {
             showNoInternet()
             return
