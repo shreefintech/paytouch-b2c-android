@@ -54,4 +54,7 @@ object Constant {
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
+    // Transaction type values returned by /api/transactions/{id}
+    const val TRANSACTION_TYPE_HDFC = "hdfc_smartgateway"
+
 }

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
@@ -21,6 +22,7 @@ class TransactionHistoryDetailViewModel(application: Application) : AndroidViewM
         onSuccess: (TransactionHistoryDetailItem) -> Unit,
         onError: (String) -> Unit
     ) {
+        if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         onLoading()
         ApiClient.apiService.getTransactionHistoryDetail(bearerToken(), transactionId)
             .enqueue(object : Callback<General<TransactionHistoryDetailItem>> {

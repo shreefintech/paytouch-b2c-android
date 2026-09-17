@@ -8,6 +8,6 @@ enum class CategoryType {
     DTH,
     FASTAG,
     LOAN,
-    MUNICIPALTAX,
+    MUNICIPAL_TAX,
     UNKNOWN
 }
