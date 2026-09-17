@@ -97,7 +97,7 @@ class TransactionHistoryDetailActivity : BaseActivity() {
         binding.tvTransactionId.text = item.referenceId ?: "--"
         binding.tvIdentifierLabel.text = item.identifierLabel ?: "--"
         binding.tvIdentifier.text    = item.identifier ?: "--"
-        binding.tvDate.text          = Utility.formatDate(item.createdAt, "dd/MM/yyyy, h:mm a")
+        binding.tvDate.text          = Utility.formatDate(item.createdAt, "dd/MM/yyyy hh:mm a")
 
         val status = item.status ?: "--"
         binding.tvStatus.text = status.replaceFirstChar { it.uppercaseChar() }

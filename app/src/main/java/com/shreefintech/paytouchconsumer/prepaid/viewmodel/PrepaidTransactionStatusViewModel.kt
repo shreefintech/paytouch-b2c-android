@@ -8,6 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionStatusRequest
+import com.shreefintech.paytouchconsumer.enums.CategoryType
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
@@ -104,7 +105,8 @@ class PrepaidTransactionStatusViewModel(application: Application) : AndroidViewM
             userId           = item.id?.toString() ?: "--",
             accountNumber    = item.mobileNo ?: "--",
             companyName      = item.operator?.takeIf { it.isNotEmpty() } ?: item.service ?: "--",
-            isMobileCategory = true
+            isMobileCategory = true,
+            categoryType     = CategoryType.PREPAID
         )
     }
 }

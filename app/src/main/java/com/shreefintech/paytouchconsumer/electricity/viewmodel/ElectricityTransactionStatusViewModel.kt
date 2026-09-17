@@ -8,6 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionStatusRequest
+import com.shreefintech.paytouchconsumer.enums.CategoryType
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
@@ -104,7 +105,8 @@ class ElectricityTransactionStatusViewModel(application: Application) : BaseBill
             userId           = item.id?.toString() ?: "--",
             accountNumber    = item.subscriberNo ?: "--",
             companyName      = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--",
-            isMobileCategory = false
+            isMobileCategory = false,
+            categoryType     = CategoryType.ELECTRICITY
         )
     }
 

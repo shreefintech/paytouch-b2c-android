@@ -8,6 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanTransactionReportRequest
+import com.shreefintech.paytouchconsumer.enums.CategoryType
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -106,7 +107,8 @@ class LoanTransactionReportViewModel(application: Application) : AndroidViewMode
             userId           = item.id?.toString() ?: "--",
             accountNumber    = item.connectionNumber ?: "--",
             companyName      = item.operatorName ?: "--",
-            isMobileCategory = false
+            isMobileCategory = false,
+            categoryType     = CategoryType.LOAN
         )
     }
 }

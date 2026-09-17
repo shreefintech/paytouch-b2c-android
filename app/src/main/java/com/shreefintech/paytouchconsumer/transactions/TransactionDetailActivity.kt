@@ -2,7 +2,6 @@ package com.shreefintech.paytouchconsumer.transactions
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,16 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
+import com.shreefintech.paytouchconsumer.dth.transactions.DthSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.enums.CategoryType
+import com.shreefintech.paytouchconsumer.fastag.transactions.FastagSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.gas.transactions.GasSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.loan.transactions.LoanSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -80,6 +88,7 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvPlatformFee.text   = item.platformFee
         binding.tvTotalPayable.text  = item.totalPayable
         binding.tvTransactionId.text = item.transactionId
+        binding.llViewReceipt.visibility = if (item.categoryType != CategoryType.UNKNOWN && item.transactionId != "--") View.VISIBLE else View.GONE
 
         val (bgColor, textColor) = when (item.status.lowercase()) {
             "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
@@ -105,6 +114,22 @@ class TransactionDetailActivity : BaseActivity() {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
+                }
+                binding.llViewReceipt -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    val item = transactionItem ?: return@OnClickListener
+                    val txnId = item.transactionId.takeIf { it != "--" } ?: return@OnClickListener
+                    when (item.categoryType) {
+                        CategoryType.ELECTRICITY  -> SmsReceiptActivity.start(mActivity, txnId)
+                        CategoryType.GAS          -> GasSmsReceiptActivity.start(mActivity, txnId)
+                        CategoryType.PREPAID      -> PrepaidSmsReceiptActivity.start(mActivity, txnId)
+                        CategoryType.POSTPAID     -> PostpaidSmsReceiptActivity.start(mActivity, txnId)
+                        CategoryType.DTH          -> DthSmsReceiptActivity.start(mActivity, txnId)
+                        CategoryType.FASTAG       -> FastagSmsReceiptActivity.start(mActivity, txnId)
+                        CategoryType.LOAN         -> LoanSmsReceiptActivity.start(mActivity, txnId)
+                        CategoryType.MUNICIPALTAX -> MunicipalTaxSmsReceiptActivity.start(mActivity, txnId)
+                        CategoryType.UNKNOWN      -> {}
+                    }
                 }
             }
         }

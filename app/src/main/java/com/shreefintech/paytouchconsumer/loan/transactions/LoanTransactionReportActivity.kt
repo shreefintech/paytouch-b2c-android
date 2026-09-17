@@ -18,7 +18,7 @@ import com.shreefintech.paytouchconsumer.adapter.TransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoanTransactionReportBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loan.viewmodel.LoanTransactionReportViewModel
-import com.shreefintech.paytouchconsumer.transactions.TransactionReportDetailActivity
+import com.shreefintech.paytouchconsumer.transactions.TransactionDetailActivity
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.TransactionFilterHelper
@@ -82,7 +82,7 @@ class LoanTransactionReportActivity : BaseActivity() {
     private fun setupRecyclerView() {
         transactionAdp = TransactionAdp(mActivity, mDisplayList)
         transactionAdp.onClickItem = { item ->
-            TransactionReportDetailActivity.start(mActivity, item.transactionId)
+            TransactionDetailActivity.start(mActivity, item)
         }
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
