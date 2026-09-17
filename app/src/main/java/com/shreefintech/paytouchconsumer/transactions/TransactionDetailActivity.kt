@@ -127,7 +127,7 @@ class TransactionDetailActivity : BaseActivity() {
                         CategoryType.DTH          -> DthSmsReceiptActivity.start(mActivity, txnId)
                         CategoryType.FASTAG       -> FastagSmsReceiptActivity.start(mActivity, txnId)
                         CategoryType.LOAN         -> LoanSmsReceiptActivity.start(mActivity, txnId)
-                        CategoryType.MUNICIPALTAX -> MunicipalTaxSmsReceiptActivity.start(mActivity, txnId)
+                        CategoryType.MUNICIPAL_TAX -> MunicipalTaxSmsReceiptActivity.start(mActivity, txnId)
                         CategoryType.UNKNOWN      -> {}
                     }
                 }

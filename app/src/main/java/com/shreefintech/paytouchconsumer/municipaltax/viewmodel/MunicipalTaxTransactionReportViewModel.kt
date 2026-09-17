@@ -109,7 +109,7 @@ class MunicipalTaxTransactionReportViewModel(application: Application) : Android
             accountNumber    = accountNo,
             companyName      = item.operatorName ?: item.serviceType ?: "--",
             isMobileCategory = false,
-            categoryType     = CategoryType.MUNICIPALTAX
+            categoryType     = CategoryType.MUNICIPAL_TAX
         )
     }
 }

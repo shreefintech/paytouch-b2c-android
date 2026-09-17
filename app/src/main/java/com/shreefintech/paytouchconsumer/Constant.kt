@@ -2,8 +2,13 @@ package com.shreefintech.paytouchconsumer
 
 object Constant {
 
+
     // API Base URLs
-    const val BASE_URL = "https://www.paytouch.in/"
+    // swap BASE_URL to LOCAL_URL for local testing only — never commit that swap
+    const val LOCAL_URL = "https://tablet-frying-shy.ngrok-free.dev/"
+
+    const val LIVE_URL = "https://www.paytouch.in/"
+    const val BASE_URL = LIVE_URL
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
 
     // AUTH store keys
@@ -49,5 +54,8 @@ object Constant {
 
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
+
+    // Transaction type values returned by /api/transactions/{id}
+    const val TRANSACTION_TYPE_HDFC = "hdfc_smartgateway"
 
 }

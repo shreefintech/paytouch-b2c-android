@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionHistoryDetailBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -110,7 +111,7 @@ class TransactionHistoryDetailActivity : BaseActivity() {
         binding.cvStatus.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
         binding.tvStatus.setTextColor(ContextCompat.getColor(mActivity, textColor))
 
-        val isHdfc = item.type == "hdfc_smartgateway"
+        val isHdfc = item.type == Constant.TRANSACTION_TYPE_HDFC
         if (isHdfc) {
             item.paymentMethodDisplayName?.let { method ->
                 binding.llPaymentMethod.visibility = View.VISIBLE
