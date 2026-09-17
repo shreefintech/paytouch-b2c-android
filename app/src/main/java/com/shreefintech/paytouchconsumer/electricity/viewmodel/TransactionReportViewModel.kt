@@ -8,6 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityTransactionReportRequest
+import com.shreefintech.paytouchconsumer.enums.CategoryType
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
@@ -106,7 +107,7 @@ class TransactionReportViewModel(application: Application) : BaseBillViewModel(a
             accountNumber    = item.consumerNo ?: "--",
             companyName      = item.subservice?.takeIf { it.isNotEmpty() } ?: item.operatorId ?: "--",
             isMobileCategory = false,
-            categoryType     = "electricity"
+            categoryType     = CategoryType.ELECTRICITY
         )
     }
 

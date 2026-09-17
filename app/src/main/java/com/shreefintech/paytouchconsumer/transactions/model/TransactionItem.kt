@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.transactions.model
 
 import androidx.annotation.DrawableRes
+import com.shreefintech.paytouchconsumer.enums.CategoryType
 
 data class TransactionItem(
     val mobileNumber: String,
@@ -18,5 +19,5 @@ data class TransactionItem(
     val companyName: String,
     val isMobileCategory: Boolean = false,
     val isVehicleCategory: Boolean = false,
-    val categoryType: String = ""
+    val categoryType: CategoryType = CategoryType.UNKNOWN
 )
