@@ -8,6 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagTransactionStatusRequest
+import com.shreefintech.paytouchconsumer.enums.CategoryType
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -105,7 +106,7 @@ class FastagTransactionStatusViewModel(application: Application) : AndroidViewMo
             companyName       = item.operatorName?.takeIf { it.isNotEmpty() } ?: item.operator ?: "--",
             isMobileCategory  = false,
             isVehicleCategory = true,
-            categoryType      = "fastag"
+            categoryType      = CategoryType.FASTAG
         )
     }
 }

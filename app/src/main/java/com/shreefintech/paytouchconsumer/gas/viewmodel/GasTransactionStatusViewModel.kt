@@ -8,6 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionStatusRequest
+import com.shreefintech.paytouchconsumer.enums.CategoryType
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
@@ -105,7 +106,7 @@ class GasTransactionStatusViewModel(application: Application) : AndroidViewModel
             accountNumber    = item.connectionNumber ?: "--",
             companyName      = item.operatorName?.takeIf { it.isNotEmpty() } ?: item.subservice ?: "--",
             isMobileCategory = false,
-            categoryType     = "gas"
+            categoryType     = CategoryType.GAS
         )
     }
 }
