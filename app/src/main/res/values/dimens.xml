@@ -76,7 +76,7 @@
     <dimen name="section_spacing">20dp</dimen>
     <dimen name="content_spacing">16dp</dimen>
 
-    <dimen name="back_btn_size">33dp</dimen>
+    <dimen name="back_btn_size">38dp</dimen>
     <dimen name="toast_radius">20dp</dimen>
     <dimen name="toast_blure">50dp</dimen>
 

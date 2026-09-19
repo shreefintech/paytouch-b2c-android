@@ -155,6 +155,7 @@ class MyAccountActivity : BaseActivity() {
 
         binding.tvReferralCode.text = code
         binding.tvReferralLink.text = link
+        binding.tvTotalEarnings.text = Utility.formatAmount(data.totalEarnings)
 
         // Store referral code in SharedPreferences for sharing
         if (code != "--") {
@@ -162,8 +163,6 @@ class MyAccountActivity : BaseActivity() {
                 mActivity, com.shreefintech.paytouchconsumer.Constant.KEY_REFERRAL_CODE, code
             )
         }
-
-        // TODO(PAYTOUCH-523): Expose tvEarningsRow1/2/3 and bind to total_earnings / earning_potential
     }
 
     // ── Helpers ───────────────────────────────────────────────
@@ -207,7 +206,6 @@ class MyAccountActivity : BaseActivity() {
             binding.llAccountInfoContent.visibility = View.GONE
         }
 
-        binding.tvTitle.setText(if (isAccountInfo) R.string.titleMyAccount else R.string.titleReferAndEarn)
 
         val activeColor = ContextCompat.getColor(mActivity, R.color.primary)
         val inactiveColor = android.graphics.Color.TRANSPARENT

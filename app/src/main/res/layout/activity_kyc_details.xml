@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -135,6 +136,10 @@
                                     android:layout_marginTop="2dp"
                                     android:fontFamily="@font/proza_libre_semi_bold"
                                     android:includeFontPadding="false"
+                                    tools:text="@string/labelVerified"
+                                    android:background="@drawable/bg_status_success"
+                                    android:paddingHorizontal="@dimen/margin_small_medium"
+                                    android:paddingVertical="@dimen/margin_extra_small"
                                     android:textColor="@color/colorStatusSuccess"
                                     android:textSize="@dimen/text_size_12" />
 
@@ -387,6 +392,10 @@
                                 android:fontFamily="@font/proza_libre_semi_bold"
                                 android:includeFontPadding="false"
                                 android:textColor="@color/colorStatusSuccess"
+                                tools:text="@string/labelVerified"
+                                android:background="@drawable/bg_status_success"
+                                android:paddingHorizontal="@dimen/margin_small_medium"
+                                android:paddingVertical="@dimen/margin_extra_small"
                                 android:textSize="@dimen/text_size_12" />
                         </LinearLayout>
 
@@ -609,6 +618,10 @@
                                 android:fontFamily="@font/proza_libre_semi_bold"
                                 android:includeFontPadding="false"
                                 android:textColor="@color/colorStatusSuccess"
+                                tools:text="@string/labelVerified"
+                                android:background="@drawable/bg_status_success"
+                                android:paddingHorizontal="@dimen/margin_small_medium"
+                                android:paddingVertical="@dimen/margin_extra_small"
                                 android:textSize="@dimen/text_size_12" />
                         </LinearLayout>
 

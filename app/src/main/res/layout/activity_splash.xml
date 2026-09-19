@@ -8,7 +8,7 @@
 
     <ImageView
         android:id="@+id/ivSplash"
-        android:layout_width="300dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         app:layout_constraintEnd_toEndOf="parent"

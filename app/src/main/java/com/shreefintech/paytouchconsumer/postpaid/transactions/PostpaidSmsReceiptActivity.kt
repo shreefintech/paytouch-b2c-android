@@ -133,6 +133,7 @@ class PostpaidSmsReceiptActivity : BaseActivity() {
             },
             onError = { msg ->
                 showReceiptLoading(false)
+                showEmpty()
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )
@@ -253,8 +254,8 @@ class PostpaidSmsReceiptActivity : BaseActivity() {
     }
 
     private fun showEmpty() {
-        binding.flCard.visibility     = View.GONE
-        binding.tvEmpty.visibility    = View.VISIBLE
+        binding.llCardContent.visibility = View.GONE
+        binding.tvNoData.visibility      = View.VISIBLE
     }
 
     // ── Download & Share ──────────────────────────────────────

@@ -37,7 +37,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperato
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
-import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import androidx.core.net.toUri
 import android.widget.LinearLayout
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
@@ -51,10 +50,6 @@ class PostpaidActivity : BaseActivity() {
     private var operatorItems: List<PostpaidOperatorItem> = emptyList()
     private var selectedOperatorId: String? = null
     private var selectedOperatorName: String? = null
-
-    private var selectedCircleId: String? = null
-    private var selectedCircleName: String? = null
-
 
     private val showProgressFetch = ObservableBoolean(false)
     private var fetchedBillItem: PostpaidFetchBillDataItem? = null
@@ -205,7 +200,6 @@ class PostpaidActivity : BaseActivity() {
         viewModel.verifyAndPay(
             mobileNumber = mobileNumber,
             operatorId = selectedOperatorId ?: "",
-            circleId = selectedCircleId ?: "",
             amount = amount,
             fee = fee,
             total = total,
@@ -232,22 +226,6 @@ class PostpaidActivity : BaseActivity() {
         }
         val items = operatorItems.map { OperatorSelectionItem(id = it.id ?: "", name = it.name ?: "") }
         operatorSelectionLauncher.launch(OperatorSelectionActivity.newIntent(mActivity, items, selectedOperatorId))
-    }
-
-    private fun showStateDropdown() {
-        Utility.hideKeyboard(binding.clRoot)
-        val names = Utility.STATE_LIST.map { it.second }
-        CustomDropdown.showDropdown(
-            activity = mActivity,
-            anchorView = binding.flStateAnchor,
-            arrowView = binding.ivStateArrow,
-            textView = binding.tvState,
-            items = names
-        ) { selected, index ->
-            selectedCircleId = Utility.STATE_LIST.getOrNull(index)?.first
-            selectedCircleName = selected
-            binding.tvState.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-        }
     }
 
     private fun setOperatorLoading(loading: Boolean) {
@@ -283,10 +261,6 @@ class PostpaidActivity : BaseActivity() {
     private fun onFetchBill() {
         if (selectedOperatorId.isNullOrEmpty()) {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
-            return
-        }
-        if (selectedCircleId.isNullOrEmpty()) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgStateEmpty))
             return
         }
         val connectionNumber = binding.etMobileNumber.text?.toString()?.trim() ?: ""
@@ -338,10 +312,6 @@ class PostpaidActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
             return
         }
-        if (selectedCircleId.isNullOrEmpty()) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgStateEmpty))
-            return
-        }
         if (!isBillFetched) {
             Utility.hideKeyboard(mActivity)
             fetchBill(mobileNumber)
@@ -366,16 +336,12 @@ class PostpaidActivity : BaseActivity() {
         binding.etAmount.setText("")
         binding.tvCompany.text = getString(R.string.hintSelectCompany)
         binding.tvCompany.setTextColor(mActivity.getThemeColor(R.attr.colorTextHint))
-        binding.tvState.text = getString(R.string.labelSelectState)
-        binding.tvState.setTextColor(mActivity.getThemeColor(R.attr.colorTextHint))
         binding.cbTerms.isChecked = false
         selectedOperatorId = null
         selectedOperatorName = null
         isBillFetched = false
         fetchedBillItem = null
         binding.cvBillDetails.visibility = View.GONE
-        selectedCircleId = null
-        selectedCircleName = null
         resetFeeDisplay()
         Utility.hideKeyboard(binding.clRoot)
     }
@@ -427,10 +393,6 @@ class PostpaidActivity : BaseActivity() {
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
                     showOperatorSelection()
-                }
-                binding.flStateAnchor -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    showStateDropdown()
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener
