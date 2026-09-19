@@ -24,8 +24,8 @@ import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import androidx.databinding.ObservableBoolean
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -35,8 +35,6 @@ class HomeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private val viewModel: HomeViewModel by viewModels()
-    private val showProgressLogout = ObservableBoolean(false)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
@@ -57,7 +55,6 @@ class HomeActivity : BaseActivity() {
         )
 
         binding.lytToolbar.ivBack.gone()
-        binding.lytToolbar.showProgressLogout = showProgressLogout
         binding.lytToolbar.flLogout.visible()
         binding.lytToolbar.ivLogo.layoutParams.height =
             resources.getDimensionPixelSize(R.dimen.toolbar_height)
