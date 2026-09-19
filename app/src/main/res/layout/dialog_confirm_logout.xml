@@ -5,6 +5,9 @@
     <data>
         <import type="android.view.View" />
         <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
             name="showProgress"
             type="androidx.databinding.ObservableBoolean" />
     </data>
@@ -19,9 +22,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="28dp"
-            android:paddingBottom="24dp">
+            android:paddingHorizontal="@dimen/dialog_padding_horizontal"
+            android:paddingTop="@dimen/dialog_padding_top"
+            android:paddingBottom="@dimen/dialog_padding_horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvTitle"
@@ -68,6 +71,7 @@
                     android:layout_height="@dimen/btn_height"
                     android:layout_marginEnd="@dimen/margin_small"
                     android:layout_weight="1"
+                    android:onClickListener="@{onClickListener}"
                     app:cardBackgroundColor="@color/primary"
                     app:cardCornerRadius="@dimen/dialog_corner_radius"
                     app:cardElevation="0dp"
@@ -105,6 +109,7 @@
                     android:layout_height="@dimen/btn_height"
                     android:layout_marginStart="@dimen/margin_small"
                     android:layout_weight="1"
+                    android:onClickListener="@{onClickListener}"
                     app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="@dimen/dialog_corner_radius"
                     app:cardElevation="0dp"

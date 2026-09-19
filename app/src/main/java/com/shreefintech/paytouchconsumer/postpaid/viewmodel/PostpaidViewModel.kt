@@ -57,7 +57,6 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
     fun verifyAndPay(
         mobileNumber: String,
         operatorId: String,
-        circleId: String,
         amount: Double,
         fee: Double,
         total: Double,
@@ -70,7 +69,7 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
             return
         }
         onLoading()
-        val proceed = { processPayment(mobileNumber, operatorId, circleId, amount, fee, total, onSuccess, onError) }
+        val proceed = { processPayment(mobileNumber, operatorId, amount, fee, total, onSuccess, onError) }
         val fallback = { checkWalletBalance(total, proceed, onError) }
         val userId = SharedPreferenceHelper.getSharedPreferenceString(
             getApplication(), Constant.KEY_USER_ID, ""
@@ -81,7 +80,6 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
     private fun processPayment(
         mobileNumber: String,
         operatorId: String,
-        circleId: String,
         amount: Double,
         fee: Double,
         total: Double,
@@ -97,7 +95,6 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
             PostpaidProcessPaymentRequest(
                 mobileNumber = mobileNumber,
                 operatorId = operatorId,
-                circleId = circleId,
                 amount = amount,
                 platformFee = fee,
                 totalPayable = total
@@ -141,8 +138,7 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
             bearerToken(),
             PostpaidFetchBillRequest(
                 mobileNumber = mobileNumber,
-                operatorId = operatorId,
-                circleId = "0"
+                operatorId = operatorId
             )
         ).enqueue(object : Callback<PostpaidFetchBillResponseItem> {
             override fun onResponse(

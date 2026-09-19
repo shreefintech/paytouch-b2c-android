@@ -355,7 +355,7 @@
                                     android:background="@drawable/bg_form_field"
                                     android:fontFamily="@font/proza_libre_medium"
                                     android:hint="@string/hintConsumerNumber"
-                                    android:inputType="number"
+                                    android:inputType="text"
                                     android:padding="@dimen/margin_small_medium"
                                     android:textColor="@color/black"
                                     android:textColorHint="?attr/colorTextHint"
@@ -485,6 +485,7 @@
 
                                 <!-- Due Date -->
                                 <LinearLayout
+                                    android:id="@+id/llBillDueDateRow"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
@@ -513,6 +514,7 @@
 
                                 <!-- Bill Date -->
                                 <LinearLayout
+                                    android:id="@+id/llBillDateRow"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"

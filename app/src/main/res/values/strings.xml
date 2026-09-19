@@ -212,6 +212,7 @@
     <string name="hintSelectCompany">Select Company</string>
     <string name="labelConsumerNumber">Consumer Number</string>
     <string name="hintConsumerNumber">Enter Consumer Number</string>
+    <string name="hintPropertyNumber">Enter Property Number</string>
     <string name="labelAmount">Amount</string>
     <string name="hintAmount">Enter Amount</string>
     <string name="labelPlatformFee">Platform Fee</string>
@@ -274,6 +275,7 @@
     <string name="titleTransactionDetails">Transaction Details</string>
     <string name="msgTransactionDetailsNotFound">Transaction details not found</string>
     <string name="msgTransactionNotFound">Transaction not found</string>
+    <string name="msgNoDataFound">No data found</string>
     <string name="labelPaymentMethod">Payment Method</string>
     <string name="labelBankReferenceNumber">Bank Reference Number</string>
     <string name="labelUsername">Username :</string>
@@ -286,7 +288,7 @@
 
     <!-- SMS Receipt screen -->
     <string name="tabReceipt">Receipt</string>
-    <string name="tabDisplay">Display</string>
+    <string name="tabDisplay">SMS Display</string>
     <string name="tabSmsDisplay">SMS Display</string>
     <string name="labelConsumerNo">Consumer No</string>
     <string name="labelCustomerName">Customer Name</string>
@@ -362,6 +364,7 @@
     <string name="btnClear">Clear</string>
     <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 digits</string>
     <string name="msgLoadingOperators">Loading operators, please wait…</string>
+    <string name="msgLoadingStates">Loading states, please wait…</string>
     <string name="hintSearchOperator">Search</string>
     <string name="msgNoOperatorsFound">No operators found</string>
 
@@ -399,14 +402,13 @@
     <string name="titleMunicipalTax">Municipal Tax</string>
     <string name="titleMunicipalTaxBillDetailsFetched">Municipal Tax Bill Details Fetched</string>
     <string name="titleMunicipalTaxPaymentConfirmation">Municipal Tax Payment Confirmation</string>
-    <string name="labelPropertyNo">Property No.</string>
+    <string name="labelPropertyNo">Property Number</string>
     <string name="msgMunicipalTaxSmsBody">Dear Customer, Your municipal tax payment of %1$s for Property No %2$s has been successfully processed.</string>
 
     <!-- My Account screen -->
-    <string name="titleMyAccount">My account</string>
+    <string name="titleMyAccount">My Account</string>
     <string name="titleReferAndEarn">Refer &amp; Earn</string>
     <string name="tabAccountInfo">Account Info</string>
-    <string name="tabReferEarn">Refer&amp;Earn</string>
     <string name="labelMemberId">Member ID</string>
     <string name="labelMemberNo">Member No</string>
     <string name="labelMemberCode">Member Code:</string>

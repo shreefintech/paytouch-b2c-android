@@ -76,7 +76,7 @@
     <dimen name="section_spacing">20dp</dimen>
     <dimen name="content_spacing">16dp</dimen>
 
-    <dimen name="back_btn_size">33dp</dimen>
+    <dimen name="back_btn_size">38dp</dimen>
     <dimen name="toast_radius">20dp</dimen>
     <dimen name="toast_blure">50dp</dimen>
 
@@ -109,4 +109,6 @@
     <dimen name="kyc_icon_bg_size">40dp</dimen>
     <dimen name="no_internet_bg_radius">90dp</dimen>
     <dimen name="toolbar_logo_height">55dp</dimen>
+    <dimen name="dialog_padding_horizontal">24dp</dimen>
+    <dimen name="dialog_padding_top">28dp</dimen>
 </resources>

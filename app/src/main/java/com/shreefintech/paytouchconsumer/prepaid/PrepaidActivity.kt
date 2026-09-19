@@ -32,6 +32,7 @@ import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransaction
 import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidViewModel
 import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
 import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
+import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlanItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -49,6 +50,7 @@ class PrepaidActivity : BaseActivity() {
     private lateinit var tabHelper: TabAnimationHelper
 
     private var operatorItems: List<PrepaidOperatorItem> = emptyList()
+    private var stateItems: List<StateItem> = emptyList()
     private var selectedOperatorId: String? = null
     private var selectedOperatorCode: String? = null
     private var selectedOperatorName: String? = null
@@ -120,6 +122,7 @@ class PrepaidActivity : BaseActivity() {
         setupTermsText()
         retryCallback = { loadOperators() }
         loadOperators()
+        loadStates()
         tabHelper = TabAnimationHelper(mActivity, binding.llTabPayBill, binding.llTabReport, binding.llTabStatus, binding.llTabSmsReceipt)
         onBack()
     }
@@ -200,6 +203,21 @@ class PrepaidActivity : BaseActivity() {
         )
     }
 
+    private fun loadStates() {
+        if (!Utility.isInternetAvailable(mActivity)) return
+        viewModel.loadStates(
+            onLoading = { setStateLoading(true) },
+            onSuccess = { states ->
+                setStateLoading(false)
+                stateItems = states
+            },
+            onError = { msg ->
+                setStateLoading(false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
     private fun verifyBalanceAndProcessPayment() {
         val amount = binding.etAmount.text?.toString()?.trim()?.toDoubleOrNull() ?: 0.0
         val fee = Utility.calculatePlatformFee(amount)
@@ -239,7 +257,12 @@ class PrepaidActivity : BaseActivity() {
 
     private fun showStateDropdown() {
         Utility.hideKeyboard(binding.clRoot)
-        val names = Utility.STATE_LIST.map { it.second }
+        if (stateItems.isEmpty()) {
+            loadStates()
+            ToastUtil.showWarning(mActivity, getString(R.string.msgLoadingStates))
+            return
+        }
+        val names = stateItems.map { it.name ?: "" }
         CustomDropdown.showDropdown(
             activity = mActivity,
             anchorView = binding.flStateAnchor,
@@ -247,11 +270,18 @@ class PrepaidActivity : BaseActivity() {
             textView = binding.tvState,
             items = names
         ) { selected, index ->
-            selectedCircleId = Utility.STATE_LIST.getOrNull(index)?.first
+            selectedCircleId = stateItems.getOrNull(index)?.id
             selectedCircleName = selected
             binding.tvState.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
             clearSelectedPlan()
         }
+    }
+
+    private fun setStateLoading(loading: Boolean) {
+        binding.pbStateLoading.visibility = if (loading) View.VISIBLE else View.GONE
+        binding.ivStateArrow.visibility = if (loading) View.GONE else View.VISIBLE
+        binding.flStateAnchor.isClickable = !loading
+        binding.flStateAnchor.isFocusable = !loading
     }
 
     private fun setOperatorLoading(loading: Boolean) {

@@ -31,6 +31,10 @@ object Constant {
     // Circle IDs for bill payment modules
     const val LOAN_CIRCLE_ID = "0"
 
+    // Session timeout
+    const val KEY_LAST_INTERACTION = "LAST_INTERACTION"
+    const val SESSION_TIMEOUT_MS = 5 * 60 * 1000L
+
     // Auth flow type extras
     const val EXTRA_FLOW_TYPE = "FLOW_TYPE"
     const val EXTRA_MOBILE = "EXTRA_MOBILE"

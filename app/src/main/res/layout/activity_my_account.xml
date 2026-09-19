@@ -128,7 +128,7 @@
                             android:paddingTop="6dp"
                             android:paddingEnd="14dp"
                             android:paddingBottom="6dp"
-                            android:text="@string/tabReferEarn"
+                            android:text="@string/titleReferAndEarn"
                             android:textSize="@dimen/text_size_13" />
                     </com.google.android.material.card.MaterialCardView>
 
@@ -786,6 +786,47 @@
                             </LinearLayout>
 
                         </FrameLayout>
+
+                        <!-- Total Earnings card -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvTotalEarnings"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="@dimen/card_corner_radius"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingHorizontal="@dimen/margin_medium"
+                                android:paddingVertical="@dimen/margin_small_medium">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelTotalEarnings"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvTotalEarnings"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/primary"
+                                    android:textSize="@dimen/text_size_14" />
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         <!-- Earnings Row 1: Green -->
                         <com.google.android.material.card.MaterialCardView
