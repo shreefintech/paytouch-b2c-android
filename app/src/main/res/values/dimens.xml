@@ -109,4 +109,6 @@
     <dimen name="kyc_icon_bg_size">40dp</dimen>
     <dimen name="no_internet_bg_radius">90dp</dimen>
     <dimen name="toolbar_logo_height">55dp</dimen>
+    <dimen name="dialog_padding_horizontal">24dp</dimen>
+    <dimen name="dialog_padding_top">28dp</dimen>
 </resources>

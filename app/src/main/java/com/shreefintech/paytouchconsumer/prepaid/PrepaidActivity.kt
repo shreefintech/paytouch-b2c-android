@@ -259,7 +259,7 @@ class PrepaidActivity : BaseActivity() {
         Utility.hideKeyboard(binding.clRoot)
         if (stateItems.isEmpty()) {
             loadStates()
-            ToastUtil.showWarning(mActivity, getString(R.string.msgLoadingOperators))
+            ToastUtil.showWarning(mActivity, getString(R.string.msgLoadingStates))
             return
         }
         val names = stateItems.map { it.name ?: "" }

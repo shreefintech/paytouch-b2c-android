@@ -83,28 +83,32 @@ class HomeActivity : BaseActivity() {
         )
         dialog.setCancelable(true)
 
-        dialogBinding.btnLogout.setOnClickListener {
-            if (showProgress.get()) return@setOnClickListener
-            if (!Utility.isInternetAvailable(mActivity)) {
-                ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
-                return@setOnClickListener
-            }
-            viewModel.logout(
-                onLoading = { showProgress.set(true) },
-                onComplete = {
-                    dialog.dismiss()
-                    SharedPreferenceHelper.clearSharedPreference(mActivity)
-                    startActivity(Intent(mActivity, LoginActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    })
-                },
-                onError = { msg ->
-                    showProgress.set(false)
-                    ToastUtil.showWarning(mActivity, msg)
+        dialogBinding.onClickListener = View.OnClickListener { view ->
+            when (view) {
+                dialogBinding.btnLogout -> {
+                    if (showProgress.get()) return@OnClickListener
+                    if (!Utility.isInternetAvailable(mActivity)) {
+                        ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
+                        return@OnClickListener
+                    }
+                    viewModel.logout(
+                        onLoading = { showProgress.set(true) },
+                        onComplete = {
+                            dialog.dismiss()
+                            SharedPreferenceHelper.clearSharedPreference(mActivity)
+                            startActivity(Intent(mActivity, LoginActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            })
+                        },
+                        onError = { msg ->
+                            showProgress.set(false)
+                            ToastUtil.showWarning(mActivity, msg)
+                        }
+                    )
                 }
-            )
+                dialogBinding.btnCancel -> dialog.dismiss()
+            }
         }
-        dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 

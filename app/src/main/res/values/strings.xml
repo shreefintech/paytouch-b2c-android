@@ -364,6 +364,7 @@
     <string name="btnClear">Clear</string>
     <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 digits</string>
     <string name="msgLoadingOperators">Loading operators, please wait…</string>
+    <string name="msgLoadingStates">Loading states, please wait…</string>
     <string name="hintSearchOperator">Search</string>
     <string name="msgNoOperatorsFound">No operators found</string>
 

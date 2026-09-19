@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
 import com.shreefintech.paytouchconsumer.R
 
 class TabAnimationHelper(
@@ -26,8 +27,8 @@ class TabAnimationHelper(
         val blackColor = ContextCompat.getColor(context, R.color.black)
         allTabs.forEach { tab ->
             tab.setBackgroundResource(selectableBg)
-            (tab.getChildAt(0) as? AppCompatImageView)?.imageTintList = ColorStateList.valueOf(primaryColor)
-            (tab.getChildAt(1) as? AppCompatTextView)?.setTextColor(blackColor)
+            tab.children.filterIsInstance<AppCompatImageView>().firstOrNull()?.imageTintList = ColorStateList.valueOf(primaryColor)
+            tab.children.filterIsInstance<AppCompatTextView>().firstOrNull()?.setTextColor(blackColor)
         }
     }
 
@@ -41,9 +42,9 @@ class TabAnimationHelper(
 
     private fun selectTab(tab: LinearLayout) {
         tab.background = ContextCompat.getDrawable(context, R.drawable.bg_toggle_selected)?.mutate()
-        (tab.getChildAt(0) as? AppCompatImageView)?.imageTintList =
+        tab.children.filterIsInstance<AppCompatImageView>().firstOrNull()?.imageTintList =
             ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
-        (tab.getChildAt(1) as? AppCompatTextView)?.setTextColor(
+        tab.children.filterIsInstance<AppCompatTextView>().firstOrNull()?.setTextColor(
             ContextCompat.getColor(context, R.color.white))
     }
 }
