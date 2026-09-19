@@ -354,7 +354,7 @@ class MunicipalTaxActivity : BaseActivity() {
     private fun onReset() {
         binding.etConsumerNumber.setText("")
         binding.etAmount.setText("")
-        binding.tvCompany.text = getString(R.string.hintSelectCompany)
+        binding.tvCompany.text = getString(R.string.hintSelectCorporation)
         binding.tvCompany.setTextColor(mActivity.getThemeColor(R.attr.colorTextHint))
         binding.cbTerms.isChecked = false
         selectedOperatorId   = null

@@ -86,6 +86,7 @@ class HomeActivity : BaseActivity() {
         dialogBinding.onClickListener = View.OnClickListener { view ->
             when (view) {
                 dialogBinding.btnLogout -> {
+                    if (Utility.stopClick()) return@OnClickListener
                     if (showProgress.get()) return@OnClickListener
                     if (!Utility.isInternetAvailable(mActivity)) {
                         ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
@@ -106,7 +107,10 @@ class HomeActivity : BaseActivity() {
                         }
                     )
                 }
-                dialogBinding.btnCancel -> dialog.dismiss()
+                dialogBinding.btnCancel -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    dialog.dismiss()
+                }
             }
         }
         dialog.show()
