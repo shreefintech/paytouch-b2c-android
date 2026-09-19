@@ -258,7 +258,6 @@ class SmsReceiptActivity : BaseActivity() {
     }
 
     private fun showEmpty() {
-        binding.llTitleRow.visibility = View.GONE
         binding.flCard.visibility     = View.GONE
         binding.tvEmpty.visibility    = View.VISIBLE
     }

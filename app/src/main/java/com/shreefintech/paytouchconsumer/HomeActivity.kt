@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -8,6 +9,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.databinding.DataBindingUtil
+import com.shreefintech.paytouchconsumer.databinding.DialogConfirmLogoutBinding
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
@@ -56,10 +59,56 @@ class HomeActivity : BaseActivity() {
         binding.lytToolbar.ivBack.gone()
         binding.lytToolbar.showProgressLogout = showProgressLogout
         binding.lytToolbar.flLogout.visible()
+        binding.lytToolbar.ivLogo.layoutParams.height =
+            resources.getDimensionPixelSize(R.dimen.toolbar_height)
+
+        binding.lytToolbar.ivLogo.requestLayout()
+
         val listener = onClickListener()
         binding.onClickListener = listener
         binding.lytToolbar.onClickListener = listener
         onBack()
+    }
+
+    private fun showLogoutDialog() {
+        val dialogBinding = DataBindingUtil.inflate<DialogConfirmLogoutBinding>(
+            layoutInflater, R.layout.dialog_confirm_logout, null, false
+        )
+        val showProgress = ObservableBoolean(false)
+        dialogBinding.showProgress = showProgress
+
+        val dialog = Dialog(mActivity)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.85).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.setCancelable(true)
+
+        dialogBinding.btnLogout.setOnClickListener {
+            if (showProgress.get()) return@setOnClickListener
+            if (!Utility.isInternetAvailable(mActivity)) {
+                ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
+                return@setOnClickListener
+            }
+            viewModel.logout(
+                onLoading = { showProgress.set(true) },
+                onComplete = {
+                    dialog.dismiss()
+                    SharedPreferenceHelper.clearSharedPreference(mActivity)
+                    startActivity(Intent(mActivity, LoginActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    })
+                },
+                onError = { msg ->
+                    showProgress.set(false)
+                    ToastUtil.showWarning(mActivity, msg)
+                }
+            )
+        }
+        dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     private fun onBack() {
@@ -76,19 +125,7 @@ class HomeActivity : BaseActivity() {
             when (view) {
                 binding.lytToolbar.ivLogout -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    viewModel.logout(
-                        onLoading = { showProgressLogout.set(true) },
-                        onComplete = {
-                            SharedPreferenceHelper.clearSharedPreference(mActivity)
-                            startActivity(Intent(mActivity, LoginActivity::class.java).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            })
-                        },
-                        onError = { msg ->
-                            showProgressLogout.set(false)
-                            ToastUtil.showWarning(mActivity, msg)
-                        }
-                    )
+                    showLogoutDialog()
                 }
 
                 binding.llElectricity -> {

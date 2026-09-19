@@ -2,7 +2,6 @@ package com.shreefintech.paytouchconsumer.loan
 
 import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -13,10 +12,12 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
@@ -35,15 +36,16 @@ import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
 import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanOperatorItem
+import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
-import androidx.core.net.toUri
 
 class LoanActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLoanBinding
     private val viewModel: LoanViewModel by viewModels()
+    private lateinit var tabHelper: TabAnimationHelper
 
     private var operatorItems: List<LoanOperatorItem> = emptyList()
     private var selectedOperatorId: String? = null
@@ -106,6 +108,7 @@ class LoanActivity : BaseActivity() {
         setupTermsText()
         retryCallback = { loadOperators() }
         loadOperators()
+        tabHelper = TabAnimationHelper(mActivity, binding.llTabPayBill, binding.llTabReport, binding.llTabStatus, binding.llTabSmsReceipt)
         onBack()
     }
 
@@ -363,6 +366,15 @@ class LoanActivity : BaseActivity() {
         Utility.hideKeyboard(binding.clRoot)
     }
 
+    override fun onResume() {
+        super.onResume()
+        tabHelper.resetAll()
+        tabHelper.selectPayBill()
+    }
+
+    private fun animateTabAndNavigate(tab: LinearLayout, navigate: () -> Unit) =
+        tabHelper.animateAndNavigate(tab, navigate)
+
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() { finish() }
@@ -378,15 +390,21 @@ class LoanActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, LoanTransactionReportActivity::class.java))
+                    animateTabAndNavigate(binding.llTabReport) {
+                        startActivity(Intent(mActivity, LoanTransactionReportActivity::class.java))
+                    }
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, LoanTransactionStatusActivity::class.java))
+                    animateTabAndNavigate(binding.llTabStatus) {
+                        startActivity(Intent(mActivity, LoanTransactionStatusActivity::class.java))
+                    }
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    LoanSmsReceiptActivity.start(mActivity)
+                    animateTabAndNavigate(binding.llTabSmsReceipt) {
+                        LoanSmsReceiptActivity.start(mActivity)
+                    }
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener

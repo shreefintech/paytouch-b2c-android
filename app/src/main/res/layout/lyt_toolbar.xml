@@ -32,7 +32,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivLogo"
             android:layout_width="0dp"
-            android:layout_height="55dp"
+            android:layout_height="@dimen/toolbar_logo_height"
             android:src="@drawable/img_paytouch"
             app:layout_constraintDimensionRatio="3:1"
             android:layout_marginStart="-8dp"

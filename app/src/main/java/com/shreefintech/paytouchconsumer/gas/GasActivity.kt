@@ -38,11 +38,14 @@ import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
+import android.widget.LinearLayout
+import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
 
 class GasActivity : BaseActivity() {
 
     private lateinit var binding: ActivityGasBinding
     private val viewModel: GasViewModel by viewModels()
+    private lateinit var tabHelper: TabAnimationHelper
 
     private var operatorItems: List<GasOperatorItem> = emptyList()
     private var selectedOperatorId: String? = null
@@ -105,6 +108,7 @@ class GasActivity : BaseActivity() {
         setupTermsText()
         retryCallback = { loadOperators() }
         loadOperators()
+        tabHelper = TabAnimationHelper(mActivity, binding.llTabPayBill, binding.llTabReport, binding.llTabStatus, binding.llTabSmsReceipt)
         onBack()
     }
 
@@ -362,6 +366,15 @@ class GasActivity : BaseActivity() {
         Utility.hideKeyboard(binding.clRoot)
     }
 
+    override fun onResume() {
+        super.onResume()
+        tabHelper.resetAll()
+        tabHelper.selectPayBill()
+    }
+
+    private fun animateTabAndNavigate(tab: LinearLayout, navigate: () -> Unit) =
+        tabHelper.animateAndNavigate(tab, navigate)
+
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() { finish() }
@@ -377,15 +390,21 @@ class GasActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, GasTransactionReportActivity::class.java))
+                    animateTabAndNavigate(binding.llTabReport) {
+                        startActivity(Intent(mActivity, GasTransactionReportActivity::class.java))
+                    }
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    GasTransactionStatusActivity.start(mActivity)
+                    animateTabAndNavigate(binding.llTabStatus) {
+                        GasTransactionStatusActivity.start(mActivity)
+                    }
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    GasSmsReceiptActivity.start(mActivity)
+                    animateTabAndNavigate(binding.llTabSmsReceipt) {
+                        GasSmsReceiptActivity.start(mActivity)
+                    }
                 }
                 binding.llFetchBill -> {
                     if (Utility.stopClick()) return@OnClickListener

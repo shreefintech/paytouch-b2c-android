@@ -92,6 +92,7 @@
 
                 <!-- Tab: PayBill (always active on this screen) -->
                 <LinearLayout
+                    android:id="@+id/llTabPayBill"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
