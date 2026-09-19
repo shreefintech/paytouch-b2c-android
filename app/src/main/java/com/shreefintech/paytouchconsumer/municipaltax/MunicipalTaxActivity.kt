@@ -1,7 +1,6 @@
 package com.shreefintech.paytouchconsumer.municipaltax
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -12,10 +11,12 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
@@ -34,15 +35,16 @@ import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
 import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxFetchBillDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxOperatorItem
+import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
-import androidx.core.net.toUri
 
 class MunicipalTaxActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMunicipalTaxBinding
     private val viewModel: MunicipalTaxViewModel by viewModels()
+    private lateinit var tabHelper: TabAnimationHelper
 
     private var operatorItems: List<MunicipalTaxOperatorItem> = emptyList()
     private var selectedOperatorId: String? = null
@@ -107,6 +109,7 @@ class MunicipalTaxActivity : BaseActivity() {
         setupTermsText()
         retryCallback = { loadOperators() }
         loadOperators()
+        tabHelper = TabAnimationHelper(mActivity, binding.llTabPayBill, binding.llTabReport, binding.llTabStatus, binding.llTabSmsReceipt)
         onBack()
     }
 
@@ -255,7 +258,7 @@ class MunicipalTaxActivity : BaseActivity() {
             return
         }
         val items = operatorItems.map { OperatorSelectionItem(id = it.id ?: "", name = it.name ?: "", extra = it.circleId) }
-        operatorSelectionLauncher.launch(OperatorSelectionActivity.newIntent(mActivity, items, selectedOperatorId))
+        operatorSelectionLauncher.launch(OperatorSelectionActivity.newIntent(mActivity, items, selectedOperatorId, getString(R.string.hintSelectCorporation)))
     }
 
     private fun setOperatorLoading(loading: Boolean) {
@@ -364,6 +367,15 @@ class MunicipalTaxActivity : BaseActivity() {
         Utility.hideKeyboard(binding.clRoot)
     }
 
+    override fun onResume() {
+        super.onResume()
+        tabHelper.resetAll()
+        tabHelper.selectPayBill()
+    }
+
+    private fun animateTabAndNavigate(tab: LinearLayout, navigate: () -> Unit) =
+        tabHelper.animateAndNavigate(tab, navigate)
+
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() { finish() }
@@ -379,15 +391,21 @@ class MunicipalTaxActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, MunicipalTaxTransactionReportActivity::class.java))
+                    animateTabAndNavigate(binding.llTabReport) {
+                        startActivity(Intent(mActivity, MunicipalTaxTransactionReportActivity::class.java))
+                    }
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, MunicipalTaxTransactionStatusActivity::class.java))
+                    animateTabAndNavigate(binding.llTabStatus) {
+                        startActivity(Intent(mActivity, MunicipalTaxTransactionStatusActivity::class.java))
+                    }
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    MunicipalTaxSmsReceiptActivity.start(mActivity)
+                    animateTabAndNavigate(binding.llTabSmsReceipt) {
+                        MunicipalTaxSmsReceiptActivity.start(mActivity)
+                    }
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener

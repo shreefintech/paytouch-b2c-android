@@ -39,11 +39,14 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import androidx.core.net.toUri
+import android.widget.LinearLayout
+import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
 
 class PrepaidActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPrepaidBinding
     private val viewModel: PrepaidViewModel by viewModels()
+    private lateinit var tabHelper: TabAnimationHelper
 
     private var operatorItems: List<PrepaidOperatorItem> = emptyList()
     private var selectedOperatorId: String? = null
@@ -117,6 +120,7 @@ class PrepaidActivity : BaseActivity() {
         setupTermsText()
         retryCallback = { loadOperators() }
         loadOperators()
+        tabHelper = TabAnimationHelper(mActivity, binding.llTabPayBill, binding.llTabReport, binding.llTabStatus, binding.llTabSmsReceipt)
         onBack()
     }
 
@@ -362,6 +366,15 @@ class PrepaidActivity : BaseActivity() {
         Utility.hideKeyboard(binding.clRoot)
     }
 
+    override fun onResume() {
+        super.onResume()
+        tabHelper.resetAll()
+        tabHelper.selectPayBill()
+    }
+
+    private fun animateTabAndNavigate(tab: LinearLayout, navigate: () -> Unit) =
+        tabHelper.animateAndNavigate(tab, navigate)
+
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() { finish() }
@@ -377,11 +390,15 @@ class PrepaidActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, PrepaidTransactionReportActivity::class.java))
+                    animateTabAndNavigate(binding.llTabReport) {
+                        startActivity(Intent(mActivity, PrepaidTransactionReportActivity::class.java))
+                    }
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, PrepaidTransactionStatusActivity::class.java))
+                    animateTabAndNavigate(binding.llTabStatus) {
+                        startActivity(Intent(mActivity, PrepaidTransactionStatusActivity::class.java))
+                    }
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
@@ -389,7 +406,9 @@ class PrepaidActivity : BaseActivity() {
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    PrepaidSmsReceiptActivity.start(mActivity)
+                    animateTabAndNavigate(binding.llTabSmsReceipt) {
+                        PrepaidSmsReceiptActivity.start(mActivity)
+                    }
                 }
                 binding.flCompanyAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener

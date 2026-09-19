@@ -362,7 +362,7 @@
     <string name="btnClear">Clear</string>
     <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 digits</string>
     <string name="msgLoadingOperators">Loading operators, please wait…</string>
-    <string name="hintSearchOperator">Search operator…</string>
+    <string name="hintSearchOperator">Search</string>
     <string name="msgNoOperatorsFound">No operators found</string>
 
     <!-- Bill Details card -->
@@ -611,5 +611,11 @@
     <string name="errMinWithdrawAmount">Minimum withdrawal amount is ₹100</string>
     <string name="errInsufficientBalance">Insufficient wallet balance</string>
     <string name="msgWithdrawInitiated">Withdrawal request submitted successfully</string>
+    <string name="labelCorporation">Corporation</string>
+    <string name="hintSelectCorporation">Select Corporation</string>
+    <string name="titleLogout">Logout</string>
+    <string name="msgConfirmLogout">Are you sure you want to logout?</string>
+    <string name="btnLogout">Logout</string>
+    <string name="btnCancel">Cancel</string>
 
 </resources>

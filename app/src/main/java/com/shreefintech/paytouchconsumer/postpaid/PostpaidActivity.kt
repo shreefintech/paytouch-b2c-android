@@ -39,11 +39,14 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import androidx.core.net.toUri
+import android.widget.LinearLayout
+import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
 
 class PostpaidActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPostpaidBinding
     private val viewModel: PostpaidViewModel by viewModels()
+    private lateinit var tabHelper: TabAnimationHelper
 
     private var operatorItems: List<PostpaidOperatorItem> = emptyList()
     private var selectedOperatorId: String? = null
@@ -106,6 +109,7 @@ class PostpaidActivity : BaseActivity() {
         setupTermsText()
         retryCallback = { loadOperators() }
         loadOperators()
+        tabHelper = TabAnimationHelper(mActivity, binding.llTabPayBill, binding.llTabReport, binding.llTabStatus, binding.llTabSmsReceipt)
         onBack()
     }
 
@@ -376,6 +380,15 @@ class PostpaidActivity : BaseActivity() {
         Utility.hideKeyboard(binding.clRoot)
     }
 
+    override fun onResume() {
+        super.onResume()
+        tabHelper.resetAll()
+        tabHelper.selectPayBill()
+    }
+
+    private fun animateTabAndNavigate(tab: LinearLayout, navigate: () -> Unit) =
+        tabHelper.animateAndNavigate(tab, navigate)
+
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() { finish() }
@@ -391,15 +404,21 @@ class PostpaidActivity : BaseActivity() {
                 }
                 binding.llTabReport -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, PostpaidTransactionReportActivity::class.java))
+                    animateTabAndNavigate(binding.llTabReport) {
+                        startActivity(Intent(mActivity, PostpaidTransactionReportActivity::class.java))
+                    }
                 }
                 binding.llTabStatus -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, PostpaidTransactionStatusActivity::class.java))
+                    animateTabAndNavigate(binding.llTabStatus) {
+                        startActivity(Intent(mActivity, PostpaidTransactionStatusActivity::class.java))
+                    }
                 }
                 binding.llTabSmsReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    PostpaidSmsReceiptActivity.start(mActivity)
+                    animateTabAndNavigate(binding.llTabSmsReceipt) {
+                        PostpaidSmsReceiptActivity.start(mActivity)
+                    }
                 }
                 binding.llRecentTransactions -> {
                     if (Utility.stopClick()) return@OnClickListener
