@@ -108,4 +108,6 @@
     <dimen name="kyc_gradiant_line_width">120dp</dimen>
     <dimen name="kyc_icon_bg_size">40dp</dimen>
     <dimen name="no_internet_bg_radius">90dp</dimen>
+    <dimen name="toolbar_logo_height">55dp</dimen>
+    <dimen name="home_toolbar_logo_height">70dp</dimen>
 </resources>

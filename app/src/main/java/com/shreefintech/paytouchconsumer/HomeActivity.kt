@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -8,6 +9,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.databinding.DataBindingUtil
+import com.shreefintech.paytouchconsumer.databinding.DialogConfirmLogoutBinding
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
@@ -21,8 +24,8 @@ import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import androidx.databinding.ObservableBoolean
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -32,6 +35,9 @@ class HomeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private val viewModel: HomeViewModel by viewModels()
+
+    private var logoutDialog: Dialog? = null
+    private var logoutDialogBinding: DialogConfirmLogoutBinding? = null
     private val showProgressLogout = ObservableBoolean(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,12 +60,62 @@ class HomeActivity : BaseActivity() {
         )
 
         binding.lytToolbar.ivBack.gone()
-        binding.lytToolbar.showProgressLogout = showProgressLogout
         binding.lytToolbar.flLogout.visible()
+        binding.lytToolbar.ivLogo.layoutParams.height =
+            resources.getDimensionPixelSize(R.dimen.home_toolbar_logo_height)
+
+        binding.lytToolbar.ivLogo.requestLayout()
+
         val listener = onClickListener()
         binding.onClickListener = listener
         binding.lytToolbar.onClickListener = listener
         onBack()
+    }
+
+    private fun showLogoutDialog() {
+        showProgressLogout.set(false)
+        val dialogBinding = DataBindingUtil.inflate<DialogConfirmLogoutBinding>(
+            layoutInflater, R.layout.dialog_confirm_logout, null, false
+        )
+        logoutDialogBinding = dialogBinding
+        dialogBinding.onClickListener = onClickListener()
+        dialogBinding.showProgress = showProgressLogout
+
+        val dialog = Dialog(mActivity)
+        logoutDialog = dialog
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.85).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.setCancelable(true)
+        dialog.setOnDismissListener {
+            logoutDialog = null
+            logoutDialogBinding = null
+        }
+        dialog.show()
+    }
+
+    private fun startLogout() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        viewModel.logout(
+            onLoading = { showProgressLogout.set(true) },
+            onComplete = {
+                logoutDialog?.dismiss()
+                SharedPreferenceHelper.clearSharedPreference(mActivity)
+                startActivity(Intent(mActivity, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            },
+            onError = { msg ->
+                showProgressLogout.set(false)
+                ToastUtil.showWarning(mActivity, msg)
+            }
+        )
     }
 
     private fun onBack() {
@@ -76,19 +132,18 @@ class HomeActivity : BaseActivity() {
             when (view) {
                 binding.lytToolbar.ivLogout -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    viewModel.logout(
-                        onLoading = { showProgressLogout.set(true) },
-                        onComplete = {
-                            SharedPreferenceHelper.clearSharedPreference(mActivity)
-                            startActivity(Intent(mActivity, LoginActivity::class.java).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            })
-                        },
-                        onError = { msg ->
-                            showProgressLogout.set(false)
-                            ToastUtil.showWarning(mActivity, msg)
-                        }
-                    )
+                    showLogoutDialog()
+                }
+
+                logoutDialogBinding?.btnLogout -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressLogout.get()) return@OnClickListener
+                    startLogout()
+                }
+
+                logoutDialogBinding?.btnCancel -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    logoutDialog?.dismiss()
                 }
 
                 binding.llElectricity -> {

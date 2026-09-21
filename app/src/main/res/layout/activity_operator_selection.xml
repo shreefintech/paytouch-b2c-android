@@ -27,6 +27,24 @@
             app:layout_constraintTop_toTopOf="parent"
             app:onClickListener="@{onClickListener}" />
 
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_bold"
+            android:includeFontPadding="false"
+            android:text="@string/hintSelectCompany"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_20"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar" />
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cvSearch"
             android:layout_width="0dp"
@@ -41,7 +59,7 @@
             app:strokeWidth="1.5dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+            app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
             <LinearLayout
                 android:layout_width="match_parent"

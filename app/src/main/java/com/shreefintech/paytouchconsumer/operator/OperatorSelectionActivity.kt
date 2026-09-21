@@ -36,15 +36,18 @@ class OperatorSelectionActivity : BaseActivity() {
     companion object {
         private const val EXTRA_ITEMS = "extra_items"
         private const val EXTRA_SELECTED_ID = "extra_selected_id"
+        private const val EXTRA_TITLE = "extra_title"
         const val EXTRA_SELECTED = "extra_selected"
 
         fun newIntent(
             context: Context,
             items: List<OperatorSelectionItem>,
-            selectedId: String?
+            selectedId: String?,
+            title: String? = null
         ): Intent = Intent(context, OperatorSelectionActivity::class.java).apply {
             putExtra(EXTRA_ITEMS, Gson().toJson(items))
             selectedId?.let { putExtra(EXTRA_SELECTED_ID, it) }
+            title?.let { putExtra(EXTRA_TITLE, it) }
         }
     }
 
@@ -61,6 +64,7 @@ class OperatorSelectionActivity : BaseActivity() {
         }
 
         binding.onClickListener = onClickListener()
+        intent.getStringExtra(EXTRA_TITLE)?.let { binding.tvTitle.text = it }
         setupRecyclerView()
         setupSearch()
         onBack()

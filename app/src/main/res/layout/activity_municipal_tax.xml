@@ -90,6 +90,7 @@
 
                 <!-- Tab: PayBill (active) -->
                 <LinearLayout
+                    android:id="@+id/llTabPayBill"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -262,7 +263,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/proza_libre_medium"
                             android:includeFontPadding="false"
-                            android:text="@string/labelCompany"
+                            android:text="@string/labelCorporation"
                             android:textColor="@color/black"
                             android:textSize="@dimen/text_size_12" />
 
@@ -291,7 +292,7 @@
                                     android:fontFamily="@font/proza_libre_medium"
                                     android:includeFontPadding="false"
                                     android:maxLines="1"
-                                    android:text="@string/hintSelectCompany"
+                                    android:text="@string/hintSelectCorporation"
                                     android:textColor="?attr/colorTextHint"
                                     android:textSize="@dimen/text_size_12" />
 
