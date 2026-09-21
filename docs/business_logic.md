@@ -264,11 +264,15 @@ amount > 40000           → fee = ₹30
 ### API Endpoints
 | Method | Path | Purpose |
 |---|---|---|
+| GET | `api/states` | Get circle (telecom zone) list — fetched on screen open |
 | GET | `api/recharge/operators` | Get prepaid operators |
 | GET | `api/recharge/plans/{operatorId}/{circleId}` | Get plans for selected operator + circle |
 | POST | `api/recharge/process-direct` | Process recharge |
 
 > Prepaid transaction screens (recent transactions, report, status, SMS receipt) are fully implemented.
+
+### Response Fields (States/Circles — `General<T>` wrapped)
+- `data[].id` (String), `data[].name` (String)
 
 ### Response Fields (Operators — `General<T>` wrapped)
 - `data[].id` (String), `data[].name` (String), `data[].code` (String)
@@ -281,7 +285,7 @@ amount > 40000           → fee = ₹30
 ### Request Fields (Process Recharge)
 - `mobile_no` (String, required)
 - `operator_code` (String, required)
-- `circle_code` (String, required) — circle value from the fixed circle list, not a server-fetched dropdown
+- `circle_code` (String, required) — `id` from the `api/states` response (server-fetched, not a hardcoded list)
 - `amount` (Decimal, required)
 - `platform_fee` (Decimal, required)
 - `total_payable` (Decimal, required)
@@ -414,10 +418,12 @@ Transaction IDs are **generated and returned by the backend** in the `process-pa
 | `AUTH` | `PENDING_ORDER_ID` | String | HDFC order ID in progress (cleared after status check) |
 | `AUTH` | `PENDING_AMOUNT` | String | HDFC payment amount in progress (cleared after status check) |
 | `app_prefs` | `mpin_created` | Boolean | MPIN setup complete |
+| `app_prefs` | `LAST_INTERACTION` | String (Long ms) | Timestamp of last user interaction — used for idle session timeout |
 
 ### Rules
 - Token is checked at Splash; no token → go to Login
 - Any 401 response → clear ALL SharedPreferences → launch LoginActivity with `FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK`
+- **Idle session timeout:** `BaseActivity.onResume()` calls `checkSessionTimeout()`. If the elapsed time since `LAST_INTERACTION` exceeds `SESSION_TIMEOUT_MS` (5 minutes), the session is cleared and `LoginActivity` is launched with a cleared back stack. `LAST_INTERACTION` is updated on every `onUserInteraction()` call while the user is logged in.
 - `isLoggedIn()` = token is not null AND userId > 0
 
 ---
