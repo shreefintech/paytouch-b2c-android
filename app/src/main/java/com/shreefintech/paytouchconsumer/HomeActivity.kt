@@ -35,6 +35,11 @@ class HomeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private val viewModel: HomeViewModel by viewModels()
+
+    private var logoutDialog: Dialog? = null
+    private var logoutDialogBinding: DialogConfirmLogoutBinding? = null
+    private val showProgressLogout = ObservableBoolean(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
@@ -57,7 +62,7 @@ class HomeActivity : BaseActivity() {
         binding.lytToolbar.ivBack.gone()
         binding.lytToolbar.flLogout.visible()
         binding.lytToolbar.ivLogo.layoutParams.height =
-            resources.getDimensionPixelSize(R.dimen.toolbar_height)
+            resources.getDimensionPixelSize(R.dimen.home_toolbar_logo_height)
 
         binding.lytToolbar.ivLogo.requestLayout()
 
@@ -68,13 +73,16 @@ class HomeActivity : BaseActivity() {
     }
 
     private fun showLogoutDialog() {
+        showProgressLogout.set(false)
         val dialogBinding = DataBindingUtil.inflate<DialogConfirmLogoutBinding>(
             layoutInflater, R.layout.dialog_confirm_logout, null, false
         )
-        val showProgress = ObservableBoolean(false)
-        dialogBinding.showProgress = showProgress
+        logoutDialogBinding = dialogBinding
+        dialogBinding.onClickListener = onClickListener()
+        dialogBinding.showProgress = showProgressLogout
 
         val dialog = Dialog(mActivity)
+        logoutDialog = dialog
         dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.window?.setLayout(
@@ -82,18 +90,22 @@ class HomeActivity : BaseActivity() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(true)
+        dialog.setOnDismissListener {
+            logoutDialog = null
+            logoutDialogBinding = null
+        }
 
         dialogBinding.onClickListener = View.OnClickListener { view ->
             when (view) {
                 dialogBinding.btnLogout -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (showProgress.get()) return@OnClickListener
+                    if (showProgressLogout.get()) return@OnClickListener
                     if (!Utility.isInternetAvailable(mActivity)) {
                         ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
                         return@OnClickListener
                     }
                     viewModel.logout(
-                        onLoading = { showProgress.set(true) },
+                        onLoading = { showProgressLogout.set(true) },
                         onComplete = {
                             dialog.dismiss()
                             SharedPreferenceHelper.clearSharedPreference(mActivity)
@@ -102,7 +114,7 @@ class HomeActivity : BaseActivity() {
                             })
                         },
                         onError = { msg ->
-                            showProgress.set(false)
+                            showProgressLogout.set(false)
                             ToastUtil.showWarning(mActivity, msg)
                         }
                     )
@@ -114,7 +126,11 @@ class HomeActivity : BaseActivity() {
             }
         }
         dialog.show()
+
+
     }
+
+
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {

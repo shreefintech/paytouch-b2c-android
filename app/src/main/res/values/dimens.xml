@@ -111,4 +111,5 @@
     <dimen name="toolbar_logo_height">55dp</dimen>
     <dimen name="dialog_padding_horizontal">24dp</dimen>
     <dimen name="dialog_padding_top">28dp</dimen>
+    <dimen name="home_toolbar_logo_height">70dp</dimen>
 </resources>
