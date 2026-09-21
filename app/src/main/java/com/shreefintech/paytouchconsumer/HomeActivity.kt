@@ -35,6 +35,11 @@ class HomeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private val viewModel: HomeViewModel by viewModels()
+
+    private var logoutDialog: Dialog? = null
+    private var logoutDialogBinding: DialogConfirmLogoutBinding? = null
+    private val showProgressLogout = ObservableBoolean(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
@@ -57,7 +62,7 @@ class HomeActivity : BaseActivity() {
         binding.lytToolbar.ivBack.gone()
         binding.lytToolbar.flLogout.visible()
         binding.lytToolbar.ivLogo.layoutParams.height =
-            resources.getDimensionPixelSize(R.dimen.toolbar_height)
+            resources.getDimensionPixelSize(R.dimen.home_toolbar_logo_height)
 
         binding.lytToolbar.ivLogo.requestLayout()
 
@@ -68,13 +73,16 @@ class HomeActivity : BaseActivity() {
     }
 
     private fun showLogoutDialog() {
+        showProgressLogout.set(false)
         val dialogBinding = DataBindingUtil.inflate<DialogConfirmLogoutBinding>(
             layoutInflater, R.layout.dialog_confirm_logout, null, false
         )
-        val showProgress = ObservableBoolean(false)
-        dialogBinding.showProgress = showProgress
+        logoutDialogBinding = dialogBinding
+        dialogBinding.onClickListener = onClickListener()
+        dialogBinding.showProgress = showProgressLogout
 
         val dialog = Dialog(mActivity)
+        logoutDialog = dialog
         dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.window?.setLayout(
@@ -82,30 +90,32 @@ class HomeActivity : BaseActivity() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(true)
-
-        dialogBinding.btnLogout.setOnClickListener {
-            if (showProgress.get()) return@setOnClickListener
-            if (!Utility.isInternetAvailable(mActivity)) {
-                ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
-                return@setOnClickListener
-            }
-            viewModel.logout(
-                onLoading = { showProgress.set(true) },
-                onComplete = {
-                    dialog.dismiss()
-                    SharedPreferenceHelper.clearSharedPreference(mActivity)
-                    startActivity(Intent(mActivity, LoginActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    })
-                },
-                onError = { msg ->
-                    showProgress.set(false)
-                    ToastUtil.showWarning(mActivity, msg)
-                }
-            )
+        dialog.setOnDismissListener {
+            logoutDialog = null
+            logoutDialogBinding = null
         }
-        dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    private fun startLogout() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
+            return
+        }
+        viewModel.logout(
+            onLoading = { showProgressLogout.set(true) },
+            onComplete = {
+                logoutDialog?.dismiss()
+                SharedPreferenceHelper.clearSharedPreference(mActivity)
+                startActivity(Intent(mActivity, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            },
+            onError = { msg ->
+                showProgressLogout.set(false)
+                ToastUtil.showWarning(mActivity, msg)
+            }
+        )
     }
 
     private fun onBack() {
@@ -123,6 +133,17 @@ class HomeActivity : BaseActivity() {
                 binding.lytToolbar.ivLogout -> {
                     if (Utility.stopClick()) return@OnClickListener
                     showLogoutDialog()
+                }
+
+                logoutDialogBinding?.btnLogout -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressLogout.get()) return@OnClickListener
+                    startLogout()
+                }
+
+                logoutDialogBinding?.btnCancel -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    logoutDialog?.dismiss()
                 }
 
                 binding.llElectricity -> {

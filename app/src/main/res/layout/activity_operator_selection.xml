@@ -33,7 +33,6 @@
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:fontFamily="@font/proza_libre_bold"
             android:includeFontPadding="false"
             android:text="@string/hintSelectCompany"
