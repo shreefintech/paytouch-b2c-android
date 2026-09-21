@@ -5,8 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
@@ -16,21 +15,18 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
 
     fun validateSession(
         authorization: String,
-        onSuccess: (MeDataItem?) -> Unit,
+        onSuccess: (UserProfileItem?) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
             onError(getApplication<Application>().getString(R.string.msgNoInternet))
             return
         }
-        ApiClient.apiService.getMe(authorization)
-            .enqueue(object : Callback<General<MeDataItem?>?> {
-                override fun onResponse(
-                    call: Call<General<MeDataItem?>?>,
-                    response: Response<General<MeDataItem?>?>
-                ) {
+        ApiClient.apiService.getUser(authorization)
+            .enqueue(object : Callback<UserProfileItem> {
+                override fun onResponse(call: Call<UserProfileItem>, response: Response<UserProfileItem>) {
                     if (response.isSuccessful) {
-                        onSuccess(response.body()?.data)
+                        onSuccess(response.body())
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(
@@ -40,7 +36,7 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                     }
                 }
 
-                override fun onFailure(call: Call<General<MeDataItem?>?>, t: Throwable) {
+                override fun onFailure(call: Call<UserProfileItem>, t: Throwable) {
                     onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
                 }
             })

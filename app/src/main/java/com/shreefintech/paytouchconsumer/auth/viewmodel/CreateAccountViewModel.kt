@@ -6,8 +6,7 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
@@ -34,13 +33,10 @@ class CreateAccountViewModel : ViewModel() {
         }
         onLoading()
         ApiClient.apiService.register(name, mobile, email, password, passwordConfirmation, referralCode)
-            .enqueue(object : Callback<General<LoginItem?>?> {
-                override fun onResponse(
-                    call: Call<General<LoginItem?>?>,
-                    response: Response<General<LoginItem?>?>
-                ) {
+            .enqueue(object : Callback<RegisterItem> {
+                override fun onResponse(call: Call<RegisterItem>, response: Response<RegisterItem>) {
                     if (response.isSuccessful) {
-                        val data = response.body()?.data
+                        val data = response.body()
                         data?.let {
                             SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_TOKEN, it.token ?: "")
                             SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_TOKEN_TYPE, it.tokenType ?: "")
@@ -53,11 +49,12 @@ class CreateAccountViewModel : ViewModel() {
                         }
                         onSuccess()
                     } else {
-                        onError(ApiHelper.parseErrorMessage(context, response.code(), response.errorBody()?.string()))
+                        val msg = ApiHelper.parseErrorMessage(context, response.code(), response.errorBody()?.string())
+                        onError(msg)
                     }
                 }
 
-                override fun onFailure(call: Call<General<LoginItem?>?>, t: Throwable) {
+                override fun onFailure(call: Call<RegisterItem>, t: Throwable) {
                     onError(t.localizedMessage ?: context.getString(R.string.errGeneric))
                 }
             })

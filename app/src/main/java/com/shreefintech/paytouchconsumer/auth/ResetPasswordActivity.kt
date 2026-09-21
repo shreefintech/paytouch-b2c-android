@@ -27,7 +27,7 @@ class ResetPasswordActivity : BaseActivity() {
     private var showProgress = ObservableBoolean(false)
     private var isNewPasswordVisible     = false
     private var isConfirmPasswordVisible = false
-    private val resetToken by lazy { intent.getStringExtra(Constant.EXTRA_RESET_TOKEN) ?: "" }
+    private val mobile by lazy { intent.getStringExtra(Constant.EXTRA_MOBILE) ?: "" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,7 +122,7 @@ class ResetPasswordActivity : BaseActivity() {
         val newPassword = binding.etNewPassword.text?.toString() ?: ""
         viewModel.changePassword(
             context     = mActivity,
-            resetToken  = resetToken,
+            mobile      = mobile,
             newPassword = newPassword,
             onLoading   = { showProgress.set(true) },
             onSuccess   = { showProgress.set(false); navigateToLogin() },

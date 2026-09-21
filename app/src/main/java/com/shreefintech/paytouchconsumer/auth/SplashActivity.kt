@@ -13,7 +13,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
 import com.shreefintech.paytouchconsumer.kyc.KycActivity
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -24,7 +24,7 @@ class SplashActivity : BaseActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private var sessionData: MeDataItem? = null
+    private var sessionData: UserProfileItem? = null
     private var apiFinished = false
     private var timerFinished = false
 
@@ -77,7 +77,7 @@ class SplashActivity : BaseActivity() {
         )
     }
 
-    private fun onApiDone(data: MeDataItem?) {
+    private fun onApiDone(data: UserProfileItem?) {
         sessionData = data
         apiFinished = true
         if (timerFinished) redirect()
@@ -85,10 +85,10 @@ class SplashActivity : BaseActivity() {
 
     private fun redirect() {
         val intent = when {
-            sessionData == null -> Intent(mActivity, LoginActivity::class.java)
-            sessionData?.nextStep == Constant.NEXT_STEP_KYC_REQUIRED -> Intent(mActivity, KycActivity::class.java)
-            sessionData?.nextStep == Constant.NEXT_STEP_REGISTRATION_REJECTED -> Intent(mActivity, LoginActivity::class.java)
-            else -> Intent(mActivity, HomeActivity::class.java)
+            sessionData?.requiresKyc == true  -> Intent(mActivity, KycActivity::class.java)
+            sessionData?.requiresMpin == true -> ResetMpinActivity.buildCreateIntent(mActivity)
+            sessionData != null               -> Intent(mActivity, HomeActivity::class.java)
+            else                              -> Intent(mActivity, LoginActivity::class.java)
         }
         navigate(intent)
     }

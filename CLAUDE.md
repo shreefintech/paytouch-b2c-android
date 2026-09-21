@@ -8,22 +8,6 @@ PayTouch Consumer is a **fintech Android app** (Kotlin) for Indian consumers to 
 
 ---
 
-## Ask, Don't Assume (Mandatory)
-
-If at any point during a session — while reading code, planning, or generating output — something is **missing, ambiguous, or unclear**, stop and ask before proceeding. This applies even when auto-permission is enabled.
-
-**Never assume an answer and move on.** Examples of when to stop and ask:
-
-- An API endpoint, request/response field, or contract detail is not documented and cannot be inferred from existing code.
-- A UI requirement (layout, behavior, copy) is unspecified and multiple valid interpretations exist.
-- A referenced file, class, drawable, or string resource does not exist and its intended form is unclear.
-- Business logic (fee, routing, validation rule) is not covered in `docs/` and cannot be derived from analogous modules.
-- The correct base class, pattern, or architecture decision is genuinely ambiguous for the new case.
-
-**One blocking question is better than one wrong assumption baked into generated code.** Ask the question in plain language, state what you were about to assume, and wait for the answer before writing any code that depends on it.
-
----
-
 ## Final Verification (Mandatory)
 
 Before presenting any code, perform a complete self-review and confirm all of the following:
