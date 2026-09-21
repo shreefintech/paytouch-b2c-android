@@ -37,7 +37,7 @@ class ResetMpinActivity : BaseActivity() {
     private val viewModel: ResetMpinViewModel by viewModels()
     private var showProgress = ObservableBoolean(false)
 
-    private val mobile by lazy { intent.getStringExtra(Constant.EXTRA_MOBILE) ?: "" }
+    private val resetToken by lazy { intent.getStringExtra(Constant.EXTRA_RESET_TOKEN) ?: "" }
     private val isCreateMode by lazy { intent.getBooleanExtra(EXTRA_IS_CREATE_MODE, false) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -182,11 +182,11 @@ class ResetMpinActivity : BaseActivity() {
             )
         } else {
             viewModel.changeMpin(
-                mobile    = mobile,
-                newMpin   = mpin,
-                onLoading = { showProgress.set(true) },
-                onSuccess = { showProgress.set(false); navigateToLogin() },
-                onError   = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
+                resetToken = resetToken,
+                newMpin    = mpin,
+                onLoading  = { showProgress.set(true) },
+                onSuccess  = { showProgress.set(false); navigateToLogin() },
+                onError    = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
             )
         }
     }

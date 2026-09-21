@@ -250,10 +250,9 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun navigateAfterLogin(data: LoginItem?) {
-        val intent = when {
-            data?.requiresKyc == true            -> Intent(mActivity, KycActivity::class.java)
-            data?.requiresMpin == true           -> ResetMpinActivity.buildCreateIntent(mActivity)
-            else                                 -> Intent(mActivity, HomeActivity::class.java)
+        val intent = when (data?.nextStep) {
+            Constant.NEXT_STEP_KYC_REQUIRED -> Intent(mActivity, KycActivity::class.java)
+            else                            -> Intent(mActivity, HomeActivity::class.java)
         }
         startActivity(intent)
         finishAffinity()

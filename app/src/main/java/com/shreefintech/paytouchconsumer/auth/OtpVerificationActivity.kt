@@ -206,11 +206,10 @@ class OtpVerificationActivity : BaseActivity() {
             context = mActivity,
             mobile = mobile,
             otp = collectOtp(),
-            flowType = flowType,
             onLoading = { showProgress.set(true) },
-            onSuccess = {
+            onSuccess = { resetToken ->
                 showProgress.set(false)
-                navigateToNextScreen()
+                navigateToNextScreen(resetToken)
             },
             onError = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
         )
@@ -231,13 +230,13 @@ class OtpVerificationActivity : BaseActivity() {
         )
     }
 
-    private fun navigateToNextScreen() {
+    private fun navigateToNextScreen(resetToken: String) {
         val intent = if (flowType == Constant.FLOW_RESET_MPIN) {
             Intent(mActivity, ResetMpinActivity::class.java)
         } else {
             Intent(mActivity, ResetPasswordActivity::class.java)
         }
-        intent.putExtra(Constant.EXTRA_MOBILE, mobile)
+        intent.putExtra(Constant.EXTRA_RESET_TOKEN, resetToken)
         startActivity(intent)
         finish()
     }

@@ -5,8 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
+import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MpinItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -17,7 +17,7 @@ import retrofit2.Response
 class ResetMpinViewModel(application: Application) : AndroidViewModel(application) {
 
     fun changeMpin(
-        mobile: String,
+        resetToken: String,
         newMpin: String,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
@@ -28,9 +28,9 @@ class ResetMpinViewModel(application: Application) : AndroidViewModel(applicatio
             return
         }
         onLoading()
-        ApiClient.apiService.resetMpin(mobile, newMpin, newMpin)
-            .enqueue(object : Callback<MessageItem> {
-                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+        ApiClient.apiService.forgotCredentialReset(resetToken, "mpin", newMpin)
+            .enqueue(object : Callback<General<Any?>?> {
+                override fun onResponse(call: Call<General<Any?>?>, response: Response<General<Any?>?>) {
                     if (response.isSuccessful && response.body()?.success == true) {
                         onSuccess()
                     } else {
@@ -38,7 +38,7 @@ class ResetMpinViewModel(application: Application) : AndroidViewModel(applicatio
                     }
                 }
 
-                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
+                override fun onFailure(call: Call<General<Any?>?>, t: Throwable) {
                     onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
                 }
             })

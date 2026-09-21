@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
@@ -15,7 +15,7 @@ class ResetPasswordViewModel : ViewModel() {
 
     fun changePassword(
         context: Context,
-        mobile: String,
+        resetToken: String,
         newPassword: String,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
@@ -26,9 +26,9 @@ class ResetPasswordViewModel : ViewModel() {
             return
         }
         onLoading()
-        ApiClient.apiService.resetPassword(mobile, newPassword, newPassword)
-            .enqueue(object : Callback<MessageItem> {
-                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+        ApiClient.apiService.forgotCredentialReset(resetToken, "password", newPassword)
+            .enqueue(object : Callback<General<Any?>?> {
+                override fun onResponse(call: Call<General<Any?>?>, response: Response<General<Any?>?>) {
                     if (response.isSuccessful && response.body()?.success == true) {
                         onSuccess()
                     } else {
@@ -36,7 +36,7 @@ class ResetPasswordViewModel : ViewModel() {
                     }
                 }
 
-                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
+                override fun onFailure(call: Call<General<Any?>?>, t: Throwable) {
                     onError(t.localizedMessage ?: context.getString(R.string.errGeneric))
                 }
             })
