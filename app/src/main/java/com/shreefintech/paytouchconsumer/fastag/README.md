@@ -6,6 +6,37 @@ Handles FASTag recharge: operator selection, vehicle number entry, amount entry,
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.fastag`
+Transaction screens: `fastag/transactions/` | ViewModels: `fastag/viewmodel/`
+
+**Pattern:** Amount-entry — operator → vehicle number → user types amount → real-time fee calculation → pay
+
+**First files to open:**
+1. `FastagActivity.kt` — operator dropdown, vehicle number field, amount entry with real-time `TextWatcher` fee display
+2. `viewmodel/FastagViewModel.kt` — extends `BaseBillViewModel`; `POST /api/fastag` payment endpoint
+3. `retrofit/model/fastag/` folder — FASTag-specific DTOs
+4. `transactions/FastagRecentTransactionActivity.kt` — note: does NOT pre-load operators (FASTag gets operator name from `UnifiedTransactionExtraItem`)
+
+**Shared components this module uses (outside `fastag/`):**
+- `adapter/RecentTransactionAdp.kt` + `adapter/TransactionAdp.kt`
+- `transactions/model/RecentTransactionItem.kt` + `TransactionItem.kt`
+- `transactions/TransactionDetailActivity.kt`
+- `utill/TransactionFilterHelper.kt` + `utill/ReceiptHelper.kt`
+- `BaseBillViewModel.kt`
+
+**Launched from:** `HomeActivity` → `binding.cardFastag` click handler
+
+**Key FASTag-specific points:**
+- Uses "vehicle number" everywhere instead of "consumer number" — `isVehicleCategory = true` in all mapping functions
+- `circleId` comes from `FastagOperatorItem.circleId` (not hardcoded like Gas/Electricity)
+- Report endpoint is a `GET` not `POST`: `GET /api/fastag` with query params
+- Report response is double-wrapped: `General<FastagTransactionPageItem>` → `data.data` for the row list
+- Recent transactions skips operator pre-load — operator name is already resolved in `UnifiedTransactionExtraItem.operatorName`
+
+---
+
 ## Screens & ViewModels
 
 | Activity | ViewModel | Purpose |

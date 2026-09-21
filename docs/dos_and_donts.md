@@ -273,7 +273,8 @@ Apply to every `mapToTransactionItem()` in every module's report/status ViewMode
 | `platformFee` | `Utility.formatAmount(item.platformFee)` — or `"₹0.00"` if the DTO has no fee field |
 | `totalPayable` | `Utility.formatAmount(item.totalPayable)` |
 | `categoryIconRes` | `R.drawable.ic_{category}` — the only visual difference between modules |
-| `isMobileCategory` | `true` for Mobile Prepaid, Postpaid, DTH; `false` for all others (Electricity, Gas, etc.) — **never omit this field** |
+| `isMobileCategory` | `true` for Mobile Prepaid, Postpaid, DTH; `false` for all others — **never omit this field** |
+| `isVehicleCategory` | `true` for FASTag only; `false` for all others — drives "Vehicle No" label in adapters |
 
 Apply to every `mapToDisplayItem()` in every module's recent transaction ViewModel:
 
@@ -282,24 +283,31 @@ Apply to every `mapToDisplayItem()` in every module's recent transaction ViewMod
 | `date` | `Utility.formatDate(item.createdAt, "dd MMM yyyy")` — **pre-format here**; the list card displays it directly, there is no detail formatter for recent items |
 | `amount` | `Utility.formatAmount(item.totalPayable ?: item.amount)` — prefer `totalPayable`; fall back to `amount` only if `totalPayable` is absent |
 | `isMobileCategory` | Same rule as `mapToTransactionItem()` above |
+| `isVehicleCategory` | Same rule as `mapToTransactionItem()` above |
 
-**`isMobileCategory` drives two UI behaviours:**
-- **Adapter label** (`RecentTransactionAdp`, `TransactionDetailActivity`): `true` → "Mobile No - %s", `false` → "Consumer No - %s"
-- **Masked display** (`TransactionAdp.tvMobile`): shows `Utility.maskNumber(item.mobileNumber)` — the `mobileNumber` field holds either the mobile number or the consumer/connection number depending on the module
+**`isMobileCategory` and `isVehicleCategory` drive adapter label behaviour:**
+- `isMobileCategory = true` → "Mobile No - %s"
+- `isVehicleCategory = true` → "Vehicle No - %s"
+- Both `false` → "Consumer No - %s"
+- **Masked display** (`TransactionAdp.tvMobile`): shows `Utility.maskNumber(item.mobileNumber)` — the `mobileNumber` field holds whichever identifier applies (mobile number, consumer number, or vehicle number)
 
 **SMS Receipt label** — set `tvConsumerNoLabel` dynamically in `populateReceiptFromApi()`, never rely on the static XML default alone:
 
 | Module | Label string |
 |---|---|
-| Electricity, Gas (and any future consumer-number category) | `R.string.labelConsumerNo` — "Consumer No" |
-| Prepaid, Postpaid, DTH (and any future mobile-number category) | `R.string.labelMobileNo` — "Mobile No." |
+| Electricity, Gas, Loan, Municipal Tax | `R.string.labelConsumerNo` — "Consumer No" |
+| Mobile Prepaid, Mobile Postpaid, DTH | `R.string.labelMobileNo` — "Mobile No." |
+| FASTag | `R.string.labelVehicleNumber` — "Vehicle No" |
 
 ```kotlin
-// In populateReceiptFromApi() — consumer-number category
+// In populateReceiptFromApi() — consumer-number category (Electricity, Gas, Loan, Municipal Tax)
 binding.tvConsumerNoLabel.text = getString(R.string.labelConsumerNo)
 
-// In populateReceiptFromApi() — mobile-number category
+// In populateReceiptFromApi() — mobile-number category (Prepaid, Postpaid, DTH)
 binding.tvConsumerNoLabel.text = getString(R.string.labelMobileNo)
+
+// In populateReceiptFromApi() — vehicle-number category (FASTag)
+binding.tvConsumerNoLabel.text = getString(R.string.labelVehicleNumber)
 ```
 
 The XML default (`android:text="@string/labelConsumerNo"`) is a layout-editor placeholder only; every Activity must set the label explicitly at runtime so the correct string is guaranteed regardless of the XML default.
@@ -413,7 +421,12 @@ The `type` query parameter for `GET /api/transactions` must match the server con
 |---|---|
 | Electricity | `"electricity"` |
 | Gas | `"gas"` |
-| Prepaid / Mobile Recharge | `"mobile_recharge"` |
+| Mobile Prepaid | `"mobile_recharge"` |
+| Mobile Postpaid | `"mobile_postpaid"` |
+| DTH | `"dth"` |
+| FASTag | `"fastag"` |
+| Loan Repayment | `"loan_repayment"` |
+| Municipal Tax | `"municipal_tax"` |
 | Any new module | Check the API contract — never guess |
 
 ---

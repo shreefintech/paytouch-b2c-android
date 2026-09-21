@@ -362,7 +362,7 @@
     </div>
     <div class="cover-meta-item">
       <div class="label">Phase</div>
-      <div class="value">API Integration</div>
+      <div class="value">Production Ready (Cable TV pending)</div>
     </div>
     <div class="cover-meta-item">
       <div class="label">Min / Target SDK</div>
@@ -370,7 +370,7 @@
     </div>
     <div class="cover-meta-item">
       <div class="label">Last Updated</div>
-      <div class="value">August 2026</div>
+      <div class="value">September 2026</div>
     </div>
   </div>
 </div>
@@ -642,7 +642,7 @@ showProgressFetch.set(<span class="keyword">false</span>)  <span class="comment"
 }</code></pre>
 
 <h3>Bottom Sheet Pattern</h3>
-<p>Always use <code>BottomSheetBehavior</code> embedded in the layout — never <code>Dialog</code>.</p>
+<p>Use <code>Dialog</code> for confirmation/alert modals. Use <code>BottomSheetBehavior</code> only for UI specifically designed as a bottom sheet (filter sheets, payment forms, multi-field input panels).</p>
 
 <pre><code><span class="comment">// Activity layout: CoordinatorLayout → main content + viewBg overlay + include sheet</span>
 <span class="comment">// Sheet XML root: ConstraintLayout with app:layout_behavior="...BottomSheetBehavior"</span>
@@ -1081,7 +1081,7 @@ All detail taps ─────────────────────�
   <tr><td>POST</td><td><code>api/password/send-otp</code></td><td>Begin password reset</td></tr>
   <tr><td>POST</td><td><code>api/kyc/account-info</code></td><td>My Account info</td></tr>
   <tr><td>GET</td><td><code>api/wallet/transactions</code></td><td>Wallet transaction history (paginated)</td></tr>
-  <tr><td>GET</td><td><code>api/hdfc/order-status/{orderId}</code></td><td>Check HDFC payment order status after WebView return</td></tr>
+  <tr><td>GET</td><td><code>api/hdfc/orders/{order_id}/status</code></td><td>Check HDFC payment order status after WebView return</td></tr>
   <tr><td>GET</td><td><code>api/dashboard-kyc/my-account</code></td><td>Fetch full KYC details for KycDetailsActivity</td></tr>
 </table>
 </div>
@@ -1161,7 +1161,7 @@ binding.flSubmit.attach(binding.clRoot <span class="keyword">as</span> ViewGroup
 <!-- ════════════════ FOOTER ════════════════ -->
 <div class="footer">
   PayTouch Consumer · Project Documentation · Shreefintech Solutions<br>
-  Internal use only · Generated August 2026
+  Internal use only · Updated September 2026
 </div>
 
 </body>

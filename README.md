@@ -1,7 +1,52 @@
 # PayTouch Consumer
 
 Utility bill payment and digital wallet app for Indian consumers. Built by Shree Fintech Solutions.
-Single user role -- every verified user has the same feature set.
+Single user role — every verified user has the same feature set.
+
+---
+
+## Prerequisites
+
+| Tool | Version |
+|---|---|
+| Android Studio | Hedgehog (2023.1.1) or newer |
+| JDK | 11 (bundled with Android Studio) |
+| Android SDK | API 36 (install via SDK Manager) |
+| Kotlin | 1.9+ (bundled with the Gradle plugin) |
+| Min device / emulator | API 24 (Android 7.0 Nougat) |
+
+---
+
+## Getting Started
+
+```bash
+# 1. Clone
+git clone <repo-url>
+cd PaytouchConsumer1
+
+# 2. Open in Android Studio → File → Open → select this folder
+# 3. Let Gradle sync complete (downloads dependencies automatically)
+# 4. Run on emulator or device: Run → Run 'app'
+```
+
+**First launch:** The app opens at `SplashActivity` → routes to `LoginActivity` (no session yet). Use a test account or register a new one.
+
+**Debug network calls:** All HTTP requests are logged in Logcat. Filter by tag `CURL` to see curl-formatted requests. Filter by tag `OkHttp` for raw logs.
+
+---
+
+## First Day Reading Order
+
+Read these in order — each one builds on the previous:
+
+| # | What | Why |
+|---|---|---|
+| 1 | `docs/caveman.md` | Plain-English system overview — how the backend works, what the app does |
+| 2 | `docs/dos_and_donts.md` | Hard constraints you must not violate — read before touching any code |
+| 3 | This file (root `README.md`) | Architecture, module map, and all cross-cutting rules |
+| 4 | `CLAUDE.md` | Strict code-generation rules (naming, patterns, API conventions) — repeat violators become review blockers |
+| 5 | `electricity/README.md` | Canonical bill-payment module — read before touching any payment flow |
+| 6 | The README for the module you're working on | Module-specific flows, gotchas, and API models |
 
 ---
 
@@ -11,10 +56,11 @@ Single user role -- every verified user has the same feature set.
 |---|---|
 | Language | Kotlin (JVM 11) |
 | UI | Views + ViewBinding + DataBinding |
-| Networking | Retrofit 2 + OkHttp 4 + Gson |
-| Architecture | MVVM -- ViewModel + `.enqueue()` callback pattern |
-| Image loading | Glide 4 |
+| Networking | Retrofit 2.11 + OkHttp 4 + Gson 2.13 |
+| Architecture | MVVM — ViewModel + `.enqueue()` callback pattern (no coroutines) |
+| Image loading | Glide 4.16 |
 | Auth storage | SharedPreferences via `SharedPreferenceHelper` |
+| Loading shimmer | Facebook Shimmer 0.5.0 |
 | Min / Target SDK | 24 / 36 |
 
 ---
@@ -35,85 +81,88 @@ com.shreefintech.paytouchconsumer/
 |   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
 |
 +-- gas/                Gas bill payment + transaction history (mirrors electricity/ exactly)
-|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|   \-- transactions/
 |
 +-- prepaid/            Mobile prepaid recharge -- operator + circle + plan selection, no bill fetch
 |   +-- viewmodel/
-|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|   \-- transactions/
 |
-+-- postpaid/           Mobile postpaid bill payment -- shares PrepaidPlanSelectionActivity
++-- postpaid/           Mobile postpaid bill payment -- bill-fetch + circle selection
 |   +-- viewmodel/
-|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|   \-- transactions/
 |
 +-- dth/                DTH recharge -- operator + plan selection (mirrors Prepaid flow)
 |   +-- viewmodel/
-|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|   \-- transactions/
 |
 +-- fastag/             FASTag recharge -- no bill-fetch, vehicle number + amount, real-time fee
 |   +-- viewmodel/
-|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|   \-- transactions/
 |
-+-- loan/               Loan repayment -- bill-fetch pattern, mirrors Gas; circleId = "0"
++-- loan/               Loan repayment -- bill-fetch pattern; circleId = "0"
 |   +-- viewmodel/
-|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|   \-- transactions/
 |
-+-- municipaltax/       Municipal tax payment -- bill-fetch pattern; transaction-status routes via mobile-recharge endpoint
++-- municipaltax/       Municipal tax -- bill-fetch; transaction-status routes via mobile-recharge endpoint
 |   +-- viewmodel/
-|   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
+|   \-- transactions/
 |
 +-- myaccount/          My Account -- two-tab profile viewer (Account Info + Refer & Earn)
 |   \-- viewmodel/
 |
-+-- loadwallet/         Wallet top-up via HDFC payment gateway; wallet balance, virtual account, transaction history
++-- loadwallet/         Wallet top-up via HDFC payment gateway; balance, virtual account, history
 |   +-- model/          WalletTransactionItem (display), PaymentStatusItem (local DTO)
-|   \-- viewmodel/      LoadWalletViewModel, WalletTransactionsViewModel
+|   \-- viewmodel/
 |
 +-- transactions/       Shared across ALL bill-payment modules -- never duplicate per module
 |   +-- model/
-|   |   \-- TransactionItem.kt         Category-agnostic report/status row model
-|   \-- TransactionDetailActivity.kt   Single detail screen reused by every module
+|   |   +-- TransactionItem.kt          Category-agnostic report/status row model
+|   |   \-- RecentTransactionItem.kt    Recent transaction row model
+|   +-- TransactionDetailActivity.kt    Single detail screen reused by every module
+|   \-- TransactionHistoryDetailActivity.kt  Wallet transaction detail (separate flow)
 |
-+-- home/               (planned -- HomeActivity currently lives at root)
-|
-+-- adapter/            Shared adapters used across modules (TransactionAdp, RecentTransactionAdp, PrepaidPlanAdp)
++-- adapter/            Shared adapters used across modules
+|   +-- TransactionAdp.kt           Report + status lists (all modules)
+|   +-- RecentTransactionAdp.kt     Recent transaction lists (all modules)
+|   +-- PrepaidPlanAdp.kt           Prepaid plan selection
+|   +-- DthPlanAdp.kt               DTH plan selection
+|   +-- OperatorSelectionAdp.kt     Operator picker
+|   \-- WalletTransactionAdp.kt     Wallet history
 |
 +-- retrofit/           All networking
 |   +-- model/
-|   |   +-- General.kt            Universal response wrapper for most endpoints
-|   |   +-- UserProfileItem.kt    GET /api/user response
-|   |   +-- electricity/          Electricity request/response DTOs
-|   |   +-- gas/                  Gas request/response DTOs
-|   |   +-- prepaid/              Prepaid request/response DTOs
-|   |   +-- postpaid/             Postpaid request/response DTOs
-|   |   +-- dth/                  DTH request/response DTOs
-|   |   +-- fastag/               FASTag request/response DTOs
-|   |   +-- loan/                 Loan request/response DTOs
-|   |   +-- municipaltax/         Municipal tax request/response DTOs
-|   |   +-- myaccount/            AccountInfoItem, AccountInfoDataItem, ReferralInfoItem, ReferralDataItem
-|   |   +-- hdfc/                 HdfcCreateOrderRequest, HdfcOrderItem, HdfcOrderResponseItem, HdfcPaymentLinksItem
-|   |   +-- wallet/               WalletHistoryItem, WalletHistoryPageItem
-|   |   \-- auth/
-|   |       +-- LoginItem.kt
-|   |       +-- RegisterItem.kt
-|   |       \-- MessageItem.kt
-|   +-- ApiClient.kt              Main Retrofit singleton (paytouch.in)
-|   +-- ApiAdminClient.kt         VPS Retrofit singleton (admin.paytouch.in)
-|   +-- ApiService.kt             All endpoint declarations
-|   +-- ApiAdminService.kt
-|   +-- ApiHelper.kt              Error body parsing
-|   +-- SessionInterceptor.kt     Global 401 handler
-|   \-- CurlInterceptor.kt        Debug curl logger (tag: CURL)
+|   |   +-- General.kt              Universal response wrapper { data, success, meta, message }
+|   |   +-- electricity/            Electricity request/response DTOs
+|   |   +-- gas/                    Gas request/response DTOs
+|   |   +-- prepaid/                Prepaid request/response DTOs
+|   |   +-- postpaid/               Postpaid request/response DTOs
+|   |   +-- dth/                    DTH request/response DTOs
+|   |   +-- fastag/                 FASTag request/response DTOs
+|   |   +-- loan/                   Loan request/response DTOs
+|   |   +-- municipaltax/           Municipal tax request/response DTOs
+|   |   +-- kyc/                    KYC request/response DTOs (15+ files)
+|   |   +-- myaccount/              AccountInfoItem, ReferralInfoItem
+|   |   +-- hdfc/                   HdfcCreateOrderRequest, HdfcOrderItem, etc.
+|   |   +-- wallet/                 WalletHistoryItem, WalletHistoryPageItem
+|   |   \-- auth/                   LoginItem, RegisterItem, MessageItem
+|   +-- ApiClient.kt                Main Retrofit singleton (paytouch.in)
+|   +-- ApiAdminClient.kt           VPS Retrofit singleton (admin.paytouch.in)
+|   +-- ApiService.kt               All endpoint declarations for paytouch.in
+|   +-- ApiAdminService.kt          Endpoint declarations for admin.paytouch.in
+|   +-- ApiHelper.kt                Error body parsing
+|   +-- SessionInterceptor.kt       Global 401 handler -- clears session + relaunches LoginActivity
+|   \-- CurlInterceptor.kt          Debug curl logger (Logcat tag: CURL)
 |
 +-- glass/              LiquidGlassEffect blur UI system
 +-- widget/             Reusable custom views (LiquidGlassButton, CustomDropdown, OutlineTextView)
-+-- enums/              LoginMode
++-- enums/              Project-wide enums (LoginMode, KycSubmissionStatus, ProofType, etc.)
 +-- utill/              Shared utilities -- double-l spelling is intentional, never rename
 |                       (TransactionFilterHelper, ReceiptHelper, ToastUtil, Utility, SharedPreferenceHelper)
 |
 +-- BaseActivity.kt        All Activities extend this -- never AppCompatActivity
 +-- BaseBillViewModel.kt   Shared VPS/wallet balance-check logic -- every bill-payment ViewModel extends this
 +-- HomeActivity.kt        Main dashboard (will move to home/ package)
-\-- Constant.kt            All URLs, keys, and intent extra names
+\-- Constant.kt            All URLs, SharedPrefs keys, and intent extra names
 ```
 
 ---
@@ -138,7 +187,7 @@ SplashActivity  (2s logo -> GET /api/user)
 
 ## Mandatory Onboarding Sequence
 
-Server-driven via flags on the login / session response. Users cannot skip any step.
+Server-driven via flags on the login/session response. Users cannot skip any step.
 
 ```
 Register / Login
@@ -152,32 +201,31 @@ Register / Login
 
 ---
 
-## Modules
+## Module Directory
 
-### Implemented
+| Module | Entry Point | Pattern | Screens | Status |
+|---|---|---|---|---|
+| Auth | `SplashActivity` → `LoginActivity` | — | 6 | Complete |
+| KYC (Onboarding) | `KycActivity` | — | 4 + 4 fragments | Complete |
+| Home | `HomeActivity` | — | 1 | Complete |
+| Electricity | `ElectricityActivity` | Bill-fetch | 5 | Complete |
+| Gas | `GasActivity` | Bill-fetch | 5 | Complete |
+| Mobile Prepaid | `PrepaidActivity` | Plan-select | 6 | Complete |
+| Mobile Postpaid | `PostpaidActivity` | Bill-fetch + circle | 5 | Complete |
+| DTH | `DthActivity` | Plan-select | 6 | Complete |
+| FASTag | `FastagActivity` | Amount-entry | 5 | Complete |
+| Loan Repayment | `LoanActivity` | Bill-fetch | 5 | Complete |
+| Municipal Tax | `MunicipalTaxActivity` | Bill-fetch | 5 | Complete |
+| My Account | `MyAccountActivity` | Profile | 3 | Complete |
+| Load Wallet | `LoadWalletActivity` | HDFC gateway | 4 | Complete |
+| TV Cable | — | — | — | Not started |
+| Broadband | — | — | — | Not started |
 
-| Module | Entry Point | Sub-screens |
-|---|---|---|
-| Auth | `SplashActivity` -> `LoginActivity` | `CreateAccountActivity`, `OtpVerificationActivity`, `ResetPasswordActivity`, `ResetMpinActivity` |
-| Onboarding | `KycActivity` | `IdentityVerificationActivity`, `BankDetailsActivity`, `KycStatusActivity` |
-| Home | `HomeActivity` | Category grid -- routes to bill payment screens |
-| Electricity | `ElectricityActivity` | `RecentTransactionActivity`, `TransactionReportActivity`, `ElectricityTransactionStatusActivity`, `TransactionDetailActivity` (shared), `SmsReceiptActivity` |
-| Gas | `GasActivity` | `GasRecentTransactionActivity`, `GasTransactionReportActivity`, `GasTransactionStatusActivity`, `TransactionDetailActivity` (shared), `GasSmsReceiptActivity` |
-| Mobile Prepaid | `PrepaidActivity` | `PrepaidPlanSelectionActivity`, `PrepaidRecentTransactionActivity`, `PrepaidTransactionReportActivity`, `PrepaidTransactionStatusActivity`, `TransactionDetailActivity` (shared), `PrepaidSmsReceiptActivity` |
-| Mobile Postpaid | `PostpaidActivity` | `PrepaidPlanSelectionActivity` (shared from prepaid), `PostpaidRecentTransactionActivity`, `PostpaidTransactionReportActivity`, `PostpaidTransactionStatusActivity`, `TransactionDetailActivity` (shared), `PostpaidSmsReceiptActivity` |
-| DTH | `DthActivity` | `DthPlanSelectionActivity`, `DthRecentTransactionActivity`, `DthTransactionReportActivity`, `DthTransactionStatusActivity`, `TransactionDetailActivity` (shared), `DthSmsReceiptActivity` |
-| FASTag | `FastagActivity` | `FastagRecentTransactionActivity`, `FastagTransactionReportActivity`, `FastagTransactionStatusActivity`, `TransactionDetailActivity` (shared), `FastagSmsReceiptActivity` |
-| Loan Repayment | `LoanActivity` | `LoanRecentTransactionActivity`, `LoanTransactionReportActivity`, `LoanTransactionStatusActivity`, `TransactionDetailActivity` (shared), `LoanSmsReceiptActivity` |
-| Municipal Tax | `MunicipalTaxActivity` | `MunicipalTaxRecentTransactionActivity`, `MunicipalTaxTransactionReportActivity`, `MunicipalTaxTransactionStatusActivity`, `TransactionDetailActivity` (shared), `MunicipalTaxSmsReceiptActivity` |
-| My Account | `MyAccountActivity` | Two-tab screen: Account Info + Refer & Earn |
-| Load Wallet | `LoadWalletActivity` | Wallet balance, virtual account info, HDFC top-up, wallet transaction history (`WalletTransactionsActivity`), payment status (`PaymentStatusActivity`) |
+**Bill-fetch pattern:** operator → consumer/account number → server fetches bill → show amount → pay (Electricity, Gas, Postpaid, Loan, Municipal Tax)
 
-### Planned (stubs in HomeActivity)
+**Plan-select pattern:** operator → select plan → amount auto-filled → pay (Prepaid, DTH)
 
-| Module | Status |
-|---|---|
-| TV Cable payment | Not started |
-| Broadband | Not started |
+**Amount-entry pattern:** operator → vehicle number → user enters amount → real-time fee → pay (FASTag)
 
 ---
 
@@ -185,36 +233,39 @@ Register / Login
 
 | Rule | Detail |
 |---|---|
-| `ApiClient.apiService` only | Never construct Retrofit directly -- `ApiAdminClient` is the only valid second instance |
+| `ApiClient.apiService` only | Never construct Retrofit directly; `ApiAdminClient` is the only valid second instance |
 | `SharedPreferenceHelper` only | Never call `getSharedPreferences()` directly |
 | `Constant.kt` only | No inline URL strings, key strings, or extra names elsewhere |
 | `ToastUtil` only | Never `Toast.makeText()` |
 | `ApiHelper.parseErrorMessage()` | Never write custom error string logic |
 | `Utility.isInternetAvailable()` first | Call before every network request |
 | Extend `BaseActivity` | All Activities extend `BaseActivity`, never `AppCompatActivity` |
-| No Context in ViewModel field | Pass context as a lambda parameter -- never store it as a field |
+| No Context in ViewModel field | Pass context as a lambda parameter — never store it as a field |
 | No network in Adapters | All API calls belong in a ViewModel |
 | `Utility.stopClick()` guard | Every click that triggers navigation, API call, or form submit must call this first |
-| Extend `BaseBillViewModel` | Every main bill-payment ViewModel (Electricity, Gas, Prepaid, Postpaid) extends this for shared `checkVpsBalance()` / `checkWalletBalance()` / `bearerToken()` -- never reimplement balance checks per module. Transaction history / receipt ViewModels extend `AndroidViewModel` directly. |
-| Reuse `transactions/` package | `TransactionItem`, `TransactionDetailActivity`, `TransactionAdp`, `RecentTransactionAdp` are category-agnostic and shared by every module -- never fork per module |
-| Reuse `PrepaidPlanSelectionActivity` | Postpaid shares this screen from `prepaid/` -- do not create a `PostpaidPlanSelectionActivity` |
+| Extend `BaseBillViewModel` | Every main bill-payment ViewModel extends this; transaction/receipt ViewModels extend `AndroidViewModel` directly |
+| Reuse `transactions/` package | `TransactionItem`, `TransactionDetailActivity`, `TransactionAdp`, `RecentTransactionAdp` are shared by every module — never fork per module |
+| `Utility.maskNumber()` | Always mask the account/mobile number in list rows |
+| `Utility.formatAmount()` | Always use this for currency — never `"₹%.2f".format(value)` |
+| `Utility.formatDate()` | Always use this for dates — never `SimpleDateFormat` directly in a ViewModel |
+| Never generate `transaction_id` client-side | Backend owns transaction ID generation |
 
 ---
 
 ## Networking
 
-### ApiClient -- `paytouch.in`
+### ApiClient — `paytouch.in`
 
 Lazy singleton. OkHttp chain (in order):
 
-1. Header interceptor -- adds `Accept: application/json`
-2. **SessionInterceptor** -- on 401: clears SharedPreferences, relaunches `LoginActivity` (clear back stack)
-3. `HttpLoggingInterceptor` -- DEBUG builds only
-4. `CurlInterceptor` -- DEBUG builds only (Logcat tag: `CURL`)
+1. Header interceptor — adds `Accept: application/json`
+2. **SessionInterceptor** — on 401: clears SharedPreferences, relaunches `LoginActivity` (clear back stack)
+3. `HttpLoggingInterceptor` — DEBUG builds only
+4. `CurlInterceptor` — DEBUG builds only (Logcat tag: `CURL`)
 
 Timeouts: 30s connect / read / write.
 
-### ApiAdminClient -- `admin.paytouch.in`
+### ApiAdminClient — `admin.paytouch.in`
 
 Separate singleton. Used only for VPS user registration (fire-and-forget after login success). No interceptors.
 
@@ -228,7 +279,7 @@ All endpoints return `Call<T>`, never `suspend fun`. Always invoked with `.enque
 @POST("api/some-endpoint")
 fun doThing(@Field("param") param: String): Call<SomeItem>
 
-// ViewModel
+// ViewModel call
 if (!Utility.isInternetAvailable(context)) { onError(...); return }
 onLoading()
 ApiClient.apiService.doThing(param).enqueue(object : Callback<SomeItem> {
@@ -250,7 +301,7 @@ ApiClient.apiService.doThing(param).enqueue(object : Callback<SomeItem> {
 | `LoginItem` / `RegisterItem` / `UserProfileItem` | Auth endpoints (no wrapper) | `response.isSuccessful` |
 | `MessageItem` | OTP + reset endpoints (no wrapper) | `response.isSuccessful && response.body()?.success == true` |
 
-`MessageItem` requires both checks -- HTTP 200 with `success = false` is a valid server error (e.g. expired OTP).
+**DTO nullability rule:** Every field in an API response DTO must be nullable (`String?`, `Int?`, `Double?`). Gson silently sets missing fields to `null` — non-nullable fields crash at runtime.
 
 ---
 
@@ -258,10 +309,10 @@ ApiClient.apiService.doThing(param).enqueue(object : Callback<SomeItem> {
 
 All Activities extend `BaseActivity`. It provides:
 
-- `mActivity: Activity` -- stable Activity reference for use inside lambdas and callbacks
-- `betterActivityResult` -- pre-registered `ActivityResultLauncher`
+- `mActivity: Activity` — stable Activity reference for use inside lambdas and callbacks
+- `betterActivityResult` — pre-registered `ActivityResultLauncher`
 - Transparent status + navigation bars
-- Forced `fontScale = 1.0f` and `densityDpi = DENSITY_DEVICE_STABLE` (prevents system accessibility overrides from breaking layouts)
+- Forced `fontScale = 1.0f` and `densityDpi = DENSITY_DEVICE_STABLE` (prevents accessibility overrides from breaking layouts)
 
 ---
 
@@ -282,21 +333,21 @@ Never use `Toast.makeText()`. Always use `ToastUtil`:
 
 ## Shared Utilities (`utill/`)
 
-> Double-l spelling is intentional -- 30+ imports reference it. Never rename.
+> Double-l spelling is intentional — 30+ imports reference it. Never rename.
 
 | Utility | Purpose |
 |---|---|
-| `Utility.isInternetAvailable(context)` | Active network check -- call before every API call |
-| `Utility.stopClick()` | 800ms debounce guard -- call at the top of every click handler |
+| `Utility.isInternetAvailable(context)` | Active network check — call before every API call |
+| `Utility.stopClick()` | 800ms debounce guard — call at the top of every click handler |
 | `Utility.hideKeyboard(activity)` | Dismisses soft keyboard |
 | `Utility.calculatePlatformFee(amount)` | Returns platform fee for the amount (see Business Rules) |
-| `Utility.EmojiExcludeFilter()` | InputFilter that strips emoji |
-| `Utility.digitFilter()` | InputFilter that allows digits only |
-| `Utility.alphaSpaceFilter()` | InputFilter that allows letters and spaces only |
-| `View.visible()` / `.gone()` / `.invisible()` | Visibility extension functions |
+| `Utility.maskNumber(number)` | Masks account/mobile number for display in list rows: `9876*****0` |
+| `Utility.formatAmount(raw)` | Formats currency string — two overloads (`String?` and `Double?`) |
+| `Utility.formatDate(raw, pattern)` | Formats date string — always use instead of `SimpleDateFormat` |
 | `SharedPreferenceHelper` | Only way to read/write SharedPreferences |
+| `TransactionFilterHelper` | Filter state and sheet behavior for all transaction report screens |
+| `ReceiptHelper` | Receipt card capture, download (MediaStore API 29+), share |
 | `FilePickerUtil` | File + image picking helpers |
-| `TransactionFilterHelper` | Filter state for transaction report screens |
 
 ---
 
@@ -304,22 +355,13 @@ Never use `Toast.makeText()`. Always use `ToastUtil`:
 
 Custom blur-glass cards and buttons used throughout the app.
 
-**Card / overlay blur:**
-```kotlin
-LiquidGlassEffect.attach(
-    targetView   = binding.flCard,
-    rootView     = binding.clRoot as ViewGroup,
-    cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
-    distortion   = 0f,
-    blur         = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
-)
-```
-
 **LiquidGlassButton:** Call `.attach(root as ViewGroup)` in `onCreate()` after `setContentView()` for every button.
 Without it the button renders with no background.
 
 ```kotlin
+// In onCreate(), after setContentView():
 binding.flSubmit.attach(binding.clRoot as ViewGroup)
+binding.flFetchBill.attach(binding.clRoot as ViewGroup)
 ```
 
 ---
@@ -329,14 +371,14 @@ binding.flSubmit.attach(binding.clRoot as ViewGroup)
 | Thing | Pattern | Example |
 |---|---|---|
 | Activity | PascalCase + `Activity` | `ElectricityActivity` |
-| Adapter | PascalCase + `Adp` -- never `Adapter` | `TransactionAdp` |
-| Model / DTO | PascalCase + `Item` -- never `Response`, `Model`, `Dto` | `TransactionItem` |
+| Adapter | PascalCase + `Adp` — never `Adapter` | `TransactionAdp` |
+| Model / DTO | PascalCase + `Item` — never `Response`, `Model`, `Dto` | `TransactionItem` |
 | ViewModel | PascalCase + `ViewModel` | `LoginViewModel` |
 | Layout | prefix + snake_case | `activity_home`, `item_transaction`, `sheet_filter` |
 | Drawable | `ic_` icons, `bg_` shapes, `img_` raster | `ic_wallet`, `bg_otp_box` |
 | String IDs | camelCase with context prefix | `msgNoInternet`, `titleHome`, `hintConsumerNumber`, `errGeneric` |
-| ViewBinding field | always `binding` | -- |
-| Activity ref inside callbacks | always `mActivity` | -- |
+| ViewBinding field | always `binding` | — |
+| Activity ref inside callbacks | always `mActivity` | — |
 | Booleans | `is` / `has` / `can` prefix | `isShowPwd`, `isLastPage` |
 | Constants / enum entries | `UPPER_SNAKE_CASE` | `FLOW_RESET_MPIN` |
 
@@ -346,51 +388,59 @@ binding.flSubmit.attach(binding.clRoot as ViewGroup)
 
 ### Platform Fee
 
-Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)` -- never inline.
+Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)` — never inline.
 
 | Bill amount | Fee |
 |---|---|
 | < Rs.1,000 | Rs.4 |
-| Rs.1,000 - Rs.5,000 | Rs.8 |
-| Rs.5,001 - Rs.40,000 | Rs.20 |
+| Rs.1,000 – Rs.5,000 | Rs.8 |
+| Rs.5,001 – Rs.40,000 | Rs.20 |
 | > Rs.40,000 | Rs.30 |
 
 ### Field Validation
 
 | Field | Rule |
 |---|---|
-| Mobile | Exactly 10 digits, starts with 6-9 |
+| Mobile | Exactly 10 digits, starts with 6–9 |
 | Password | Minimum 8 characters |
 | MPIN | Exactly 4 digits |
-| PAN | [A-Z]{5}[0-9]{4}[A-Z] |
+| PAN | `[A-Z]{5}[0-9]{4}[A-Z]` |
 | Aadhaar | Exactly 12 digits |
 | Email | Standard email format |
 
 ---
 
-## Constant.kt -- Key Reference
+## Confirmed Backend Quirks — Do NOT Fix
+
+| Location | Apparent anomaly | Confirmed behaviour |
+|---|---|---|
+| `getMunicipalTaxTransactionStatus` in `ApiService.kt` | Uses `@POST("mobile-recharge/transaction-status")` (not `municipal-taxes/...`) | Backend-side intentional routing. Do not change this URL. |
+| `MunicipalTaxLatestPaymentDataItem.subService` | `@field:SerializedName("subservice")` has no underscore | Backend sends `subservice`, not `sub_service`. Do not rename. |
+| `KycViewModel.callInitiate()` — HTTP 422 from `initiateKyc` | 422 treated the same as success | 422 means KYC was already initiated. Proceed as if initiation succeeded. |
+| Gas `circleId` | Hardcoded `"0"` | Gas uses `"0"`, Electricity uses `"00"`. Both are correct per their server contracts. |
+
+---
+
+## Constant.kt — Key Reference
 
 | Constant | Purpose |
 |---|---|
 | `BASE_URL` | `https://www.paytouch.in/` |
 | `BASE_URL_ADMIN` | `https://admin.paytouch.in/` |
-| `KEY_TOKEN` | SharedPrefs -- Bearer token |
-| `KEY_TOKEN_TYPE` | SharedPrefs -- token type (e.g. "Bearer") |
-| `KEY_USER_ID` | SharedPrefs -- user ID (non-empty = logged in) |
-| `KEY_MOBILE` | SharedPrefs -- logged-in user's mobile |
-| `KEY_EMAIL` | SharedPrefs -- logged-in user's email |
-| `KEY_WALLET_BALANCE` | SharedPrefs -- last known wallet balance |
-| `KEY_REFERRAL_CODE` | SharedPrefs -- user's referral code |
-| `EXTRA_FLOW_TYPE` | Intent extra -- OTP screen routing (RESET_PASSWORD or RESET_MPIN) |
-| `EXTRA_MOBILE` | Intent extra -- mobile number propagated through OTP and reset screens |
-| `FLOW_RESET_PASSWORD` | "RESET_PASSWORD" |
-| `FLOW_RESET_MPIN` | "RESET_MPIN" |
-| `EXTRA_FROM_PAYMENT` | Intent extra — `PaymentStatusActivity` → `LoadWalletActivity` (triggers data refresh) |
+| `KEY_TOKEN` | SharedPrefs — Bearer token |
+| `KEY_TOKEN_TYPE` | SharedPrefs — token type (e.g. "Bearer") |
+| `KEY_USER_ID` | SharedPrefs — user ID (non-empty = logged in) |
+| `KEY_MOBILE` | SharedPrefs — logged-in user's mobile |
+| `KEY_EMAIL` | SharedPrefs — logged-in user's email |
+| `KEY_WALLET_BALANCE` | SharedPrefs — last known wallet balance |
+| `KEY_REFERRAL_CODE` | SharedPrefs — user's referral code |
+| `EXTRA_FLOW_TYPE` | Intent extra — OTP screen routing |
+| `EXTRA_MOBILE` | Intent extra — mobile number through OTP + reset screens |
+| `FLOW_RESET_PASSWORD` | `"RESET_PASSWORD"` |
+| `FLOW_RESET_MPIN` | `"RESET_MPIN"` |
+| `EXTRA_FROM_PAYMENT` | Intent extra — `PaymentStatusActivity` → `LoadWalletActivity` (triggers refresh) |
 | `HDFC_STATUS_CHARGED` / `HDFC_STATUS_AUTHORIZED` | HDFC success statuses |
 | `HDFC_STATUS_NEW` | HDFC order created, payment not yet attempted |
-| `HDFC_STATUS_PENDING_VBV` / `HDFC_STATUS_AUTHORIZING` / `HDFC_STATUS_STARTED` | HDFC in-progress statuses |
-| `HDFC_STATUS_JUSPAY_DECLINED` / `HDFC_STATUS_AUTHENTICATION_FAILED` / `HDFC_STATUS_AUTHORIZATION_FAILED` / `HDFC_STATUS_AUTO_REFUNDED` | HDFC failure statuses |
-| `HDFC_ORDER_PURPOSE_WALLET_TOPUP` | `"wallet_topup"` — default `purpose` field in `HdfcCreateOrderRequest` |
 
 ---
 
@@ -399,24 +449,26 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | Module | README |
 |---|---|
 | Auth | `app/src/main/java/.../auth/README.md` |
-| Electricity | `app/src/main/java/.../electricity/README.md` (canonical bill-payment module reference) |
-| Gas | `app/src/main/java/.../gas/README.md` (mirrors Electricity -- read Electricity's README first) |
-| Mobile Prepaid | `app/src/main/java/.../prepaid/README.md` (adds plan selection + circle picker vs Gas/Electricity) |
-| Mobile Postpaid | `app/src/main/java/.../postpaid/README.md` (shares `PrepaidPlanSelectionActivity`; status searches by transaction ID) |
-| DTH | `app/src/main/java/.../dth/README.md` (plan-selection module; isMobileCategory = true; mirrors Prepaid flow) |
-| FASTag | `app/src/main/java/.../fastag/README.md` (no bill-fetch; vehicle number; real-time fee; no operator pre-load in recent transactions) |
-| Loan Repayment | `app/src/main/java/.../loan/README.md` (bill-fetch pattern like Gas; circleId = "0"; flat payment response; no ccf field) |
-| Municipal Tax | `app/src/main/java/.../municipaltax/README.md` (bill-fetch pattern; transaction-status routes via mobile-recharge endpoint — intentional) |
-| My Account | `app/src/main/java/.../myaccount/README.md` (two-tab profile viewer; Account Info from KYC data; Refer & Earn with copy/share) |
-| Load Wallet | `app/src/main/java/.../loadwallet/README.md` (HDFC WebView payment; wallet balance + virtual account; paginated wallet transaction history) |
+| KYC (Onboarding) | `app/src/main/java/.../kyc/README.md` |
+| Electricity | `app/src/main/java/.../electricity/README.md` — **canonical bill-payment template** |
+| Gas | `app/src/main/java/.../gas/README.md` (mirrors Electricity) |
+| Mobile Prepaid | `app/src/main/java/.../prepaid/README.md` |
+| Mobile Postpaid | `app/src/main/java/.../postpaid/README.md` |
+| DTH | `app/src/main/java/.../dth/README.md` |
+| FASTag | `app/src/main/java/.../fastag/README.md` |
+| Loan Repayment | `app/src/main/java/.../loan/README.md` |
+| Municipal Tax | `app/src/main/java/.../municipaltax/README.md` |
+| My Account | `app/src/main/java/.../myaccount/README.md` |
+| Load Wallet | `app/src/main/java/.../loadwallet/README.md` |
 
 ---
 
 ## Docs
 
-| File | What it contains |
-|---|---|
-| `docs/caveman.md` | Plain-English system overview -- read first on any new task |
-| `docs/business_logic.md` | Domain rules, fee tiers, routing flags, field validation |
-| `docs/dos_and_donts.md` | Hard architecture and coding constraints |
-| `docs/screens_and_navigation.md` | Navigation graph, back-stack rules, intent extras |
+| File | What it contains | Read when |
+|---|---|---|
+| `docs/caveman.md` | Plain-English system overview — read first on any new task | Always first |
+| `docs/business_logic.md` | Domain rules, fee tiers, routing flags, field validation | Before any feature or data-related code |
+| `docs/dos_and_donts.md` | Hard architecture and coding constraints | Before any structural or architectural decision |
+| `docs/screens_and_navigation.md` | Navigation graph, back-stack rules, intent extras | Before implementing a new screen or navigation flow |
+| `docs/no_internet_handling.md` | Offline behavior strategy | Before touching connectivity handling |

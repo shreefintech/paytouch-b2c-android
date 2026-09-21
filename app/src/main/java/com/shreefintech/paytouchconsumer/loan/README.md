@@ -6,6 +6,37 @@ Handles the full loan repayment flow: operator selection, account number entry, 
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.loan`
+Transaction screens: `loan/transactions/` | ViewModels: `loan/viewmodel/`
+
+**Pattern:** Bill-fetch — operator → account/loan number → `POST /api/loanrepayment/fetch-bill` → confirm → pay
+
+**First files to open:**
+1. `LoanActivity.kt` — same layout structure as `GasActivity`; "consumer number" label → "account number"
+2. `viewmodel/LoanViewModel.kt` — extends `BaseBillViewModel`; note the operator response is a `Map<String, String>` not a list
+3. `retrofit/model/loan/` folder — Loan-specific DTOs; note `LoanOperatorsDataItem` has `operators: Map<String, String>`
+4. `transactions/LoanRecentTransactionActivity.kt` — operators pre-loaded from map before transactions fetch
+
+**Shared components this module uses (outside `loan/`):**
+- `adapter/RecentTransactionAdp.kt` + `adapter/TransactionAdp.kt`
+- `transactions/model/RecentTransactionItem.kt` + `TransactionItem.kt`
+- `transactions/TransactionDetailActivity.kt`
+- `utill/TransactionFilterHelper.kt` + `utill/ReceiptHelper.kt`
+- `BaseBillViewModel.kt`
+
+**Launched from:** `HomeActivity` → `binding.cardLoan` click handler
+
+**Key Loan-specific points:**
+- Operator response is a `Map<String, String>` (ID → name) — not a list like other modules; converted to a list in `LoanViewModel.loadOperators()`
+- Fetch-bill returns `General<List<LoanBillItem>>` — use `.firstOrNull()` for the single result
+- `circleId` is hardcoded to `Constant.LOAN_CIRCLE_ID = "0"` (same as Gas, different from Electricity's `"00"`)
+- No `ccf` field in `LoanLatestPaymentDataItem` — use `platformFee` directly for the CCF row in receipt
+- `type = "loan_repayment"` for the unified transactions endpoint
+
+---
+
 ## Screens & ViewModels
 
 | Activity | ViewModel | Purpose |

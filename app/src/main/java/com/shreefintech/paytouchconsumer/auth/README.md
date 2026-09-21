@@ -4,6 +4,26 @@ Handles all pre-login screens: splash routing, login, account creation, OTP veri
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.auth`
+
+**First files to open:**
+1. `SplashActivity.kt` — app entry point; validates saved session, routes to login / KYC / home
+2. `LoginActivity.kt` — password + MPIN tab login, forgot-password link, register link
+3. `viewmodel/LoginViewModel.kt` — login API call, post-login flag routing, VPS fire-and-forget
+4. `viewmodel/SplashViewModel.kt` — `GET /api/user` and `requires_kyc` / `requires_mpin` routing logic
+
+**Launched from:** `SplashActivity` is the `android:exported="true"` launcher Activity in `AndroidManifest.xml`
+
+**Session state lives in:** `utill/SharedPreferenceHelper.kt` — `isLoggedIn()` returns `true` only when both `KEY_TOKEN` and `KEY_USER_ID` are non-empty
+
+**Global 401 handling:** `retrofit/SessionInterceptor.kt` intercepts all responses — on 401 it clears all SharedPreferences and relaunches `LoginActivity` with a clear back stack. No per-screen handling needed.
+
+**Debug tip:** If the app always opens at SplashActivity and looks stuck, clear app data on the emulator (Settings → Apps → PayTouch → Clear Data) to reset the session.
+
+---
+
 ## Screens & ViewModels
 
 | Activity | ViewModel | Purpose |

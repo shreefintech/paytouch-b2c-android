@@ -6,6 +6,38 @@ Handles mobile postpaid bill payment: operator selection, circle selection, mobi
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.postpaid`
+Transaction screens: `postpaid/transactions/` | ViewModels: `postpaid/viewmodel/`
+
+**Pattern:** Bill-fetch + circle — operator + circle → mobile number → `POST /api/mobile-postpaid/fetch-bill` → confirm → pay
+
+**First files to open:**
+1. `PostpaidActivity.kt` — operator dropdown, circle picker (local `Utility.STATE_LIST`), mobile number, fetch + proceed buttons
+2. `viewmodel/PostpaidViewModel.kt` — extends `BaseBillViewModel`; bill-fetch then `process-payment`
+3. `retrofit/model/postpaid/` folder — Postpaid-specific DTOs
+4. `prepaid/PrepaidPlanSelectionActivity.kt` — **shared from the prepaid module** (not duplicated here)
+
+**Shared components this module uses (outside `postpaid/`):**
+- `prepaid/PrepaidPlanSelectionActivity.kt` — shared; do NOT create a `PostpaidPlanSelectionActivity`
+- `adapter/RecentTransactionAdp.kt` + `adapter/TransactionAdp.kt`
+- `transactions/model/RecentTransactionItem.kt` + `TransactionItem.kt`
+- `transactions/TransactionDetailActivity.kt`
+- `utill/TransactionFilterHelper.kt` + `utill/ReceiptHelper.kt`
+- `BaseBillViewModel.kt`
+
+**Launched from:** `HomeActivity` → `binding.cardPostpaid` click handler
+
+**Key differences from Prepaid:**
+- Has a bill-fetch step (Prepaid does not)
+- Status screen searches by **transaction ID** (Prepaid searches by mobile number)
+- `type = "mobile_postpaid"` for the unified transactions endpoint
+- `isMobileCategory = true` in all mapping functions
+- The SMS receipt has two tabs when opened from recent transactions: Receipt + Display
+
+---
+
 ## Screens & ViewModels
 
 | Activity | ViewModel | Purpose |

@@ -6,6 +6,37 @@ Handles mobile prepaid recharge: operator selection, circle selection, plan brow
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.prepaid`
+Transaction screens: `prepaid/transactions/` | ViewModels: `prepaid/viewmodel/`
+
+**Pattern:** Plan-select — operator + circle → browse/enter amount (or pick a plan) → pay (no bill-fetch step)
+
+**First files to open:**
+1. `PrepaidActivity.kt` — operator dropdown, circle picker (local `STATE_LIST`), mobile number, amount or plan button
+2. `PrepaidPlanSelectionActivity.kt` — plan browser; launched via `ActivityResultLauncher`; also shared by Postpaid module
+3. `viewmodel/PrepaidViewModel.kt` — extends `BaseBillViewModel`; `process-direct` (not `process-payment`)
+4. `viewmodel/PrepaidPlanSelectionViewModel.kt` — fetches plans for selected operator + circle
+
+**Shared components this module uses (outside `prepaid/`):**
+- `adapter/PrepaidPlanAdp.kt` — plan list (Prepaid-specific adapter, lives in `adapter/`)
+- `adapter/RecentTransactionAdp.kt` + `adapter/TransactionAdp.kt`
+- `transactions/model/RecentTransactionItem.kt` + `TransactionItem.kt`
+- `transactions/TransactionDetailActivity.kt`
+- `utill/TransactionFilterHelper.kt` + `utill/ReceiptHelper.kt`
+- `BaseBillViewModel.kt`
+
+**Launched from:** `HomeActivity` → `binding.cardPrepaid` click handler
+
+**Key differences to remember:**
+- Circle list is a hardcoded local `STATE_LIST` — no API call
+- `isMobileCategory = true` in all `mapToTransactionItem()` calls
+- Status screen searches by **mobile number**, not transaction ID
+- `type = "mobile_recharge"` for the unified transactions endpoint (not "prepaid")
+
+---
+
 ## Screens & ViewModels
 
 | Activity | ViewModel | Purpose |

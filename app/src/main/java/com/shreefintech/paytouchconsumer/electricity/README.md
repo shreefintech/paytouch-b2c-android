@@ -2,6 +2,36 @@
 
 Handles the full electricity bill payment flow: operator selection, bill fetch, payment processing, and all transaction history screens.
 
+**This is the canonical bill-payment module.** Before building any new bill-payment module, read this README in full — every other bill-fetch module (Gas, Loan, Municipal Tax) mirrors this structure.
+
+---
+
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.electricity`
+Transaction screens: `electricity/transactions/` | ViewModels: `electricity/viewmodel/`
+
+**Pattern:** Bill-fetch — operator → consumer number → `POST /api/electricity/fetch-bill` → confirm bill card → pay
+
+**First files to open:**
+1. `ElectricityActivity.kt` — entry screen; all UI wiring, operator dropdown, fetch/proceed buttons
+2. `viewmodel/ElectricityViewModel.kt` — extends `BaseBillViewModel`; operator load, bill fetch, VPS/wallet balance check, process-payment
+3. `retrofit/model/electricity/` folder — request/response DTOs for all electricity endpoints
+4. `transactions/RecentTransactionActivity.kt` — paginated history; operators pre-loaded before transactions
+
+**Shared components this module uses (outside `electricity/`):**
+- `adapter/RecentTransactionAdp.kt` — recent transaction rows
+- `adapter/TransactionAdp.kt` — report and status rows
+- `transactions/model/RecentTransactionItem.kt` + `TransactionItem.kt` — display models (never duplicated here)
+- `transactions/TransactionDetailActivity.kt` — shared detail screen
+- `utill/TransactionFilterHelper.kt` — filter sheet setup and state
+- `utill/ReceiptHelper.kt` — receipt image download + share
+- `BaseBillViewModel.kt` — `checkVpsBalance()`, `checkWalletBalance()`, `bearerToken()`
+
+**Launched from:** `HomeActivity` → `binding.cardElectricity` click handler
+
+**Debug tip:** Filter Logcat by tag `CURL` to see every request as a curl command. The `CurlInterceptor` in `ApiClient` logs all requests in DEBUG builds.
+
 ---
 
 ## Screens & ViewModels

@@ -4,6 +4,29 @@ User profile viewer and referral/earn screen. Two tabs: **Account Info** (KYC-de
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.myaccount`
+
+**First files to open:**
+1. `MyAccountActivity.kt` — two-tab screen; both API calls triggered in `onCreate()` (no manual refresh)
+2. `viewmodel/MyAccountViewModel.kt` — extends `AndroidViewModel` (not `BaseBillViewModel`); two independent API calls
+3. `KycDetailsActivity.kt` — in this same package; opened from "View KYC Details" button; shows submitted KYC documents
+4. `retrofit/model/myaccount/` folder — `AccountInfoItem`, `ReferralInfoItem` and their data classes
+
+**Launched from:** `HomeActivity` → `binding.llMyAccount` click handler
+
+**ViewModel base class:** `AndroidViewModel` — this module has no bill-payment flow, so `BaseBillViewModel` is not used
+
+**Key things to know:**
+- Both tabs load their data up-front in `onCreate()` — tab switching is purely visual (no re-fetch)
+- Balance field format from server: `"100.00 [ Rupees One Hundred Only ]"` — split on `[` for separate amount and words display
+- `KycDetailsActivity` is in this package but calls `GET /api/dashboard-kyc/my-account` (same endpoint family as the KYC module)
+- `DocPreviewActivity` is also in this package — handles full-screen image/PDF preview of KYC documents
+- Clipboard copy uses `ClipboardManager` directly; share uses `Intent.ACTION_SEND` — no third-party libraries needed
+
+---
+
 ## Entry Point
 
 `MyAccountActivity` — launched from `HomeActivity` via `binding.llMyAccount`.

@@ -1,7 +1,7 @@
 # PayTouch Consumer — Screens & Navigation
 
 > **Status legend:** ✅ Implemented (UI + API) | 🔧 UI only (API pending) | 📋 Planned (not started)
-> **Current phase:** API wiring in progress. Core modules have live API integration.
+> All core modules are fully implemented with live API integration. Cable TV is the only remaining planned module.
 
 ---
 
@@ -192,8 +192,9 @@
 - App launch (already onboarded)
 
 **Exit points:**
-- Category tile tap → respective category screen (planned)
+- Category tile tap → respective category screen (all implemented modules are wired; Cable TV tile is a TODO placeholder)
 - "Load Wallet" tap → `LoadWalletActivity`
+- "My Account" tile → `MyAccountActivity`
 
 **Key UI elements:**
 - Toolbar with PayTouch logo and back button
@@ -485,7 +486,7 @@ Session check (read SharedPreferences)
                LoanActivity ✅             MunicipalTaxActivity ✅    MyAccountActivity ✅
                            │                              │                    │
                Recent Report Status Receipt  Recent Report Status Receipt   Account Info + Refer & Earn
-                Txns                          Txns                           TODO(B2C-81): KycDetailsActivity 📋
+                Txns                          Txns                           KycDetailsActivity ✅
                 ✅    ✅    ✅    ✅             ✅    ✅    ✅    ✅
 
                LoadWalletActivity ✅ ("Load Wallet" button)

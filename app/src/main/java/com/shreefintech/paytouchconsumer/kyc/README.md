@@ -4,6 +4,29 @@ Handles the mandatory KYC onboarding flow: initiation, 4-step identity verificat
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.kyc`
+Sub-packages: `kyc/identity/` (4-step wizard), `kyc/bank/` (bank card submission)
+
+**First files to open:**
+1. `KycActivity.kt` — hub that fetches KYC status first on every launch and routes accordingly; never navigates directly on first open
+2. `KycViewModel.kt` — all routing logic: initiate → section A → hub buttons → agree → status
+3. `identity/IdentityVerificationActivity.kt` — 4-step wizard; fragments driven by `currentStep` LiveData
+4. `bank/BankDetailsActivity.kt` — dynamic 1–4 bank card layout inflated into `llBankContainer`
+
+**Launched from:** `SplashActivity` / `LoginActivity` when `requires_kyc = true` on the session response
+
+**Enums used:** `KycSubmissionStatus`, `KycSectionStatus`, `ProofType`, `StatementPeriod` — all in `enums/`
+
+**After KYC completes:** User is routed to `ResetMpinActivity` (create MPIN mode), then `HomeActivity`
+
+**Viewing KYC after onboarding:** `myaccount/KycDetailsActivity` (not in this package) — calls `GET /api/dashboard-kyc/my-account`
+
+**Key quirk:** HTTP 422 from `initiateKyc` is treated as success (KYC was already initiated). Do not change this — see `KycViewModel.callInitiate()`.
+
+---
+
 ## Screens & ViewModels
 
 | Activity | ViewModel | Purpose |
