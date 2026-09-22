@@ -8,6 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MpinItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetCredentialRequest
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import retrofit2.Call
@@ -17,7 +18,7 @@ import retrofit2.Response
 class ResetMpinViewModel(application: Application) : AndroidViewModel(application) {
 
     fun changeMpin(
-        mobile: String,
+        resetToken: String,
         newMpin: String,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
@@ -28,7 +29,7 @@ class ResetMpinViewModel(application: Application) : AndroidViewModel(applicatio
             return
         }
         onLoading()
-        ApiClient.apiService.resetMpin(mobile, newMpin, newMpin)
+        ApiClient.apiService.resetCredential(ResetCredentialRequest(resetToken, "mpin", newMpin))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     if (response.isSuccessful && response.body()?.success == true) {
@@ -44,6 +45,7 @@ class ResetMpinViewModel(application: Application) : AndroidViewModel(applicatio
             })
     }
 
+    // TODO(B2C-147): createMpin endpoint pending backend confirmation
     fun createMpin(
         mpin: String,
         onLoading: () -> Unit,

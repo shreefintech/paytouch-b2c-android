@@ -2,13 +2,17 @@ package com.shreefintech.paytouchconsumer.retrofit
 
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
-import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
-import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.ForgotCredentialRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MpinItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetCredentialRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetTokenDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.VerifyOtpRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPaymentItem
@@ -92,12 +96,11 @@ import com.shreefintech.paytouchconsumer.retrofit.model.transactions.Transaction
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -109,95 +112,52 @@ import retrofit2.http.Query
 interface ApiService {
 
     companion object {
-        const val AUTH = "api/"
+        const val AUTH = "mobile/"
     }
 
     // ── Session ───────────────────────────────────────────────────────────────
 
-    @GET("${AUTH}user")
-    fun getUser(
+    @GET("${AUTH}auth/me")
+    fun getMe(
         @Header("Authorization") authorization: String
-    ): Call<UserProfileItem>
+    ): Call<General<MeDataItem>>
 
-    @POST("${AUTH}logout")
+    @POST("${AUTH}auth/logout")
     fun logout(
         @Header("Authorization") authorization: String
     ): Call<MessageItem>
 
     // ── Authentication ────────────────────────────────────────────────────────
 
-    @FormUrlEncoded
-    @POST("${AUTH}login")
-    fun loginWithPassword(
-        @Field("mobile") mobile: String,
-        @Field("password") password: String
-    ): Call<LoginItem>
+    @POST("${AUTH}auth/login")
+    fun login(
+        @Body request: LoginRequest
+    ): Call<General<LoginDataItem>>
 
-    @FormUrlEncoded
-    @POST("${AUTH}login")
-    fun loginWithMpin(
-        @Field("mobile") mobile: String,
-        @Field("mpin") mpin: String
-    ): Call<LoginItem>
-
-    @FormUrlEncoded
-    @POST("${AUTH}register")
+    @POST("${AUTH}auth/register")
     fun register(
-        @Field("name") name: String,
-        @Field("mobile") mobile: String,
-        @Field("email") email: String,
-        @Field("password") password: String,
-        @Field("password_confirmation") passwordConfirmation: String,
-        @Field("referral_code") referralCode: String
-    ): Call<RegisterItem>
+        @Body request: RegisterRequest
+    ): Call<General<LoginDataItem>>
 
-    // ── Forgot Password OTP flow ──────────────────────────────────────────────
+    // ── Forgot Credential (unified OTP flow) ──────────────────────────────────
 
-    @FormUrlEncoded
-    @POST("${AUTH}password/send-otp")
-    fun sendPasswordOtp(
-        @Field("mobile") mobile: String
+    @POST("${AUTH}auth/forgot-credential")
+    fun sendForgotCredentialOtp(
+        @Body request: ForgotCredentialRequest
     ): Call<MessageItem>
 
-    @FormUrlEncoded
-    @POST("${AUTH}password/verify-otp")
-    fun verifyPasswordOtp(
-        @Field("mobile") mobile: String,
-        @Field("otp") otp: String
+    @POST("${AUTH}auth/forgot-credential/verify-otp")
+    fun verifyForgotCredentialOtp(
+        @Body request: VerifyOtpRequest
+    ): Call<General<ResetTokenDataItem>>
+
+    @POST("${AUTH}auth/forgot-credential/reset")
+    fun resetCredential(
+        @Body request: ResetCredentialRequest
     ): Call<MessageItem>
 
-    @FormUrlEncoded
-    @POST("${AUTH}password/reset")
-    fun resetPassword(
-        @Field("mobile") mobile: String,
-        @Field("new_password") newPassword: String,
-        @Field("new_password_confirmation") newPasswordConfirmation: String
-    ): Call<MessageItem>
-
-    // ── Forgot MPIN OTP flow ──────────────────────────────────────────────────
-
-    @FormUrlEncoded
-    @POST("${AUTH}mpin/send-otp")
-    fun sendMpinOtp(
-        @Field("mobile") mobile: String
-    ): Call<MessageItem>
-
-    @FormUrlEncoded
-    @POST("${AUTH}mpin/verify-otp")
-    fun verifyMpinOtp(
-        @Field("mobile") mobile: String,
-        @Field("otp") otp: String
-    ): Call<MessageItem>
-
-    @FormUrlEncoded
-    @POST("${AUTH}mpin/reset")
-    fun resetMpin(
-        @Field("mobile") mobile: String,
-        @Field("new_mpin") newMpin: String,
-        @Field("new_mpin_confirmation") newMpinConfirmation: String
-    ): Call<MessageItem>
-
-    @POST("${AUTH}mpin/create")
+    // TODO(B2C-147): createMpin endpoint path unconfirmed — update when backend finalises
+    @POST("${AUTH}auth/mpin/create")
     fun createMpin(
         @Header("Authorization") token: String,
         @Body body: CreateMpinRequest
@@ -509,6 +469,7 @@ interface ApiService {
         @Body request: MunicipalTaxProcessPaymentRequest
     ): Call<MunicipalTaxPaymentItem>
 
+    // Confirmed backend quirk: municipal tax transaction-status routes through mobile-recharge endpoint
     @POST("${AUTH}mobile-recharge/transaction-status")
     fun getMunicipalTaxTransactionStatus(
         @Header("Authorization") authorization: String,

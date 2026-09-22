@@ -13,7 +13,6 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
 import com.shreefintech.paytouchconsumer.kyc.KycActivity
-import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -24,7 +23,8 @@ class SplashActivity : BaseActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private var sessionData: UserProfileItem? = null
+    private var sessionValid = false
+    private var nextStep: String? = null
     private var apiFinished = false
     private var timerFinished = false
 
@@ -52,7 +52,8 @@ class SplashActivity : BaseActivity() {
     private fun startFlow() {
         apiFinished = false
         timerFinished = false
-        sessionData = null
+        sessionValid = false
+        nextStep = null
         handler.removeCallbacks(timerRunnable)
         handler.postDelayed(timerRunnable, 5000L)
         fetchSession()
@@ -60,7 +61,7 @@ class SplashActivity : BaseActivity() {
 
     private fun fetchSession() {
         if (!SharedPreferenceHelper.isLoggedIn(mActivity)) {
-            onApiDone(null)
+            onApiDone(false, null)
             return
         }
         if (!Utility.isInternetAvailable(mActivity)) {
@@ -72,23 +73,24 @@ class SplashActivity : BaseActivity() {
         val tokenType = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN_TYPE, "Bearer") ?: "Bearer"
         viewModel.validateSession(
             authorization = "$tokenType $token",
-            onSuccess = { data -> onApiDone(data) },
-            onError = { onApiDone(null) }
+            onSuccess = { step -> onApiDone(true, step) },
+            onError = { onApiDone(false, null) }
         )
     }
 
-    private fun onApiDone(data: UserProfileItem?) {
-        sessionData = data
+    private fun onApiDone(valid: Boolean, step: String?) {
+        sessionValid = valid
+        nextStep = step
         apiFinished = true
         if (timerFinished) redirect()
     }
 
     private fun redirect() {
         val intent = when {
-            sessionData?.requiresKyc == true  -> Intent(mActivity, KycActivity::class.java)
-            sessionData?.requiresMpin == true -> ResetMpinActivity.buildCreateIntent(mActivity)
-            sessionData != null               -> Intent(mActivity, HomeActivity::class.java)
-            else                              -> Intent(mActivity, LoginActivity::class.java)
+            !sessionValid                                        -> Intent(mActivity, LoginActivity::class.java)
+            nextStep == "kyc_required" ||
+            nextStep == "pending_approval"                       -> Intent(mActivity, KycActivity::class.java)
+            else                                                 -> Intent(mActivity, HomeActivity::class.java)
         }
         navigate(intent)
     }

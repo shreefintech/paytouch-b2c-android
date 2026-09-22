@@ -6,6 +6,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetCredentialRequest
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
@@ -15,7 +16,7 @@ class ResetPasswordViewModel : ViewModel() {
 
     fun changePassword(
         context: Context,
-        mobile: String,
+        resetToken: String,
         newPassword: String,
         onLoading: () -> Unit,
         onSuccess: () -> Unit,
@@ -26,7 +27,7 @@ class ResetPasswordViewModel : ViewModel() {
             return
         }
         onLoading()
-        ApiClient.apiService.resetPassword(mobile, newPassword, newPassword)
+        ApiClient.apiService.resetCredential(ResetCredentialRequest(resetToken, "password", newPassword))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     if (response.isSuccessful && response.body()?.success == true) {

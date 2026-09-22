@@ -7,9 +7,10 @@ object Constant {
     // swap BASE_URL to LOCAL_URL for local testing only — never commit that swap
     const val LOCAL_URL = "https://tablet-frying-shy.ngrok-free.dev/"
 
-    const val LIVE_URL = "https://www.paytouch.in/"
+    const val LIVE_URL = "https://backend-b2c.paytouch.in/api/"
     const val BASE_URL = LIVE_URL
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
+    const val CHANNEL = "mobile/"
 
     // AUTH store keys
     const val KEY_TOKEN = "TOKEN"
@@ -38,6 +39,7 @@ object Constant {
     // Auth flow type extras
     const val EXTRA_FLOW_TYPE = "FLOW_TYPE"
     const val EXTRA_MOBILE = "EXTRA_MOBILE"
+    const val EXTRA_RESET_TOKEN = "EXTRA_RESET_TOKEN"
     const val FLOW_RESET_PASSWORD = "RESET_PASSWORD"
     const val FLOW_RESET_MPIN = "RESET_MPIN"
 
