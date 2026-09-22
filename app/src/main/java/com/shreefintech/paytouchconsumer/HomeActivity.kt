@@ -78,7 +78,6 @@ class HomeActivity : BaseActivity() {
             layoutInflater, R.layout.dialog_confirm_logout, null, false
         )
         logoutDialogBinding = dialogBinding
-        dialogBinding.onClickListener = onClickListener()
         dialogBinding.showProgress = showProgressLogout
 
         val dialog = Dialog(mActivity)

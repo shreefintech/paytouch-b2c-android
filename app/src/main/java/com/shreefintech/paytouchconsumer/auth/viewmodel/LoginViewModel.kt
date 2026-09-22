@@ -61,6 +61,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private fun saveSession(data: LoginItem) {
         SharedPreferenceHelper.setSharedPreferenceString(
             getApplication(),
+            Constant.KEY_LAST_INTERACTION,
+            System.currentTimeMillis().toString()
+        )
+        SharedPreferenceHelper.setSharedPreferenceString(
+            getApplication(),
             Constant.KEY_TOKEN,
             data.token ?: ""
         )
