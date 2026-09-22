@@ -362,12 +362,26 @@
                                     android:textColor="?attr/colorTextHint"
                                     android:textSize="@dimen/text_size_12" />
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:id="@+id/ivStateArrow"
-                                    android:layout_width="14dp"
-                                    android:layout_height="14dp"
-                                    android:src="@drawable/ic_down_arrow"
-                                    android:tint="@color/primary" />
+                                <FrameLayout
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivStateArrow"
+                                        android:layout_width="14dp"
+                                        android:layout_height="14dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_down_arrow"
+                                        android:tint="@color/primary" />
+
+                                    <ProgressBar
+                                        android:id="@+id/pbStateLoading"
+                                        style="?android:attr/progressBarStyleSmall"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:indeterminateTint="@color/primary"
+                                        android:visibility="gone" />
+                                </FrameLayout>
                             </LinearLayout>
                         </FrameLayout>
 

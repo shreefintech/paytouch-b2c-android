@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.retrofit
 
 import com.shreefintech.paytouchconsumer.retrofit.model.General
+import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
@@ -301,6 +302,13 @@ interface ApiService {
     fun getGasLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<GasVerifyPaymentDataItem>>
+
+    // ── General ───────────────────────────────────────────────────────────────
+
+    @GET("${AUTH}states")
+    fun getStates(
+        @Header("Authorization") authorization: String
+    ): Call<General<List<StateItem>>>
 
     // ── Mobile Prepaid ────────────────────────────────────────────────────────
 

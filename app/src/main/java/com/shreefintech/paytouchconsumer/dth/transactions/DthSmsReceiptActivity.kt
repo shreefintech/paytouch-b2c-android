@@ -134,6 +134,7 @@ class DthSmsReceiptActivity : BaseActivity() {
             },
             onError = { msg ->
                 showProgressReceipt.set(false)
+                showEmpty()
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )
@@ -228,8 +229,8 @@ class DthSmsReceiptActivity : BaseActivity() {
     }
 
     private fun showEmpty() {
-        binding.flCard.visibility     = View.GONE
-        binding.tvEmpty.visibility    = View.VISIBLE
+        binding.llCardContent.visibility = View.GONE
+        binding.tvNoData.visibility      = View.VISIBLE
     }
 
     private fun selectTab(tab: Int) {

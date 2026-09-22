@@ -348,7 +348,6 @@ class LoadWalletActivity : BaseActivity() {
         hideNoInternet()
         fetchWalletData()
         fetchRecentHistory()
-        fetchBankName()
     }
 
     private fun validateAndShowConfirmDialog() {
@@ -485,13 +484,6 @@ class LoadWalletActivity : BaseActivity() {
         )
     }
 
-    private fun fetchBankName() {
-        viewModel.fetchBankName(
-            onSuccess = { bankName -> binding.tvBankName.text = bankName ?: "--" },
-            onError = { binding.tvBankName.text = "--" }
-        )
-    }
-
     private fun showLoading() {
         binding.viewDimmer.visibility = View.VISIBLE
         binding.pbLoading.visibility = View.VISIBLE
@@ -509,6 +501,7 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
         binding.tvIfscCode.text = data.ifsc ?: "--"
+        binding.tvBankName.text = data.bankName ?: "--"
         Glide.with(mActivity as Context)
             .load(data.qrCodeUrl)
             .placeholder(R.drawable.ic_qr)

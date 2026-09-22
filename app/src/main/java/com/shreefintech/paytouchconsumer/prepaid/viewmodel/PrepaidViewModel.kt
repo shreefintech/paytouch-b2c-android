@@ -7,6 +7,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
+import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPaymentItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidProcessDirectRequest
@@ -19,6 +20,39 @@ import retrofit2.Response
 class PrepaidViewModel(application: Application) : BaseBillViewModel(application) {
 
     // ── Public API ────────────────────────────────────────────────────────────
+
+    fun loadStates(
+        onLoading: () -> Unit,
+        onSuccess: (List<StateItem>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        onLoading()
+        ApiClient.apiService.getStates(bearerToken())
+            .enqueue(object : Callback<General<List<StateItem>>> {
+                override fun onResponse(
+                    call: Call<General<List<StateItem>>>,
+                    response: Response<General<List<StateItem>>>
+                ) {
+                    if (response.isSuccessful && response.body()?.data != null) {
+                        onSuccess(response.body()!!.data!!)
+                    } else {
+                        onError(
+                            ApiHelper.parseErrorMessage(
+                                getApplication(), response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<General<List<StateItem>>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+    }
 
     fun loadOperators(
         onLoading: () -> Unit,

@@ -148,6 +148,7 @@
             app:layout_constraintTop_toBottomOf="@id/llTitleRow">
 
             <LinearLayout
+                android:id="@+id/llCardContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -174,7 +175,7 @@
                             android:id="@+id/llReceiptContent"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:visibility="gone"
+                            android:visibility="visible"
                             android:orientation="vertical">
 
                             <ProgressBar
@@ -247,7 +248,7 @@
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelConsumerNo"
                                             android:textColor="?attr/colorTextSubtitle"
@@ -279,7 +280,7 @@
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelCustomerName"
                                             android:textColor="?attr/colorTextSubtitle"
@@ -291,7 +292,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
                                             android:textAlignment="viewEnd"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/text_size_13"
@@ -311,7 +312,7 @@
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelCompanyName"
                                             android:textColor="?attr/colorTextSubtitle"
@@ -323,7 +324,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
                                             android:textAlignment="viewEnd"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:maxLines="2"
                                             android:textColor="@color/black"
@@ -353,7 +354,7 @@
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelTransactionDate"
                                             android:textColor="?attr/colorTextSubtitle"
@@ -365,7 +366,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
                                             android:textAlignment="viewEnd"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/text_size_13"
@@ -385,7 +386,7 @@
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelAmountPaid"
                                             android:textColor="?attr/colorTextSubtitle"
@@ -436,7 +437,7 @@
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelPaytouchTxnId"
                                             android:textColor="?attr/colorTextSubtitle"
@@ -448,7 +449,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
                                             android:textAlignment="viewEnd"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/text_size_13"
@@ -469,7 +470,7 @@
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelBConnectTxnId"
                                             android:textColor="?attr/colorTextSubtitle"
@@ -479,7 +480,7 @@
                                             android:id="@+id/tvBConnectTxnId"
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:layout_weight="1"
                                             android:textAlignment="viewEnd"
@@ -501,7 +502,7 @@
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelCcf"
                                             android:textColor="?attr/colorTextSubtitle"
@@ -511,7 +512,7 @@
                                             android:id="@+id/tvCcf"
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:layout_weight="1"
                                             android:textAlignment="viewEnd"
@@ -534,7 +535,7 @@
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
-                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
                                             android:includeFontPadding="false"
                                             android:text="@string/labelStatus"
                                             android:textColor="?attr/colorTextSubtitle"
@@ -575,7 +576,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
-                            android:visibility="visible"
+                            android:visibility="gone"
                             android:orientation="vertical">
 
                             <ProgressBar
@@ -917,22 +918,20 @@
                 </LinearLayout>
 
             </LinearLayout>
-        </FrameLayout>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvEmpty"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/proza_libre_regular"
-            android:includeFontPadding="false"
-            android:text="@string/msgTransactionNotFound"
-            android:textColor="?attr/colorTextSubtitle"
-            android:textSize="@dimen/text_size_14"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/llTitleRow" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNoData"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:fontFamily="@font/proza_libre_semi_bold"
+                android:includeFontPadding="false"
+                android:text="@string/msgNoDataFound"
+                android:textColor="?attr/colorTextSubtitle"
+                android:textSize="@dimen/text_size_14"
+                android:visibility="gone" />
+        </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

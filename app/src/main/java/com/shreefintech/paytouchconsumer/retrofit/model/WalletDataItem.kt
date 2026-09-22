@@ -13,6 +13,7 @@ data class WalletDataItem(
     @field:SerializedName("virtual_account_number") val virtualAccountNumber: String?,
     @field:SerializedName("vpa") val vpa: String?,
     @field:SerializedName("ifsc") val ifsc: String?,
+    @field:SerializedName("bank_name") val bankName: String?,
     @field:SerializedName("has_virtual_account") val hasVirtualAccount: Boolean?,
     @field:SerializedName("can_create_virtual_account") val canCreateVirtualAccount: Boolean?,
     @field:SerializedName("wallet") val wallet: WalletInfoItem?

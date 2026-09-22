@@ -322,55 +322,6 @@
                             </LinearLayout>
                         </FrameLayout>
 
-                        <!-- Select State row -->
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/margin_medium"
-                            android:fontFamily="@font/proza_libre_medium"
-                            android:includeFontPadding="false"
-                            android:text="@string/labelSelectState"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/text_size_12" />
-
-                        <FrameLayout
-                            android:id="@+id/flStateAnchor"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:background="@drawable/bg_form_field"
-                            android:foreground="?selectableItemBackground"
-                            android:onClickListener="@{onClickListener}"
-                            android:padding="@dimen/margin_small_medium">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvState"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:ellipsize="end"
-                                    android:fontFamily="@font/proza_libre_medium"
-                                    android:includeFontPadding="false"
-                                    android:maxLines="1"
-                                    android:text="@string/labelSelectState"
-                                    android:textColor="?attr/colorTextHint"
-                                    android:textSize="@dimen/text_size_12" />
-
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:id="@+id/ivStateArrow"
-                                    android:layout_width="14dp"
-                                    android:layout_height="14dp"
-                                    android:src="@drawable/ic_down_arrow"
-                                    android:tint="@color/primary" />
-                            </LinearLayout>
-                        </FrameLayout>
-
                         <!-- Mobile Number + Browse Plan -->
                         <LinearLayout
                             android:layout_width="match_parent"

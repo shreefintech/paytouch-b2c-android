@@ -116,7 +116,7 @@ class LoanActivity : BaseActivity() {
 
     private fun setupInputFilters() {
         val emojiFilter = Utility.EmojiExcludeFilter()
-        binding.etConsumerNumber.filters = arrayOf(Utility.digitFilter(), emojiFilter)
+        binding.etConsumerNumber.filters = arrayOf(emojiFilter)
         binding.etAmount.filters = arrayOf(emojiFilter)
     }
 
@@ -269,9 +269,9 @@ class LoanActivity : BaseActivity() {
 
     private fun showBillDetails() {
         val bill = fetchedBillItem ?: return
-        binding.tvBillCustomerName.text = bill.customerName ?: "-"
-        binding.tvBillDueDate.text = bill.dueDate ?: "-"
-        binding.tvBillDate.text = bill.billDate ?: "-"
+        binding.tvBillCustomerName.text = bill.userName ?: "-"
+        binding.llBillDueDateRow.visibility = View.GONE
+        binding.llBillDateRow.visibility = View.GONE
         binding.tvBillAmount.text = Utility.formatAmount(bill.billAmount)
         binding.tvBillConnectionNumber.text = binding.etConsumerNumber.text?.toString()?.trim() ?: "-"
         binding.tvBillOperator.text = selectedOperatorName ?: "-"
