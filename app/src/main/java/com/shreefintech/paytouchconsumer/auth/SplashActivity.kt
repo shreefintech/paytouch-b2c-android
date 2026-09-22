@@ -13,6 +13,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
 import com.shreefintech.paytouchconsumer.kyc.KycActivity
+import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -24,7 +25,7 @@ class SplashActivity : BaseActivity() {
     private val handler = Handler(Looper.getMainLooper())
 
     private var sessionValid = false
-    private var nextStep: String? = null
+    private var nextStep: NextStep? = null
     private var apiFinished = false
     private var timerFinished = false
 
@@ -80,17 +81,17 @@ class SplashActivity : BaseActivity() {
 
     private fun onApiDone(valid: Boolean, step: String?) {
         sessionValid = valid
-        nextStep = step
+        nextStep = NextStep.from(step)
         apiFinished = true
         if (timerFinished) redirect()
     }
 
     private fun redirect() {
         val intent = when {
-            !sessionValid                                        -> Intent(mActivity, LoginActivity::class.java)
-            nextStep == "kyc_required" ||
-            nextStep == "pending_approval"                       -> Intent(mActivity, KycActivity::class.java)
-            else                                                 -> Intent(mActivity, HomeActivity::class.java)
+            !sessionValid                                                                -> Intent(mActivity, LoginActivity::class.java)
+            nextStep == NextStep.KYC_REQUIRED || nextStep == NextStep.PENDING_APPROVAL  -> Intent(mActivity, KycActivity::class.java)
+            // TODO(B2C-147): nextStep == NextStep.MPIN_REQUIRED → ResetMpinActivity.buildCreateIntent(mActivity)
+            else                                                                        -> Intent(mActivity, HomeActivity::class.java)
         }
         navigate(intent)
     }

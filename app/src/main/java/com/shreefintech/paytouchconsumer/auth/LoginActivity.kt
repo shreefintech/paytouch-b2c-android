@@ -23,6 +23,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.LoginViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoginBinding
 import com.shreefintech.paytouchconsumer.enums.LoginMode
+import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
@@ -250,9 +251,10 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun navigateAfterLogin(data: LoginDataItem?) {
-        val intent = when (data?.nextStep) {
-            "kyc_required", "pending_approval" -> Intent(mActivity, KycActivity::class.java)
-            else                               -> Intent(mActivity, HomeActivity::class.java)
+        val intent = when (NextStep.from(data?.nextStep)) {
+            NextStep.KYC_REQUIRED, NextStep.PENDING_APPROVAL -> Intent(mActivity, KycActivity::class.java)
+            // TODO(B2C-147): NextStep.MPIN_REQUIRED → ResetMpinActivity.buildCreateIntent(mActivity)
+            else                                             -> Intent(mActivity, HomeActivity::class.java)
         }
         startActivity(intent)
         finishAffinity()

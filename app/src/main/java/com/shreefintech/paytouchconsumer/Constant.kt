@@ -10,7 +10,7 @@ object Constant {
     const val LIVE_URL = "https://backend-b2c.paytouch.in/api/"
     const val BASE_URL = LIVE_URL
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
-    const val CHANNEL = "mobile/"
+
 
     // AUTH store keys
     const val KEY_TOKEN = "TOKEN"

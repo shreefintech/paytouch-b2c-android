@@ -41,17 +41,16 @@ class CreateAccountViewModel : ViewModel() {
                 call: Call<General<LoginDataItem>>,
                 response: Response<General<LoginDataItem>>
             ) {
-                if (response.isSuccessful) {
-                    response.body()?.data?.let { data ->
-                        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_TOKEN, data.token ?: "")
-                        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_TOKEN_TYPE, data.tokenType ?: "")
-                        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_WALLET_BALANCE, "0.00")
-                        data.user?.let { user ->
-                            SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_USER_ID, user.id?.toString() ?: "")
-                            SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_MOBILE, user.mobile ?: "")
-                            SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_EMAIL, user.email ?: "")
-                            SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_REFERRAL_CODE, user.referralCode ?: "")
-                        }
+                if (response.isSuccessful && response.body()?.data != null) {
+                    val data = response.body()!!.data!!
+                    SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_TOKEN, data.token ?: "")
+                    SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_TOKEN_TYPE, data.tokenType ?: "")
+                    SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_WALLET_BALANCE, "0.00")
+                    data.user?.let { user ->
+                        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_USER_ID, user.id?.toString() ?: "")
+                        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_MOBILE, user.mobile ?: "")
+                        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_EMAIL, user.email ?: "")
+                        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_REFERRAL_CODE, user.referralCode ?: "")
                     }
                     onSuccess()
                 } else {
