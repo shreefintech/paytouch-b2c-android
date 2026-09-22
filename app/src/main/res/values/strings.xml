@@ -211,6 +211,8 @@
     <string name="labelCompany">Company</string>
     <string name="hintSelectCompany">Select Company</string>
     <string name="labelConsumerNumber">Consumer Number</string>
+    <string name="labelLoanAccountNumber">Loan Account Number</string>
+    <string name="hintLoanAccountNumber">Enter Loan Account Number</string>
     <string name="hintConsumerNumber">Enter Consumer Number</string>
     <string name="hintPropertyNumber">Enter Property Number</string>
     <string name="labelAmount">Amount</string>

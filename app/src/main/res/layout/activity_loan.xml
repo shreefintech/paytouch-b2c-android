@@ -343,7 +343,7 @@
                                     android:fontFamily="@font/proza_libre_medium"
                                     android:includeFontPadding="false"
                                     android:maxLines="1"
-                                    android:text="@string/labelConsumerNumber"
+                                    android:text="@string/labelLoanAccountNumber"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_12" />
 
@@ -354,7 +354,7 @@
                                     android:layout_marginTop="4dp"
                                     android:background="@drawable/bg_form_field"
                                     android:fontFamily="@font/proza_libre_medium"
-                                    android:hint="@string/hintConsumerNumber"
+                                    android:hint="@string/hintLoanAccountNumber"
                                     android:inputType="text"
                                     android:padding="@dimen/margin_small_medium"
                                     android:textColor="@color/black"

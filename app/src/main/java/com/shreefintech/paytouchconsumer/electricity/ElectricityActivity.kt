@@ -307,11 +307,6 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
-        if (connectionNumber.length < 10) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
-            return
-        }
         Utility.hideKeyboard(mActivity)
         fetchBill(connectionNumber)
     }
@@ -321,11 +316,6 @@ class ElectricityActivity : BaseActivity() {
         if (connectionNumber.isEmpty()) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
-            return
-        }
-        if (connectionNumber.length < 10) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
             return
         }
         if (selectedOperatorId.isNullOrEmpty()) {

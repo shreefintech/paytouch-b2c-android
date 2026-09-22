@@ -307,11 +307,6 @@ class GasActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
-        if (consumerNumber.length < 10) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
-            return
-        }
         Utility.hideKeyboard(mActivity)
         fetchBill(consumerNumber)
     }
@@ -321,11 +316,6 @@ class GasActivity : BaseActivity() {
         if (consumerNumber.isEmpty()) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
-            return
-        }
-        if (consumerNumber.length < 10) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
             return
         }
         if (selectedOperatorId.isNullOrEmpty()) {
