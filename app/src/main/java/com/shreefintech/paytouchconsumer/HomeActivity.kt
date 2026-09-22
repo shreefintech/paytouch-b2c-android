@@ -78,7 +78,6 @@ class HomeActivity : BaseActivity() {
             layoutInflater, R.layout.dialog_confirm_logout, null, false
         )
         logoutDialogBinding = dialogBinding
-        dialogBinding.onClickListener = onClickListener()
         dialogBinding.showProgress = showProgressLogout
 
         val dialog = Dialog(mActivity)
@@ -95,41 +94,9 @@ class HomeActivity : BaseActivity() {
             logoutDialogBinding = null
         }
 
-        dialogBinding.onClickListener = View.OnClickListener { view ->
-            when (view) {
-                dialogBinding.btnLogout -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    if (showProgressLogout.get()) return@OnClickListener
-                    if (!Utility.isInternetAvailable(mActivity)) {
-                        ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
-                        return@OnClickListener
-                    }
-                    viewModel.logout(
-                        onLoading = { showProgressLogout.set(true) },
-                        onComplete = {
-                            dialog.dismiss()
-                            SharedPreferenceHelper.clearSharedPreference(mActivity)
-                            startActivity(Intent(mActivity, LoginActivity::class.java).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            })
-                        },
-                        onError = { msg ->
-                            showProgressLogout.set(false)
-                            ToastUtil.showWarning(mActivity, msg)
-                        }
-                    )
-                }
-                dialogBinding.btnCancel -> {
-                    if (Utility.stopClick()) return@OnClickListener
-                    dialog.dismiss()
-                }
-            }
-        }
+        dialogBinding.onClickListener = onClickListener()
         dialog.show()
-
-
     }
-
 
 
     private fun onBack() {
@@ -199,6 +166,36 @@ class HomeActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     LoadWalletActivity.start(mActivity)
                 }
+
+                logoutDialogBinding?.btnLogout -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressLogout.get()) return@OnClickListener
+                    if (!Utility.isInternetAvailable(mActivity)) {
+                        ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
+                        return@OnClickListener
+                    }
+                    viewModel.logout(
+                        onLoading = { showProgressLogout.set(true) },
+                        onComplete = {
+                            logoutDialog?.dismiss()
+                            SharedPreferenceHelper.clearSharedPreference(mActivity)
+                            startActivity(Intent(mActivity, LoginActivity::class.java).apply {
+                                flags =
+                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            })
+                        },
+                        onError = { msg ->
+                            showProgressLogout.set(false)
+                            ToastUtil.showWarning(mActivity, msg)
+                        }
+                    )
+                }
+
+                logoutDialogBinding?.btnCancel -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    logoutDialog?.dismiss()
+                }
+
             }
         }
     }
