@@ -21,7 +21,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.ResetMpinActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycStatusBinding
 import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDataItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -31,10 +31,10 @@ class KycStatusActivity : BaseActivity() {
     companion object {
         private const val EXTRA_STATUS = "extra_status"
 
-        fun start(context: Context, status: KycStatusItem) {
+        fun start(context: Context, data: KycDataItem) {
             context.startActivity(
                 Intent(context, KycStatusActivity::class.java).apply {
-                    putExtra(EXTRA_STATUS, Gson().toJson(status))
+                    putExtra(EXTRA_STATUS, Gson().toJson(data))
                 }
             )
         }
@@ -43,8 +43,8 @@ class KycStatusActivity : BaseActivity() {
     private lateinit var binding: ActivityKycStatusBinding
     private val viewModel: KycStatusViewModel by viewModels()
 
-    private val statusItem: KycStatusItem? by lazy {
-        intent.getStringExtra(EXTRA_STATUS)?.let { Gson().fromJson(it, KycStatusItem::class.java) }
+    private val kycData: KycDataItem? by lazy {
+        intent.getStringExtra(EXTRA_STATUS)?.let { Gson().fromJson(it, KycDataItem::class.java) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,22 +58,21 @@ class KycStatusActivity : BaseActivity() {
             insets
         }
 
-
         binding.swipeRefresh.setColorSchemeColors(ContextCompat.getColor(mActivity, R.color.primary))
         binding.swipeRefresh.setOnRefreshListener { refreshStatus() }
 
         binding.lytToolbar.ivBack.gone()
         binding.onClickListener = onClickListener()
 
-        statusItem?.let { renderStatus(it) }
+        kycData?.let { renderStatus(it) }
     }
 
     private fun refreshStatus() {
         viewModel.fetchStatus(
             onLoading = {},
-            onReady = { item ->
+            onReady = { data ->
                 binding.swipeRefresh.isRefreshing = false
-                renderStatus(item)
+                renderStatus(data)
             },
             onError = { msg ->
                 binding.swipeRefresh.isRefreshing = false
@@ -82,8 +81,8 @@ class KycStatusActivity : BaseActivity() {
         )
     }
 
-    private fun renderStatus(item: KycStatusItem) {
-        when (KycSubmissionStatus.from(item.submission?.status)) {
+    private fun renderStatus(data: KycDataItem) {
+        when (KycSubmissionStatus.from(data.status)) {
             KycSubmissionStatus.KYC_APPROVED  -> navigateToMpin()
             KycSubmissionStatus.KYC_REJECTED  -> showRejected()
             KycSubmissionStatus.KYC_SUBMITTED -> showPending()

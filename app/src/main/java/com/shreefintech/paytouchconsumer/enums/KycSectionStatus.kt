@@ -2,7 +2,8 @@ package com.shreefintech.paytouchconsumer.enums
 
 enum class KycSectionStatus(val value: String) {
     PENDING("pending"),
-    UNDER_REVIEW("under_review"),
+    SUBMITTED("submitted"),
+    APPROVED("approved"),
     REJECTED("rejected");
 
     companion object {

@@ -3,13 +3,10 @@ package com.shreefintech.paytouchconsumer.kyc
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.enums.KycSectionStatus
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycAgreeDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDataItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -25,14 +22,15 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
     private val textMediaType = "text/plain".toMediaTypeOrNull()
 
     /**
-     * Entry point for the KYC hub.
-     * 1. Always fetches /status first.
-     * 2. Uses entity_type + section_a_submitted_at to decide whether initiate / section-A are needed.
-     * 3. Passes the status item to onReady so KycActivity can derive section B/C completion state.
+     * Entry point for the KYC hub. Flow is driven by current_section from /kyc/status:
+     *  - entity_type null (never started) → initiate → section A placeholder → onReady
+     *  - current_section = "a"            → section A placeholder → onReady
+     *  - current_section = "b" / "c"      → onReady directly
+     *  - current_section = null (all done) → onReady (KycActivity calls agree)
      */
     fun startKyc(
         onLoading: () -> Unit,
-        onReady: (KycStatusItem) -> Unit,
+        onReady: (KycDataItem) -> Unit,
         onRegistrationPending: (String) -> Unit,
         onError: (String) -> Unit
     ) {
@@ -42,49 +40,37 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
         }
         onLoading()
         ApiClient.apiService.getKycStatus(bearerToken())
-            .enqueue(object : Callback<KycStatusItem> {
-                override fun onResponse(call: Call<KycStatusItem>, response: Response<KycStatusItem>) {
+            .enqueue(object : Callback<General<KycDataItem>> {
+                override fun onResponse(call: Call<General<KycDataItem>>, response: Response<General<KycDataItem>>) {
                     if (response.isSuccessful && response.body()?.success == true) {
-                        val statusItem = response.body()!!
-                        val submission = statusItem.submission
-                        val sectionAStatus = KycSectionStatus.from(statusItem.sections?.a?.status)
+                        val data = response.body()!!.data
                         when {
-                            submission == null || submission.entityType.isNullOrEmpty() ->
-                                callInitiate(
-                                    onReady = { onReady(statusItem) },
-                                    onRegistrationPending = onRegistrationPending,
-                                    onError = onError
-                                )
-
-                            sectionAStatus == KycSectionStatus.PENDING || sectionAStatus == KycSectionStatus.REJECTED ->
-                                submitSectionAPlaceholder(onReady = { onReady(statusItem) }, onError = onError)
-
-                            else -> onReady(statusItem)
+                            data?.entityType.isNullOrEmpty() ->
+                                callInitiate(onReady, onRegistrationPending, onError)
+                            data?.currentSection == "a" ->
+                                submitSectionAPlaceholder(onReady, onError)
+                            else -> onReady(data!!)
                         }
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                     }
                 }
 
-                override fun onFailure(call: Call<KycStatusItem>, t: Throwable) {
+                override fun onFailure(call: Call<General<KycDataItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
 
     private fun callInitiate(
-        onReady: () -> Unit,
+        onReady: (KycDataItem) -> Unit,
         onRegistrationPending: (String) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
-        val entityTypeBody = "individual".toRequestBody(textMediaType)
-        ApiClient.apiService.initiateKyc(bearerToken(), entityTypeBody)
-            .enqueue(object : Callback<General<KycSubmissionDataItem>> {
-                override fun onResponse(
-                    call: Call<General<KycSubmissionDataItem>>,
-                    response: Response<General<KycSubmissionDataItem>>
-                ) {
+        ApiClient.apiService.initiateKyc(bearerToken())
+            .enqueue(object : Callback<General<KycDataItem>> {
+                override fun onResponse(call: Call<General<KycDataItem>>, response: Response<General<KycDataItem>>) {
                     when {
                         response.isSuccessful ->
                             submitSectionAPlaceholder(onReady, onError)
@@ -99,29 +85,26 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
 
-                override fun onFailure(call: Call<General<KycSubmissionDataItem>>, t: Throwable) {
+                override fun onFailure(call: Call<General<KycDataItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
 
-    private fun submitSectionAPlaceholder(onReady: () -> Unit, onError: (String) -> Unit) {
+    private fun submitSectionAPlaceholder(onReady: (KycDataItem) -> Unit, onError: (String) -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         val hasGstBody = "0".toRequestBody(textMediaType)
         ApiClient.apiService.submitKycSectionA(bearerToken(), hasGstBody)
-            .enqueue(object : Callback<General<KycSubmissionDataItem>> {
-                override fun onResponse(
-                    call: Call<General<KycSubmissionDataItem>>,
-                    response: Response<General<KycSubmissionDataItem>>
-                ) {
+            .enqueue(object : Callback<General<KycDataItem>> {
+                override fun onResponse(call: Call<General<KycDataItem>>, response: Response<General<KycDataItem>>) {
                     if (response.isSuccessful && response.body()?.data != null) {
-                        onReady()
+                        onReady(response.body()!!.data!!)
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                     }
                 }
 
-                override fun onFailure(call: Call<General<KycSubmissionDataItem>>, t: Throwable) {
+                override fun onFailure(call: Call<General<KycDataItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
@@ -129,7 +112,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
 
     fun agreeAndFetchStatus(
         onLoading: () -> Unit,
-        onReady: (KycStatusItem) -> Unit,
+        onReady: (KycDataItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -137,44 +120,45 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         onLoading()
-        val emptyBody = ByteArray(0).toRequestBody("application/json".toMediaTypeOrNull())
-        ApiClient.apiService.agreeKyc(bearerToken(), emptyBody)
-            .enqueue(object : Callback<General<KycAgreeDataItem>> {
-                override fun onResponse(
-                    call: Call<General<KycAgreeDataItem>>,
-                    response: Response<General<KycAgreeDataItem>>
-                ) {
-                    if (!response.isSuccessful) {
+        ApiClient.apiService.agreeKyc(bearerToken())
+            .enqueue(object : Callback<General<KycDataItem>> {
+                override fun onResponse(call: Call<General<KycDataItem>>, response: Response<General<KycDataItem>>) {
+                    if (response.isSuccessful && response.body()?.data != null) {
+                        onReady(response.body()!!.data!!)
+                    } else {
                         ToastUtil.showWarning(
                             getApplication(),
                             ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string())
                         )
+                        fetchFinalStatus(onReady, onError)
                     }
-                    fetchFinalStatus(onReady, onError)
                 }
 
-                override fun onFailure(call: Call<General<KycAgreeDataItem>>, t: Throwable) {
+                override fun onFailure(call: Call<General<KycDataItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
 
-    private fun fetchFinalStatus(onReady: (KycStatusItem) -> Unit, onError: (String) -> Unit) {
+    private fun fetchFinalStatus(onReady: (KycDataItem) -> Unit, onError: (String) -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         ApiClient.apiService.getKycStatus(bearerToken())
-            .enqueue(object : Callback<KycStatusItem> {
-                override fun onResponse(call: Call<KycStatusItem>, response: Response<KycStatusItem>) {
+            .enqueue(object : Callback<General<KycDataItem>> {
+                override fun onResponse(call: Call<General<KycDataItem>>, response: Response<General<KycDataItem>>) {
                     if (response.isSuccessful && response.body()?.success == true) {
-                        onReady(response.body()!!)
+                        val data = response.body()?.data ?: run {
+                            onError(getString(R.string.errGeneric))
+                            return
+                        }
+                        onReady(data)
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                     }
                 }
 
-                override fun onFailure(call: Call<KycStatusItem>, t: Throwable) {
+                override fun onFailure(call: Call<General<KycDataItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
-
 }

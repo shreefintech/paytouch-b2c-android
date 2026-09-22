@@ -5,8 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
+import com.shreefintech.paytouchconsumer.retrofit.model.General
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -18,7 +19,7 @@ class KycStatusViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun fetchStatus(
         onLoading: () -> Unit,
-        onReady: (KycStatusItem) -> Unit,
+        onReady: (KycDataItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -27,16 +28,20 @@ class KycStatusViewModel(application: Application) : AndroidViewModel(applicatio
         }
         onLoading()
         ApiClient.apiService.getKycStatus(bearerToken())
-            .enqueue(object : Callback<KycStatusItem> {
-                override fun onResponse(call: Call<KycStatusItem>, response: Response<KycStatusItem>) {
+            .enqueue(object : Callback<General<KycDataItem>> {
+                override fun onResponse(call: Call<General<KycDataItem>>, response: Response<General<KycDataItem>>) {
                     if (response.isSuccessful && response.body()?.success == true) {
-                        onReady(response.body()!!)
+                        val data = response.body()?.data ?: run {
+                            onError(getString(R.string.errGeneric))
+                            return
+                        }
+                        onReady(data)
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                     }
                 }
 
-                override fun onFailure(call: Call<KycStatusItem>, t: Throwable) {
+                override fun onFailure(call: Call<General<KycDataItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })

@@ -19,7 +19,7 @@ import com.shreefintech.paytouchconsumer.kyc.bank.BankDetailsActivity
 import com.shreefintech.paytouchconsumer.kyc.identity.IdentityVerificationActivity
 import com.shreefintech.paytouchconsumer.enums.KycSectionStatus
 import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDataItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -90,12 +90,12 @@ class KycActivity : BaseActivity() {
                 binding.llKycContent.visibility = View.GONE
                 binding.llPendingRegistration.visibility = View.GONE
             },
-            onReady = { statusItem ->
+            onReady = { data ->
                 binding.shimmerKyc.stopShimmer()
                 binding.shimmerKyc.visibility = View.GONE
                 binding.llKycContent.visibility = View.VISIBLE
                 binding.llPendingRegistration.visibility = View.GONE
-                applyStatus(statusItem)
+                applyStatus(data)
             },
             onRegistrationPending = { msg ->
                 binding.shimmerKyc.stopShimmer()
@@ -114,36 +114,35 @@ class KycActivity : BaseActivity() {
         )
     }
 
-    private fun applyStatus(statusItem: KycStatusItem) {
-        val sub = statusItem.submission
-        if (KycSubmissionStatus.from(sub?.status) == KycSubmissionStatus.KYC_SUBMITTED) {
-            KycStatusActivity.start(mActivity, statusItem)
+    private fun applyStatus(data: KycDataItem) {
+        if (KycSubmissionStatus.from(data.status) == KycSubmissionStatus.KYC_SUBMITTED) {
+            KycStatusActivity.start(mActivity, data)
             finish()
             return
         }
 
-        val sectionBStatus = KycSectionStatus.from(statusItem.sections?.b?.status)
-        val sectionCStatus = KycSectionStatus.from(statusItem.sections?.c?.status)
-
-        identityDone = sectionBStatus == KycSectionStatus.UNDER_REVIEW
-        bankDone = sectionCStatus == KycSectionStatus.UNDER_REVIEW
-
-        if (identityDone && bankDone) {
+        if (data.currentSection == null) {
             agreeAndNavigateToStatus()
             return
         }
 
-        updateSectionIcons(statusItem)
+        val sectionBStatus = KycSectionStatus.from(data.sections?.b)
+        val sectionCStatus = KycSectionStatus.from(data.sections?.c)
+
+        identityDone = sectionBStatus == KycSectionStatus.SUBMITTED
+        bankDone = sectionCStatus == KycSectionStatus.SUBMITTED
+
+        updateSectionIcons(data)
         updateProgress()
     }
 
-    private fun updateSectionIcons(statusItem: KycStatusItem) {
-        val sectionBStatus = KycSectionStatus.from(statusItem.sections?.b?.status)
-        val sectionCStatus = KycSectionStatus.from(statusItem.sections?.c?.status)
+    private fun updateSectionIcons(data: KycDataItem) {
+        val sectionBStatus = KycSectionStatus.from(data.sections?.b)
+        val sectionCStatus = KycSectionStatus.from(data.sections?.c)
 
         // Identity card icon — driven by section B
         when (sectionBStatus) {
-            KycSectionStatus.UNDER_REVIEW -> {
+            KycSectionStatus.SUBMITTED -> {
                 binding.ivSectionAStatus.setImageResource(R.drawable.ic_success)
                 binding.ivSectionAStatus.imageTintList = null
                 binding.mcIdentity.alpha = 0.5f
@@ -167,7 +166,7 @@ class KycActivity : BaseActivity() {
 
         // Bank card icon — driven by section C
         when (sectionCStatus) {
-            KycSectionStatus.UNDER_REVIEW -> {
+            KycSectionStatus.SUBMITTED -> {
                 binding.ivSectionBStatus.setImageResource(R.drawable.ic_success)
                 binding.ivSectionBStatus.imageTintList = null
                 binding.mcBank.alpha = 0.5f
@@ -207,8 +206,8 @@ class KycActivity : BaseActivity() {
 
         viewModel.agreeAndFetchStatus(
             onLoading = {},
-            onReady = { statusItem ->
-                KycStatusActivity.start(mActivity, statusItem)
+            onReady = { data ->
+                KycStatusActivity.start(mActivity, data)
                 finish()
             },
             onError = { msg ->

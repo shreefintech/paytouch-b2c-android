@@ -47,11 +47,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReport
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasVerifyPaymentDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycAgreeDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanFetchBillRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanLatestPaymentDataItem
@@ -506,29 +503,27 @@ interface ApiService {
         @Header("Authorization") authorization: String
     ): Call<ReferralInfoItem>
 
-    // ── Dashboard KYC ─────────────────────────────────────────────────────────
+    // ── KYC ───────────────────────────────────────────────────────────────────
 
-    @Multipart
-    @POST("${CHANNEL}dashboard-kyc/initiate")
+    @POST("${CHANNEL}kyc/initiate")
     fun initiateKyc(
-        @Header("Authorization") authorization: String,
-        @Part("entity_type") entityType: RequestBody
-    ): Call<General<KycSubmissionDataItem>>
+        @Header("Authorization") authorization: String
+    ): Call<General<KycDataItem>>
 
-    @GET("${CHANNEL}dashboard-kyc/status")
+    @GET("${CHANNEL}kyc/status")
     fun getKycStatus(
         @Header("Authorization") authorization: String
-    ): Call<KycStatusItem>
+    ): Call<General<KycDataItem>>
 
     @Multipart
-    @POST("${CHANNEL}dashboard-kyc/sections/a")
+    @POST("${CHANNEL}kyc/sections/a")
     fun submitKycSectionA(
         @Header("Authorization") authorization: String,
         @Part("has_gst") hasGst: RequestBody
-    ): Call<General<KycSubmissionDataItem>>
+    ): Call<General<KycDataItem>>
 
     @Multipart
-    @POST("${CHANNEL}dashboard-kyc/sections/b/signatory")
+    @POST("${CHANNEL}kyc/sections/b/signatory")
     fun submitKycSectionB(
         @Header("Authorization") authorization: String,
         @Part("email") email: RequestBody,
@@ -539,22 +534,21 @@ interface ApiService {
         @Part aadhaarFrontFile: MultipartBody.Part,
         @Part aadhaarBackFile: MultipartBody.Part,
         @Part passportPhotoFile: MultipartBody.Part
-    ): Call<General<KycSignatoryDataItem>>
+    ): Call<General<KycDataItem>>
 
     @Multipart
-    @POST("${CHANNEL}dashboard-kyc/sections/c")
+    @POST("${CHANNEL}kyc/sections/c")
     fun submitKycSectionC(
         @Header("Authorization") authorization: String,
         @Part parts: List<MultipartBody.Part>
-    ): Call<General<KycSubmissionDataItem>>
+    ): Call<General<KycDataItem>>
 
-    @POST("${CHANNEL}dashboard-kyc/agree")
+    @POST("${CHANNEL}kyc/agree")
     fun agreeKyc(
-        @Header("Authorization") authorization: String,
-        @Body body: RequestBody
-    ): Call<General<KycAgreeDataItem>>
+        @Header("Authorization") authorization: String
+    ): Call<General<KycDataItem>>
 
-    @GET("${CHANNEL}dashboard-kyc/my-account")
+    @GET("${CHANNEL}kyc/my-account")
     fun getKycMyAccount(
         @Header("Authorization") authorization: String
     ): Call<KycMyAccountItem>

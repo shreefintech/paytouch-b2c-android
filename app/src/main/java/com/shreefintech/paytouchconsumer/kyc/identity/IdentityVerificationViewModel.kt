@@ -8,7 +8,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDataItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -95,8 +95,8 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
         ApiClient.apiService.submitKycSectionB(
             bearerToken(), emailBody, mobileBody, panBody, aadhaarBody,
             panFilePart, aadhaarFrontFilePart, aadhaarBackFilePart, passportPhotoFilePart
-        ).enqueue(object : Callback<General<KycSignatoryDataItem>> {
-            override fun onResponse(call: Call<General<KycSignatoryDataItem>>, response: Response<General<KycSignatoryDataItem>>) {
+        ).enqueue(object : Callback<General<KycDataItem>> {
+            override fun onResponse(call: Call<General<KycDataItem>>, response: Response<General<KycDataItem>>) {
                 if (response.isSuccessful && response.body()?.data != null) {
                     onSuccess()
                 } else {
@@ -104,7 +104,7 @@ class IdentityVerificationViewModel(application: Application) : AndroidViewModel
                 }
             }
 
-            override fun onFailure(call: Call<General<KycSignatoryDataItem>>, t: Throwable) {
+            override fun onFailure(call: Call<General<KycDataItem>>, t: Throwable) {
                 onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })

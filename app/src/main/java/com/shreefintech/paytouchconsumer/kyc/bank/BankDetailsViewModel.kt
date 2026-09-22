@@ -7,7 +7,7 @@ import com.shreefintech.paytouchconsumer.kyc.bank.model.BankAccountInputItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSubmissionDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDataItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -48,8 +48,8 @@ class BankDetailsViewModel(application: Application) : AndroidViewModel(applicat
         }
 
         ApiClient.apiService.submitKycSectionC(bearerToken(), parts)
-            .enqueue(object : Callback<General<KycSubmissionDataItem>> {
-                override fun onResponse(call: Call<General<KycSubmissionDataItem>>, response: Response<General<KycSubmissionDataItem>>) {
+            .enqueue(object : Callback<General<KycDataItem>> {
+                override fun onResponse(call: Call<General<KycDataItem>>, response: Response<General<KycDataItem>>) {
                     if (response.isSuccessful && response.body()?.data != null) {
                         onSuccess()
                     } else {
@@ -57,7 +57,7 @@ class BankDetailsViewModel(application: Application) : AndroidViewModel(applicat
                     }
                 }
 
-                override fun onFailure(call: Call<General<KycSubmissionDataItem>>, t: Throwable) {
+                override fun onFailure(call: Call<General<KycDataItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
