@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
@@ -38,6 +40,16 @@ open class BaseActivity : AppCompatActivity() {
     private var glassAttached = false
 
     protected var retryCallback: (() -> Unit)? = null
+
+    private val sessionHandler = Handler(Looper.getMainLooper())
+    private val sessionCheckRunnable = object : Runnable {
+        override fun run() {
+            checkSessionTimeout()
+            if (SharedPreferenceHelper.isLoggedIn(this@BaseActivity)) {
+                sessionHandler.postDelayed(this, SESSION_CHECK_INTERVAL_MS)
+            }
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,16 +122,14 @@ open class BaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         checkSessionTimeout()
+        sessionHandler.postDelayed(sessionCheckRunnable, SESSION_CHECK_INTERVAL_MS)
     }
 
-    override fun onUserInteraction() {
-        super.onUserInteraction()
-        if (SharedPreferenceHelper.isLoggedIn(this)) {
-            SharedPreferenceHelper.setSharedPreferenceString(
-                this, Constant.KEY_LAST_INTERACTION, System.currentTimeMillis().toString()
-            )
-        }
+    override fun onPause() {
+        super.onPause()
+        sessionHandler.removeCallbacks(sessionCheckRunnable)
     }
+
 
     private fun checkSessionTimeout() {
         if (!SharedPreferenceHelper.isLoggedIn(this)) return
@@ -133,6 +143,10 @@ open class BaseActivity : AppCompatActivity() {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             })
         }
+    }
+
+    companion object {
+        private const val SESSION_CHECK_INTERVAL_MS = 30_000L
     }
 
     override fun attachBaseContext(newBase: Context) {
