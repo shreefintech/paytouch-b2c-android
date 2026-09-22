@@ -10,8 +10,6 @@ import okhttp3.Response
 
 class SessionInterceptor(private val context: Context) : Interceptor {
 
-    @Volatile private var isForceLoggingOut = false
-
     override fun intercept(chain: Interceptor.Chain): Response {
         if (SharedPreferenceHelper.isLoggedIn(context)) {
             SharedPreferenceHelper.setSharedPreferenceString(
@@ -19,8 +17,7 @@ class SessionInterceptor(private val context: Context) : Interceptor {
             )
         }
         val response = chain.proceed(chain.request())
-        if (response.code == 401 && !isForceLoggingOut) {
-            isForceLoggingOut = true
+        if (response.code == 401) {
             SharedPreferenceHelper.clearSharedPreference(context)
             context.startActivity(Intent(context, LoginActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
