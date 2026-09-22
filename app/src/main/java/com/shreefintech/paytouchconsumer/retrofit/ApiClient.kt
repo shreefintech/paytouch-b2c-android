@@ -28,11 +28,6 @@ object ApiClient {
         if (_apiService == null) _apiService = retrofit.create(ApiService::class.java)
     }
 
-    fun resetWithNewUrl() {
-        _retrofit = null
-        _apiService = null
-    }
-
     private fun buildRetrofit(): Retrofit {
         val clientBuilder = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
