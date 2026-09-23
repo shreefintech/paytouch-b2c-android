@@ -197,7 +197,7 @@
     <string name="labelValidity">Validity</string>
     <string name="labelDataBenefit">Data</string>
     <string name="labelTalktime">Talktime</string>
-    <string name="fmtPlanTalktimeData">Talktime: %1$s    Data: %2$s</string>
+    <string name="fmtPlanTalktimeData">Data: %1$s</string>
     <string name="labelViewMore"> View more</string>
 
     <!-- Electricity screen -->
@@ -377,6 +377,8 @@
     <string name="labelBillDate">Bill Date</string>
     <string name="labelBillAmount">Bill Amount</string>
     <string name="labelConnectionNumber">Connection Number</string>
+    <string name="labelAgreementNumber">Agreement Number</string>
+    <string name="labelBillNumber">Bill Number</string>
     <string name="labelOperator">Operator</string>
     <string name="btnClearAndEnterManually">Clear &amp; Enter Manually</string>
     <string name="textFilter">Filter</string>

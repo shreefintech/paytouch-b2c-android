@@ -139,7 +139,7 @@ object Utility {
             val number = raw.toDouble()
             val fmt = NumberFormat.getNumberInstance(Locale.Builder().setLanguage("en").setRegion("IN").build()).apply {
                 maximumFractionDigits = 2
-                minimumFractionDigits = 2
+                minimumFractionDigits = 0
             }
             "₹${fmt.format(number)}"
         } catch (_: Exception) {
