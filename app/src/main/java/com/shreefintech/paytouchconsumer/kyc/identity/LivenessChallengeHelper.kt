@@ -1,31 +1,9 @@
 package com.shreefintech.paytouchconsumer.kyc.identity
 
+import com.shreefintech.paytouchconsumer.kyc.identity.model.LivenessFrameItem
+import com.shreefintech.paytouchconsumer.kyc.identity.model.LivenessInstruction
+import com.shreefintech.paytouchconsumer.kyc.identity.model.LivenessStage
 import kotlin.math.abs
-
-/**
- * One analysed camera frame, reduced to the values the liveness check needs.
- * Position/size are ratios of the upright image (0..1) so the helper is resolution-independent.
- * [yaw]/[roll] are ML Kit `headEulerAngleY`/`headEulerAngleZ` in degrees.
- */
-data class LivenessFrameItem(
-    val faceCount: Int,
-    val trackingId: Int?,
-    val centerXRatio: Float,
-    val centerYRatio: Float,
-    val widthRatio: Float,
-    val yaw: Float,
-    val roll: Float,
-    val leftEyeOpen: Float?,
-    val rightEyeOpen: Float?,
-    val timestampMs: Long
-)
-
-enum class LivenessStage { POSITION, BLINK, HOLD, DONE }
-
-enum class LivenessInstruction {
-    ALIGN_FACE, SINGLE_FACE_ONLY, MOVE_CLOSER, MOVE_BACK, LOOK_STRAIGHT,
-    BLINK, BLINK_AGAIN, HOLD_STILL, CAPTURING
-}
 
 /**
  * Active liveness challenge: position face → blink [REQUIRED_BLINKS] times → hold still with eyes open → pass.

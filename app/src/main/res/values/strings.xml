@@ -549,7 +549,6 @@
     <string name="msgIdentitySubmitSuccess">Identity verification submitted successfully</string>
 
     <!-- KYC module — live selfie liveness check (SelfieCaptureActivity) -->
-    <string name="titleLiveSelfie">Live Selfie</string>
     <string name="msgLivenessSubtitle">Your photo is taken automatically</string>
     <string name="msgLivenessAlignFace">Place your face inside the circle</string>
     <string name="msgLivenessSingleFace">Only one face should be visible</string>

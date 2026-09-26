@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.kyc.identity
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -39,8 +40,13 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivitySelfieCaptureBinding
+import com.shreefintech.paytouchconsumer.kyc.identity.model.LivenessFrameItem
+import com.shreefintech.paytouchconsumer.kyc.identity.model.LivenessInstruction
+import com.shreefintech.paytouchconsumer.kyc.identity.model.LivenessStage
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlinx.coroutines.Dispatchers
@@ -61,6 +67,7 @@ class SelfieCaptureActivity : BaseActivity() {
 
     companion object {
         private const val EXTRA_OUTPUT_PATH = "extra_output_path"
+        private const val STATE_PERMISSION_REQUEST_IN_FLIGHT = "state_permission_request_in_flight"
         private const val MAX_CAPTURE_ATTEMPTS = 2
         private const val JPEG_QUALITY = 92
 
@@ -89,28 +96,40 @@ class SelfieCaptureActivity : BaseActivity() {
     private val faceDetector: FaceDetector by faceDetectorLazy
 
     private var imageCapture: ImageCapture? = null
+
+    /** Read from [analysisExecutor] in [saveFallbackFrame], written on main. */
+    @Volatile
     private var imageAnalysis: ImageAnalysis? = null
 
     /** Set when ImageCapture keeps failing — the analyzer then saves the next live frame instead. */
     private val grabNextFrame = AtomicBoolean(false)
 
+    /** True while the system permission dialog is up — survives recreation so we never ask twice. */
+    private var isPermissionRequestInFlight = false
+
     private val cameraPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            isPermissionRequestInFlight = false
+            val hasRationale =
+                ActivityCompat.shouldShowRequestPermissionRationale(mActivity, Manifest.permission.CAMERA)
             when {
-                granted -> startCamera()
-                // No rationale after a denial = "Don't ask again" / blocked — the dialog will never
-                // show again, so send the user to app settings instead of a dead-end toast loop.
-                !ActivityCompat.shouldShowRequestPermissionRationale(mActivity, Manifest.permission.CAMERA) -> {
-                    ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionSettings))
-                    startActivity(
-                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null))
-                    )
-                    finish()
+                granted -> {
+                    // Fresh start: a later revoke from Settings puts the permission back in "ask" state.
+                    SharedPreferenceHelper.setSharedPreferenceBoolean(mActivity, Constant.KEY_CAMERA_DENIED, false)
+                    startCamera()
                 }
-                else -> {
-                    ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionRequired))
-                    finish()
+                // Rationale after a denial = explicit "Deny" (not a tap-outside dismiss). Remember it so
+                // a later denial with no rationale can be recognised as "blocked".
+                hasRationale -> {
+                    SharedPreferenceHelper.setSharedPreferenceBoolean(mActivity, Constant.KEY_CAMERA_DENIED, true)
+                    onPermissionDenied()
                 }
+                // No rationale after an earlier explicit denial = "Don't ask again" / blocked — the dialog
+                // will never show again, so send the user to app settings instead of a dead-end loop.
+                SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_CAMERA_DENIED, false) ->
+                    openAppSettings()
+                // No rationale and never explicitly denied = dialog dismissed (Back / tap outside).
+                else -> onPermissionDenied()
             }
         }
 
@@ -143,12 +162,44 @@ class SelfieCaptureActivity : BaseActivity() {
 
         setupLiveness()
 
-        if (ContextCompat.checkSelfPermission(mActivity, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            startCamera()
-        } else if (savedInstanceState == null) {
-            // On recreation a pending request is re-delivered to the launcher — don't ask twice.
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        isPermissionRequestInFlight =
+            savedInstanceState?.getBoolean(STATE_PERMISSION_REQUEST_IN_FLIGHT, false) ?: false
+        when {
+            ContextCompat.checkSelfPermission(mActivity, Manifest.permission.CAMERA) ==
+                    PackageManager.PERMISSION_GRANTED -> startCamera()
+            // A request pending across recreation is re-delivered to the launcher — don't ask twice.
+            // Otherwise (first launch, or restored after the permission was revoked) ask now.
+            !isPermissionRequestInFlight -> requestCameraPermission()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(STATE_PERMISSION_REQUEST_IN_FLIGHT, isPermissionRequestInFlight)
+    }
+
+    // ─── Permission ─────────────────────────────────────────────────────────────
+
+    private fun requestCameraPermission() {
+        isPermissionRequestInFlight = true
+        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+    }
+
+    private fun onPermissionDenied() {
+        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionRequired))
+        finish()
+    }
+
+    private fun openAppSettings() {
+        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionSettings))
+        try {
+            startActivity(
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null))
+            )
+        } catch (e: ActivityNotFoundException) {
+            e.printStackTrace()
+        }
+        finish()
     }
 
     private fun setupLiveness() {
@@ -167,7 +218,7 @@ class SelfieCaptureActivity : BaseActivity() {
         // Circle turns green once the blink is verified (hold / capture).
         val passedBlink = stage == LivenessStage.HOLD || stage == LivenessStage.DONE
         binding.ovFaceCircle.setStrokeColor(
-            ContextCompat.getColor(mActivity, if (passedBlink) R.color.fetch_bill_stroke else R.color.white)
+            ContextCompat.getColor(mActivity, if (passedBlink) R.color.selfie_circle_passed else R.color.white)
         )
     }
 

@@ -392,7 +392,7 @@ Never use `Toast.makeText()`. Always use `ToastUtil`:
 | `Utility.maskNumber(number)` | Masks account/mobile number for display in list rows: `9876*****0` |
 | `Utility.formatAmount(raw)` | Formats currency (`₹1,234.50`) — `String?` and `Double?` overloads; `trimZeros = true` (plan cards only) drops `.00` |
 | `Utility.formatDate(raw, pattern)` | Formats date string — always use instead of `SimpleDateFormat` |
-| `SharedPreferenceHelper` | Only way to read/write SharedPreferences — `clearSharedPreference()` keeps the device-level `KEY_LOCATION_ASKED` |
+| `SharedPreferenceHelper` | Only way to read/write SharedPreferences — `clearSharedPreference()` keeps the device-level `KEY_LOCATION_ASKED` and `KEY_CAMERA_DENIED` |
 | `TransactionFilterHelper` | Filter state and sheet behavior for all transaction report screens |
 | `ReceiptHelper` | Receipt card capture, download (MediaStore API 29+), share |
 | `FilePickerUtil` | File + image picking helpers |
@@ -486,6 +486,7 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | `KEY_FCM_TOKEN` | SharedPrefs — last FCM token the backend accepted (cleared on logout) |
 | `FCM_PLATFORM_ANDROID` | `"android"` — `platform` field of `DeviceTokenRequest` |
 | `KEY_LOCATION_ASKED` | SharedPrefs — system location popup shown at least once (survives logout) |
+| `KEY_CAMERA_DENIED` | SharedPrefs — user explicitly denied the KYC selfie camera popup (survives logout; cleared on grant) |
 | `EXTRA_FLOW_TYPE` | Intent extra — OTP screen routing |
 | `EXTRA_MOBILE` | Intent extra — mobile number through OTP + reset screens |
 | `FLOW_RESET_PASSWORD` | `"RESET_PASSWORD"` |

@@ -147,14 +147,17 @@ Launched for result by `IdentityVerificationActivity.captureSelfie()` with the o
 | Piece | Role |
 |---|---|
 | `SelfieCaptureActivity` | CameraX front camera (preview + 640×480 analysis + capture capped at ~1920×1440), bundled ML Kit face detection (fully on-device), auto-capture |
-| `LivenessChallengeHelper` | Pure-Kotlin state machine — no Android types, unit-testable with `LivenessFrameItem` |
+| `LivenessChallengeHelper` | Pure-Kotlin state machine — no Android types; covered by `LivenessChallengeHelperTest` (JVM unit test) |
+| `model/LivenessFrameItem`, `LivenessStage`, `LivenessInstruction` | Per-frame input and state/instruction enums for the helper |
 | `widget/FaceCircleOverlayView` | Full-screen dim with a centred circle (0.75 × width) and 1dp outline; outline turns green after the blinks |
 
 **Check sequence:** face centred + straight → **blink twice** (each: open → closed → open within 1.5 s) → hold still with eyes open → auto-capture. A lost face, second face or changed tracking ID restarts the check; 20 s timeout. Thresholds live in the helper's `companion object`.
 
 **Capture resilience:** in-memory `takePicture` → one retry → fall back to saving the live analysis frame. If the device can't bind Preview + Capture + Analysis together, it binds Preview + Analysis only and uses the frame fallback.
 
-**Permission:** `CAMERA` requested at runtime; if blocked ("Don't ask again") the user is sent to app settings. Both `android.hardware.camera` and `camera.front` are `required="false"` in the manifest so Play doesn't filter devices.
+**Permission:** `CAMERA` requested at runtime. Deny or dismiss → toast + back to step 4. "Blocked" is only assumed when the popup returns no rationale **after** an earlier explicit Deny (`Constant.KEY_CAMERA_DENIED`, kept across logout) — then the user is sent to app settings. The in-flight request flag is saved in `onSaveInstanceState`, so recreation never double-asks and a restore after revocation asks again.
+
+**Security note:** the liveness check is client-side only; the backend face match remains the real anti-spoofing control. Both `android.hardware.camera` and `camera.front` are `required="false"` in the manifest so Play doesn't filter devices.
 
 ---
 

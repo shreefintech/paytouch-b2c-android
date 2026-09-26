@@ -100,9 +100,11 @@ object SharedPreferenceHelper {
         val settings = context.getSharedPreferences(PREF_FILE, 0)
         // Device-level, not user-level — must survive logout so "Don't ask again" is still detected
         val isLocationAsked = settings.getBoolean(Constant.KEY_LOCATION_ASKED, false)
+        val isCameraDenied = settings.getBoolean(Constant.KEY_CAMERA_DENIED, false)
         return settings.edit()
             .clear()
             .putBoolean(Constant.KEY_LOCATION_ASKED, isLocationAsked)
+            .putBoolean(Constant.KEY_CAMERA_DENIED, isCameraDenied)
             .commit()
     }
 
