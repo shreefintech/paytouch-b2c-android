@@ -7,7 +7,6 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDataItem
-import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -126,10 +125,7 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     if (response.isSuccessful && response.body()?.data != null) {
                         onReady(response.body()!!.data!!)
                     } else {
-                        ToastUtil.showWarning(
-                            getApplication(),
-                            ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string())
-                        )
+                        onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                         fetchFinalStatus(onReady, onError)
                     }
                 }
@@ -161,4 +157,5 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                 }
             })
     }
+
 }

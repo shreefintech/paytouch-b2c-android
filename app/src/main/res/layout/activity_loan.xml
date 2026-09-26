@@ -343,7 +343,7 @@
                                     android:fontFamily="@font/proza_libre_medium"
                                     android:includeFontPadding="false"
                                     android:maxLines="1"
-                                    android:text="@string/labelConsumerNumber"
+                                    android:text="@string/labelLoanAccountNumber"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_12" />
 
@@ -354,7 +354,7 @@
                                     android:layout_marginTop="4dp"
                                     android:background="@drawable/bg_form_field"
                                     android:fontFamily="@font/proza_libre_medium"
-                                    android:hint="@string/hintConsumerNumber"
+                                    android:hint="@string/hintLoanAccountNumber"
                                     android:inputType="text"
                                     android:padding="@dimen/margin_small_medium"
                                     android:textColor="@color/black"
@@ -483,62 +483,104 @@
                                         android:textSize="@dimen/text_size_12" />
                                 </LinearLayout>
 
-                                <!-- Due Date -->
+                                <!-- Additional Details (dynamic, populated from API) -->
                                 <LinearLayout
-                                    android:id="@+id/llBillDueDateRow"
+                                    android:id="@+id/llAdditionalDetails"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
-                                    android:orientation="horizontal">
+                                    android:orientation="vertical"
+                                    android:visibility="gone">
 
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="0dp"
+                                    <!-- Agreement Number -->
+                                    <LinearLayout
+                                        android:id="@+id/llAgreementNumberRow"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:fontFamily="@font/proza_libre_medium"
-                                        android:includeFontPadding="false"
-                                        android:text="@string/labelDueDate"
-                                        android:textColor="?attr/colorTextHint"
-                                        android:textSize="@dimen/text_size_12" />
+                                        android:orientation="horizontal"
+                                        android:visibility="gone">
 
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tvBillDueDate"
-                                        android:layout_width="0dp"
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelAgreementNumber"
+                                            android:textColor="?attr/colorTextHint"
+                                            android:textSize="@dimen/text_size_12" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvBillAgreementNumber"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:textColor="@color/black"
+                                            android:textSize="@dimen/text_size_12" />
+                                    </LinearLayout>
+
+                                    <!-- Bill Number -->
+                                    <LinearLayout
+                                        android:id="@+id/llBillNumberRow"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:fontFamily="@font/proza_libre_medium"
-                                        android:includeFontPadding="false"
-                                        android:textColor="@color/black"
-                                        android:textSize="@dimen/text_size_12" />
-                                </LinearLayout>
+                                        android:layout_marginTop="6dp"
+                                        android:orientation="horizontal"
+                                        android:visibility="gone">
 
-                                <!-- Bill Date -->
-                                <LinearLayout
-                                    android:id="@+id/llBillDateRow"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
-                                    android:orientation="horizontal">
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelBillNumber"
+                                            android:textColor="?attr/colorTextHint"
+                                            android:textSize="@dimen/text_size_12" />
 
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="0dp"
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvBillBillNumber"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:textColor="@color/black"
+                                            android:textSize="@dimen/text_size_12" />
+                                    </LinearLayout>
+
+                                    <!-- Additional Customer Name -->
+                                    <LinearLayout
+                                        android:id="@+id/llAdditionalCustomerNameRow"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:fontFamily="@font/proza_libre_medium"
-                                        android:includeFontPadding="false"
-                                        android:text="@string/labelBillDate"
-                                        android:textColor="?attr/colorTextHint"
-                                        android:textSize="@dimen/text_size_12" />
+                                        android:layout_marginTop="6dp"
+                                        android:orientation="horizontal"
+                                        android:visibility="gone">
 
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tvBillDate"
-                                        android:layout_width="0dp"
-                                        android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:fontFamily="@font/proza_libre_medium"
-                                        android:includeFontPadding="false"
-                                        android:textColor="@color/black"
-                                        android:textSize="@dimen/text_size_12" />
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelCustomerName"
+                                            android:textColor="?attr/colorTextHint"
+                                            android:textSize="@dimen/text_size_12" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvBillAdditionalCustomerName"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:textColor="@color/black"
+                                            android:textSize="@dimen/text_size_12" />
+                                    </LinearLayout>
+
                                 </LinearLayout>
 
                                 <!-- Bill Amount -->
@@ -569,7 +611,7 @@
                                         android:textSize="@dimen/text_size_12" />
                                 </LinearLayout>
 
-                                <!-- Consumer Number (bill details row) -->
+                                <!-- Loan Account Number (bill details row) -->
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
@@ -582,7 +624,7 @@
                                         android:layout_weight="1"
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
-                                        android:text="@string/labelConsumerNumber"
+                                        android:text="@string/labelLoanAccountNumber"
                                         android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
 
@@ -811,6 +853,7 @@
                                 app:cardBackgroundColor="@color/white"
                                 app:cardElevation="0dp"
                                 app:strokeColor="?attr/colorPrimary"
+                                android:id="@+id/cvProceed"
                                 app:strokeWidth="1dp">
 
                                 <LinearLayout

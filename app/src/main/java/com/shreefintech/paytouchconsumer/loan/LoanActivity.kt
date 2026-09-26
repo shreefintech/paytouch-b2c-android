@@ -34,6 +34,7 @@ import com.shreefintech.paytouchconsumer.loan.transactions.LoanTransactionStatus
 import com.shreefintech.paytouchconsumer.loan.viewmodel.LoanViewModel
 import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
 import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
+import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanBillAdditionalDetailsItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanOperatorItem
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
@@ -121,11 +122,13 @@ class LoanActivity : BaseActivity() {
     }
 
     private fun setupAmountWatcher() {
+        updateProceedButton(false)
         binding.etAmount.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 val amount = s?.toString()?.trim()?.toDoubleOrNull()
+                updateProceedButton(amount != null && amount > 0)
                 if (amount == null || amount <= 0) {
                     resetFeeDisplay()
                     return
@@ -139,6 +142,11 @@ class LoanActivity : BaseActivity() {
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
+    }
+
+    private fun updateProceedButton(enabled: Boolean) {
+        binding.llProceed.isEnabled = enabled
+        binding.cvProceed.alpha = if (enabled) 1f else 0.5f
     }
 
     private fun setupConsumerNumberWatcher() {
@@ -270,13 +278,32 @@ class LoanActivity : BaseActivity() {
     private fun showBillDetails() {
         val bill = fetchedBillItem ?: return
         binding.tvBillCustomerName.text = bill.userName ?: "-"
-        binding.llBillDueDateRow.visibility = View.GONE
-        binding.llBillDateRow.visibility = View.GONE
+        populateAdditionalDetails(bill.additionalDetails)
         binding.tvBillAmount.text = Utility.formatAmount(bill.billAmount)
         binding.tvBillConnectionNumber.text = binding.etConsumerNumber.text?.toString()?.trim() ?: "-"
         binding.tvBillOperator.text = selectedOperatorName ?: "-"
         binding.etAmount.setText(bill.billAmount ?: "")
         binding.cvBillDetails.visibility = View.VISIBLE
+    }
+
+    private fun populateAdditionalDetails(details: LoanBillAdditionalDetailsItem?) {
+        if (details == null) {
+            binding.llAdditionalDetails.visibility = View.GONE
+            return
+        }
+        binding.llAdditionalDetails.visibility = View.VISIBLE
+        details.agreementNumber?.let {
+            binding.llAgreementNumberRow.visibility = View.VISIBLE
+            binding.tvBillAgreementNumber.text = it
+        } ?: run { binding.llAgreementNumberRow.visibility = View.GONE }
+        details.billNumber?.let {
+            binding.llBillNumberRow.visibility = View.VISIBLE
+            binding.tvBillBillNumber.text = it
+        } ?: run { binding.llBillNumberRow.visibility = View.GONE }
+        details.customerName?.let {
+            binding.llAdditionalCustomerNameRow.visibility = View.VISIBLE
+            binding.tvBillAdditionalCustomerName.text = it
+        } ?: run { binding.llAdditionalCustomerNameRow.visibility = View.GONE }
     }
 
     private fun onClearBill() {
@@ -307,11 +334,6 @@ class LoanActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
-        if (consumerNumber.length < 10) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
-            return
-        }
         Utility.hideKeyboard(mActivity)
         fetchBill(consumerNumber)
     }
@@ -321,11 +343,6 @@ class LoanActivity : BaseActivity() {
         if (consumerNumber.isEmpty()) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
-            return
-        }
-        if (consumerNumber.length < 10) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
             return
         }
         if (selectedOperatorId.isNullOrEmpty()) {
