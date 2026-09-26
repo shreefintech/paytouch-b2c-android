@@ -13,6 +13,7 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -287,23 +288,20 @@ class LoanActivity : BaseActivity() {
     }
 
     private fun populateAdditionalDetails(details: LoanBillAdditionalDetailsItem?) {
-        if (details == null) {
-            binding.llAdditionalDetails.visibility = View.GONE
-            return
-        }
-        binding.llAdditionalDetails.visibility = View.VISIBLE
-        details.agreementNumber?.let {
-            binding.llAgreementNumberRow.visibility = View.VISIBLE
-            binding.tvBillAgreementNumber.text = it
-        } ?: run { binding.llAgreementNumberRow.visibility = View.GONE }
-        details.billNumber?.let {
-            binding.llBillNumberRow.visibility = View.VISIBLE
-            binding.tvBillBillNumber.text = it
-        } ?: run { binding.llBillNumberRow.visibility = View.GONE }
-        details.customerName?.let {
-            binding.llAdditionalCustomerNameRow.visibility = View.VISIBLE
-            binding.tvBillAdditionalCustomerName.text = it
-        } ?: run { binding.llAdditionalCustomerNameRow.visibility = View.GONE }
+        val hasAgreement = bindDetailRow(binding.llAgreementNumberRow, binding.tvBillAgreementNumber, details?.agreementNumber)
+        val hasBillNo    = bindDetailRow(binding.llBillNumberRow, binding.tvBillBillNumber, details?.billNumber)
+        val hasName      = bindDetailRow(binding.llAdditionalCustomerNameRow, binding.tvBillAdditionalCustomerName, details?.customerName)
+        // Hide the whole section when no row has a value — avoids an empty block
+        binding.llAdditionalDetails.visibility =
+            if (hasAgreement || hasBillNo || hasName) View.VISIBLE else View.GONE
+    }
+
+    /** Shows [row] with [value] when present; returns whether the row is visible. */
+    private fun bindDetailRow(row: View, textView: TextView, value: String?): Boolean {
+        val isVisible = !value.isNullOrBlank()
+        row.visibility = if (isVisible) View.VISIBLE else View.GONE
+        if (isVisible) textView.text = value
+        return isVisible
     }
 
     private fun onClearBill() {

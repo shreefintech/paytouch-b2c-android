@@ -22,12 +22,16 @@ Single user role — every verified user has the same feature set.
 ```bash
 # 1. Clone
 git clone <repo-url>
-cd PaytouchConsumer1
+cd paytouch-b2c-android
 
 # 2. Open in Android Studio → File → Open → select this folder
 # 3. Let Gradle sync complete (downloads dependencies automatically)
 # 4. Run on emulator or device: Run → Run 'app'
 ```
+
+**Firebase:** `app/google-services.json` (project `paytouch-b2c`) is committed and required by the `com.google.gms.google-services` plugin — the build fails without it.
+
+**Release build:** R8 minify + resource shrinking are enabled (`isMinifyEnabled = true`, `isShrinkResources = true`). Smoke-test a signed release build (payment → report → detail) before every release. Current version: `1.4` (versionCode `5`).
 
 **First launch:** The app opens at `SplashActivity` → routes to `LoginActivity` (no session yet). Use a test account or register a new one.
 
@@ -61,6 +65,9 @@ Read these in order — each one builds on the previous:
 | Image loading | Glide 4.16 |
 | Auth storage | SharedPreferences via `SharedPreferenceHelper` |
 | Loading shimmer | Facebook Shimmer 0.5.0 |
+| Push notifications | Firebase Cloud Messaging (Firebase BoM 34.14.0) |
+| Location | Play Services Location 21.3.0 (foreground, single fix) |
+| Code shrinking | R8 (release) — rules in `app/proguard-rules.pro` |
 | Min / Target SDK | 24 / 36 |
 
 ---
@@ -114,6 +121,15 @@ com.shreefintech.paytouchconsumer/
 |   +-- model/          WalletTransactionItem (display), PaymentStatusItem (local DTO)
 |   \-- viewmodel/
 |
++-- operator/           Shared OperatorSelectionActivity (operator picker for every bill module)
+|   \-- model/          OperatorSelectionItem (local DTO passed as Gson JSON)
+|
++-- fcm/                Push notifications -- MyFirebaseMessagingService + NotificationHelper
+|                       (channel, POST_NOTIFICATIONS permission, token register/remove)
+|
++-- location/           LocationPermissionHelper -- disclosure dialog -> permission -> one
+|                       foreground location fix sent for payment risk checks (never background)
+|
 +-- transactions/       Shared across ALL bill-payment modules -- never duplicate per module
 |   +-- model/
 |   |   +-- TransactionItem.kt          Category-agnostic report/status row model
@@ -144,6 +160,8 @@ com.shreefintech.paytouchconsumer/
 |   |   +-- myaccount/              AccountInfoItem, ReferralInfoItem
 |   |   +-- hdfc/                   HdfcCreateOrderRequest, HdfcOrderItem, etc.
 |   |   +-- wallet/                 WalletHistoryItem, WalletHistoryPageItem
+|   |   +-- notification/           DeviceTokenRequest, DeviceTokenRemoveRequest
+|   |   +-- location/               UserLocationRequest
 |   |   \-- auth/                   LoginItem, RegisterItem, MessageItem
 |   +-- ApiClient.kt                Main Retrofit singleton (paytouch.in)
 |   +-- ApiAdminClient.kt           VPS Retrofit singleton (admin.paytouch.in)
@@ -162,6 +180,7 @@ com.shreefintech.paytouchconsumer/
 +-- BaseActivity.kt        All Activities extend this -- never AppCompatActivity
 +-- BaseBillViewModel.kt   Shared VPS/wallet balance-check logic -- every bill-payment ViewModel extends this
 +-- HomeActivity.kt        Main dashboard (will move to home/ package)
++-- HomeViewModel.kt       Logout (removes FCM token first) + fire-and-forget location upload
 \-- Constant.kt            All URLs, SharedPrefs keys, and intent extra names
 ```
 
@@ -182,6 +201,18 @@ SplashActivity  (2s logo -> GET /api/user)
 ```
 
 > `requires_mpin = true` routes to `ResetMpinActivity` as a placeholder. A dedicated CreateMpinActivity should replace this once built.
+
+**On every fresh `HomeActivity` launch** (skipped on config change / process restore):
+
+```
+HomeActivity.onCreate()
+    +-- NotificationHelper.syncToken()        register FCM token if not already accepted
+    \-- LocationPermissionHelper.start()      disclosure dialog -> permission -> "turn on location" -> one fix
+            \-- on finish (success or not)
+                    +-- HomeViewModel.sendLocation()          only when a non-mock fix was obtained
+                    \-- NotificationHelper.requestPermission() POST_NOTIFICATIONS (Android 13+),
+                                                              asked after location so popups never overlap
+```
 
 ---
 
@@ -218,10 +249,14 @@ Register / Login
 | Municipal Tax | `MunicipalTaxActivity` | Bill-fetch | 5 | Complete |
 | My Account | `MyAccountActivity` | Profile | 3 | Complete |
 | Load Wallet | `LoadWalletActivity` | HDFC gateway | 4 | Complete |
+| Push Notifications | `MyFirebaseMessagingService` | FCM | — | Complete (deep links pending backend payload) |
+| Location (risk checks) | `LocationPermissionHelper` (from Home) | Foreground fix | 1 dialog | Complete |
 | TV Cable | — | — | — | Not started |
 | Broadband | — | — | — | Not started |
 
-**Bill-fetch pattern:** operator → consumer/account number → server fetches bill → show amount → pay (Electricity, Gas, Postpaid, Loan, Municipal Tax)
+**Bill-fetch pattern:** operator → consumer/account number → server fetches bill → show amount → pay (Electricity, Gas, Postpaid, Loan, Municipal Tax). Loan also shows the optional `additionalDetails` rows (agreement no., bill no., customer name) — the section is hidden when all are empty.
+
+**Proceed button (all 8 bill modules):** disabled (alpha 0.5) until the amount field holds a value > 0 — see `updateProceedButton()` in each Activity.
 
 **Plan-select pattern:** operator → select plan → amount auto-filled → pay (Prepaid, DTH)
 
@@ -249,6 +284,8 @@ Register / Login
 | `Utility.formatAmount()` | Always use this for currency — never `"₹%.2f".format(value)` |
 | `Utility.formatDate()` | Always use this for dates — never `SimpleDateFormat` directly in a ViewModel |
 | Never generate `transaction_id` client-side | Backend owns transaction ID generation |
+| No toast from a ViewModel | ViewModels return messages via callbacks; the Activity shows them with `ToastUtil` + `mActivity` |
+| Gson-passed DTOs live in a `model/` package | R8 keeps only `**.model.**` — a local DTO elsewhere loses its field names in release builds |
 
 ---
 
@@ -268,6 +305,14 @@ Timeouts: 30s connect / read / write.
 ### ApiAdminClient — `admin.paytouch.in`
 
 Separate singleton. Used only for VPS user registration (fire-and-forget after login success). No interceptors.
+
+### Device Endpoints (bearer token required, `MessageItem` response)
+
+| Method | Endpoint | Body | Caller |
+|---|---|---|---|
+| `POST` | `/api/device-token` | `DeviceTokenRequest` (`fcm_token`, `platform`, `device_id`) | `NotificationHelper.syncToken()` |
+| `DELETE` | `/api/device-token` | `DeviceTokenRemoveRequest` (`fcm_token`) — `@HTTP(hasBody = true)` | `NotificationHelper.removeToken()` before logout |
+| `POST` | `/api/location` | `UserLocationRequest` (`latitude`, `longitude`, `accuracy`) | `HomeViewModel.sendLocation()` (fire-and-forget) |
 
 ### Endpoint Pattern
 
@@ -311,7 +356,7 @@ All Activities extend `BaseActivity`. It provides:
 
 - `mActivity: Activity` — stable Activity reference for use inside lambdas and callbacks
 - `betterActivityResult` — pre-registered `ActivityResultLauncher`
-- Transparent status + navigation bars
+- Edge-to-edge via `enableEdgeToEdge()` — transparent status + navigation bars with dark icons
 - Forced `fontScale = 1.0f` and `densityDpi = DENSITY_DEVICE_STABLE` (prevents accessibility overrides from breaking layouts)
 
 ---
@@ -342,9 +387,9 @@ Never use `Toast.makeText()`. Always use `ToastUtil`:
 | `Utility.hideKeyboard(activity)` | Dismisses soft keyboard |
 | `Utility.calculatePlatformFee(amount)` | Returns platform fee for the amount (see Business Rules) |
 | `Utility.maskNumber(number)` | Masks account/mobile number for display in list rows: `9876*****0` |
-| `Utility.formatAmount(raw)` | Formats currency string — two overloads (`String?` and `Double?`) |
+| `Utility.formatAmount(raw)` | Formats currency (`₹1,234.50`) — `String?` and `Double?` overloads; `trimZeros = true` (plan cards only) drops `.00` |
 | `Utility.formatDate(raw, pattern)` | Formats date string — always use instead of `SimpleDateFormat` |
-| `SharedPreferenceHelper` | Only way to read/write SharedPreferences |
+| `SharedPreferenceHelper` | Only way to read/write SharedPreferences — `clearSharedPreference()` keeps the device-level `KEY_LOCATION_ASKED` |
 | `TransactionFilterHelper` | Filter state and sheet behavior for all transaction report screens |
 | `ReceiptHelper` | Receipt card capture, download (MediaStore API 29+), share |
 | `FilePickerUtil` | File + image picking helpers |
@@ -401,7 +446,8 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 
 | Field | Rule |
 |---|---|
-| Mobile | Exactly 10 digits, starts with 6–9 |
+| Mobile | Exactly 10 digits, starts with 6–9 (Prepaid, Postpaid, DTH enforce 10 digits) |
+| Consumer / account number | Non-empty only — no minimum length (lengths vary per biller) |
 | Password | Minimum 8 characters |
 | MPIN | Exactly 4 digits |
 | PAN | `[A-Z]{5}[0-9]{4}[A-Z]` |
@@ -434,6 +480,9 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | `KEY_EMAIL` | SharedPrefs — logged-in user's email |
 | `KEY_WALLET_BALANCE` | SharedPrefs — last known wallet balance |
 | `KEY_REFERRAL_CODE` | SharedPrefs — user's referral code |
+| `KEY_FCM_TOKEN` | SharedPrefs — last FCM token the backend accepted (cleared on logout) |
+| `FCM_PLATFORM_ANDROID` | `"android"` — `platform` field of `DeviceTokenRequest` |
+| `KEY_LOCATION_ASKED` | SharedPrefs — system location popup shown at least once (survives logout) |
 | `EXTRA_FLOW_TYPE` | Intent extra — OTP screen routing |
 | `EXTRA_MOBILE` | Intent extra — mobile number through OTP + reset screens |
 | `FLOW_RESET_PASSWORD` | `"RESET_PASSWORD"` |
@@ -460,6 +509,7 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 | Municipal Tax | `app/src/main/java/.../municipaltax/README.md` |
 | My Account | `app/src/main/java/.../myaccount/README.md` |
 | Load Wallet | `app/src/main/java/.../loadwallet/README.md` |
+| Push Notifications (FCM) | `app/src/main/java/.../fcm/README.md` |
 
 ---
 

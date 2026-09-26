@@ -6,8 +6,9 @@
     @com.google.gson.annotations.SerializedName <fields>;
 }
 
-# Keep all Retrofit model classes (DTOs in retrofit/model/**)
--keep class com.shreefintech.paytouchconsumer.retrofit.model.** { *; }
+# Keep all model classes — API DTOs (retrofit/model/**) and local DTOs passed between
+# Activities as Gson JSON (operator/model, transactions/model, loadwallet/model, …)
+-keep class com.shreefintech.paytouchconsumer.**.model.** { *; }
 
 # Retrofit
 -keepattributes Signature

@@ -25,33 +25,6 @@ import androidx.core.graphics.createBitmap
 
 object Utility {
 
-    val STATE_LIST = listOf(
-        "01" to "Andhra Pradesh",
-        "02" to "Assam",
-        "03" to "Bihar & Jharkhand",
-        "04" to "Chennai",
-        "05" to "Delhi & NCR",
-        "06" to "Gujarat",
-        "07" to "Haryana",
-        "08" to "Himachal Pradesh",
-        "09" to "Jammu & Kashmir",
-        "10" to "Karnataka",
-        "11" to "Kerala",
-        "12" to "Kolkata",
-        "13" to "Maharashtra & Goa (except Mumbai)",
-        "14" to "MP & Chattisgarh",
-        "15" to "Mumbai",
-        "16" to "North East",
-        "17" to "Orissa",
-        "18" to "Punjab",
-        "19" to "Rajasthan",
-        "20" to "Tamilnadu",
-        "21" to "UP(EAST)",
-        "22" to "UP(WEST) & Uttarakhand",
-        "23" to "West Bengal",
-        "51" to "All India (except Delhi/Mumbai)"
-    )
-
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
         val cleaned = createdAt.substringBefore(".").substringBefore("+")
@@ -133,13 +106,14 @@ object Utility {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    fun formatAmount(raw: String?): String {
+    /** [trimZeros] drops trailing ".00" — plan cards only; bills and transactions always show paise. */
+    fun formatAmount(raw: String?, trimZeros: Boolean = false): String {
         if (raw.isNullOrBlank()) return "-"
         return try {
             val number = raw.toDouble()
             val fmt = NumberFormat.getNumberInstance(Locale.Builder().setLanguage("en").setRegion("IN").build()).apply {
                 maximumFractionDigits = 2
-                minimumFractionDigits = 0
+                minimumFractionDigits = if (trimZeros) 0 else 2
             }
             "₹${fmt.format(number)}"
         } catch (_: Exception) {

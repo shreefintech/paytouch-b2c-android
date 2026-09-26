@@ -98,8 +98,12 @@ object SharedPreferenceHelper {
 
     fun clearSharedPreference(context: Context): Boolean {
         val settings = context.getSharedPreferences(PREF_FILE, 0)
-        val editor = settings.edit()
-        return editor.clear().commit()
+        // Device-level, not user-level — must survive logout so "Don't ask again" is still detected
+        val isLocationAsked = settings.getBoolean(Constant.KEY_LOCATION_ASKED, false)
+        return settings.edit()
+            .clear()
+            .putBoolean(Constant.KEY_LOCATION_ASKED, isLocationAsked)
+            .commit()
     }
 
     fun isLoggedIn(context: Context): Boolean {

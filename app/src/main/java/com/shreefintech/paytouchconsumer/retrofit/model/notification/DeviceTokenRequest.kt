@@ -7,7 +7,3 @@ data class DeviceTokenRequest(
     @field:SerializedName("platform") val platform: String,
     @field:SerializedName("device_id") val deviceId: String
 )
-
-data class DeviceTokenRemoveRequest(
-    @field:SerializedName("fcm_token") val fcmToken: String
-)

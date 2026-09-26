@@ -144,7 +144,9 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     response: Response<General<KycAgreeDataItem>>
                 ) {
                     if (!response.isSuccessful) {
-                        onError(response.errorBody()?.string()?: getString(R.string.errGeneric))
+                        // Message only — KycActivity shows the toast
+                        onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+                        return
                     }
                     fetchFinalStatus(onReady, onError)
                 }

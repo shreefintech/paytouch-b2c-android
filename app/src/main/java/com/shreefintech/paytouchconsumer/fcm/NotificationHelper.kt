@@ -144,6 +144,8 @@ object NotificationHelper {
             })
     }
 
+    // Synchronized: onNewToken runs on an FCM worker thread while Login/Home sync on main
+    @Synchronized
     private fun registerToken(context: Context, token: String) {
         if (token.isEmpty() || token == pendingToken) return
         if (!Utility.isInternetAvailable(context)) return

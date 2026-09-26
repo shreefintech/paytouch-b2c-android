@@ -276,6 +276,11 @@ class PostpaidActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgMobileNumberEmpty))
             return
         }
+        if (connectionNumber.length < 10) {
+            binding.etMobileNumber.requestFocus()
+            ToastUtil.showDelete(mActivity, getString(R.string.msgMobileNumberInvalid))
+            return
+        }
         Utility.hideKeyboard(mActivity)
         fetchBill(connectionNumber)
     }
