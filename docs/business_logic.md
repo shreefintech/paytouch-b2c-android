@@ -78,7 +78,8 @@ Both sections must be completed before KYC can be submitted. Once both are done,
 ### Rules and Constraints
 - PAN card must match regex: `[A-Z]{5}[0-9]{4}[A-Z]{1}`
 - Aadhaar number must be exactly 12 digits
-- Selfie is captured via the system camera (no CameraX dependency); a captured selfie is required to submit step 4
+- Selfie is captured in-app by `SelfieCaptureActivity` (CameraX front camera + bundled on-device ML Kit face detection) only after an active liveness check passes: face centred in the circle and looking straight → blink twice (each blink: both eyes open → closed → open within 1.5 s) → hold still, centred, eyes open. If `ImageCapture` fails it retries once, then saves the current live camera frame instead. A second face, lost face or face tracking-id change restarts the check; the whole challenge times out after 20 s. The photo is auto-captured (no manual shutter). A captured selfie is required to submit step 4
+- Camera permission is requested at runtime by `SelfieCaptureActivity`; denial shows a toast and returns to step 4 with no selfie
 - Bank Details supports 1-4 accounts; the delete icon on a card is hidden when only one account remains
 - Terms & Conditions checkbox is mandatory before Bank Details submission
 - Section completion (`identityDone` / `bankDone`) is driven by the API via `KycSectionStatus.UNDER_REVIEW` returned in the KYC status response

@@ -78,4 +78,10 @@ dependencies {
 
     // Location — single current-location fetch + "turn on location" resolution dialog
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // KYC live selfie — CameraX preview/analysis/capture + on-device (bundled) face detection for liveness
+    implementation("androidx.camera:camera-camera2:1.4.2")
+    implementation("androidx.camera:camera-lifecycle:1.4.2")
+    implementation("androidx.camera:camera-view:1.4.2")
+    implementation("com.google.mlkit:face-detection:16.1.7")
 }

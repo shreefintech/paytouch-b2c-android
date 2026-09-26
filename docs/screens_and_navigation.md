@@ -139,8 +139,27 @@
 - Step 1: Mobile Number, Email Address
 - Step 2: Aadhaar number, front/back upload slots
 - Step 3: PAN number, front upload slot
-- Step 4: Selfie capture (system camera) with circular guide
+- Step 4: Selfie capture — "Capture" / edit opens `SelfieCaptureActivity` (live liveness check, for result)
 - Previous / Continue (Submit on last step) buttons
+
+---
+
+### ✅ SelfieCaptureActivity — "Live Selfie"
+
+**Purpose:** Capture a live selfie only after an on-device liveness check (position → blink twice → hold still).
+
+**Entry points:**
+- `IdentityVerificationActivity.captureSelfie()` (step 4 Capture / edit) — for result
+
+**Intent extras:** `extra_output_path` (String — absolute path of the JPEG file to write; primitive-only exception)
+
+**Exit points:**
+- Liveness passed + photo saved → `RESULT_OK` → back to step 4 (host compresses and shows preview)
+- Back / camera permission denied / no front camera → `RESULT_CANCELED`
+
+**Key UI elements:**
+- Full-screen front camera, dimmed outside a centred circle with a 1dp stroke (`FaceCircleOverlayView`); stroke turns green after the blink
+- Instruction text (16sp) below the circle + "taken automatically" hint
 
 ---
 

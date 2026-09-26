@@ -67,6 +67,7 @@ Read these in order — each one builds on the previous:
 | Loading shimmer | Facebook Shimmer 0.5.0 |
 | Push notifications | Firebase Cloud Messaging (Firebase BoM 34.14.0) |
 | Location | Play Services Location 21.3.0 (foreground, single fix) |
+| Camera + face detection | CameraX 1.4.2 + ML Kit Face Detection 16.1.7 (bundled, on-device) — KYC live selfie with blink liveness check |
 | Code shrinking | R8 (release) — rules in `app/proguard-rules.pro` |
 | Min / Target SDK | 24 / 36 |
 
@@ -81,7 +82,8 @@ com.shreefintech.paytouchconsumer/
 |   \-- viewmodel/
 |
 +-- kyc/                KYC hub, identity verification, bank details, KYC status (post-login gate)
-|   +-- identity/
+|   +-- identity/       4-step wizard + SelfieCaptureActivity (live selfie, blink-twice liveness
+|   |                   via LivenessChallengeHelper, auto-capture)
 |   \-- bank/
 |
 +-- electricity/        Electricity bill payment + transaction history (canonical module template)
@@ -172,7 +174,8 @@ com.shreefintech.paytouchconsumer/
 |   \-- CurlInterceptor.kt          Debug curl logger (Logcat tag: CURL)
 |
 +-- glass/              LiquidGlassEffect blur UI system
-+-- widget/             Reusable custom views (LiquidGlassButton, CustomDropdown, OutlineTextView)
++-- widget/             Reusable custom views (LiquidGlassButton, CustomDropdown, OutlineTextView,
+|                       FaceCircleOverlayView)
 +-- enums/              Project-wide enums (LoginMode, KycSubmissionStatus, ProofType, etc.)
 +-- utill/              Shared utilities -- double-l spelling is intentional, never rename
 |                       (TransactionFilterHelper, ReceiptHelper, ToastUtil, Utility, SharedPreferenceHelper)
@@ -237,7 +240,7 @@ Register / Login
 | Module | Entry Point | Pattern | Screens | Status |
 |---|---|---|---|---|
 | Auth | `SplashActivity` → `LoginActivity` | — | 6 | Complete |
-| KYC (Onboarding) | `KycActivity` | — | 4 + 4 fragments | Complete |
+| KYC (Onboarding) | `KycActivity` | — | 5 + 4 fragments | Complete |
 | Home | `HomeActivity` | — | 1 | Complete |
 | Electricity | `ElectricityActivity` | Bill-fetch | 5 | Complete |
 | Gas | `GasActivity` | Bill-fetch | 5 | Complete |

@@ -7,7 +7,7 @@ Handles the mandatory KYC onboarding flow: initiation, 4-step identity verificat
 ## Getting Oriented
 
 **Package:** `com.shreefintech.paytouchconsumer.kyc`
-Sub-packages: `kyc/identity/` (4-step wizard), `kyc/bank/` (bank card submission)
+Sub-packages: `kyc/identity/` (4-step wizard + live selfie), `kyc/bank/` (bank card submission)
 
 **First files to open:**
 1. `KycActivity.kt` — hub that fetches KYC status first on every launch and routes accordingly; never navigates directly on first open
@@ -33,6 +33,7 @@ Sub-packages: `kyc/identity/` (4-step wizard), `kyc/bank/` (bank card submission
 |---|---|---|
 | `KycActivity` | `KycViewModel` | Hub: fetches KYC status, auto-initiates, routes to Identity or Bank |
 | `IdentityVerificationActivity` | `IdentityVerificationViewModel` | 4-step wizard: personal details → Aadhaar upload → PAN upload → selfie capture |
+| `SelfieCaptureActivity` | — (`LivenessChallengeHelper`) | CameraX front-camera preview + ML Kit face detection; auto-captures the selfie after position → blink twice → hold still |
 | `BankDetailsActivity` | `BankDetailsViewModel` | Dynamic bank cards (1–4); account number, IFSC, proof document upload |
 | `KycStatusActivity` | `KycStatusViewModel` | Status display: pending GIF / rejected GIF / approved (routes to MPIN) |
 
@@ -43,7 +44,7 @@ Sub-screens (Fragment-based, inside `IdentityVerificationActivity`):
 | `KycStep1Fragment` | 0 | Personal details (name, DOB, gender, address, PAN, Aadhaar number) |
 | `KycStep2Fragment` | 1 | Aadhaar card upload (front + back) |
 | `KycStep3Fragment` | 2 | PAN card upload (front) |
-| `KycStep4Fragment` | 3 | Selfie capture via system camera |
+| `KycStep4Fragment` | 3 | Live selfie via `SelfieCaptureActivity` (blink liveness) |
 
 All Activities live in `kyc/`, identity screens in `kyc/identity/`, bank screens in `kyc/bank/`.
 
@@ -131,11 +132,29 @@ The Bank card is only clickable after Identity is UNDER_REVIEW — disabled and 
 Back press on step 0 → `setResult(resultCode); finish()` (resultCode = 0 = no change; resultCode = 1 = submitted).
 Back press on steps 1–3 → `goToPreviousStep()`.
 
-**Document upload** — the Activity hosts a `FilePickerUtil` (gallery/camera picker) and a `cameraLauncher` (system camera). Fragments call `pickDocument(callback)` or `captureSelfie(callback)` on the Activity to avoid multiple launcher registrations.
+**Document upload** — the Activity hosts a `FilePickerUtil` (gallery/camera picker) and a `selfieLauncher` (launches `SelfieCaptureActivity` for result with the output file path). Fragments call `pickDocument(callback)` or `captureSelfie(callback)` on the Activity to avoid multiple launcher registrations.
 
 **Selfie compression** — captured JPEG is compressed on `Dispatchers.IO` before the callback fires: quality steps down from 85 → 70 → 55 → 40 until the file is ≤2 MB. EXIF rotation is corrected before compression.
 
 **Submit** — on step 3 continue, `submitIdentity()` reads all four byte arrays on `Dispatchers.IO` and calls `viewModel.submitIdentity()` which POSTs a multipart form to `api/dashboard-kyc/sections/b/signatory` (PAN, Aadhaar front/back, selfie). Success → `setResult(1); finish()`.
+
+---
+
+## SelfieCaptureActivity — Live Selfie (Liveness Check)
+
+Launched for result by `IdentityVerificationActivity.captureSelfie()` with the output file path (`extra_output_path`). Returns `RESULT_OK` only after the liveness check passes and the JPEG is written; the host then runs its normal EXIF/2 MB compression.
+
+| Piece | Role |
+|---|---|
+| `SelfieCaptureActivity` | CameraX front camera (preview + 640×480 analysis + capture capped at ~1920×1440), bundled ML Kit face detection (fully on-device), auto-capture |
+| `LivenessChallengeHelper` | Pure-Kotlin state machine — no Android types, unit-testable with `LivenessFrameItem` |
+| `widget/FaceCircleOverlayView` | Full-screen dim with a centred circle (0.75 × width) and 1dp outline; outline turns green after the blinks |
+
+**Check sequence:** face centred + straight → **blink twice** (each: open → closed → open within 1.5 s) → hold still with eyes open → auto-capture. A lost face, second face or changed tracking ID restarts the check; 20 s timeout. Thresholds live in the helper's `companion object`.
+
+**Capture resilience:** in-memory `takePicture` → one retry → fall back to saving the live analysis frame. If the device can't bind Preview + Capture + Analysis together, it binds Preview + Analysis only and uses the frame fallback.
+
+**Permission:** `CAMERA` requested at runtime; if blocked ("Don't ask again") the user is sent to app settings. Both `android.hardware.camera` and `camera.front` are `required="false"` in the manifest so Play doesn't filter devices.
 
 ---
 

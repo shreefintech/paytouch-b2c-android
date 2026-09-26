@@ -61,17 +61,17 @@ class IdentityVerificationActivity : BaseActivity() {
     private lateinit var filePickerUtil: FilePickerUtil
     private var onDocumentPicked: ((Uri) -> Unit)? = null
 
-    // ─── Selfie capture via system camera ──────────────────────────────────────
+    // ─── Live selfie capture with liveness check (SelfieCaptureActivity) ───────
     private var cameraOutputFile: File? = null
     private var cameraOutputUri: Uri? = null
     private var onSelfieCaptured: ((Uri) -> Unit)? = null
-    private val cameraLauncher =
-        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+    private val selfieLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val file = cameraOutputFile
             val uri = cameraOutputUri
             val callback = onSelfieCaptured
             onSelfieCaptured = null
-            if (success && file != null && uri != null && callback != null) {
+            if (result.resultCode == RESULT_OK && file != null && file.exists() && uri != null && callback != null) {
                 lifecycleScope.launch(Dispatchers.IO) {
                     compressIfNeeded(file)
                     withContext(Dispatchers.Main) { callback(uri) }
@@ -201,7 +201,7 @@ class IdentityVerificationActivity : BaseActivity() {
         cameraOutputFile = file
         cameraOutputUri = uri
         onSelfieCaptured = onCaptured
-        cameraLauncher.launch(uri)
+        selfieLauncher.launch(SelfieCaptureActivity.buildIntent(mActivity, file))
     }
 
     private fun compressIfNeeded(file: File) {

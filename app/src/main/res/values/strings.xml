@@ -548,6 +548,24 @@
     <string name="msgSelfieRequired">Please capture a selfie</string>
     <string name="msgIdentitySubmitSuccess">Identity verification submitted successfully</string>
 
+    <!-- KYC module — live selfie liveness check (SelfieCaptureActivity) -->
+    <string name="titleLiveSelfie">Live Selfie</string>
+    <string name="msgLivenessSubtitle">Your photo is taken automatically</string>
+    <string name="msgLivenessAlignFace">Place your face inside the circle</string>
+    <string name="msgLivenessSingleFace">Only one face should be visible</string>
+    <string name="msgLivenessMoveCloser">Move closer to the camera</string>
+    <string name="msgLivenessMoveBack">Move a little away from the camera</string>
+    <string name="msgLivenessLookStraight">Look straight at the camera</string>
+    <string name="msgLivenessBlink">Blink your eyes twice</string>
+    <string name="msgLivenessBlinkAgain">Good! Blink once more</string>
+    <string name="msgLivenessHoldStill">Great! Hold still with eyes open</string>
+    <string name="msgLivenessCapturing">Capturing your selfie…</string>
+    <string name="msgLivenessTimeout">Verification timed out. Please try again</string>
+    <string name="msgLivenessCaptureFailed">Could not capture selfie. Please try again</string>
+    <string name="msgCameraPermissionRequired">Camera permission is required to capture your selfie</string>
+    <string name="msgCameraPermissionSettings">Camera access is blocked. Open Settings → Permissions → Camera and allow it to capture your selfie</string>
+    <string name="msgCameraUnavailable">Unable to start the camera</string>
+
     <!-- KYC module — bank details -->
     <string name="fmtBankAccountTitle">Bank Account %d</string>
     <string name="labelAccountNumber">Account Number</string>

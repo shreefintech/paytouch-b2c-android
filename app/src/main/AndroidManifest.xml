@@ -8,6 +8,15 @@
     <!-- Foreground only — used for payment risk checks. Never request ACCESS_BACKGROUND_LOCATION. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- KYC live selfie (SelfieCaptureActivity) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- CAMERA implies a required back camera; mark both optional so Play doesn't filter devices out -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
@@ -70,6 +79,10 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.shreefintech.paytouchconsumer.kyc.identity.SelfieCaptureActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.shreefintech.paytouchconsumer.kyc.bank.BankDetailsActivity"
             android:exported="false"

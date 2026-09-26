@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black">
+
+        <!-- Full-screen front camera (fillCenter keeps the image centre at the screen centre) -->
+        <androidx.camera.view.PreviewView
+            android:id="@+id/pvCamera"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:scaleType="fillCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.shreefintech.paytouchconsumer.widget.FaceCircleOverlayView
+            android:id="@+id/ovFaceCircle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Invisible twin of the overlay circle (same 0.75 width ratio) — anchors the text below it -->
+        <Space
+            android:id="@+id/spCircle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="H,1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.75" />
+
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvInstruction"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_extra_large"
+            android:fontFamily="@font/proza_libre_medium"
+            android:includeFontPadding="false"
+            android:text="@string/msgLivenessAlignFace"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_16"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spCircle" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvHint"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_small"
+            android:alpha="0.7"
+            android:fontFamily="@font/proza_libre_medium"
+            android:includeFontPadding="false"
+            android:text="@string/msgLivenessSubtitle"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvInstruction" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
