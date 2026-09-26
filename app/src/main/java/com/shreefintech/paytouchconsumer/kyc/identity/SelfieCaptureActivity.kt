@@ -50,8 +50,8 @@ import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -248,60 +248,68 @@ class SelfieCaptureActivity : BaseActivity() {
                     return@addListener
                 }
 
-                val preview = Preview.Builder().build().also {
-                    it.setSurfaceProvider(binding.pvCamera.surfaceProvider)
-                }
-                // Capped resolution: many front cameras are 16–32 MP, and decoding that to a Bitmap
-                // (plus the rotated copy) would OOM. ~2.7 MP is plenty for a KYC selfie.
-                val capture = ImageCapture.Builder()
-                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                    .setResolutionSelector(
-                        ResolutionSelector.Builder()
-                            .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
-                            .setResolutionStrategy(
-                                ResolutionStrategy(
-                                    Size(1920, 1440),
-                                    ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER_THEN_HIGHER
-                                )
-                            )
-                            .build()
-                    )
-                    .build()
-                // Small analysis frames are enough for face detection and keep it fast.
-                val analysis = ImageAnalysis.Builder()
-                    .setResolutionSelector(
-                        ResolutionSelector.Builder()
-                            .setResolutionStrategy(
-                                ResolutionStrategy(
-                                    Size(640, 480),
-                                    ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
-                                )
-                            )
-                            .build()
-                    )
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .build()
-                    .also { it.setAnalyzer(analysisExecutor, ::analyzeFrame) }
-
-                provider.unbindAll()
-                imageCapture = try {
-                    provider.bindToLifecycle(this, selector, preview, capture, analysis)
-                    capture
-                } catch (e: IllegalArgumentException) {
-                    // Some LEGACY-level cameras can't run 3 streams — keep preview + analysis and
-                    // let capturePhoto() save the live frame instead of blocking KYC.
-                    e.printStackTrace()
-                    provider.unbindAll()
-                    provider.bindToLifecycle(this, selector, preview, analysis)
-                    null
-                }
-                imageAnalysis = analysis
+                bindUseCases(provider, selector)
             } catch (e: Exception) {
                 e.printStackTrace()
                 onCameraUnavailable()
             }
         }, ContextCompat.getMainExecutor(mActivity))
     }
+
+    private fun bindUseCases(provider: ProcessCameraProvider, selector: CameraSelector) {
+        val preview = Preview.Builder().build().also {
+            it.setSurfaceProvider(binding.pvCamera.surfaceProvider)
+        }
+        val capture = buildImageCapture()
+        val analysis = buildImageAnalysis()
+
+        provider.unbindAll()
+        imageCapture = try {
+            provider.bindToLifecycle(this, selector, preview, capture, analysis)
+            capture
+        } catch (e: IllegalArgumentException) {
+            // Some LEGACY-level cameras can't run 3 streams — keep preview + analysis and
+            // let capturePhoto() save the live frame instead of blocking KYC.
+            e.printStackTrace()
+            provider.unbindAll()
+            provider.bindToLifecycle(this, selector, preview, analysis)
+            null
+        }
+        imageAnalysis = analysis
+    }
+
+    // Capped resolution: many front cameras are 16–32 MP, and decoding that to a Bitmap
+    // (plus the rotated copy) would OOM. ~2.7 MP is plenty for a KYC selfie.
+    private fun buildImageCapture(): ImageCapture = ImageCapture.Builder()
+        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+        .setResolutionSelector(
+            ResolutionSelector.Builder()
+                .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+                .setResolutionStrategy(
+                    ResolutionStrategy(
+                        Size(1920, 1440),
+                        ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER_THEN_HIGHER
+                    )
+                )
+                .build()
+        )
+        .build()
+
+    // Small analysis frames are enough for face detection and keep it fast.
+    private fun buildImageAnalysis(): ImageAnalysis = ImageAnalysis.Builder()
+        .setResolutionSelector(
+            ResolutionSelector.Builder()
+                .setResolutionStrategy(
+                    ResolutionStrategy(
+                        Size(640, 480),
+                        ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+                    )
+                )
+                .build()
+        )
+        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+        .build()
+        .also { it.setAnalyzer(analysisExecutor, ::analyzeFrame) }
 
     private fun onCameraUnavailable() {
         ToastUtil.showDelete(mActivity, getString(R.string.msgCameraUnavailable))
@@ -377,36 +385,29 @@ class SelfieCaptureActivity : BaseActivity() {
         }
         imageAnalysis?.clearAnalyzer()
 
-        capture.takePicture(ContextCompat.getMainExecutor(mActivity),
+        val mainExecutor = ContextCompat.getMainExecutor(mActivity)
+        // Callbacks run on an IO thread: the JPEG is written synchronously there, so the ImageProxy
+        // is always closed even if the Activity is destroyed meanwhile (a cancelled coroutine could
+        // skip the close and leak the camera buffer). Results hop back to main for UI work.
+        capture.takePicture(Dispatchers.IO.asExecutor(),
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
-                    lifecycleScope.launch {
-                        val saved = withContext(Dispatchers.IO) {
-                            try {
-                                saveUpright(image.toBitmap(), image.imageInfo.rotationDegrees)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                false
-                            } catch (e: OutOfMemoryError) {
-                                e.printStackTrace()
-                                false
-                            } finally {
-                                image.close()
-                            }
-                        }
-                        if (saved) finishWithSelfie() else fallbackToFrame()
-                    }
+                    val saved = saveProxy(image)
+                    mainExecutor.execute { if (saved) finishWithSelfie() else fallbackToFrame() }
                 }
 
                 override fun onError(exception: ImageCaptureException) {
                     exception.printStackTrace()
-                    if (isFinishing || isDestroyed) return
-                    if (attempt < MAX_CAPTURE_ATTEMPTS) capturePhoto(attempt + 1) else fallbackToFrame()
+                    mainExecutor.execute {
+                        if (isFinishing || isDestroyed) return@execute
+                        if (attempt < MAX_CAPTURE_ATTEMPTS) capturePhoto(attempt + 1) else fallbackToFrame()
+                    }
                 }
             })
     }
 
     private fun fallbackToFrame() {
+        if (isFinishing || isDestroyed) return
         val analysis = imageAnalysis
         if (analysis == null) {
             onCaptureFailed()
@@ -419,18 +420,21 @@ class SelfieCaptureActivity : BaseActivity() {
     /** Runs on [analysisExecutor]. */
     private fun saveFallbackFrame(proxy: ImageProxy) {
         imageAnalysis?.clearAnalyzer()
-        val saved = try {
-            saveUpright(proxy.toBitmap(), proxy.imageInfo.rotationDegrees)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        } catch (e: OutOfMemoryError) {
-            e.printStackTrace()
-            false
-        } finally {
-            proxy.close()
-        }
+        val saved = saveProxy(proxy)
         lifecycleScope.launch { if (saved) finishWithSelfie() else onCaptureFailed() }
+    }
+
+    /** Background thread only. Saves [proxy] as the selfie JPEG and always closes it. */
+    private fun saveProxy(proxy: ImageProxy): Boolean = try {
+        saveUpright(proxy.toBitmap(), proxy.imageInfo.rotationDegrees)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    } catch (e: OutOfMemoryError) {
+        e.printStackTrace()
+        false
+    } finally {
+        proxy.close()
     }
 
     /** Background thread only. Rotates to upright (no EXIF needed downstream) and writes the JPEG. */

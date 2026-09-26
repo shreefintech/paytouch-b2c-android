@@ -14,7 +14,7 @@ Transaction screens: `prepaid/transactions/` | ViewModels: `prepaid/viewmodel/`
 **Pattern:** Plan-select — operator + circle → browse/enter amount (or pick a plan) → pay (no bill-fetch step)
 
 **First files to open:**
-1. `PrepaidActivity.kt` — operator dropdown, circle picker (local `STATE_LIST`), mobile number, amount or plan button
+1. `PrepaidActivity.kt` — operator dropdown, circle picker (loaded from `GET api/states`), mobile number, amount or plan button
 2. `PrepaidPlanSelectionActivity.kt` — plan browser; launched via `ActivityResultLauncher`; also shared by Postpaid module
 3. `viewmodel/PrepaidViewModel.kt` — extends `BaseBillViewModel`; `process-direct` (not `process-payment`)
 4. `viewmodel/PrepaidPlanSelectionViewModel.kt` — fetches plans for selected operator + circle
@@ -30,7 +30,7 @@ Transaction screens: `prepaid/transactions/` | ViewModels: `prepaid/viewmodel/`
 **Launched from:** `HomeActivity` → `binding.cardPrepaid` click handler
 
 **Key differences to remember:**
-- Circle list is a hardcoded local `STATE_LIST` — no API call
+- Circle list is fetched from `GET api/states` (`PrepaidViewModel.loadStates()`) — no local list
 - `isMobileCategory = true` in all `mapToTransactionItem()` calls
 - Status screen searches by **mobile number**, not transaction ID
 - `type = "mobile_recharge"` for the unified transactions endpoint (not "prepaid")
@@ -86,9 +86,9 @@ PrepaidActivity
 
 ---
 
-## Circle Selection — Local, No API Call
+## Circle Selection — `GET api/states`
 
-The telecom circle list is a hardcoded `STATE_LIST` in `PrepaidActivity.Companion` (24 entries, e.g. `"05" to "Delhi & NCR"`). There is no API call for circles — the user picks from this static list. `circleId` is the numeric string key (e.g. `"05"`); `circleCode` passed to the API is the same value.
+The telecom circle list is fetched from `GET api/states` (`ApiService.getStates`, `General<List<StateItem>>`) when the screen opens; the field shows an in-slot spinner while it loads. `circleId` is the selected `StateItem.id`; `circleCode` passed to the API is the same value.
 
 ---
 
@@ -228,7 +228,7 @@ All endpoints are declared in `ApiService.kt` under the `// ── Mobile Prepai
 | Aspect | Gas / Electricity | Prepaid |
 |---|---|---|
 | Bill fetch step | Required (server-fetched amount) | None — user enters amount or selects a plan |
-| Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from local `STATE_LIST` in `PrepaidActivity` |
+| Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from `GET api/states` list |
 | Plan selection | N/A | `PrepaidPlanSelectionActivity` (separate screen) |
 | Transactions type param | `"electricity"` / `"gas"` | `"mobile_recharge"` |
 | Status search field | Transaction ID | Mobile number |

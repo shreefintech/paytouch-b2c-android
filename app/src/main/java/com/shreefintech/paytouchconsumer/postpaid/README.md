@@ -14,7 +14,7 @@ Transaction screens: `postpaid/transactions/` | ViewModels: `postpaid/viewmodel/
 **Pattern:** Bill-fetch + circle — operator + circle → mobile number → `POST /api/mobile-postpaid/fetch-bill` → confirm → pay
 
 **First files to open:**
-1. `PostpaidActivity.kt` — operator dropdown, circle picker (local `Utility.STATE_LIST`), mobile number, fetch + proceed buttons
+1. `PostpaidActivity.kt` — operator dropdown, mobile number, fetch + proceed buttons
 2. `viewmodel/PostpaidViewModel.kt` — extends `BaseBillViewModel`; bill-fetch then `process-payment`
 3. `retrofit/model/postpaid/` folder — Postpaid-specific DTOs
 4. `prepaid/PrepaidPlanSelectionActivity.kt` — **shared from the prepaid module** (not duplicated here)
@@ -84,9 +84,9 @@ PostpaidActivity
 
 ---
 
-## Circle Selection — Local Static List
+## Circle Selection — Not Applicable
 
-The circle list is `Utility.STATE_LIST` (24 entries). There is no API call for circles — the user picks from this local list. `circleId` is the numeric string key (e.g. `"05"`).
+Postpaid has no circle picker — the bill-fetch request does not take a circle. (The old local `Utility.STATE_LIST` was removed; Prepaid loads circles from `GET api/states`.)
 
 ---
 
@@ -224,7 +224,7 @@ All endpoints are declared in `ApiService.kt` under the `// ── Mobile Postpa
 |---|---|---|---|
 | Bill fetch step | Required (server-fetched amount) | None | **Required** (server-fetched amount) |
 | Plan selection | N/A | `PrepaidPlanSelectionActivity` | None |
-| Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from `Utility.STATE_LIST` | User picks from `Utility.STATE_LIST` |
+| Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from `GET api/states` list | Not applicable — no circle picker |
 | Transactions type param | `"electricity"` / `"gas"` | `"mobile_recharge"` | `"mobile_postpaid"` |
 | Status search field | Transaction ID | Mobile number | Transaction ID |
 | SMS ViewModel base | `BaseBillViewModel` subclass | Standalone `AndroidViewModel` | Standalone `AndroidViewModel` |

@@ -12,7 +12,7 @@ registered with the backend for the logged-in user.
 
 Related: request DTOs in `retrofit/model/notification/` (`DeviceTokenRequest.kt`, `DeviceTokenRemoveRequest.kt`),
 keys `KEY_FCM_TOKEN` / `FCM_PLATFORM_ANDROID` in `Constant.kt`, channel strings
-`labelNotificationChannelId` / `labelNotificationChannel`, and the service + default channel/icon
+`notificationChannelId` / `labelNotificationChannel`, and the service + default channel/icon
 meta-data in `AndroidManifest.xml`.
 
 ## APIs

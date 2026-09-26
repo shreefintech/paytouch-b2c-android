@@ -41,7 +41,7 @@ object NotificationHelper {
     fun createChannel(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
-            context.getString(R.string.labelNotificationChannelId),
+            context.getString(R.string.notificationChannelId),
             context.getString(R.string.labelNotificationChannel),
             NotificationManager.IMPORTANCE_HIGH
         )
@@ -84,7 +84,7 @@ object NotificationHelper {
         )
 
         val notification = NotificationCompat.Builder(
-            context, context.getString(R.string.labelNotificationChannelId)
+            context, context.getString(R.string.notificationChannelId)
         )
             .setSmallIcon(R.drawable.img_paytouch)
             .setContentTitle(title)
@@ -131,9 +131,12 @@ object NotificationHelper {
             onDone()
             return
         }
-        ApiClient.apiService.removeDeviceToken(bearerToken(appContext), DeviceTokenRemoveRequest(token))
+        ApiClient.apiService.removeDeviceToken(SharedPreferenceHelper.bearerToken(appContext), DeviceTokenRemoveRequest(token))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+                    if (!response.isSuccessful) {
+                        IllegalStateException("removeDeviceToken failed: HTTP ${response.code()}").printStackTrace()
+                    }
                     onDone()
                 }
 
@@ -160,7 +163,7 @@ object NotificationHelper {
             platform = Constant.FCM_PLATFORM_ANDROID,
             deviceId = deviceId(context)
         )
-        ApiClient.apiService.registerDeviceToken(bearerToken(context), body)
+        ApiClient.apiService.registerDeviceToken(SharedPreferenceHelper.bearerToken(context), body)
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     pendingToken = null
@@ -168,6 +171,9 @@ object NotificationHelper {
                         SharedPreferenceHelper.setSharedPreferenceString(
                             context, Constant.KEY_FCM_TOKEN, token
                         )
+                    } else {
+                        // Background call — no toast, but keep the failure visible for debugging
+                        IllegalStateException("registerDeviceToken failed: HTTP ${response.code()}").printStackTrace()
                     }
                 }
 
@@ -176,13 +182,6 @@ object NotificationHelper {
                     t.printStackTrace()
                 }
             })
-    }
-
-    private fun bearerToken(context: Context): String {
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            context, Constant.KEY_TOKEN, ""
-        ) ?: ""
-        return "Bearer $token"
     }
 
     // ANDROID_ID is stable per app-signing key + device user and survives SharedPreferences clears

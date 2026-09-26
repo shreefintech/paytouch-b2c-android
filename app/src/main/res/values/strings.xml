@@ -305,7 +305,7 @@
     <string name="titleGasPaymentConfirmation">Gas Payment Confirmation</string>
     <string name="titlePrepaidPaymentConfirmation">Prepaid Payment Confirmation</string>
     <string name="labelPaytouchSmsNotification">Paytouch SMS Notification</string>
-    <string name="labelNotificationChannelId" translatable="false">push_channel</string>
+    <string name="notificationChannelId" translatable="false">push_channel</string>
     <string name="labelNotificationChannel">Payment &amp; Account Alerts</string>
 
     <!-- Location permission -->

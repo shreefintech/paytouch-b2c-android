@@ -559,8 +559,7 @@
                                     android:id="@+id/ivLoadWallet"
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
-                                    android:src="@drawable/ic_wallet"
-                                    android:tint="@color/white" />
+                                    android:src="@drawable/ic_wallet" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:layout_width="wrap_content"

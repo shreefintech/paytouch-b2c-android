@@ -2,15 +2,26 @@ package com.shreefintech.paytouchconsumer
 
 import android.app.Dialog
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmLogoutBinding
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
@@ -47,8 +58,11 @@ class HomeActivity : BaseActivity() {
     private val locationHelper = LocationPermissionHelper(this) { location ->
         location?.let { viewModel.sendLocation(it) }
         // Asked after the location flow ends so the two system permission popups never overlap
-        NotificationHelper.requestPermission(mActivity)
+        requestNotificationPermission()
     }
+
+    // True when the location flow ended while Home was not in front — asked again in onResume()
+    private var isNotificationPermissionPending = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,27 +104,62 @@ class HomeActivity : BaseActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (isNotificationPermissionPending) requestNotificationPermission()
+    }
+
+    // Never pop the system dialog over another screen (e.g. a category opened mid location fix)
+    private fun requestNotificationPermission() {
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            isNotificationPermissionPending = true
+            return
+        }
+        isNotificationPermissionPending = false
+        NotificationHelper.requestPermission(mActivity)
+    }
+
     // Animated WebP — decoded on all API levels via the webpdecoder Glide integration.
-    // The static ic_ drawable is shown while loading and if decoding fails.
+    // If decoding fails the static ic_ drawable from the layout is restored and styled so it
+    // stays visible (white icons on a white card need their pill background / tint back).
     private fun loadCategoryIcons() {
         listOf(
-            Triple(binding.ivElectricity, R.drawable.img_electricity, R.drawable.ic_electricity),
-            Triple(binding.ivGas, R.drawable.img_gas, R.drawable.ic_gas),
-            Triple(binding.ivPrepaid, R.drawable.img_prepaid, R.drawable.ic_prepaid),
-            Triple(binding.ivPostpaid, R.drawable.img_postpaid, R.drawable.ic_postpaid),
-            Triple(binding.ivDth, R.drawable.img_dth, R.drawable.ic_broadband),
-            Triple(binding.ivFastag, R.drawable.img_fastag, R.drawable.ic_fastag),
-            Triple(binding.ivLoan, R.drawable.img_loan, R.drawable.ic_loan),
-            Triple(binding.ivTax, R.drawable.img_municipal_tax, R.drawable.ic_tax),
-            Triple(binding.ivMyAccount, R.drawable.img_my_account, R.drawable.ic_profile),
-            Triple(binding.ivLoadWallet, R.drawable.img_load_wallet, R.drawable.ic_wallet)
-        ).forEach { (imageView, animatedRes, fallbackRes) ->
-            Glide.with(this)
-                .load(animatedRes)
-                .placeholder(fallbackRes)
-                .error(fallbackRes)
-                .into(imageView)
+            binding.ivElectricity to R.drawable.img_electricity,
+            binding.ivGas to R.drawable.img_gas,
+            binding.ivPrepaid to R.drawable.img_prepaid,
+            binding.ivPostpaid to R.drawable.img_postpaid,
+            binding.ivDth to R.drawable.img_dth,
+            binding.ivFastag to R.drawable.img_fastag,
+            binding.ivLoan to R.drawable.img_loan,
+            binding.ivTax to R.drawable.img_municipal_tax,
+            binding.ivMyAccount to R.drawable.img_my_account
+        ).forEach { (imageView, animatedRes) ->
+            loadAnimatedIcon(imageView, animatedRes) {
+                imageView.setBackgroundResource(R.drawable.bg_toggle_selected)
+            }
         }
+        loadAnimatedIcon(binding.ivLoadWallet, R.drawable.img_load_wallet) {
+            ImageViewCompat.setImageTintList(
+                binding.ivLoadWallet,
+                ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.white))
+            )
+        }
+    }
+
+    private fun loadAnimatedIcon(imageView: ImageView, @DrawableRes animatedRes: Int, onFallback: () -> Unit) {
+        val fallback = imageView.drawable
+        Glide.with(this)
+            .load(animatedRes)
+            .error(fallback)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean): Boolean {
+                    onFallback()
+                    return false
+                }
+
+                override fun onResourceReady(resource: Drawable, model: Any, target: Target<Drawable>?, dataSource: DataSource, isFirstResource: Boolean) = false
+            })
+            .into(imageView)
     }
 
     private fun showLogoutDialog() {

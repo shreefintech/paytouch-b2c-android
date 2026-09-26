@@ -3,7 +3,6 @@ package com.shreefintech.paytouchconsumer
 import android.app.Application
 import android.location.Location
 import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -39,7 +38,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         )
         ApiClient.apiService.sendLocation(bearerToken(), body)
             .enqueue(object : Callback<MessageItem> {
-                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {}
+                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+                    if (!response.isSuccessful) {
+                        IllegalStateException("sendLocation failed: HTTP ${response.code()}").printStackTrace()
+                    }
+                }
+
                 override fun onFailure(call: Call<MessageItem>, t: Throwable) {
                     t.printStackTrace()
                 }
