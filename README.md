@@ -151,7 +151,7 @@ com.shreefintech.paytouchconsumer/
 |   +-- ApiAdminService.kt          Endpoint declarations for admin.paytouch.in
 |   +-- ApiHelper.kt                Error body parsing
 |   +-- SessionInterceptor.kt       Global 401 handler -- clears session + relaunches LoginActivity
-|   \-- CurlInterceptor.kt          Debug curl logger (Logcat tag: CURL)
+|   \-- CurlInterceptor.kt          Debug curl logger (Logcat tag: CURL) -- gitignored, local-only
 |
 +-- glass/              LiquidGlassEffect blur UI system
 +-- widget/             Reusable custom views (LiquidGlassButton, CustomDropdown, OutlineTextView)
@@ -211,7 +211,7 @@ Register / Login
 | Electricity | `ElectricityActivity` | Bill-fetch | 5 | Complete |
 | Gas | `GasActivity` | Bill-fetch | 5 | Complete |
 | Mobile Prepaid | `PrepaidActivity` | Plan-select | 6 | Complete |
-| Mobile Postpaid | `PostpaidActivity` | Bill-fetch + circle | 5 | Complete |
+| Mobile Postpaid | `PostpaidActivity` | Bill-fetch | 5 | Complete |
 | DTH | `DthActivity` | Plan-select | 6 | Complete |
 | FASTag | `FastagActivity` | Amount-entry | 5 | Complete |
 | Loan Repayment | `LoanActivity` | Bill-fetch | 5 | Complete |
@@ -261,13 +261,13 @@ Lazy singleton. OkHttp chain (in order):
 1. Header interceptor — adds `Accept: application/json`
 2. **SessionInterceptor** — on 401: clears SharedPreferences, relaunches `LoginActivity` (clear back stack)
 3. `HttpLoggingInterceptor` — DEBUG builds only
-4. `CurlInterceptor` — DEBUG builds only (Logcat tag: `CURL`)
+4. `CurlInterceptor` — DEBUG builds only (Logcat tag: `CURL`). **Gitignored (`.gitignore:27`) — not present in a fresh clone.** `ApiClient` references it directly, so create `retrofit/CurlInterceptor.kt` locally before building a fresh clone.
 
 Timeouts: 30s connect / read / write.
 
 ### ApiAdminClient — `admin.paytouch.in`
 
-Separate singleton. Used only for VPS user registration (fire-and-forget after login success). No interceptors.
+Separate singleton. Used for VPS user registration (fire-and-forget after login success) and VPS balance checks (`BaseBillViewModel.checkVpsBalance()`). Adds `SessionInterceptor` only (updates `LAST_INTERACTION` + global 401 handling) — no header, logging, or curl interceptors. Timeouts: 30s connect / read / write.
 
 ### Endpoint Pattern
 

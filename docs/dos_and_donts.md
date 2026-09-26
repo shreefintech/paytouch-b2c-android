@@ -297,7 +297,7 @@ Apply to every `mapToDisplayItem()` in every module's recent transaction ViewMod
 |---|---|
 | Electricity, Gas, Loan, Municipal Tax | `R.string.labelConsumerNo` — "Consumer No" |
 | Mobile Prepaid, Mobile Postpaid, DTH | `R.string.labelMobileNo` — "Mobile No." |
-| FASTag | `R.string.labelVehicleNumber` — "Vehicle No" |
+| FASTag | `R.string.labelVehicleNumber` — "Vehicle Number" |
 
 ```kotlin
 // In populateReceiptFromApi() — consumer-number category (Electricity, Gas, Loan, Municipal Tax)

@@ -418,12 +418,12 @@ Transaction IDs are **generated and returned by the backend** in the `process-pa
 | `AUTH` | `PENDING_ORDER_ID` | String | HDFC order ID in progress (cleared after status check) |
 | `AUTH` | `PENDING_AMOUNT` | String | HDFC payment amount in progress (cleared after status check) |
 | `app_prefs` | `mpin_created` | Boolean | MPIN setup complete |
-| `app_prefs` | `LAST_INTERACTION` | String (Long ms) | Timestamp of last user interaction — used for idle session timeout |
+| `app_prefs` | `LAST_INTERACTION` | String (Long ms) | Timestamp of last API call — used for idle session timeout |
 
 ### Rules
 - Token is checked at Splash; no token → go to Login
 - Any 401 response → clear ALL SharedPreferences → launch LoginActivity with `FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK`
-- **Idle session timeout:** `BaseActivity.onResume()` calls `checkSessionTimeout()`. If the elapsed time since `LAST_INTERACTION` exceeds `SESSION_TIMEOUT_MS` (5 minutes), the session is cleared and `LoginActivity` is launched with a cleared back stack. `LAST_INTERACTION` is updated on every `onUserInteraction()` call while the user is logged in.
+- **Idle session timeout (API-call based):** `LAST_INTERACTION` is written by `SessionInterceptor` on every API call while the user is logged in (both `ApiClient` and `ApiAdminClient`), and once by `LoginViewModel` at login. `BaseActivity` calls `checkSessionTimeout()` in `onResume()` and then every 30 seconds (`SESSION_CHECK_INTERVAL_MS`) until `onPause()`. If the elapsed time since `LAST_INTERACTION` exceeds `SESSION_TIMEOUT_MS` (5 minutes), the session is cleared and `LoginActivity` is launched with a cleared back stack. Touch events do **not** reset the timer — the touch-based `onUserInteraction()` approach was intentionally removed in B2C-145.
 - `isLoggedIn()` = token is not null AND userId > 0
 
 ---

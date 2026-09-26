@@ -368,8 +368,8 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules â
 
 | Endpoint | Purpose |
 |---|---|
-| `GET api/kyc/account-info` | Fetch account profile data |
-| `GET api/referral` | Fetch referral code and link |
+| `GET api/dashboard-kyc/account-overview` | Fetch account profile data |
+| `GET api/referral-info` | Fetch referral code and link |
 
 **Pending:** `TODO(PAYTOUCH-523)` â€” expose `totalEarnings` and `earningPotential` on Refer & Earn tab.
 
@@ -387,7 +387,7 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules â
 
 **Package:** `myaccount/`
 
-**ViewModel:** `KycDetailsViewModel` â€” calls `api/kyc/my-account` (flat response, `KycMyAccountItem`)
+**ViewModel:** `KycDetailsViewModel` â€” calls `api/dashboard-kyc/my-account` (flat response, `KycMyAccountItem`)
 
 **Key UI elements:**
 - Identity section: avatar, mobile, Aadhaar, PAN, email, verification status chip
