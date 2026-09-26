@@ -64,6 +64,8 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    // Animated WebP decoding on API < 28 (version suffix must match the Glide version)
+    implementation("com.github.zjupure:webpdecoder:2.6.4.16.0")
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")

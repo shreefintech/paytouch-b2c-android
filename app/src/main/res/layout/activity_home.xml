@@ -107,10 +107,10 @@
                                     android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivElectricity"
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
-                                        android:background="@drawable/bg_toggle_selected"
                                         android:src="@drawable/ic_electricity" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -153,10 +153,10 @@
                                     android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivGas"
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
-                                        android:background="@drawable/bg_toggle_selected"
                                         android:src="@drawable/ic_gas" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -199,10 +199,10 @@
                                     android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivPrepaid"
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
-                                        android:background="@drawable/bg_toggle_selected"
                                         android:src="@drawable/ic_prepaid" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -254,10 +254,10 @@
                                     android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivPostpaid"
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
-                                        android:background="@drawable/bg_toggle_selected"
                                         android:src="@drawable/ic_postpaid" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -299,10 +299,10 @@
                                     android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivDth"
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
-                                        android:background="@drawable/bg_toggle_selected"
                                         android:src="@drawable/ic_broadband" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -343,10 +343,10 @@
                                     android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivFastag"
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
-                                        android:background="@drawable/bg_toggle_selected"
                                         android:src="@drawable/ic_fastag" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -397,10 +397,10 @@
                                     android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivLoan"
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
-                                        android:background="@drawable/bg_toggle_selected"
                                         android:src="@drawable/ic_loan" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -442,10 +442,10 @@
                                     android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivTax"
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
-                                        android:background="@drawable/bg_toggle_selected"
                                         android:src="@drawable/ic_tax" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -486,10 +486,10 @@
                                     android:paddingBottom="@dimen/margin_medium">
 
                                     <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivMyAccount"
                                         android:layout_width="@dimen/category_icon_size"
                                         android:layout_height="@dimen/category_icon_size"
                                         android:layout_gravity="center"
-                                        android:background="@drawable/bg_toggle_selected"
                                         android:src="@drawable/ic_profile" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -556,6 +556,7 @@
                                 app:layout_constraintTop_toTopOf="parent">
 
                                 <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/ivLoadWallet"
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
                                     android:src="@drawable/ic_wallet"

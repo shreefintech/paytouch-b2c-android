@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmLogoutBinding
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
@@ -75,6 +76,8 @@ class HomeActivity : BaseActivity() {
 
         binding.lytToolbar.ivLogo.requestLayout()
 
+        loadCategoryIcons()
+
         val listener = onClickListener()
         binding.onClickListener = listener
         binding.lytToolbar.onClickListener = listener
@@ -84,6 +87,29 @@ class HomeActivity : BaseActivity() {
         if (savedInstanceState == null) {
             NotificationHelper.syncToken(mActivity)
             locationHelper.start()
+        }
+    }
+
+    // Animated WebP — decoded on all API levels via the webpdecoder Glide integration.
+    // The static ic_ drawable is shown while loading and if decoding fails.
+    private fun loadCategoryIcons() {
+        listOf(
+            Triple(binding.ivElectricity, R.drawable.img_electricity, R.drawable.ic_electricity),
+            Triple(binding.ivGas, R.drawable.img_gas, R.drawable.ic_gas),
+            Triple(binding.ivPrepaid, R.drawable.img_prepaid, R.drawable.ic_prepaid),
+            Triple(binding.ivPostpaid, R.drawable.img_postpaid, R.drawable.ic_postpaid),
+            Triple(binding.ivDth, R.drawable.img_dth, R.drawable.ic_broadband),
+            Triple(binding.ivFastag, R.drawable.img_fastag, R.drawable.ic_fastag),
+            Triple(binding.ivLoan, R.drawable.img_loan, R.drawable.ic_loan),
+            Triple(binding.ivTax, R.drawable.img_municipal_tax, R.drawable.ic_tax),
+            Triple(binding.ivMyAccount, R.drawable.img_my_account, R.drawable.ic_profile),
+            Triple(binding.ivLoadWallet, R.drawable.img_load_wallet, R.drawable.ic_wallet)
+        ).forEach { (imageView, animatedRes, fallbackRes) ->
+            Glide.with(this)
+                .load(animatedRes)
+                .placeholder(fallbackRes)
+                .error(fallbackRes)
+                .into(imageView)
         }
     }
 
