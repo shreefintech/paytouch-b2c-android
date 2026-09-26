@@ -306,6 +306,21 @@
     <string name="titleGasPaymentConfirmation">Gas Payment Confirmation</string>
     <string name="titlePrepaidPaymentConfirmation">Prepaid Payment Confirmation</string>
     <string name="labelPaytouchSmsNotification">Paytouch SMS Notification</string>
+    <string name="labelNotificationChannelId" translatable="false">push_channel</string>
+    <string name="labelNotificationChannel">Payment &amp; Account Alerts</string>
+
+    <!-- Location permission -->
+    <string name="titleLocationAccess">Allow Location Access</string>
+    <string name="msgLocationAwareness">As per RBI guidelines, your location helps verify payments and protect you from fraud.</string>
+    <string name="labelLocationPoints">✓  Used only to secure your payments\n✓  Taken only while you use the app, never in the background\n✓  Not used for ads or marketing</string>
+    <string name="titleLocationRationale">Location Needed for Secure Payments</string>
+    <string name="msgLocationRationale">Bill payments on PayTouch need your location for the risk-based fraud checks required under RBI rules. Please allow location access to continue.</string>
+    <string name="titleLocationSettings">Enable Location in Settings</string>
+    <string name="msgLocationSettings">Location access is turned off for PayTouch. Open Settings → Permissions → Location and choose \"Allow only while using the app\".</string>
+    <string name="msgTurnOnLocation">Please turn on location to make secure payments.</string>
+    <string name="btnAllow">Allow</string>
+    <string name="btnNotNow">Not Now</string>
+    <string name="btnOpenSettings">Open Settings</string>
     <string name="labelBConnectTxnColon">B-Connect Txn ID:</string>
     <string name="labelDateColon">Date:</string>
     <string name="labelPaytouchSignature">-Paytouch</string>

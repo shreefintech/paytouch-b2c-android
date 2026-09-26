@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "798882728986",
+    "project_id": "paytouch-b2c",
+    "storage_bucket": "paytouch-b2c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:798882728986:android:f3fdf2e6c0aa83252695a3",
+        "android_client_info": {
+          "package_name": "com.shreefintech.paytouchconsumer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZkSyO7uPGdpvkdPfdILJVOM4FZu1Vw8c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
