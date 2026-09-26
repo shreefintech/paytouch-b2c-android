@@ -1,7 +1,7 @@
 # PayTouch Consumer — Screens & Navigation
 
 > **Status legend:** ✅ Implemented (UI + API) | 🔧 UI only (API pending) | 📋 Planned (not started)
-> **Current phase:** API wiring in progress. Core modules have live API integration.
+> All core modules are fully implemented with live API integration. Cable TV is the only remaining planned module.
 
 ---
 
@@ -192,8 +192,9 @@
 - App launch (already onboarded)
 
 **Exit points:**
-- Category tile tap → respective category screen (planned)
+- Category tile tap → respective category screen (all implemented modules are wired; Cable TV tile is a TODO placeholder)
 - "Load Wallet" tap → `LoadWalletActivity`
+- "My Account" tile → `MyAccountActivity`
 
 **Key UI elements:**
 - Toolbar with PayTouch logo and back button
@@ -367,8 +368,8 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules �
 
 | Endpoint | Purpose |
 |---|---|
-| `GET api/kyc/account-info` | Fetch account profile data |
-| `GET api/referral` | Fetch referral code and link |
+| `GET api/dashboard-kyc/account-overview` | Fetch account profile data |
+| `GET api/referral-info` | Fetch referral code and link |
 
 **Pending:** `TODO(PAYTOUCH-523)` — expose `totalEarnings` and `earningPotential` on Refer & Earn tab.
 
@@ -386,7 +387,7 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules �
 
 **Package:** `myaccount/`
 
-**ViewModel:** `KycDetailsViewModel` — calls `api/kyc/my-account` (flat response, `KycMyAccountItem`)
+**ViewModel:** `KycDetailsViewModel` — calls `api/dashboard-kyc/my-account` (flat response, `KycMyAccountItem`)
 
 **Key UI elements:**
 - Identity section: avatar, mobile, Aadhaar, PAN, email, verification status chip
@@ -485,7 +486,7 @@ Session check (read SharedPreferences)
                LoanActivity ✅             MunicipalTaxActivity ✅    MyAccountActivity ✅
                            │                              │                    │
                Recent Report Status Receipt  Recent Report Status Receipt   Account Info + Refer & Earn
-                Txns                          Txns                           TODO(B2C-81): KycDetailsActivity 📋
+                Txns                          Txns                           KycDetailsActivity ✅
                 ✅    ✅    ✅    ✅             ✅    ✅    ✅    ✅
 
                LoadWalletActivity ✅ ("Load Wallet" button)
@@ -512,6 +513,7 @@ All detail taps → TransactionDetailActivity ✅ (shared by all modules)
 - **Onboarding back stack:** Users cannot navigate back to a completed onboarding step. Use `FLAG_ACTIVITY_CLEAR_TOP` or equivalent.
 - **Post-login stack:** After successful login/registration, the back stack is cleared — the user cannot press Back to reach the login screen from Home.
 - **Forced logout (401):** Stack completely cleared with `FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK`.
+- **Forced logout (idle timeout):** `BaseActivity.onResume()` checks `LAST_INTERACTION` in SharedPreferences. If the user has been idle for more than 5 minutes (`SESSION_TIMEOUT_MS`), the session is cleared and `LoginActivity` is launched with a cleared back stack — same as a 401 forced logout.
 - **Within a category:** Back navigation returns to the Category Home screen.
 - **Result refresh:** Use `ActivityResultLauncher` when a child screen's data changes should trigger a refresh on the parent screen.
 

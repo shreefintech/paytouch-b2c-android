@@ -4,6 +4,29 @@ User profile viewer and referral/earn screen. Two tabs: **Account Info** (KYC-de
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.myaccount`
+
+**First files to open:**
+1. `MyAccountActivity.kt` — two-tab screen; both API calls triggered in `onCreate()` (no manual refresh)
+2. `viewmodel/MyAccountViewModel.kt` — extends `AndroidViewModel` (not `BaseBillViewModel`); two independent API calls
+3. `KycDetailsActivity.kt` — in this same package; opened from "View KYC Details" button; shows submitted KYC documents
+4. `retrofit/model/myaccount/` folder — `AccountInfoItem`, `ReferralInfoItem` and their data classes
+
+**Launched from:** `HomeActivity` → `binding.llMyAccount` click handler
+
+**ViewModel base class:** `AndroidViewModel` — this module has no bill-payment flow, so `BaseBillViewModel` is not used
+
+**Key things to know:**
+- Both tabs load their data up-front in `onCreate()` — tab switching is purely visual (no re-fetch)
+- Balance (`wallet_balance`) is shown via `Utility.formatAmount()`; `"--"` when null
+- `KycDetailsActivity` is in this package but calls `GET /api/dashboard-kyc/my-account` (same endpoint family as the KYC module)
+- `DocPreviewActivity` is also in this package — handles full-screen image/PDF preview of KYC documents
+- Clipboard copy uses `ClipboardManager` directly; share uses `Intent.ACTION_SEND` — no third-party libraries needed
+
+---
+
 ## Entry Point
 
 `MyAccountActivity` — launched from `HomeActivity` via `binding.llMyAccount`.
@@ -37,9 +60,9 @@ No data is passed on entry — all content is fetched from the API.
 
 | File | Purpose |
 |---|---|
-| `AccountInfoItem.kt` | Response wrapper for `GET /api/kyc/account-info` |
-| `AccountInfoDataItem.kt` | Account profile fields (member ID, name, balance, dates, etc.) |
-| `ReferralInfoItem.kt` | Response wrapper for `GET /api/referral` |
+| `AccountInfoItem.kt` | Flat response for `GET /api/dashboard-kyc/account-overview`; also declares nested `AccountInfoContactItem` and `AccountInfoMembershipItem` |
+| `AccountInfoMemberItem.kt` | Nested `member` object (`memberCode`, `city`, `status`) |
+| `ReferralInfoItem.kt` | Response wrapper for `GET /api/referral-info` |
 | `ReferralDataItem.kt` | Referral code, link, total earnings, earning potential |
 
 ---
@@ -52,20 +75,19 @@ Displays KYC-verified profile data. Shows a shimmer placeholder while the API ca
 
 | Field | Source field |
 |---|---|
-| Member ID | `AccountInfoDataItem.memberId` |
-| Member No | `AccountInfoDataItem.memberNo` |
-| Member Code | `AccountInfoDataItem.memberCode` |
-| Member Name | `AccountInfoDataItem.memberName` |
-| Mobile No | `AccountInfoDataItem.mobileNo` |
-| Email | `AccountInfoDataItem.email` |
-| Status | `AccountInfoDataItem.status` |
-| City | `AccountInfoDataItem.cityName` |
-| Home Address | `AccountInfoDataItem.homeAddress` |
-| Registration Date | `AccountInfoDataItem.registrationDate` — formatted `dd-MM-yyyy` |
-| Activation Date | `AccountInfoDataItem.activationDate` — formatted `dd-MM-yyyy` |
-| Balance | `AccountInfoDataItem.balance` — server format: `"100.00 [ Rupees One Hundred Only ]"`. Amount (before `[`) and words (inside `[ ]`) are split and displayed separately. |
+| Member Name | `AccountInfoItem.name` |
+| Status | `AccountInfoItem.member?.status` |
+| Member Code | `AccountInfoItem.member?.memberCode` |
+| Mobile No | `AccountInfoItem.contact?.mobile` |
+| Email | `AccountInfoItem.contact?.email` |
+| Home Address | `AccountInfoItem.homeAddress` |
+| Registration Date | `AccountInfoItem.membership?.registeredOn` — `Utility.formatDate(…, "dd-MM-yyyy")` |
+| Activation Date | `AccountInfoItem.membership?.activatedOn` — `Utility.formatDate(…, "dd-MM-yyyy")` |
+| Balance | `AccountInfoItem.walletBalance` — `Utility.formatAmount(…)`, `"--"` when null |
 
-**"View KYC Details" button:** Navigates to `KycDetailsActivity` (in this package) — fetches `GET /api/kyc/my-account` via `KycDetailsViewModel`. Document taps open `DocPreviewActivity` with `extra_file_url` + `extra_file_title`.
+Text fields fall back to `"--"` when null.
+
+**"View KYC Details" button:** Navigates to `KycDetailsActivity` (in this package) — fetches `GET /api/dashboard-kyc/my-account` via `KycDetailsViewModel`. Document taps open `DocPreviewActivity` with `extra_file_url` + `extra_file_title`.
 
 ---
 
@@ -88,15 +110,15 @@ Displays referral code and link with copy and share actions. Shows a shimmer pla
 
 ## API Endpoints
 
-| Method | Endpoint | ViewModel method | Response model |
-|---|---|---|---|
-| GET | `api/kyc/account-info` | `getAccountInfo()` | `AccountInfoItem` |
-| GET | `api/referral` | `getReferralInfo()` | `ReferralInfoItem` |
+| Method | Endpoint | `ApiService` function | ViewModel method | Response model |
+|---|---|---|---|---|
+| GET | `api/dashboard-kyc/account-overview` | `getAccountOverview()` | `getAccountInfo()` | `AccountInfoItem` |
+| GET | `api/referral-info` | `getReferralInfo()` | `getReferralInfo()` | `ReferralInfoItem` |
 
 **Success check (both endpoints):** `response.isSuccessful && response.body()?.success == true`
 
 **Parameters:**
-- `getAccountInfo` — `Authorization: Bearer <token>` header + `userId` from `SharedPreferenceHelper`
+- `getAccountInfo` — `Authorization: Bearer <token>` header only
 - `getReferralInfo` — `Authorization: Bearer <token>` header only
 
 **ViewModel base class:** `AndroidViewModel` — My Account has no bill-payment flow, so `BaseBillViewModel` is not used here.

@@ -1,6 +1,6 @@
 # PayTouch Consumer — Plain English Overview
 
-> **Current phase:** API wiring in progress. Core modules (Auth, Electricity, Gas, Prepaid, Postpaid, DTH, FASTag, Loan, Municipal Tax, My Account, Load Wallet) have live API integration. Newly added modules may begin with UI stubs marked `TODO(PAYTOUCH-xxx):`. This document describes the intended final behaviour of the app.
+> **Current status:** All core modules (Auth, Electricity, Gas, Prepaid, Postpaid, DTH, FASTag, Loan, Municipal Tax, My Account, Load Wallet) are fully implemented with live API integration. Cable TV is the only remaining planned module. This document describes the app as it stands today.
 
 ---
 
@@ -19,9 +19,8 @@ Every user of this app is a verified Indian consumer. There are no admin or agen
 1. Register an account
 2. Complete KYC (Know Your Customer) verification
 3. Create a 4-digit MPIN (used for secure login)
-4. Set up a Virtual Account (banking details for receiving/sending money)
 
-Until all four steps are complete, the user cannot reach the main dashboard.
+Until all three steps are complete, the user cannot reach the main dashboard. Virtual account creation is handled server-side automatically after KYC approval — there is no client-side virtual account screen.
 
 ---
 
@@ -179,7 +178,7 @@ A user who skips any step cannot access payment features. The server drives this
 |---|---|
 | PayTouch Main API (`paytouch.in`) | All core features: auth, KYC, MPIN, bill payments, wallet |
 | VPS Admin Backend (`admin.paytouch.in`) | Parallel tracking of users, transactions, KYC, and balance |
-| Legacy MobiKwik API (`dashboard.shreefintechsolutions.com`) | Old payment processing — audit which endpoints are still in use |
+| Legacy MobiKwik API (`dashboard.shreefintechsolutions.com`) | Old payment processing — some flows may still route here; audit before any new endpoint wiring |
 | HDFC SmartGateway | Payment processing for bill payments |
 | Dynamic QR Server | QR-based payment flow (URL must be stable before release) |
 | Firebase Cloud Messaging (FCM) | Push notifications |

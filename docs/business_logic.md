@@ -1,6 +1,6 @@
 # PayTouch Consumer — Business Logic Reference
 
-> **Current phase:** API wiring in progress. Core modules have live API integration. Field names and endpoint paths listed here are authoritative; do not invent your own.
+> All core modules are fully implemented with live API integration. Field names and endpoint paths listed here are authoritative; do not invent your own.
 
 ---
 
@@ -87,11 +87,12 @@ Both sections must be completed before KYC can be submitted. Once both are done,
 ### API Endpoints
 | Method | Path | Purpose |
 |---|---|---|
-| GET  | `api/dashboard/kyc` | Fetch current KYC status and section states |
-| POST | `api/dashboard/kyc/initiate` | Initiate KYC session |
-| POST | `api/dashboard/kyc/section-b` | Submit identity verification (multipart) |
-| POST | `api/dashboard/kyc/section-c` | Submit bank details (multipart, 1-4 accounts) |
-| POST | `api/dashboard/kyc/agree` | Mark KYC as agreed after all sections submitted |
+| GET  | `api/dashboard-kyc/status` | Fetch current KYC status and section states |
+| POST | `api/dashboard-kyc/initiate` | Initiate KYC session (entity_type = "individual") |
+| POST | `api/dashboard-kyc/sections/a` | Submit section A placeholder (has_gst = "0") |
+| POST | `api/dashboard-kyc/sections/b/signatory` | Submit identity documents (PAN, Aadhaar ×2, selfie — multipart) |
+| POST | `api/dashboard-kyc/sections/c` | Submit bank details (multipart, 1–4 accounts) |
+| POST | `api/dashboard-kyc/agree` | Mark KYC as agreed after all sections submitted |
 
 ### Request Fields — Identity Verification
 - `mobile` (String, required, 10 digits)
@@ -111,7 +112,7 @@ Both sections must be completed before KYC can be submitted. Once both are done,
 - `bank_proof` (File, required)
 
 ### Edge Cases
-- If either section was already submitted, its hub row should show a completed state (pre-fill pending API wiring)
+- If a section was already submitted, its hub row shows a completed state (derived from `api/dashboard-kyc/status` response)
 
 ---
 
@@ -263,11 +264,15 @@ amount > 40000           → fee = ₹30
 ### API Endpoints
 | Method | Path | Purpose |
 |---|---|---|
+| GET | `api/states` | Get circle (telecom zone) list — fetched on screen open |
 | GET | `api/recharge/operators` | Get prepaid operators |
 | GET | `api/recharge/plans/{operatorId}/{circleId}` | Get plans for selected operator + circle |
 | POST | `api/recharge/process-direct` | Process recharge |
 
-> `transaction-status` and `payment-reports` for Prepaid are not implemented yet — planned as a follow-up ticket, same sequencing as Gas (pay module first, transaction status/report second).
+> Prepaid transaction screens (recent transactions, report, status, SMS receipt) are fully implemented.
+
+### Response Fields (States/Circles — `General<T>` wrapped)
+- `data[].id` (String), `data[].name` (String)
 
 ### Response Fields (Operators — `General<T>` wrapped)
 - `data[].id` (String), `data[].name` (String), `data[].code` (String)
@@ -280,7 +285,7 @@ amount > 40000           → fee = ₹30
 ### Request Fields (Process Recharge)
 - `mobile_no` (String, required)
 - `operator_code` (String, required)
-- `circle_code` (String, required) — circle value from the fixed circle list, not a server-fetched dropdown
+- `circle_code` (String, required) — `id` from the `api/states` response (server-fetched, not a hardcoded list)
 - `amount` (Decimal, required)
 - `platform_fee` (Decimal, required)
 - `total_payable` (Decimal, required)
@@ -318,7 +323,7 @@ amount > 40000           → fee = ₹30
 | GET | `api/fastag/operators` | Get FASTag operators |
 | POST | `api/fastag` | Process recharge |
 
-> `transaction-status`, `payment-report`, and SMS receipt for FASTag are not implemented yet — planned as a follow-up ticket.
+> FASTag transaction screens (recent transactions, report, status, SMS receipt) are fully implemented.
 
 ### Request Fields (Process Recharge)
 - `vehicle_number` (String, required)
@@ -342,9 +347,9 @@ amount > 40000           → fee = ₹30
 |---|---|---|
 | GET | `api/wallet/balance` | Get current wallet balance |
 | GET | `api/transactions` | Get unified paginated transaction history |
-| POST | `api/hdfc/create-order` | Create HDFC payment order for wallet top-up |
+| POST | `api/hdfc/orders` | Create HDFC payment order for wallet top-up |
 | GET | `api/wallet/transactions` | Paginated wallet transaction history (Load Wallet screen) |
-| GET | `api/hdfc/order-status/{orderId}` | Check HDFC order status after returning from WebView |
+| GET | `api/hdfc/orders/{order_id}/status` | Check HDFC order status after returning from WebView |
 | GET | `api/dashboard-kyc/my-account` | Fetch full KYC details for `KycDetailsActivity` |
 
 ### Response Fields (Balance)
@@ -413,10 +418,12 @@ Transaction IDs are **generated and returned by the backend** in the `process-pa
 | `AUTH` | `PENDING_ORDER_ID` | String | HDFC order ID in progress (cleared after status check) |
 | `AUTH` | `PENDING_AMOUNT` | String | HDFC payment amount in progress (cleared after status check) |
 | `app_prefs` | `mpin_created` | Boolean | MPIN setup complete |
+| `app_prefs` | `LAST_INTERACTION` | String (Long ms) | Timestamp of last API call — used for idle session timeout |
 
 ### Rules
 - Token is checked at Splash; no token → go to Login
 - Any 401 response → clear ALL SharedPreferences → launch LoginActivity with `FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK`
+- **Idle session timeout (API-call based):** `LAST_INTERACTION` is written by `SessionInterceptor` on every API call while the user is logged in (both `ApiClient` and `ApiAdminClient`), and once by `LoginViewModel` at login. `BaseActivity` calls `checkSessionTimeout()` in `onResume()` and then every 30 seconds (`SESSION_CHECK_INTERVAL_MS`) until `onPause()`. If the elapsed time since `LAST_INTERACTION` exceeds `SESSION_TIMEOUT_MS` (5 minutes), the session is cleared and `LoginActivity` is launched with a cleared back stack. Touch events do **not** reset the timer — the touch-based `onUserInteraction()` approach was intentionally removed in B2C-145.
 - `isLoggedIn()` = token is not null AND userId > 0
 
 ---

@@ -6,6 +6,38 @@ Handles DTH (Direct-to-Home) recharge: operator selection, plan browsing, mobile
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.dth`
+Transaction screens: `dth/transactions/` | ViewModels: `dth/viewmodel/`
+
+**Pattern:** Plan-select — operator → browse plans (DTH-specific screen) → amount auto-filled → pay (no bill-fetch, no circle picker)
+
+**First files to open:**
+1. `DthActivity.kt` — operator dropdown, mobile number, browse plans button, plan card (shown after selection)
+2. `DthPlanSelectionActivity.kt` — DTH-specific plan browser (separate from `PrepaidPlanSelectionActivity`)
+3. `viewmodel/DthViewModel.kt` — extends `BaseBillViewModel`; `process-direct` endpoint; clears plan on operator change
+4. `retrofit/model/dth/` folder — DTH-specific DTOs
+
+**Shared components this module uses (outside `dth/`):**
+- `adapter/DthPlanAdp.kt` — DTH plan list (lives in `adapter/`, DTH-specific)
+- `adapter/RecentTransactionAdp.kt` + `adapter/TransactionAdp.kt`
+- `transactions/model/RecentTransactionItem.kt` + `TransactionItem.kt`
+- `transactions/TransactionDetailActivity.kt`
+- `utill/TransactionFilterHelper.kt` + `utill/ReceiptHelper.kt`
+- `BaseBillViewModel.kt`
+
+**Launched from:** `HomeActivity` → `binding.cardDth` click handler
+
+**Key DTH-specific points:**
+- No circle picker — DTH operators are national, no regional circle needed
+- DTH has its own `DthPlanSelectionActivity` (not shared with Prepaid)
+- `isMobileCategory = true` — label shows "Mobile No" not "Consumer No"
+- Operator change clears the selected plan (calls `clearSelectedPlan()`)
+- `DthPlansListItem.requiresManualAmount` field exists but is not yet wired to UI
+
+---
+
 ## Screens & ViewModels
 
 | Activity | ViewModel | Purpose |
@@ -207,7 +239,7 @@ All endpoints declared in `ApiService.kt` under the `// ── DTH ──` secti
 | Aspect | Gas / Electricity | Prepaid | DTH |
 |---|---|---|---|
 | Bill fetch step | Required | None | None |
-| Circle selection | N/A | User picks from local STATE_LIST | Not applicable |
+| Circle selection | N/A | User picks from live `GET api/states` list | Not applicable |
 | Plan selection screen | N/A | `PrepaidPlanSelectionActivity` | `DthPlanSelectionActivity` |
 | Transactions type param | `"electricity"` / `"gas"` | `"mobile_recharge"` | `"dth"` |
 | Status search field | Transaction ID | Mobile number | Transaction ID |

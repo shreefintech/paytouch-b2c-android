@@ -4,6 +4,36 @@ Handles wallet top-up via the HDFC payment gateway (WebView-based), displays wal
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.loadwallet`
+
+**First files to open:**
+1. `LoadWalletActivity.kt` — main screen; wallet balance display, bottom-sheet payment form, HDFC order creation, `onResume()` order-status check
+2. `viewmodel/LoadWalletViewModel.kt` — wallet data fetch, `createHdfcOrder()`, `checkOrderStatus()`
+3. `HdfcPaymentHelper.kt` — singleton that bridges the gap between `LoadWalletActivity` → `HdfcWebViewActivity` → back; holds pending order state across the Activity boundary
+4. `HdfcWebViewActivity.kt` — WebView loader; intercepts HDFC return URL to `finish()`
+5. `retrofit/model/hdfc/` folder — order creation request/response DTOs
+
+**Launched from:** `HomeActivity` → `binding.llLoadWallet` / wallet balance area click handler
+
+**ViewModel base class:** `AndroidViewModel` — no bill-payment flow; `BaseBillViewModel` is not used
+
+**The Activity lifecycle dance (critical to understand):**
+1. User taps "Proceed" → `createHdfcOrder()` → HDFC returns a `payUrl`
+2. `HdfcPaymentHelper` stores `pendingOrderId` + `pendingAmount`, then starts `HdfcWebViewActivity`
+3. WebView loads `payUrl`; intercepts the HDFC return URL → calls `finish()`
+4. `LoadWalletActivity.onResume()` fires → sees `pendingOrderId` → calls `checkOrderStatus()` → navigates to `PaymentStatusActivity`
+5. `PaymentStatusActivity` auto-finishes after 5s → returns to `LoadWalletActivity` via `FLAG_ACTIVITY_CLEAR_TOP` → `onNewIntent()` triggers data refresh
+
+**Key design points:**
+- `LoadWalletActivity` has `launchMode = singleTop` — required for `FLAG_ACTIVITY_CLEAR_TOP` re-entry via `onNewIntent()`
+- `@Volatile hasReturned` flag in `HdfcWebViewActivity` — `shouldInterceptRequest` runs on a WebView background thread
+- All HDFC status constants live in `Constant.kt`
+- `TransactionHistoryDetailActivity` (in `transactions/`) handles wallet transaction detail — separate from bill-payment `TransactionDetailActivity`
+
+---
+
 ## Screens & ViewModels
 
 | Activity | ViewModel | Purpose |

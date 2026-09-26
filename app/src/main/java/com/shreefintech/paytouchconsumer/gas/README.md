@@ -6,6 +6,32 @@ Handles the full gas bill payment flow: operator selection, bill fetch, payment 
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.gas`
+Transaction screens: `gas/transactions/` | ViewModels: `gas/viewmodel/`
+
+**Pattern:** Bill-fetch — operator → consumer number → `POST /api/gas/fetch-bill` → confirm bill card → pay
+
+**First files to open:**
+1. `GasActivity.kt` — identical structure to `ElectricityActivity`; swap class names to understand it
+2. `viewmodel/GasViewModel.kt` — extends `BaseBillViewModel`; same flow as `ElectricityViewModel`
+3. `retrofit/model/gas/` folder — Gas-specific DTOs
+4. `transactions/GasRecentTransactionActivity.kt` — loads gas operators first, then paginated history
+
+**Shared components this module uses (outside `gas/`):**
+- `adapter/RecentTransactionAdp.kt` + `adapter/TransactionAdp.kt`
+- `transactions/model/RecentTransactionItem.kt` + `TransactionItem.kt`
+- `transactions/TransactionDetailActivity.kt`
+- `utill/TransactionFilterHelper.kt` + `utill/ReceiptHelper.kt`
+- `BaseBillViewModel.kt`
+
+**Launched from:** `HomeActivity` → `binding.cardGas` click handler
+
+**Gas-specific quirk:** `circleId` is hardcoded to `"0"` for all Gas requests; Electricity uses `"00"`. Both are intentional server contracts — do not "fix" one to match the other.
+
+---
+
 ## Screens & ViewModels
 
 | Activity | ViewModel | Purpose |

@@ -6,6 +6,37 @@ Handles municipal (property/local body) tax bill payment: operator selection, ho
 
 ---
 
+## Getting Oriented
+
+**Package:** `com.shreefintech.paytouchconsumer.municipaltax`
+Transaction screens: `municipaltax/transactions/` | ViewModels: `municipaltax/viewmodel/`
+
+**Pattern:** Bill-fetch — operator → house/property number → `POST /api/municipal-taxes/fetch-bill` → confirm → pay
+
+**First files to open:**
+1. `MunicipalTaxActivity.kt` — same layout structure as `GasActivity`; "consumer number" → "house number"
+2. `viewmodel/MunicipalTaxViewModel.kt` — extends `BaseBillViewModel`; `circleId` comes from selected operator object (not hardcoded)
+3. `retrofit/model/municipaltax/` folder — Municipal Tax-specific DTOs
+4. `transactions/MunicipalTaxTransactionStatusActivity.kt` — read the `ApiService.kt` declaration first; it uses a surprising endpoint URL (see quirks below)
+
+**Shared components this module uses (outside `municipaltax/`):**
+- `adapter/RecentTransactionAdp.kt` + `adapter/TransactionAdp.kt`
+- `transactions/model/RecentTransactionItem.kt` + `TransactionItem.kt`
+- `transactions/TransactionDetailActivity.kt`
+- `utill/TransactionFilterHelper.kt` + `utill/ReceiptHelper.kt`
+- `BaseBillViewModel.kt`
+
+**Launched from:** `HomeActivity` → `binding.cardMunicipalTax` click handler
+
+**Critical quirks — do NOT fix these:**
+- The transaction-status endpoint is `POST api/mobile-recharge/transaction-status` (not `municipal-taxes/...`) — intentional backend routing
+- `MunicipalTaxLatestPaymentDataItem.subService` is serialized as `"subservice"` (no underscore) — matches the actual API key
+- `circleId` per operator comes from `MunicipalTaxOperatorItem.circleId` — not hardcoded like Gas/Electricity
+- Fetch-bill returns `General<List<...>>` — use `.firstOrNull()`
+- `type = "municipal_tax"` for the unified transactions endpoint
+
+---
+
 ## Screens & ViewModels
 
 | Activity | ViewModel | Purpose |
