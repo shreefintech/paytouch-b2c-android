@@ -117,11 +117,13 @@ class PostpaidActivity : BaseActivity() {
     }
 
     private fun setupAmountWatcher() {
+        updateProceedButton(false)
         binding.etAmount.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 val amount = s?.toString()?.trim()?.toDoubleOrNull()
+                updateProceedButton(amount != null && amount > 0)
                 if (amount == null || amount <= 0) {
                     resetFeeDisplay()
                     return
@@ -135,6 +137,11 @@ class PostpaidActivity : BaseActivity() {
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
+    }
+
+    private fun updateProceedButton(enabled: Boolean) {
+        binding.llProceed.isEnabled = enabled
+        binding.cvProceed.alpha = if (enabled) 1f else 0.5f
     }
 
     private fun onClearBill() {
@@ -267,11 +274,6 @@ class PostpaidActivity : BaseActivity() {
         if (connectionNumber.isEmpty()) {
             binding.etMobileNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgMobileNumberEmpty))
-            return
-        }
-        if (connectionNumber.length < 10) {
-            binding.etMobileNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgMobileNumberInvalid))
             return
         }
         Utility.hideKeyboard(mActivity)

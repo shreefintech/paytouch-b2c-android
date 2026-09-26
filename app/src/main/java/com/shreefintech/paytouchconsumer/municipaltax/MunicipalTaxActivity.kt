@@ -122,11 +122,13 @@ class MunicipalTaxActivity : BaseActivity() {
     }
 
     private fun setupAmountWatcher() {
+        updateProceedButton(false)
         binding.etAmount.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 val amount = s?.toString()?.trim()?.toDoubleOrNull()
+                updateProceedButton(amount != null && amount > 0)
                 if (amount == null || amount <= 0) {
                     resetFeeDisplay()
                     return
@@ -140,6 +142,11 @@ class MunicipalTaxActivity : BaseActivity() {
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
+    }
+
+    private fun updateProceedButton(enabled: Boolean) {
+        binding.llProceed.isEnabled = enabled
+        binding.cvProceed.alpha = if (enabled) 1f else 0.5f
     }
 
     private fun setupConsumerNumberWatcher() {
@@ -269,21 +276,13 @@ class MunicipalTaxActivity : BaseActivity() {
     }
 
     private fun showBillDetails() {
-        val bill        = fetchedBillItem ?: return
-        val billAmount  = bill.billAmount?.toDoubleOrNull() ?: 0.0
-        val fee         = Utility.calculatePlatformFee(billAmount)
-        val total       = billAmount + fee
-        val black       = ContextCompat.getColor(mActivity, R.color.black)
-
+        val bill = fetchedBillItem ?: return
         binding.tvBillCustomerName.text = bill.userName ?: "-"
+        binding.tvBillDueDate.text      = Utility.formatDate(bill.dueDate, "dd/MM/yyyy")
+        binding.tvBillDate.text         = Utility.formatDate(bill.billDate, "dd/MM/yyyy")
+        binding.tvBillAmount.text       = Utility.formatAmount(bill.billAmount)
         binding.tvBillPropertyNo.text   = bill.cellNumber ?: binding.etConsumerNumber.text?.toString()?.trim() ?: "-"
-        binding.tvBillDueDate.text      = bill.dueDate ?: "-"
-        binding.tvBillAmount.text       = bill.billAmount ?: "-"
-        binding.tvBillPlatformFee.text  = getString(R.string.fmtCurrencyAmount).format(fee)
-        binding.tvBillPlatformFee.setTextColor(black)
-        binding.tvBillTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
-        binding.tvBillTotalPayable.setTextColor(black)
-
+        binding.tvBillOperator.text     = selectedOperatorName ?: "-"
         binding.etAmount.setText(bill.billAmount ?: "")
         binding.cvBillDetails.visibility = View.VISIBLE
     }
@@ -310,11 +309,6 @@ class MunicipalTaxActivity : BaseActivity() {
         if (consumerNumber.isEmpty()) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
-            return false
-        }
-        if (consumerNumber.length < 10) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
             return false
         }
         if (selectedOperatorId.isNullOrEmpty()) {

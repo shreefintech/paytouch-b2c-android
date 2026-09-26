@@ -12,63 +12,130 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:foreground="?selectableItemBackground"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:padding="@dimen/margin_medium">
 
-        <!-- Amount | Validity -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Amount + Validity badge with gradient -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvBillDetails"
+            android:layout_width="68dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_plan_badge"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPlanAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_14"
+                    tools:text="₹101" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPlanValidity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_tiny"
+                    android:fontFamily="@font/proza_libre_regular"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_10"
+                    tools:text="30 days" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Description + data chip -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:layout_marginEnd="@dimen/margin_small"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvPlanAmount"
-                android:layout_width="0dp"
+                android:id="@+id/tvPlanDescription"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/proza_libre_bold"
+                android:fontFamily="@font/proza_libre_regular"
                 android:includeFontPadding="false"
-                android:textColor="@color/primary"
-                android:textSize="@dimen/text_size_18"
-                tools:text="₹198" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvPlanValidity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/proza_libre_semi_bold"
-                android:includeFontPadding="false"
+                android:maxLines="3"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_13"
-                tools:text="14 days" />
+                tools:text="STAR - SVP HD Tamil-Malayalam(Rs.100.3) - Channels : 11" />
+
+            <!-- Data chip: secondary-colored capsule with wifi icon + data text -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvDataChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/toast_bg_warning"
+                app:cardCornerRadius="100dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivWifiIcon"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_wifi"
+                        android:tint="@color/primary" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvPlanData"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_size_11"
+                        tools:text="1.5 GB/day" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
 
-        <!-- Full plan description -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvPlanDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_small"
-            android:fontFamily="@font/proza_libre_regular"
-            android:includeFontPadding="false"
-            android:maxLines="3"
-            android:textColor="@color/black"
-            android:textSize="@dimen/text_size_13"
-            tools:text="Data: 1.5 GB/day | Voice: Unlimited Calls | SMS: 100 SMS/day | Validity: 22 Days" />
-
-
-        <!-- Talktime | Data footer -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvPlanFooter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_small"
-            android:fontFamily="@font/proza_libre_medium"
-            android:includeFontPadding="false"
-            android:textColor="?attr/colorTextSubtitle"
-            android:textSize="@dimen/text_size_12"
-            tools:text="Talktime: -1    Data: 1.5 GB/day" />
+        <!-- Right arrow -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_right_arrow"
+            android:tint="@color/sub_text_color" />
 
     </LinearLayout>
 
