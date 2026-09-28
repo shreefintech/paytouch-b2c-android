@@ -33,7 +33,7 @@ class SplashActivity : BaseActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Glide.with(this).asGif().load(R.drawable.gif_splash).into(binding.ivSplash)
+        Glide.with(this).load(R.drawable.paytouch_splash).into(binding.ivSplash)
 
         retryCallback = { startFlow() }
         startFlow()
