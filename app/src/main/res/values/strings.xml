@@ -197,7 +197,6 @@
     <string name="labelValidity">Validity</string>
     <string name="labelDataBenefit">Data</string>
     <string name="labelTalktime">Talktime</string>
-    <string name="fmtPlanTalktimeData">Data: %1$s</string>
     <string name="labelViewMore"> View more</string>
 
     <!-- Electricity screen -->
@@ -364,7 +363,6 @@
     <string name="btnSearch">Search</string>
     <string name="msgEnterSearchQuery">Please enter consumer no. or transaction ID</string>
     <string name="btnClear">Clear</string>
-    <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 digits</string>
     <string name="msgLoadingOperators">Loading operators, please wait…</string>
     <string name="msgLoadingStates">Loading states, please wait…</string>
     <string name="hintSearchOperator">Search</string>
