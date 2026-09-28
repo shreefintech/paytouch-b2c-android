@@ -25,6 +25,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.LytNoInternetBinding
+import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.BetterActivityResult
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
@@ -131,11 +132,13 @@ open class BaseActivity : AppCompatActivity() {
             this, Constant.KEY_LAST_INTERACTION, null
         )?.toLongOrNull() ?: return
         if (System.currentTimeMillis() - last > Constant.SESSION_TIMEOUT_MS) {
-            SharedPreferenceHelper.clearSharedPreference(this)
-            ToastUtil.showExpired(this, getString(R.string.errUnauthorized))
-            startActivity(Intent(this, LoginActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            })
+            NotificationHelper.removeToken(this) {
+                SharedPreferenceHelper.clearSharedPreference(this)
+                ToastUtil.showExpired(this, getString(R.string.errUnauthorized))
+                startActivity(Intent(this, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            }
         }
     }
 
