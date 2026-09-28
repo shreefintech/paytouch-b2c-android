@@ -59,8 +59,4 @@ class DthPlanAdp(
 
     override fun getItemCount(): Int = mArrayList.size
 
-    private fun formatTalktime(talktime: Double?): String {
-        if (talktime == null || talktime < 0) return "-"
-        return Utility.formatAmount(talktime.toString())
-    }
 }
