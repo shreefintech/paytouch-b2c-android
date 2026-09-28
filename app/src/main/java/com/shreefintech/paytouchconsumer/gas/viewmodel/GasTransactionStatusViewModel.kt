@@ -96,7 +96,7 @@ class GasTransactionStatusViewModel(application: Application) : AndroidViewModel
             transactionId    = item.transactionId ?: "--",
             amount           = Utility.formatAmount(item.billAmount),
             status           = item.status ?: "--",
-            categoryIconRes  = R.drawable.ic_gas,
+            categoryIconRes  = R.drawable.img_gas,
             username         = item.customerName ?: "--",
             date             = item.createdAt ?: "--",
             platformFee      = Utility.formatAmount(item.platformFee),

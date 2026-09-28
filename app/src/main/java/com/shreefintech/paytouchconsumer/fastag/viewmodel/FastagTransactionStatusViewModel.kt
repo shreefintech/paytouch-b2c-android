@@ -95,7 +95,7 @@ class FastagTransactionStatusViewModel(application: Application) : AndroidViewMo
             transactionId     = item.transactionId ?: "--",
             amount            = Utility.formatAmount(item.amount),
             status            = item.status ?: "--",
-            categoryIconRes   = R.drawable.ic_fastag,
+            categoryIconRes   = R.drawable.img_fastag,
             username          = item.vehicleNumber ?: "--",
             date              = item.createdAt ?: "--",
             platformFee       = Utility.formatAmount(item.platformFee),
