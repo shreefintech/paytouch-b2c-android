@@ -145,7 +145,6 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                 ) {
                     if (!response.isSuccessful) {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
-                        return
                     }
                     fetchFinalStatus(onReady, onError)
                 }
