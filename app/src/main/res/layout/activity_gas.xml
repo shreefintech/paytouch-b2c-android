@@ -569,7 +569,7 @@
                                         android:textSize="@dimen/text_size_12" />
                                 </LinearLayout>
 
-                                <!-- Consumer Number (bill details row) -->
+                                <!-- Connection Number (bill details row) -->
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
@@ -582,7 +582,7 @@
                                         android:layout_weight="1"
                                         android:fontFamily="@font/proza_libre_medium"
                                         android:includeFontPadding="false"
-                                        android:text="@string/labelConsumerNumber"
+                                        android:text="@string/labelConnectionNumber"
                                         android:textColor="?attr/colorTextHint"
                                         android:textSize="@dimen/text_size_12" />
 
@@ -812,6 +812,7 @@
                                 app:cardElevation="0dp"
                                 app:cardBackgroundColor="@color/white"
                                 app:strokeColor="?attr/colorPrimary"
+                                android:id="@+id/cvProceed"
                                 app:strokeWidth="1dp"
                                 android:layout_weight="1">
 

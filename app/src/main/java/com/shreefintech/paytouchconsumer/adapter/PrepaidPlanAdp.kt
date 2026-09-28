@@ -6,6 +6,7 @@ import android.text.Spanned
 import android.text.StaticLayout
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -13,6 +14,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemPrepaidPlanBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlanItem
+import com.shreefintech.paytouchconsumer.utill.Utility
 
 class PrepaidPlanAdp(
     private val mContext: Context,
@@ -47,13 +49,10 @@ class PrepaidPlanAdp(
         val item = mArrayList[position]
 
         holder.binding.apply {
-            tvPlanAmount.text = mContext.getString(R.string.fmtCurrencyAmount).format((item.amount ?: 0).toDouble())
+            tvPlanAmount.text = Utility.formatAmount(item.amount?.toString())
             tvPlanValidity.text = item.validity ?: "--"
-            tvPlanFooter.text = mContext.getString(
-                R.string.fmtPlanTalktimeData,
-                formatTalktime(item.talktime),
-                if (item.data.isNullOrEmpty()) "--" else item.data
-            )
+            cvDataChip.visibility = if (!item.data.isNullOrEmpty()) View.VISIBLE else View.GONE
+            tvPlanData.text = item.data ?: ""
 
             tvPlanDescription.maxLines = 3
             tvPlanDescription.text = item.description ?: "--"
@@ -117,8 +116,4 @@ class PrepaidPlanAdp(
 
     override fun getItemCount(): Int = mArrayList.size
 
-    private fun formatTalktime(talktime: Double?): String {
-        if (talktime == null || talktime < 0) return "-"
-        return mContext.getString(R.string.fmtCurrencyAmount).format(talktime)
-    }
 }

@@ -121,11 +121,13 @@ class ElectricityActivity : BaseActivity() {
     }
 
     private fun setupAmountWatcher() {
+        updateProceedButton(false)
         binding.etAmount.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 val amount = s?.toString()?.trim()?.toDoubleOrNull()
+                updateProceedButton(amount != null && amount > 0)
                 if (amount == null || amount <= 0) {
                     resetFeeDisplay()
                     return
@@ -139,6 +141,11 @@ class ElectricityActivity : BaseActivity() {
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
+    }
+
+    private fun updateProceedButton(enabled: Boolean) {
+        binding.llProceed.isEnabled = enabled
+        binding.cvProceed.alpha = if (enabled) 1f else 0.5f
     }
 
     private fun setupConsumerNumberWatcher() {
@@ -307,11 +314,6 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
-        if (connectionNumber.length < 10) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
-            return
-        }
         Utility.hideKeyboard(mActivity)
         fetchBill(connectionNumber)
     }
@@ -321,11 +323,6 @@ class ElectricityActivity : BaseActivity() {
         if (connectionNumber.isEmpty()) {
             binding.etConsumerNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
-            return
-        }
-        if (connectionNumber.length < 10) {
-            binding.etConsumerNumber.requestFocus()
-            ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberInvalid))
             return
         }
         if (selectedOperatorId.isNullOrEmpty()) {

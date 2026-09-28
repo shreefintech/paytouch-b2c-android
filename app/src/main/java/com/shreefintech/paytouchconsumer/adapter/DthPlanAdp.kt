@@ -44,11 +44,6 @@ class DthPlanAdp(
             tvPlanAmount.text = Utility.formatAmount(item.amount?.toString())
             tvPlanValidity.text = item.validity ?: "--"
             tvPlanDescription.text = item.description ?: "--"
-            tvPlanFooter.text = mContext.getString(
-                R.string.fmtPlanTalktimeData,
-                formatTalktime(item.talktime),
-                if (item.data.isNullOrEmpty()) "--" else item.data
-            )
         }
         holder.binding.root.setOnClickListener {
             val pos = holder.bindingAdapterPosition
@@ -64,8 +59,4 @@ class DthPlanAdp(
 
     override fun getItemCount(): Int = mArrayList.size
 
-    private fun formatTalktime(talktime: Double?): String {
-        if (talktime == null || talktime < 0) return "-"
-        return Utility.formatAmount(talktime.toString())
-    }
 }

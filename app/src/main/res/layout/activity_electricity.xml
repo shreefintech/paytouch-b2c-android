@@ -813,6 +813,7 @@
                                 app:cardElevation="0dp"
                                 app:cardBackgroundColor="@color/white"
                                 app:strokeColor="?attr/colorPrimary"
+                                android:id="@+id/cvProceed"
                                 app:strokeWidth="1dp"
                                 android:layout_weight="1">
 

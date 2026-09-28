@@ -137,8 +137,10 @@ class KycStep2Fragment : BaseKycStepFragment() {
 
         if (ctx.contentResolver.getType(uri) == "application/pdf") {
             preview.setImageResource(R.drawable.ic_file_not_found)
+            val targetWidth = preview.width.takeIf { it > 0 }
+                ?: resources.displayMetrics.widthPixels / 2
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                val bmp = Utility.renderPdfFirstPage(ctx, uri)
+                val bmp = Utility.renderPdfFirstPage(ctx, uri, targetWidth)
                 withContext(Dispatchers.Main) {
                     if (_binding == null) return@withContext
                     if (bmp != null) Glide.with(ctx).load(bmp).into(preview)

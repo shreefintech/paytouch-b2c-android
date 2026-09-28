@@ -133,6 +133,8 @@ com.shreefintech.paytouchconsumer/
     | `MunicipalTaxLatestPaymentDataItem.subService` | `@field:SerializedName("subservice")` has no underscore (unlike every other field) | **Confirmed from API contract.** The backend sends the key as `subservice`, not `sub_service`. Do not rename. |
     | `KycViewModel.callInitiate()` — HTTP 422 from `initiateKyc` | 422 is treated the same as success (proceeds to `submitSectionAPlaceholder`) | **Intentional contract.** 422 means KYC was already initiated for this user. The backend returns 422 instead of 200 on re-initiation; the correct response is to proceed as if initiation succeeded. Do not treat 422 as an error here. |
 
+19. **Never use `getApplication()` / `applicationContext` for anything that involves a View, and never show a toast (`ToastUtil`) from a ViewModel.** Pass the message to the Activity via callback and show it with `mActivity`. The Application context has no Material theme, so inflating a view with it crashes with `InflateException`.
+
 ---
 
 ## Naming Conventions (quick ref)

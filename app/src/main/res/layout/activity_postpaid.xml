@@ -812,6 +812,7 @@
                                 app:cardBackgroundColor="@color/white"
                                 app:cardElevation="0dp"
                                 app:strokeColor="?attr/colorPrimary"
+                                android:id="@+id/cvProceed"
                                 app:strokeWidth="1dp">
 
                                 <LinearLayout
