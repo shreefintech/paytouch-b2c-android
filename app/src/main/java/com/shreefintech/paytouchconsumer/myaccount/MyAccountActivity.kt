@@ -152,7 +152,6 @@ class MyAccountActivity : BaseActivity() {
     }
 
     private fun populateReferralInfo(data: ReferralDataItem) {
-        AnimationHelper.animateChildren(binding.llReferEarnContent as ViewGroup)
         val code = data.referralCode ?: "--"
         val link = data.referralLink ?: "--"
 
@@ -203,6 +202,7 @@ class MyAccountActivity : BaseActivity() {
             } else {
                 binding.shimmerReferEarn.visibility = View.GONE
                 binding.llReferEarnContent.visibility = View.VISIBLE
+                AnimationHelper.animateChildren(binding.llReferEarnContent as ViewGroup)
             }
             binding.shimmerAccountInfo.stopShimmer()
             binding.shimmerAccountInfo.visibility = View.GONE

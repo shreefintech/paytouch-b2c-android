@@ -77,7 +77,6 @@ class TransactionDetailActivity : BaseActivity() {
     private fun populateData() {
         val item = transactionItem ?: return
         AnimationHelper.animateEntrance(binding.flCard, 0)
-        AnimationHelper.animateEntrance(binding.lytToolbar.root, 1)
         val numberLabelFmt = when {
             item.isVehicleCategory -> R.string.labelVehicleNumberFmt
             item.isMobileCategory  -> R.string.labelMobileNoFmt

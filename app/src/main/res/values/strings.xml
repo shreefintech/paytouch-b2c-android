@@ -238,6 +238,7 @@
     <string name="categoryFastag">Fastag</string>
     <string name="categoryMyAccount">My Account</string>
     <string name="btnLoadWallet">Load Wallet</string>
+    <string name="msgLoadWalletSubtitle">Add money instantly &amp; pay bills faster</string>
     <string name="categoryLoan">Loan</string>
     <string name="categoryMunicipalTax">Municipal Tax</string>
 
@@ -447,6 +448,7 @@
     <string name="labelActivatedOn">Activated On</string>
     <string name="btnViewKycDetails">View KYC Details</string>
     <string name="btnViewReceipt">View Receipt</string>
+    <string name="msgViewReceiptSubtitle">Tap to see full payment details</string>
     <string name="labelTotalEarnings">Total Earnings</string>
     <string name="msgEarnPerReferral">Earn ₹2 for each referral</string>
     <string name="msgShareReferralInfo">Share your referral link with friends and earn ₹2 for each successful referral.</string>

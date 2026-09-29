@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.R
@@ -19,6 +20,19 @@ class TransactionAdp(
 
     var onClickItem: ((TransactionItem) -> Unit)? = null
     private val animatedPositions = mutableSetOf<Int>()
+    private var layoutManager: LinearLayoutManager? = null
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        layoutManager = recyclerView.layoutManager as? LinearLayoutManager
+    }
+
+    private fun visibleItemCount(): Int {
+        val lm = layoutManager ?: return 10
+        val first = lm.findFirstVisibleItemPosition()
+        val last = lm.findLastVisibleItemPosition()
+        return if (last >= 0 && first >= 0) (last - first + 2).coerceAtLeast(5) else 10
+    }
 
     inner class ViewHolder(val binding: ItemTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -66,7 +80,7 @@ class TransactionAdp(
 
         if (position !in animatedPositions) {
             animatedPositions.add(position)
-            AnimationHelper.animateListRowEntrance(holder.binding.root, position)
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position, visibleItemCount())
         }
     }
 

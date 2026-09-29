@@ -80,6 +80,7 @@ class HomeActivity : BaseActivity() {
             rootView = binding.root as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion = 0f,
+            tintColor = ContextCompat.getColor(mActivity, R.color.home_card_bg),
             blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 

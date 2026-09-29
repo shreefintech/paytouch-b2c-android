@@ -49,8 +49,8 @@ object AnimationHelper {
         }
     }
 
-    fun animateListRowEntrance(view: View, index: Int) {
-        if (index >= 8) return
+    fun animateListRowEntrance(view: View, index: Int, visibleCount: Int) {
+        if (index >= visibleCount) return
         if (isReduceMotion(view.context)) {
             view.alpha = 0f
             view.animate()

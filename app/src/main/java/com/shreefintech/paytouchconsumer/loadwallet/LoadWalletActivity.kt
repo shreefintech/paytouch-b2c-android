@@ -508,7 +508,7 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvWalletBalance.text = Utility.formatAmount(data.walletBalance)
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
-        binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
+        binding.tvAccountHolder.text = data.name ?: "--"
         binding.tvIfscCode.text = data.ifsc ?: "--"
         binding.tvBankName.text = data.bankName ?: "--"
         Glide.with(mActivity as Context)
