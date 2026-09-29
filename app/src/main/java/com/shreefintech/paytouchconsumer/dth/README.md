@@ -239,12 +239,12 @@ All endpoints declared in `ApiService.kt` under the `// ── DTH ──` secti
 | Aspect | Gas / Electricity | Prepaid | DTH |
 |---|---|---|---|
 | Bill fetch step | Required | None | None |
-| Circle selection | N/A | User picks from `GET api/states` list | Not applicable |
+| Circle selection | N/A | User picks from live `GET api/states` list | Not applicable |
 | Plan selection screen | N/A | `PrepaidPlanSelectionActivity` | `DthPlanSelectionActivity` |
 | Transactions type param | `"electricity"` / `"gas"` | `"mobile_recharge"` | `"dth"` |
 | Status search field | Transaction ID | Mobile number | Transaction ID |
 | `isMobileCategory` | `false` | `true` | `true` |
-| Category icon | `ic_electricity` / `ic_gas` | `ic_mobile` | `ic_broadband` |
+| Category icon | `img_electricity` / `img_gas` | `img_mobile` | `img_broadband` |
 | SMS ViewModel base | `BaseBillViewModel` (Elec/Gas) / `AndroidViewModel` (Prepaid) | `AndroidViewModel` | `AndroidViewModel` |
 | Payment endpoint | `process-payment` | `process-direct` | `process-direct` |
 

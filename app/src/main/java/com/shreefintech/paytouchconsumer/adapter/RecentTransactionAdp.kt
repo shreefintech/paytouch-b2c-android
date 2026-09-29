@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemRecentTransactionBinding
 import com.shreefintech.paytouchconsumer.transactions.model.RecentTransactionItem
@@ -54,7 +55,7 @@ class RecentTransactionAdp(
     private fun bindItem(binding: ItemRecentTransactionBinding, item: RecentTransactionItem) {
         with(binding) {
             val context = root.context
-            ivCategoryIcon.setImageResource(item.categoryIconRes)
+            Glide.with(mContext).load(item.categoryIconRes).into(ivCategoryIcon)
             tvCategoryName.text = item.categoryName
             tvCollapsedDate.text = item.date
 

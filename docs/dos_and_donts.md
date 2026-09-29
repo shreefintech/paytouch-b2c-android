@@ -272,7 +272,7 @@ Apply to every `mapToTransactionItem()` in every module's report/status ViewMode
 | `amount` | `Utility.formatAmount(item.amount)` — never a string template |
 | `platformFee` | `Utility.formatAmount(item.platformFee)` — or `"₹0.00"` if the DTO has no fee field |
 | `totalPayable` | `Utility.formatAmount(item.totalPayable)` |
-| `categoryIconRes` | `R.drawable.ic_{category}` — the only visual difference between modules |
+| `categoryIconRes` | `R.drawable.img_{category}` — the only visual difference between modules |
 | `isMobileCategory` | `true` for Mobile Prepaid, Postpaid, DTH; `false` for all others — **never omit this field** |
 | `isVehicleCategory` | `true` for FASTag only; `false` for all others — drives "Vehicle No" label in adapters |
 

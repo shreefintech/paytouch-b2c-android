@@ -80,13 +80,7 @@ PostpaidActivity
                             └── onSuccess ──────────► PostpaidSmsReceiptActivity (fromPayment=true)
 ```
 
-`PostpaidActivity` validates in this order: mobile number present (10 digits) → operator selected → circle selected → bill fetched. If "Proceed" is tapped without a fetched bill, `fetchBill()` is called automatically instead of showing an error.
-
----
-
-## Circle Selection — Not Applicable
-
-Postpaid has no circle picker — the bill-fetch request does not take a circle. (The old local `Utility.STATE_LIST` was removed; Prepaid loads circles from `GET api/states`.)
+`PostpaidActivity` validates Proceed in this order: mobile number present (10 digits) → operator selected → bill fetched → terms accepted → amount > 0. If "Proceed" is tapped without a fetched bill, `fetchBill()` is called automatically instead of showing an error. No circle is needed for Postpaid.
 
 ---
 

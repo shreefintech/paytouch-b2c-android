@@ -225,6 +225,6 @@ Electricity is the canonical reference for bill-payment modules with a bill-fetc
 3. `retrofit/model/{category}/` — new DTOs matching the new endpoint's actual field names (check the API contract first, never guess).
 4. Add the new endpoints to `ApiService.kt` under a new `// ── {Category} ──` section.
 5. `{Category}RecentTransactionActivity` + `ViewModel`, `{Category}TransactionReportActivity` + `ViewModel`, `{Category}TransactionStatusActivity` + `ViewModel`, `{Category}SmsReceiptActivity` + `ViewModel` — copy the Electricity transaction screens verbatim, reusing the shared `RecentTransactionItem`, `TransactionItem`, `RecentTransactionAdp`, `TransactionAdp`, `TransactionDetailActivity`, `TransactionFilterHelper`, and `ReceiptHelper`. **Never fork these.**
-6. Pass `R.drawable.ic_{category}` as `categoryIconRes` in the new ViewModel's mapping functions — that's the only visual difference between modules' transaction rows.
+6. Pass `R.drawable.img_{category}` as `categoryIconRes` in the new ViewModel's mapping functions — that's the only visual difference between modules' transaction rows.
 
 This list matches the "Transaction Screens — Shared Structure Across All Modules" rule in the project's `CLAUDE.md`.
