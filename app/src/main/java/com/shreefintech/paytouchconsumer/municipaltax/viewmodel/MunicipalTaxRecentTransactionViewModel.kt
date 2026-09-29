@@ -104,7 +104,7 @@ class MunicipalTaxRecentTransactionViewModel(application: Application) : Android
             amount            = Utility.formatAmount(item.totalPayable ?: item.amount),
             accountNumber     = Utility.maskNumber(item.houseNumber ?: "--"),
             reference         = item.transactionId?:"--",
-            categoryIconRes   = R.drawable.img_tax,
+            categoryIconRes   = R.drawable.img_municipal_tax,
             isMobileCategory  = false
         )
     }

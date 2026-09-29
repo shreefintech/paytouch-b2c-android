@@ -95,7 +95,7 @@ class DthTransactionStatusViewModel(application: Application) : AndroidViewModel
             transactionId    = item.transactionId ?: "--",
             amount           = Utility.formatAmount(item.amount),
             status           = item.status ?: "--",
-            categoryIconRes  = R.drawable.img_broadband,
+            categoryIconRes  = R.drawable.img_dth,
             username         = item.subscriberNo ?: item.mobileNo ?: "--",
             date             = item.createdAt ?: "--",
             platformFee      = Utility.formatAmount(item.platformFee),

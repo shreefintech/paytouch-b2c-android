@@ -23,6 +23,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRemoveRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper.bearerToken
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
