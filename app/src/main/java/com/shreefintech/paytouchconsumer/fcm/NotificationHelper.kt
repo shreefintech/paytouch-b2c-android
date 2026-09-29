@@ -37,6 +37,8 @@ object NotificationHelper {
     @Volatile
     private var pendingToken: String? = null
 
+    private val notificationIdCounter = java.util.concurrent.atomic.AtomicInteger(0)
+
     /** Creates the push channel. Must run before any notification is posted — call from MyApp. */
     fun createChannel(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -96,7 +98,7 @@ object NotificationHelper {
             .build()
 
         NotificationManagerCompat.from(context)
-            .notify(System.currentTimeMillis().toInt(), notification)
+            .notify(notificationIdCounter.incrementAndGet(), notification)
     }
 
     /**
