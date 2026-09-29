@@ -27,6 +27,7 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.atomic.AtomicInteger
 
 object NotificationHelper {
 
@@ -37,7 +38,7 @@ object NotificationHelper {
     @Volatile
     private var pendingToken: String? = null
 
-    private val notificationIdCounter = java.util.concurrent.atomic.AtomicInteger(0)
+    private val notificationIdCounter = AtomicInteger(System.currentTimeMillis().toInt())
 
     /** Creates the push channel. Must run before any notification is posted — call from MyApp. */
     fun createChannel(context: Context) {
