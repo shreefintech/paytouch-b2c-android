@@ -2,7 +2,7 @@
 
 Handles the full gas bill payment flow: operator selection, bill fetch, payment processing, and all transaction history screens.
 
-**Gas mirrors Electricity exactly** (`electricity/` is the canonical reference for this pattern — see `electricity/README.md`). Only the operator/consumer terminology, the category icon (`R.drawable.ic_gas`), and the `api/gas/*` endpoints differ. Read this file for what's Gas-specific; read the Electricity README for the parts that are identical everywhere.
+**Gas mirrors Electricity exactly** (`electricity/` is the canonical reference for this pattern — see `electricity/README.md`). Only the operator/consumer terminology, the category icon (`R.drawable.img_gas`), and the `api/gas/*` endpoints differ. Read this file for what's Gas-specific; read the Electricity README for the parts that are identical everywhere.
 
 ---
 
