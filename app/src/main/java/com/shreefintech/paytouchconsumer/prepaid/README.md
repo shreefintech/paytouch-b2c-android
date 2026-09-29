@@ -30,7 +30,7 @@ Transaction screens: `prepaid/transactions/` | ViewModels: `prepaid/viewmodel/`
 **Launched from:** `HomeActivity` → `binding.cardPrepaid` click handler
 
 **Key differences to remember:**
-- Circle list is fetched from `GET api/states` (`PrepaidViewModel.loadStates()`) — no local list
+- Circle list is loaded from `GET api/states` (`PrepaidViewModel.loadStates()`) — not hardcoded
 - `isMobileCategory = true` in all `mapToTransactionItem()` calls
 - Status screen searches by **mobile number**, not transaction ID
 - `type = "mobile_recharge"` for the unified transactions endpoint (not "prepaid")

@@ -1,6 +1,6 @@
 # Postpaid (Mobile Postpaid Bill Payment) Module
 
-Handles mobile postpaid bill payment: operator selection, circle selection, mobile number entry, bill fetch, payment processing, and all transaction history screens.
+Handles mobile postpaid bill payment: operator selection, mobile number entry, bill fetch, payment processing, and all transaction history screens.
 
 **Postpaid follows the fetch-bill pattern of Gas and Electricity** — operator dropdown, mobile number / connection number entry, `fetchBill` call, bill details card, then Proceed. Read the Gas README for the identical parts; read this file for what's Postpaid-specific.
 
@@ -11,7 +11,7 @@ Handles mobile postpaid bill payment: operator selection, circle selection, mobi
 **Package:** `com.shreefintech.paytouchconsumer.postpaid`
 Transaction screens: `postpaid/transactions/` | ViewModels: `postpaid/viewmodel/`
 
-**Pattern:** Bill-fetch + circle — operator + circle → mobile number → `POST /api/mobile-postpaid/fetch-bill` → confirm → pay
+**Pattern:** Bill-fetch — operator → mobile number → `POST /api/mobile-postpaid/fetch-bill` → confirm → pay
 
 **First files to open:**
 1. `PostpaidActivity.kt` — operator dropdown, mobile number, fetch + proceed buttons
@@ -42,7 +42,7 @@ Transaction screens: `postpaid/transactions/` | ViewModels: `postpaid/viewmodel/
 
 | Activity | ViewModel | Purpose |
 |---|---|---|
-| `PostpaidActivity` | `PostpaidViewModel` | Operator dropdown, circle picker, mobile number entry, bill fetch, proceed to pay |
+| `PostpaidActivity` | `PostpaidViewModel` | Operator dropdown, mobile number entry, bill fetch, proceed to pay |
 | `PostpaidRecentTransactionActivity` | `PostpaidRecentTransactionViewModel` | Paginated postpaid transaction history |
 | `PostpaidTransactionReportActivity` | `PostpaidTransactionReportViewModel` | Filtered report with date range / status / connection number filter sheet |
 | `PostpaidTransactionStatusActivity` | `PostpaidTransactionStatusViewModel` | Search transactions by transaction ID |
@@ -61,7 +61,7 @@ PostpaidActivity
     ├── onCreate ──────────────────────────────────► GET /api/mobile-postpaid/operators
     │                                                 └── populates operator dropdown
     │
-    ├── llFetchBill (mobile number + operator + circle entered)
+    ├── llFetchBill (operator + mobile number entered)
     │       └── POST /api/mobile-postpaid/fetch-bill
     │               └── onSuccess ──────────────────► shows bill details card (cvBillDetails)
     │
@@ -224,7 +224,7 @@ All endpoints are declared in `ApiService.kt` under the `// ── Mobile Postpa
 |---|---|---|---|
 | Bill fetch step | Required (server-fetched amount) | None | **Required** (server-fetched amount) |
 | Plan selection | N/A | `PrepaidPlanSelectionActivity` | None |
-| Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from `GET api/states` list | Not applicable — no circle picker |
+| Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from live `GET api/states` list | Not required |
 | Transactions type param | `"electricity"` / `"gas"` | `"mobile_recharge"` | `"mobile_postpaid"` |
 | Status search field | Transaction ID | Mobile number | Transaction ID |
 | SMS ViewModel base | `BaseBillViewModel` subclass | Standalone `AndroidViewModel` | Standalone `AndroidViewModel` |
