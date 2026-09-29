@@ -9,6 +9,7 @@ material = "1.14.0"
 activity = "1.13.0"
 constraintlayout = "2.2.1"
 activityKtx = "1.13.0"
+googleServices = "4.4.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -23,4 +24,5 @@ androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", ve
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 

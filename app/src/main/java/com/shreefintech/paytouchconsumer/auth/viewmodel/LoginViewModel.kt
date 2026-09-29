@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.enums.LoginMode
+import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.retrofit.ApiAdminClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -107,6 +108,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 user.referralCode ?: ""
             )
         }
+        // Covers every post-login route (Home / KYC / Create MPIN)
+        NotificationHelper.syncToken(getApplication())
     }
 
     private fun fireVpsRegistration(id: Int, mobile: String, email: String, referralCode: String) {

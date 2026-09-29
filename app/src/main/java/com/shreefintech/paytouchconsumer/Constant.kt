@@ -24,6 +24,14 @@ object Constant {
 
     const val KEY_REFERRAL_CODE = "ReferralCode"
 
+    // Push notifications — last FCM token accepted by the backend
+    const val KEY_FCM_TOKEN = "FCM_TOKEN"
+    const val FCM_PLATFORM_ANDROID = "android"
+
+    // Location — true once the system location permission popup has been shown at least once.
+    // Distinguishes "never asked" from "permanently denied" (both report no rationale).
+    const val KEY_LOCATION_ASKED = "LOCATION_ASKED"
+
     // External URLs
     const val URL_PLATFORM_TERMS = "https://www.paytouch.in/terms/platform"
     const val URL_GOOGLE_DOC_VIEWER = "https://docs.google.com/gviewer?embedded=true&url="

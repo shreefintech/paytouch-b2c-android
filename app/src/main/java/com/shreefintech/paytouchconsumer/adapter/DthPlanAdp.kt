@@ -18,7 +18,7 @@ class DthPlanAdp(
 
     var onClickItem: ((DthPlanItem) -> Unit)? = null
 
-    inner class ViewHolder(val binding: ItemPrepaidPlanBinding) :
+    class ViewHolder(val binding: ItemPrepaidPlanBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -41,7 +41,7 @@ class DthPlanAdp(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         holder.binding.apply {
-            tvPlanAmount.text = Utility.formatAmount(item.amount?.toString())
+            tvPlanAmount.text = Utility.formatAmount(item.amount?.toString(), trimZeros = true)
             tvPlanValidity.text = item.validity ?: "--"
             tvPlanDescription.text = item.description ?: "--"
         }

@@ -49,7 +49,7 @@ class PrepaidPlanAdp(
         val item = mArrayList[position]
 
         holder.binding.apply {
-            tvPlanAmount.text = Utility.formatAmount(item.amount?.toString())
+            tvPlanAmount.text = Utility.formatAmount(item.amount?.toString(), trimZeros = true)
             tvPlanValidity.text = item.validity ?: "--"
             cvDataChip.visibility = if (!item.data.isNullOrEmpty()) View.VISIBLE else View.GONE
             tvPlanData.text = item.data ?: ""

@@ -15,10 +15,12 @@ import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
+import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.fastag.FastagActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.LoadWalletActivity
+import com.shreefintech.paytouchconsumer.location.LocationPermissionHelper
 import com.shreefintech.paytouchconsumer.loan.LoanActivity
 import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
@@ -39,6 +41,13 @@ class HomeActivity : BaseActivity() {
     private var logoutDialog: Dialog? = null
     private var logoutDialogBinding: DialogConfirmLogoutBinding? = null
     private val showProgressLogout = ObservableBoolean(false)
+
+    // Field-initialised: activity-result launchers must be registered before onStart()
+    private val locationHelper = LocationPermissionHelper(this) { location ->
+        location?.let { viewModel.sendLocation(it) }
+        // Asked after the location flow ends so the two system permission popups never overlap
+        NotificationHelper.requestPermission(mActivity)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +79,12 @@ class HomeActivity : BaseActivity() {
         binding.onClickListener = listener
         binding.lytToolbar.onClickListener = listener
         onBack()
+
+        // Skip on config change / process restore — once per Home launch is enough
+        if (savedInstanceState == null) {
+            NotificationHelper.syncToken(mActivity)
+            locationHelper.start()
+        }
     }
 
     private fun showLogoutDialog() {

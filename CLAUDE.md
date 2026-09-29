@@ -69,6 +69,9 @@ com.shreefintech.paytouchconsumer/
 ├── myaccount/      # My Account — two-tab profile viewer (Account Info + Refer & Earn)
 ├── transactions/   # Shared TransactionDetailActivity + TransactionItem model (never duplicated per module)
 ├── adapter/        # Shared adapters: TransactionAdp, RecentTransactionAdp, PrepaidPlanAdp, DthPlanAdp
+├── fcm/            # Push notifications — MyFirebaseMessagingService + NotificationHelper (channel, token register/remove)
+│                   # Notification icon = img_paytouch (intentional, works — don't flag)
+├── location/       # LocationPermissionHelper — disclosure dialog → permission → one foreground fix for payment risk checks
 ├── enums/          # Project-wide enums (LoginMode, etc.)
 ├── glass/          # LiquidGlassEffect custom blur UI components
 ├── retrofit/       # All networking (ApiService, ApiClient, ApiHelper, models)
