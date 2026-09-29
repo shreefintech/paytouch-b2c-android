@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.R
@@ -19,19 +18,6 @@ class WalletTransactionAdp(
 
     var onClickItem: ((transactionId: String) -> Unit)? = null
     private val animatedPositions = mutableSetOf<Int>()
-    private var layoutManager: LinearLayoutManager? = null
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        layoutManager = recyclerView.layoutManager as? LinearLayoutManager
-    }
-
-    private fun visibleItemCount(): Int {
-        val lm = layoutManager ?: return 10
-        val first = lm.findFirstVisibleItemPosition()
-        val last = lm.findLastVisibleItemPosition()
-        return if (last >= 0 && first >= 0) (last - first + 2).coerceAtLeast(5) else 10
-    }
 
     class ViewHolder(val binding: ItemWalletTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -55,7 +41,7 @@ class WalletTransactionAdp(
         holder.binding.apply {
             tvTitle.text = item.title
             tvDate.text = item.date
-            Glide.with(mContext).load(item.categoryIconRes).into(ivIcon)
+            Glide.with(mContext).load(item.categoryIconRes).placeholder(R.drawable.ic_file_not_found).into(ivIcon)
             if (item.isCredit) {
                 cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_success)
                 tvAmount.text = root.context.getString(R.string.textCreditSign, item.amount)
@@ -68,7 +54,7 @@ class WalletTransactionAdp(
         }
         if (position !in animatedPositions) {
             animatedPositions.add(position)
-            AnimationHelper.animateListRowEntrance(holder.binding.root, position, visibleItemCount())
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position, AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView))
         }
     }
 

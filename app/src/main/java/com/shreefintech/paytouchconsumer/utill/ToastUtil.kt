@@ -190,7 +190,8 @@ object ToastUtil {
             setTextColor(ContextCompat.getColor(activity, type.textColor))
         }
 
-        val bottomMargin = (88 * activity.resources.displayMetrics.density).toInt()
+        val res = activity.resources
+        val bottomMargin = res.getDimensionPixelSize(R.dimen.toast_slide_bottom_margin)
         val params = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.WRAP_CONTENT,
             FrameLayout.LayoutParams.WRAP_CONTENT
@@ -200,7 +201,7 @@ object ToastUtil {
         }
 
         toastBinding.root.alpha = 0f
-        toastBinding.root.translationY = (64 * activity.resources.displayMetrics.density)
+        toastBinding.root.translationY = res.getDimensionPixelSize(R.dimen.toast_slide_translate_enter).toFloat()
         contentRoot.addView(toastBinding.root, params)
 
         toastBinding.root.animate()
@@ -214,7 +215,7 @@ object ToastUtil {
             if (!activity.isDestroyed && toastBinding.root.parent != null) {
                 toastBinding.root.animate()
                     .alpha(0f)
-                    .translationY(48 * activity.resources.displayMetrics.density)
+                    .translationY(res.getDimensionPixelSize(R.dimen.toast_slide_translate_exit).toFloat())
                     .setDuration(200)
                     .setInterpolator(AccelerateInterpolator())
                     .withEndAction {

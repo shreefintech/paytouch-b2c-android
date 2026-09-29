@@ -6,6 +6,8 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 object AnimationHelper {
 
@@ -73,6 +75,13 @@ object AnimationHelper {
             .setStartDelay(index * ROW_STAGGER_MS)
             .setInterpolator(DecelerateInterpolator(1.2f))
             .start()
+    }
+
+    fun visibleCount(recyclerView: RecyclerView?): Int {
+        val lm = recyclerView?.layoutManager as? LinearLayoutManager ?: return 10
+        val first = lm.findFirstVisibleItemPosition()
+        val last = lm.findLastVisibleItemPosition()
+        return if (last >= 0 && first >= 0) (last - first + 2).coerceAtLeast(5) else 10
     }
 
     fun isReduceMotion(context: Context): Boolean {

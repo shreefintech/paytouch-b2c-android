@@ -151,6 +151,7 @@ class HomeActivity : BaseActivity() {
         val fallback = imageView.drawable
         Glide.with(this)
             .load(animatedRes)
+            .placeholder(fallback)
             .error(fallback)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean): Boolean {

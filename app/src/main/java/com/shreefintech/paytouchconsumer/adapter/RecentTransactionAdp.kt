@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import android.view.animation.AccelerateInterpolator
@@ -21,19 +20,6 @@ class RecentTransactionAdp(
 ) : RecyclerView.Adapter<RecentTransactionAdp.ViewHolder>() {
 
     private val animatedPositions = mutableSetOf<Int>()
-    private var layoutManager: LinearLayoutManager? = null
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        layoutManager = recyclerView.layoutManager as? LinearLayoutManager
-    }
-
-    private fun visibleItemCount(): Int {
-        val lm = layoutManager ?: return 10
-        val first = lm.findFirstVisibleItemPosition()
-        val last = lm.findLastVisibleItemPosition()
-        return if (last >= 0 && first >= 0) (last - first + 2).coerceAtLeast(5) else 10
-    }
 
     inner class ViewHolder(val binding: ItemRecentTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -72,14 +58,14 @@ class RecentTransactionAdp(
 
         if (position !in animatedPositions) {
             animatedPositions.add(position)
-            AnimationHelper.animateListRowEntrance(holder.binding.root, position, visibleItemCount())
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position, AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView))
         }
     }
 
     private fun bindItem(binding: ItemRecentTransactionBinding, item: RecentTransactionItem) {
         with(binding) {
             val context = root.context
-            Glide.with(mContext).load(item.categoryIconRes).into(ivCategoryIcon)
+            Glide.with(mContext).load(item.categoryIconRes).placeholder(R.drawable.ic_file_not_found).into(ivCategoryIcon)
             tvCategoryName.text = item.categoryName
             tvCollapsedDate.text = item.date
 

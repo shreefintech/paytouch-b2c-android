@@ -44,6 +44,7 @@ class DthPlanAdp(
             tvPlanAmount.text = Utility.formatAmount(item.amount?.toString(), trimZeros = true)
             tvPlanValidity.text = item.validity ?: "--"
             tvPlanDescription.text = item.description ?: "--"
+            cvDataChip.visibility = android.view.View.GONE
         }
         holder.binding.root.setOnClickListener {
             val pos = holder.bindingAdapterPosition
