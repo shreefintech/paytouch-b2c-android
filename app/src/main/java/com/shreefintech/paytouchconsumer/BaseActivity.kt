@@ -132,13 +132,12 @@ open class BaseActivity : AppCompatActivity() {
             this, Constant.KEY_LAST_INTERACTION, null
         )?.toLongOrNull() ?: return
         if (System.currentTimeMillis() - last > Constant.SESSION_TIMEOUT_MS) {
-            NotificationHelper.removeToken(this) {
-                SharedPreferenceHelper.clearSharedPreference(this)
-                ToastUtil.showExpired(this, getString(R.string.errUnauthorized))
-                startActivity(Intent(this, LoginActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                })
-            }
+            NotificationHelper.removeTokenDetached(this)
+            SharedPreferenceHelper.clearSharedPreference(this)
+            ToastUtil.showExpired(this, getString(R.string.errUnauthorized))
+            startActivity(Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
         }
     }
 

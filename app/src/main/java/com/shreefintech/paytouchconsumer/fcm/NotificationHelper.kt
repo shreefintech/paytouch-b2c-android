@@ -118,6 +118,25 @@ object NotificationHelper {
     }
 
     /**
+     * Fire-and-forget token removal for session timeout. Captures the FCM token and bearer
+     * before the caller clears prefs, so the request goes out even after SharedPreferences
+     * are wiped on the next line.
+     */
+    fun removeTokenDetached(context: Context) {
+        val appContext = context.applicationContext
+        val fcmToken = SharedPreferenceHelper.getSharedPreferenceString(
+            appContext, Constant.KEY_FCM_TOKEN, ""
+        ) ?: ""
+        if (fcmToken.isEmpty() || !Utility.isInternetAvailable(appContext)) return
+        val bearer = bearerToken(appContext)
+        ApiClient.apiService.removeDeviceToken(bearer, DeviceTokenRemoveRequest(fcmToken))
+            .enqueue(object : Callback<MessageItem> {
+                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {}
+                override fun onFailure(call: Call<MessageItem>, t: Throwable) { t.printStackTrace() }
+            })
+    }
+
+    /**
      * Unregisters this device's token so a logged-out device stops receiving the user's pushes.
      * Must run before the logout API (it needs a valid bearer token). [onDone] is always invoked,
      * on success, failure, or skip — logout must never be blocked by this call.
