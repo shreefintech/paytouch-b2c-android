@@ -8,6 +8,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -126,6 +128,10 @@ object ToastUtil {
         type: ToastType,
         duration: Int = Toast.LENGTH_SHORT
     ) {
+        if (context is Activity && !context.isFinishing && !context.isDestroyed) {
+            showSlideUpInActivity(context, message, type)
+            return
+        }
         val binding = LytCustomToastBinding.inflate(LayoutInflater.from(context))
 
         // ── Outer pill card ───────────────────────────────────
@@ -136,9 +142,6 @@ object ToastUtil {
 
         // ── Inner icon card ───────────────────────────────────
         LiquidGlassEffect.attach( targetView = binding.toastIconContainer, rootView = (binding.root as ViewGroup), cornerRadius = context.resources.getDimensionPixelSize(R.dimen.toast_radius), distortion = 0f,blur= context.resources.getDimensionPixelSize(R.dimen.toast_blure))
-        /*binding.toastIconContainer.setCardBackgroundColor(
-            ContextCompat.getColor(context, type.iconBackgroundColor)
-        )*/
 
         // ── Icon drawable & tint ──────────────────────────────
         binding.toastIcon.apply {
@@ -158,6 +161,68 @@ object ToastUtil {
             this.duration = duration
             this.view     = binding.root
         }.show()
+    }
+
+    private fun showSlideUpInActivity(activity: Activity, message: String, type: ToastType) {
+        val contentRoot = activity.findViewById<FrameLayout>(android.R.id.content) ?: return
+        val toastBinding = LytCustomToastBinding.inflate(LayoutInflater.from(activity))
+
+        toastBinding.toastRoot.apply {
+            setCardBackgroundColor(ContextCompat.getColor(activity, type.backgroundColor))
+            strokeColor = ContextCompat.getColor(activity, type.borderColor)
+        }
+
+        LiquidGlassEffect.attach(
+            targetView = toastBinding.toastIconContainer,
+            rootView = toastBinding.root as ViewGroup,
+            cornerRadius = activity.resources.getDimensionPixelSize(R.dimen.toast_radius),
+            distortion = 0f,
+            blur = activity.resources.getDimensionPixelSize(R.dimen.toast_blure)
+        )
+
+        toastBinding.toastIcon.apply {
+            setImageResource(type.iconRes)
+            setImageTintList(ContextCompat.getColorStateList(activity, type.iconTintColor))
+        }
+
+        toastBinding.toastMessage.apply {
+            text = message
+            setTextColor(ContextCompat.getColor(activity, type.textColor))
+        }
+
+        val bottomMargin = (88 * activity.resources.displayMetrics.density).toInt()
+        val params = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+            setMargins(0, 0, 0, bottomMargin)
+        }
+
+        toastBinding.root.alpha = 0f
+        toastBinding.root.translationY = (64 * activity.resources.displayMetrics.density)
+        contentRoot.addView(toastBinding.root, params)
+
+        toastBinding.root.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(300)
+            .setInterpolator(DecelerateInterpolator(1.2f))
+            .start()
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (!activity.isDestroyed && toastBinding.root.parent != null) {
+                toastBinding.root.animate()
+                    .alpha(0f)
+                    .translationY(48 * activity.resources.displayMetrics.density)
+                    .setDuration(200)
+                    .setInterpolator(AccelerateInterpolator())
+                    .withEndAction {
+                        if (toastBinding.root.parent != null) contentRoot.removeView(toastBinding.root)
+                    }
+                    .start()
+            }
+        }, 2000L)
     }
 
     /**

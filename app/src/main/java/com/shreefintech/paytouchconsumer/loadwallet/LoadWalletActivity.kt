@@ -30,6 +30,7 @@ import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -304,6 +305,7 @@ class LoadWalletActivity : BaseActivity() {
         withdrawConfirmDialog = dialog
         dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.88).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -385,6 +387,7 @@ class LoadWalletActivity : BaseActivity() {
         confirmDialog = dialog
         dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.88).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -494,7 +497,13 @@ class LoadWalletActivity : BaseActivity() {
         binding.pbLoading.visibility = View.GONE
     }
 
+    private var walletEntrancePlayed = false
+
     private fun populateWalletData(data: WalletDataItem) {
+        if (!walletEntrancePlayed) {
+            walletEntrancePlayed = true
+            AnimationHelper.animateChildren(binding.llTotalBalanceContent as ViewGroup)
+        }
         currentWalletBalance = data.walletBalance
         binding.tvWalletBalance.text = Utility.formatAmount(data.walletBalance)
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"

@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityMyAccountBinding
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.myaccount.viewmodel.MyAccountViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
@@ -138,6 +139,7 @@ class MyAccountActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateAccountInfo(data: AccountInfoItem) {
+        AnimationHelper.animateChildren(binding.llAccountInfoContent as ViewGroup)
         binding.tvMemberName.text = data.name ?: "--"
         binding.tvStatus.text = data.member?.status ?: "--"
         binding.tvMemberCode.text = data.member?.memberCode ?: "--"
@@ -150,6 +152,7 @@ class MyAccountActivity : BaseActivity() {
     }
 
     private fun populateReferralInfo(data: ReferralDataItem) {
+        AnimationHelper.animateChildren(binding.llReferEarnContent as ViewGroup)
         val code = data.referralCode ?: "--"
         val link = data.referralLink ?: "--"
 

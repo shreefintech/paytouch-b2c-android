@@ -39,6 +39,8 @@ class FaceCircleOverlayView @JvmOverloads constructor(
         color = ContextCompat.getColor(context, R.color.white)
     }
 
+    val currentStrokeColor: Int get() = strokePaint.color
+
     fun setStrokeColor(@ColorInt color: Int) {
         if (strokePaint.color == color) return
         strokePaint.color = color

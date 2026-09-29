@@ -13,6 +13,7 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.dth.transactions.DthSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.enums.CategoryType
@@ -75,6 +76,8 @@ class TransactionDetailActivity : BaseActivity() {
 
     private fun populateData() {
         val item = transactionItem ?: return
+        AnimationHelper.animateEntrance(binding.flCard, 0)
+        AnimationHelper.animateEntrance(binding.lytToolbar.root, 1)
         val numberLabelFmt = when {
             item.isVehicleCategory -> R.string.labelVehicleNumberFmt
             item.isMobileCategory  -> R.string.labelMobileNoFmt

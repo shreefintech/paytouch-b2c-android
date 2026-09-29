@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemTransactionBinding
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 class TransactionAdp(
@@ -17,6 +18,7 @@ class TransactionAdp(
 ) : RecyclerView.Adapter<TransactionAdp.ViewHolder>() {
 
     var onClickItem: ((TransactionItem) -> Unit)? = null
+    private val animatedPositions = mutableSetOf<Int>()
 
     inner class ViewHolder(val binding: ItemTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -61,9 +63,15 @@ class TransactionAdp(
                 onClickItem?.invoke(mArrayList[pos])
             }
         }
+
+        if (position !in animatedPositions) {
+            animatedPositions.add(position)
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position)
+        }
     }
 
     fun updateList(items: List<TransactionItem>) {
+        animatedPositions.clear()
         mArrayList.clear()
         mArrayList.addAll(items)
         notifyDataSetChanged()

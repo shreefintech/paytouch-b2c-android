@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemWalletTransactionBinding
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 
 class WalletTransactionAdp(
     private val mContext: Context,
@@ -15,6 +16,7 @@ class WalletTransactionAdp(
 ) : RecyclerView.Adapter<WalletTransactionAdp.ViewHolder>() {
 
     var onClickItem: ((transactionId: String) -> Unit)? = null
+    private val animatedPositions = mutableSetOf<Int>()
 
     class ViewHolder(val binding: ItemWalletTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -50,13 +52,18 @@ class WalletTransactionAdp(
                 tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_reject))
             }
         }
+        if (position !in animatedPositions) {
+            animatedPositions.add(position)
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position)
+        }
     }
 
+    override fun getItemCount(): Int = mArrayList.size
+
     fun updateList(items: List<WalletTransactionItem>) {
+        animatedPositions.clear()
         mArrayList.clear()
         mArrayList.addAll(items)
         notifyDataSetChanged()
     }
-
-    override fun getItemCount(): Int = mArrayList.size
 }

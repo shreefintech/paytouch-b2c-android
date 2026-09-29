@@ -6,14 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemRecentTransactionBinding
 import com.shreefintech.paytouchconsumer.transactions.model.RecentTransactionItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 
 class RecentTransactionAdp(
     private val mContext: Context,
     private val mArrayList: ArrayList<RecentTransactionItem>
 ) : RecyclerView.Adapter<RecentTransactionAdp.ViewHolder>() {
+
+    private val animatedPositions = mutableSetOf<Int>()
 
     inner class ViewHolder(val binding: ItemRecentTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -49,6 +54,11 @@ class RecentTransactionAdp(
                 notifyItemChanged(pos)
             }
         }
+
+        if (position !in animatedPositions) {
+            animatedPositions.add(position)
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position)
+        }
     }
 
     private fun bindItem(binding: ItemRecentTransactionBinding, item: RecentTransactionItem) {
@@ -78,16 +88,23 @@ class RecentTransactionAdp(
 
             if (item.isExpanded) {
                 llExpandedContent.visibility = View.VISIBLE
-                ivChevron.rotation = 180f
+                llExpandedContent.alpha = 1f
+                ivChevron.animate().cancel()
+                ivChevron.animate().rotation(180f).setDuration(200)
+                    .setInterpolator(DecelerateInterpolator()).start()
             } else {
+                ivChevron.animate().cancel()
+                ivChevron.animate().rotation(0f).setDuration(200)
+                    .setInterpolator(AccelerateInterpolator()).start()
                 llExpandedContent.visibility = View.GONE
-                ivChevron.rotation = 0f
+                llExpandedContent.alpha = 1f
             }
         }
     }
 
     fun updateList(items: List<RecentTransactionItem>) {
         expandedPosition = -1
+        animatedPositions.clear()
         mArrayList.clear()
         mArrayList.addAll(items)
         notifyDataSetChanged()
