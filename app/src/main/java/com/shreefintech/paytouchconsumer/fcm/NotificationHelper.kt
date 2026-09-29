@@ -45,7 +45,7 @@ object NotificationHelper {
     fun createChannel(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
-            context.getString(R.string.notificationChannelId),
+            context.getString(R.string.labelNotificationChannelId),
             context.getString(R.string.labelNotificationChannel),
             NotificationManager.IMPORTANCE_HIGH
         )
@@ -88,7 +88,7 @@ object NotificationHelper {
         )
 
         val notification = NotificationCompat.Builder(
-            context, context.getString(R.string.notificationChannelId)
+            context, context.getString(R.string.labelNotificationChannelId)
         )
             .setSmallIcon(R.drawable.img_paytouch)
             .setContentTitle(title)

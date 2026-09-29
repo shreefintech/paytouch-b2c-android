@@ -181,7 +181,6 @@ class MyAccountActivity : BaseActivity() {
     private fun selectTab(tab: Int) {
         currentTab = tab
         val isAccountInfo = tab == TAB_ACCOUNT_INFO
-        // title is static — same for both tabs
 
         // Account Info section
         if (isAccountInfo) {

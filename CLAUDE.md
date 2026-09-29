@@ -358,7 +358,7 @@ Each new module needs only:
 - **Never create a per-module `TransactionDetailActivity`, adapter, or item layout** — share the ones in `transactions/` and `adapter/`.
 - **`TransactionDetailActivity` has no SMS Receipt button** — it was removed. Do not add it back.
 - Copy status/report layouts from the Electricity versions (title string only changes); mirror `ElectricityTransactionStatusActivity` and `TransactionReportActivity` exactly.
-- The category icon is set in the ViewModel's `mapToTransactionItem()` — pass `R.drawable.ic_{category}` there.
+- The category icon is set in the ViewModel's `mapToTransactionItem()` — pass `R.drawable.img_{category}` there (loaded via Glide).
 
 ### Two intentionally separate detail Activities — do NOT merge
 

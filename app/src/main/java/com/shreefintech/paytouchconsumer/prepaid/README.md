@@ -30,7 +30,7 @@ Transaction screens: `prepaid/transactions/` | ViewModels: `prepaid/viewmodel/`
 **Launched from:** `HomeActivity` → `binding.cardPrepaid` click handler
 
 **Key differences to remember:**
-- Circle list is fetched from `GET api/states` (`PrepaidViewModel.loadStates()`) — no local list
+- Circle list is loaded from `GET api/states` (`PrepaidViewModel.loadStates()`) — not hardcoded
 - `isMobileCategory = true` in all `mapToTransactionItem()` calls
 - Status screen searches by **mobile number**, not transaction ID
 - `type = "mobile_recharge"` for the unified transactions endpoint (not "prepaid")
@@ -86,9 +86,14 @@ PrepaidActivity
 
 ---
 
-## Circle Selection — `GET api/states`
+## Circle Selection — Loaded from `GET api/states`
 
-The telecom circle list is fetched from `GET api/states` (`ApiService.getStates`, `General<List<StateItem>>`) when the screen opens; the field shows an in-slot spinner while it loads. `circleId` is the selected `StateItem.id`; `circleCode` passed to the API is the same value.
+The telecom circle list comes from the server. `PrepaidActivity.loadStates()` runs in `onCreate()` and calls `PrepaidViewModel.loadStates()` → `ApiService.getStates()` → `GET api/states`, which returns `General<List<StateItem>>` (`id`, `name`).
+
+- **Loading:** `setStateLoading(true)` shows `pbStateLoading` in place of `ivStateArrow` and disables `flStateAnchor` until the call finishes.
+- **Selection:** `showStateDropdown()` shows the names in `CustomDropdown`. Picking one sets `selectedCircleId = stateItems[index].id` and clears any plan already selected.
+- **Empty or failed load:** tapping the picker while `stateItems` is empty calls `loadStates()` again and shows `msgLoadingStates`.
+- `selectedCircleId` is passed as `circleCode` to `process-direct` and as `circleId` to `PrepaidPlanSelectionActivity`.
 
 ---
 
@@ -228,7 +233,7 @@ All endpoints are declared in `ApiService.kt` under the `// ── Mobile Prepai
 | Aspect | Gas / Electricity | Prepaid |
 |---|---|---|
 | Bill fetch step | Required (server-fetched amount) | None — user enters amount or selects a plan |
-| Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from `GET api/states` list |
+| Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from live `GET api/states` list |
 | Plan selection | N/A | `PrepaidPlanSelectionActivity` (separate screen) |
 | Transactions type param | `"electricity"` / `"gas"` | `"mobile_recharge"` |
 | Status search field | Transaction ID | Mobile number |
