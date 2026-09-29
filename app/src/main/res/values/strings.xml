@@ -310,10 +310,10 @@
 
     <!-- Location permission -->
     <string name="titleLocationAccess">Allow Location Access</string>
-    <string name="msgLocationAwareness">As per RBI guidelines, your location helps verify payments and protect you from fraud.</string>
+    <string name="msgLocationAwareness">Your location helps us protect your payments and detect fraud.</string>
     <string name="labelLocationPoints">✓  Used only to secure your payments\n✓  Taken only while you use the app, never in the background\n✓  Not used for ads or marketing</string>
     <string name="titleLocationRationale">Location Needed for Secure Payments</string>
-    <string name="msgLocationRationale">Bill payments on PayTouch need your location for the risk-based fraud checks required under RBI rules. Please allow location access to continue.</string>
+    <string name="msgLocationRationale">PayTouch uses your location to help protect your payments from fraud. Please allow location access to continue.</string>
     <string name="titleLocationSettings">Enable Location in Settings</string>
     <string name="msgLocationSettings">Location access is turned off for PayTouch. Open Settings → Permissions → Location and choose \"Allow only while using the app\".</string>
     <string name="msgTurnOnLocation">Please turn on location to make secure payments.</string>
