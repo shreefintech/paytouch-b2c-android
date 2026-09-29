@@ -166,7 +166,10 @@ class SelfieCaptureActivity : BaseActivity() {
             savedInstanceState?.getBoolean(STATE_PERMISSION_REQUEST_IN_FLIGHT, false) ?: false
         when {
             ContextCompat.checkSelfPermission(mActivity, Manifest.permission.CAMERA) ==
-                    PackageManager.PERMISSION_GRANTED -> startCamera()
+                    PackageManager.PERMISSION_GRANTED -> {
+                SharedPreferenceHelper.setSharedPreferenceBoolean(mActivity, Constant.KEY_CAMERA_DENIED, false)
+                startCamera()
+            }
             // A request pending across recreation is re-delivered to the launcher — don't ask twice.
             // Otherwise (first launch, or restored after the permission was revoked) ask now.
             !isPermissionRequestInFlight -> requestCameraPermission()

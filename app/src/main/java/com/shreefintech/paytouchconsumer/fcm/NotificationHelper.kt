@@ -27,6 +27,7 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.atomic.AtomicInteger
 
 object NotificationHelper {
 
@@ -36,6 +37,8 @@ object NotificationHelper {
     // HomeActivity both trigger a sync before the first call has completed.
     @Volatile
     private var pendingToken: String? = null
+
+    private val notificationIdCounter = AtomicInteger(System.currentTimeMillis().toInt())
 
     /** Creates the push channel. Must run before any notification is posted — call from MyApp. */
     fun createChannel(context: Context) {
@@ -96,7 +99,7 @@ object NotificationHelper {
             .build()
 
         NotificationManagerCompat.from(context)
-            .notify(System.currentTimeMillis().toInt(), notification)
+            .notify(notificationIdCounter.incrementAndGet(), notification)
     }
 
     /**
@@ -115,6 +118,25 @@ object NotificationHelper {
         FirebaseMessaging.getInstance().token
             .addOnSuccessListener { fcmToken -> registerToken(appContext, fcmToken) }
             .addOnFailureListener { it.printStackTrace() }
+    }
+
+    /**
+     * Fire-and-forget token removal for session timeout. Captures the FCM token and bearer
+     * before the caller clears prefs, so the request goes out even after SharedPreferences
+     * are wiped on the next line.
+     */
+    fun removeTokenDetached(context: Context) {
+        val appContext = context.applicationContext
+        val fcmToken = SharedPreferenceHelper.getSharedPreferenceString(
+            appContext, Constant.KEY_FCM_TOKEN, ""
+        ) ?: ""
+        if (fcmToken.isEmpty() || !Utility.isInternetAvailable(appContext)) return
+        val bearer = bearerToken(appContext)
+        ApiClient.apiService.removeDeviceToken(bearer, DeviceTokenRemoveRequest(fcmToken))
+            .enqueue(object : Callback<MessageItem> {
+                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {}
+                override fun onFailure(call: Call<MessageItem>, t: Throwable) { t.printStackTrace() }
+            })
     }
 
     /**
