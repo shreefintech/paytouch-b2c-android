@@ -32,6 +32,10 @@ object Constant {
     // Distinguishes "never asked" from "permanently denied" (both report no rationale).
     const val KEY_LOCATION_ASKED = "LOCATION_ASKED"
 
+    // KYC selfie — true once the user explicitly tapped "Deny" on the camera popup.
+    // A later denial with no rationale then means "Don't ask again" rather than a tap-outside dismiss.
+    const val KEY_CAMERA_DENIED = "CAMERA_DENIED"
+
     // External URLs
     const val URL_PLATFORM_TERMS = "https://www.paytouch.in/terms/platform"
     const val URL_GOOGLE_DOC_VIEWER = "https://docs.google.com/gviewer?embedded=true&url="
