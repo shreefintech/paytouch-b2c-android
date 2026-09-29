@@ -113,4 +113,10 @@ object SharedPreferenceHelper {
         val userId = getSharedPreferenceString(context, Constant.KEY_USER_ID, "") ?: ""
         return token.isNotEmpty() && userId.isNotEmpty()
     }
+
+    /** Authorization header value for the logged-in user — for callers outside a ViewModel. */
+    fun bearerToken(context: Context): String {
+        val token = getSharedPreferenceString(context, Constant.KEY_TOKEN, "") ?: ""
+        return "Bearer $token"
+    }
 }

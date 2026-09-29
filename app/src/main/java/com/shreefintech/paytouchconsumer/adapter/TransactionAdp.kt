@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemTransactionBinding
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
@@ -30,7 +31,7 @@ class TransactionAdp(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         holder.binding.apply {
-            ivCategoryIcon.setImageResource(item.categoryIconRes)
+            Glide.with(mContext).load(item.categoryIconRes).into(ivCategoryIcon)
             tvMobile.text = Utility.maskNumber(item.mobileNumber)
             tvTransactionId.text = item.transactionId
             tvAmount.text = item.amount

@@ -244,7 +244,7 @@ All endpoints declared in `ApiService.kt` under the `// ── DTH ──` secti
 | Transactions type param | `"electricity"` / `"gas"` | `"mobile_recharge"` | `"dth"` |
 | Status search field | Transaction ID | Mobile number | Transaction ID |
 | `isMobileCategory` | `false` | `true` | `true` |
-| Category icon | `ic_electricity` / `ic_gas` | `ic_mobile` | `ic_broadband` |
+| Category icon | `img_electricity` / `img_gas` | `img_prepaid` | `img_dth` |
 | SMS ViewModel base | `BaseBillViewModel` (Elec/Gas) / `AndroidViewModel` (Prepaid) | `AndroidViewModel` | `AndroidViewModel` |
 | Payment endpoint | `process-payment` | `process-direct` | `process-direct` |
 

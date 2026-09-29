@@ -99,7 +99,7 @@ class PrepaidTransactionReportViewModel(application: Application) : AndroidViewM
             transactionId    = item.txnId ?: "--",
             amount           = Utility.formatAmount(item.amount),
             status           = item.status ?: "--",
-            categoryIconRes  = R.drawable.ic_prepaid,
+            categoryIconRes  = R.drawable.img_prepaid,
             username         = item.mobileNo ?: "--",
             date             = item.createdAt ?: "--",
             platformFee      = "₹0.00",

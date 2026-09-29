@@ -37,8 +37,9 @@ class PrepaidViewModel(application: Application) : BaseBillViewModel(application
                     call: Call<General<List<StateItem>>>,
                     response: Response<General<List<StateItem>>>
                 ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        onSuccess(response.body()!!.data!!)
+                    val body = response.body()
+                    if (response.isSuccessful && body?.data != null) {
+                        onSuccess(body.data!!)
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(
@@ -70,8 +71,9 @@ class PrepaidViewModel(application: Application) : BaseBillViewModel(application
                     call: Call<General<List<PrepaidOperatorItem>>>,
                     response: Response<General<List<PrepaidOperatorItem>>>
                 ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        onSuccess(response.body()!!.data!!)
+                    val body = response.body()
+                    if (response.isSuccessful && body?.data != null) {
+                        onSuccess(body.data!!)
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(

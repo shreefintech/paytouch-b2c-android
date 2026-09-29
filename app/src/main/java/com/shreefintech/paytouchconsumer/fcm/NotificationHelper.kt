@@ -23,6 +23,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRemoveRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper.bearerToken
 import com.shreefintech.paytouchconsumer.utill.Utility
 import retrofit2.Call
 import retrofit2.Callback
@@ -153,9 +154,12 @@ object NotificationHelper {
             onDone()
             return
         }
-        ApiClient.apiService.removeDeviceToken(bearerToken(appContext), DeviceTokenRemoveRequest(token))
+        ApiClient.apiService.removeDeviceToken(SharedPreferenceHelper.bearerToken(appContext), DeviceTokenRemoveRequest(token))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+                    if (!response.isSuccessful) {
+                        IllegalStateException("removeDeviceToken failed: HTTP ${response.code()}").printStackTrace()
+                    }
                     onDone()
                 }
 
@@ -182,7 +186,7 @@ object NotificationHelper {
             platform = Constant.FCM_PLATFORM_ANDROID,
             deviceId = deviceId(context)
         )
-        ApiClient.apiService.registerDeviceToken(bearerToken(context), body)
+        ApiClient.apiService.registerDeviceToken(SharedPreferenceHelper.bearerToken(context), body)
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     pendingToken = null
@@ -190,6 +194,9 @@ object NotificationHelper {
                         SharedPreferenceHelper.setSharedPreferenceString(
                             context, Constant.KEY_FCM_TOKEN, token
                         )
+                    } else {
+                        // Background call — no toast, but keep the failure visible for debugging
+                        IllegalStateException("registerDeviceToken failed: HTTP ${response.code()}").printStackTrace()
                     }
                 }
 
@@ -198,13 +205,6 @@ object NotificationHelper {
                     t.printStackTrace()
                 }
             })
-    }
-
-    private fun bearerToken(context: Context): String {
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            context, Constant.KEY_TOKEN, ""
-        ) ?: ""
-        return "Bearer $token"
     }
 
     // ANDROID_ID is stable per app-signing key + device user and survives SharedPreferences clears

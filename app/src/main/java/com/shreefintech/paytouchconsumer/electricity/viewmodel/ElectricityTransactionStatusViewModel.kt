@@ -96,7 +96,7 @@ class ElectricityTransactionStatusViewModel(application: Application) : BaseBill
             transactionId    = item.transactionId ?: "--",
             amount           = Utility.formatAmount(item.amount),
             status           = item.status ?: "--",
-            categoryIconRes  = R.drawable.ic_electricity,
+            categoryIconRes  = R.drawable.img_electricity,
             username         = item.customerName ?: "--",
             date             = item.createdAt ?: "--",
             platformFee      = Utility.formatAmount(item.platformFee),
