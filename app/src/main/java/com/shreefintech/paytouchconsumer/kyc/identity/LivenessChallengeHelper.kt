@@ -74,7 +74,15 @@ class LivenessChallengeHelper {
     }
 
     private fun handleBlink(frame: LivenessFrameItem) {
-        if (frame.widthRatio < MIN_FACE_WIDTH * 0.8f) { restartIfInProgress(); emit(LivenessInstruction.MOVE_CLOSER); return }
+        val hint = positionHint(frame)
+        if (hint != null) {
+            // Face drifted out of position — pause blink, show correction, reset eye state so
+            // a blink that happened mid-drift is not counted once the face corrects.
+            sawEyesOpen = false
+            eyesClosedAt = null
+            emit(hint)
+            return
+        }
         val left = frame.leftEyeOpen ?: return
         val right = frame.rightEyeOpen ?: return
         val open = left > EYE_OPEN && right > EYE_OPEN

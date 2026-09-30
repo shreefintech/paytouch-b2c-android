@@ -65,6 +65,9 @@ class FilePickerUtil(activity: AppCompatActivity) {
     var onSuccess: ((FileResult) -> Unit)? = null
     var onError: ((FilePickerError) -> Unit)? = null
 
+    /** Max bytes to compress camera-captured images to. Defaults to 2 MB; set lower for faster uploads. */
+    var cameraMaxBytes: Int = 2 * 1024 * 1024
+
     // ─── Internals ────────────────────────────────────────────────────────────
 
     private val context: Context = activity
@@ -87,14 +90,14 @@ class FilePickerUtil(activity: AppCompatActivity) {
         }
 
     private val cameraLauncher: ActivityResultLauncher<Uri> =
-        activity.registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        activity.registerForActivityResult(ActivityResultContracts.TakePicture()) { _ ->
             val file = cameraOutputFile
             val uri = cameraOutputUri
             cameraOutputFile = null
             cameraOutputUri = null
-            if (success && file != null && file.exists() && uri != null) {
+            if (file != null && uri != null && file.exists() && file.length() > 0) {
                 Thread {
-                    Utility.compressImageFile(file)
+                    Utility.compressImageFile(file, cameraMaxBytes)
                     Handler(Looper.getMainLooper()).post {
                         onSuccess?.invoke(FileResult(uri, file.name, "jpg", file.length() / (1024.0 * 1024.0)))
                     }

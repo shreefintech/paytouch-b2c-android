@@ -30,6 +30,9 @@ import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -68,7 +71,7 @@ class IdentityVerificationActivity : BaseActivity() {
             onSelfieCaptured = null
             if (result.resultCode == RESULT_OK && file != null && file.exists() && uri != null && callback != null) {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    Utility.compressImageFile(file)
+                    Utility.compressImageFile(file, 800 * 1024)
                     withContext(Dispatchers.Main) { callback(uri) }
                 }
             }
@@ -111,6 +114,7 @@ class IdentityVerificationActivity : BaseActivity() {
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                if (showProgressSubmit.get()) return
                 if (!viewModel.goToPreviousStep()) {
                     setResult(resultCode)
                     finish()
@@ -175,6 +179,7 @@ class IdentityVerificationActivity : BaseActivity() {
 
     private fun setupFilePicker() {
         filePickerUtil = FilePickerUtil(this)
+        filePickerUtil.cameraMaxBytes = 800 * 1024
         filePickerUtil.onSuccess =
             { result -> onDocumentPicked?.invoke(result.uri); onDocumentPicked = null }
         filePickerUtil.onError = { error ->
@@ -185,11 +190,11 @@ class IdentityVerificationActivity : BaseActivity() {
 
     fun pickDocument(onPicked: (Uri) -> Unit) {
         onDocumentPicked = onPicked
-        filePickerUtil.showSourceChooser(java.io.File(cacheDir, "kyc_docs"))
+        filePickerUtil.showSourceChooser(java.io.File(filesDir, "kyc_docs"))
     }
 
     fun captureSelfie(onCaptured: (Uri) -> Unit) {
-        val dir = File(cacheDir, "kyc").also { it.mkdirs() }
+        val dir = File(filesDir, "kyc").also { it.mkdirs() }
         val file = File(dir, "selfie_${System.currentTimeMillis()}.jpg")
         val uri =
             FileProvider.getUriForFile(mActivity, "${mActivity.packageName}.fileprovider", file)
@@ -229,13 +234,14 @@ class IdentityVerificationActivity : BaseActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val cr = contentResolver
-                val panBytes = panUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
-                val aadhaarFrontBytes =
-                    aadhaarFrontUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
-                val aadhaarBackBytes =
-                    aadhaarBackUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
-                val selfieBytes =
-                    selfieUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+                val (panBytes, aadhaarFrontBytes, aadhaarBackBytes, selfieBytes) = coroutineScope {
+                    listOf(
+                        async { panUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } } },
+                        async { aadhaarFrontUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } } },
+                        async { aadhaarBackUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } } },
+                        async { selfieUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } } }
+                    ).awaitAll()
+                }
 
                 withContext(Dispatchers.Main) {
                     if (panBytes == null || aadhaarFrontBytes == null || aadhaarBackBytes == null || selfieBytes == null) {
@@ -283,11 +289,13 @@ class IdentityVerificationActivity : BaseActivity() {
             when (view) {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressSubmit.get()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
 
                 binding.btnCapture -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressSubmit.get()) return@OnClickListener
                     (currentFragment() as? KycStep4Fragment)?.triggerCapture()
                 }
 

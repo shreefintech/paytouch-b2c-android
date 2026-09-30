@@ -86,7 +86,9 @@
     <color name="colorStatusFailed">#D84C55</color>
     <color name="selfie_card_stroke">#D52662</color>
     <color name="selfie_overlay_scrim">#99000000</color>    <!-- live selfie dim outside the face circle -->
-    <color name="selfie_circle_passed">#0BA93F</color>      <!-- live selfie circle outline once blinks pass -->
+    <color name="selfie_circle_error">#E53935</color>       <!-- no face / multiple faces -->
+    <color name="selfie_circle_warning">#FFC107</color>     <!-- face detected but needs adjustment / blinking -->
+    <color name="selfie_circle_passed">#0BA93F</color>      <!-- blinks done, hold stage or captured -->
     <color name="personal_info_label">#6B7280</color>
     <color name="account_card_label">#FFFFF0</color>
     <color name="status_divider">#A299A1</color>
