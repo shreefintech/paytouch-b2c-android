@@ -137,6 +137,12 @@
     <string name="msgOnlyPdfJpgJpegAllowed">Only PDF, JPG, JPEG allowed.</string>
     <string name="msgFileExceeds2mbLimit">File exceeds 2MB limit.</string>
     <string name="msgUnableToReadFileTryAgain">Unable to read file. Try again.</string>
+    <string name="titleSelectDocument">Select Document</string>
+    <string name="btnTakePhoto">Take Photo</string>
+    <string name="btnChooseFile">Choose from Files</string>
+    <string name="labelUseCamera">Use camera</string>
+    <string name="labelPdfOrImage">PDF or image</string>
+    <string name="msgCameraPermissionDenied">Camera permission is required to take a photo.</string>
 
     <!-- Create Virtual Account screen -->
     <string name="titleCreateVirtualAccount">Create Virtual Account</string>

@@ -3,7 +3,9 @@ package com.shreefintech.paytouchconsumer.utill
 import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.pdf.PdfRenderer
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -16,12 +18,15 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.core.graphics.createBitmap
 import androidx.core.widget.NestedScrollView
+import androidx.exifinterface.media.ExifInterface
 import com.shreefintech.paytouchconsumer.R
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
-import androidx.core.graphics.createBitmap
 
 object Utility {
 
@@ -141,6 +146,41 @@ object Utility {
             }
         }
     } catch (_: Exception) { null }
+
+    fun compressImageFile(file: File, maxBytes: Int = 2 * 1024 * 1024) {
+        val needsCompress = file.length() > maxBytes
+        val rotation = try {
+            when (ExifInterface(file.absolutePath).getAttributeInt(
+                ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL
+            )) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
+        } catch (_: Exception) { 0 }
+
+        if (!needsCompress && rotation == 0) return
+
+        val raw = BitmapFactory.decodeFile(file.absolutePath) ?: return
+        val bitmap = if (rotation != 0) {
+            Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
+                .also { if (it !== raw) raw.recycle() }
+        } else raw
+
+        var quality = if (needsCompress) 85 else 95
+        while (true) {
+            val bos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
+            val bytes = bos.toByteArray()
+            if (bytes.size <= maxBytes || quality == 40) {
+                file.writeBytes(bytes)
+                break
+            }
+            quality -= 15
+        }
+        bitmap.recycle()
+    }
 
     fun calculatePlatformFee(amount: Double): Double {
         return when {

@@ -132,7 +132,7 @@ class BankDetailsActivity : BaseActivity() {
         val openPicker = View.OnClickListener {
             if (Utility.stopClick()) return@OnClickListener
             activeCardIndex = bankCardBindings.indexOf(card)
-            filePickerUtil.openPicker()
+            filePickerUtil.showSourceChooser(java.io.File(cacheDir, "kyc_docs"))
         }
         card.flUpload1.setOnClickListener(openPicker)
         card.ivEditProof1.setOnClickListener(openPicker)

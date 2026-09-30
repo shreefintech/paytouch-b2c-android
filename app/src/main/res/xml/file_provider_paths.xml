@@ -2,5 +2,6 @@
 <paths>
     <cache-path name="paytouch_receipts" path="receipts/" />
     <cache-path name="paytouch_kyc" path="kyc/" />
+    <cache-path name="paytouch_kyc_docs" path="kyc_docs/" />
     <external-path name="paytouch_pictures" path="Pictures/PayTouch/" />
 </paths>

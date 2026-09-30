@@ -2,10 +2,6 @@ package com.shreefintech.paytouchconsumer.kyc.identity
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -36,7 +32,6 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.io.File
 
 class IdentityVerificationActivity : BaseActivity() {
@@ -73,7 +68,7 @@ class IdentityVerificationActivity : BaseActivity() {
             onSelfieCaptured = null
             if (result.resultCode == RESULT_OK && file != null && file.exists() && uri != null && callback != null) {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    compressIfNeeded(file)
+                    Utility.compressImageFile(file)
                     withContext(Dispatchers.Main) { callback(uri) }
                 }
             }
@@ -190,7 +185,7 @@ class IdentityVerificationActivity : BaseActivity() {
 
     fun pickDocument(onPicked: (Uri) -> Unit) {
         onDocumentPicked = onPicked
-        filePickerUtil.openPicker()
+        filePickerUtil.showSourceChooser(java.io.File(cacheDir, "kyc_docs"))
     }
 
     fun captureSelfie(onCaptured: (Uri) -> Unit) {
@@ -202,54 +197,6 @@ class IdentityVerificationActivity : BaseActivity() {
         cameraOutputUri = uri
         onSelfieCaptured = onCaptured
         selfieLauncher.launch(SelfieCaptureActivity.buildIntent(mActivity, file))
-    }
-
-    private fun compressIfNeeded(file: File) {
-        val maxBytes = 2 * 1024 * 1024
-        val needsCompress = file.length() > maxBytes
-        val rotation = exifRotation(file.absolutePath)
-        if (!needsCompress && rotation == 0) return
-
-        val raw = BitmapFactory.decodeFile(file.absolutePath) ?: return
-        val bitmap = if (rotation != 0) {
-            Bitmap.createBitmap(
-                raw,
-                0,
-                0,
-                raw.width,
-                raw.height,
-                Matrix().apply { postRotate(rotation.toFloat()) },
-                true
-            )
-                .also { if (it !== raw) raw.recycle() }
-        } else raw
-
-        var quality = if (needsCompress) 85 else 95
-        while (true) {
-            val bos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
-            val bytes = bos.toByteArray()
-            if (bytes.size <= maxBytes || quality == 40) {
-                file.writeBytes(bytes)
-                break
-            }
-            quality -= 15
-        }
-        bitmap.recycle()
-    }
-
-    private fun exifRotation(path: String): Int = try {
-        when (ExifInterface(path).getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_NORMAL
-        )) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> 90
-            ExifInterface.ORIENTATION_ROTATE_180 -> 180
-            ExifInterface.ORIENTATION_ROTATE_270 -> 270
-            else -> 0
-        }
-    } catch (_: Exception) {
-        0
     }
 
     // ─── Navigation ─────────────────────────────────────────────────────────────
