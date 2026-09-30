@@ -190,6 +190,7 @@ class MyAccountActivity : BaseActivity() {
             } else {
                 binding.shimmerAccountInfo.visibility = View.GONE
                 binding.llAccountInfoContent.visibility = View.VISIBLE
+                AnimationHelper.animateChildren(binding.llAccountInfoContent as ViewGroup)
             }
             binding.shimmerReferEarn.stopShimmer()
             binding.shimmerReferEarn.visibility = View.GONE

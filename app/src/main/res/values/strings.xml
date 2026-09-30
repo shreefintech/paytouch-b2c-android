@@ -203,7 +203,7 @@
     <string name="labelValidity">Validity</string>
     <string name="labelDataBenefit">Data</string>
     <string name="labelTalktime">Talktime</string>
-    <string name="labelViewMore"> View more</string>
+    <string name="labelViewMore">... View more</string>
 
     <!-- Electricity screen -->
     <string name="titleElectricityBill">Electricity Bill</string>
@@ -586,6 +586,7 @@
     <string name="labelBankProof">Bank Proof</string>
     <string name="btnAddBankAccount">+ Add Another Bank Account</string>
     <string name="msgAgreeTAndC">I agree to the Terms &amp; Conditions</string>
+    <string name="labelTermsAndConditions">Terms &amp; Conditions</string>
     <string name="msgBankDetailsSubmitSuccess">Bank details submitted successfully</string>
 
     <!-- KYC module — bank validation -->

@@ -488,13 +488,15 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun showLoading() {
-        binding.viewDimmer.visibility = View.VISIBLE
-        binding.pbLoading.visibility = View.VISIBLE
+        binding.shimmerWallet.visibility = View.VISIBLE
+        binding.shimmerWallet.startShimmer()
+        binding.llTotalBalanceContent.visibility = View.GONE
     }
 
     private fun hideLoading() {
-        binding.viewDimmer.visibility = View.GONE
-        binding.pbLoading.visibility = View.GONE
+        binding.shimmerWallet.stopShimmer()
+        binding.shimmerWallet.visibility = View.GONE
+        binding.llTotalBalanceContent.visibility = View.VISIBLE
     }
 
     private var walletEntrancePlayed = false

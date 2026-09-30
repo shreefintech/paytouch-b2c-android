@@ -2,20 +2,28 @@ package com.shreefintech.paytouchconsumer.kyc.bank
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityBankDetailsBinding
 import com.shreefintech.paytouchconsumer.databinding.ItemBankAccountBinding
@@ -81,7 +89,37 @@ class BankDetailsActivity : BaseActivity() {
 
         onBack()
         setupFilePicker()
+        setupTermsText()
         initBankCards()
+    }
+
+    private fun setupTermsText() {
+        val fullText = getString(R.string.msgAgreeTAndC)
+        val linkText = getString(R.string.labelTermsAndConditions)
+        val start = fullText.indexOf(linkText)
+        if (start < 0) {
+            binding.tvTerms.text = fullText
+            return
+        }
+        val spannable = SpannableString(fullText)
+        spannable.setSpan(
+            object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                }
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = ContextCompat.getColor(mActivity, R.color.primary)
+                    ds.isUnderlineText = true
+                }
+            },
+            start,
+            start + linkText.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        binding.tvTerms.text = spannable
+        binding.tvTerms.movementMethod = LinkMovementMethod.getInstance()
+        binding.tvTerms.highlightColor = Color.TRANSPARENT
     }
 
     private fun onBack() {
@@ -132,7 +170,7 @@ class BankDetailsActivity : BaseActivity() {
         val openPicker = View.OnClickListener {
             if (Utility.stopClick()) return@OnClickListener
             activeCardIndex = bankCardBindings.indexOf(card)
-            filePickerUtil.showSourceChooser(java.io.File(cacheDir, "kyc_docs"))
+            filePickerUtil.showSourceChooser(java.io.File(filesDir, "kyc_docs"))
         }
         card.flUpload1.setOnClickListener(openPicker)
         card.ivEditProof1.setOnClickListener(openPicker)
