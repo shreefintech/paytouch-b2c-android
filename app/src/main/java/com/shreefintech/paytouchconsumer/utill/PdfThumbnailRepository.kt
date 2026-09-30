@@ -63,16 +63,20 @@ object PdfThumbnailRepository {
         val renderer = PdfRenderer(fd)
         try {
             val page = renderer.openPage(0)
-            val scale = 400f / page.width
-            val bmp = Bitmap.createBitmap(
-                (page.width * scale).toInt(),
-                (page.height * scale).toInt(),
-                Bitmap.Config.ARGB_8888
-            )
-            Canvas(bmp).drawColor(Color.WHITE)
-            page.render(bmp, null, Matrix().apply { setScale(scale, scale) }, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-            page.close()
-            return bmp
+            try {
+                if (page.width <= 0 || page.height <= 0) throw IllegalStateException("invalid page dimensions")
+                val scale = 400f / page.width
+                val bmp = Bitmap.createBitmap(
+                    (page.width * scale).toInt(),
+                    (page.height * scale).toInt(),
+                    Bitmap.Config.ARGB_8888
+                )
+                Canvas(bmp).drawColor(Color.WHITE)
+                page.render(bmp, null, Matrix().apply { setScale(scale, scale) }, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                return bmp
+            } finally {
+                page.close()
+            }
         } finally {
             renderer.close()
             fd.close()

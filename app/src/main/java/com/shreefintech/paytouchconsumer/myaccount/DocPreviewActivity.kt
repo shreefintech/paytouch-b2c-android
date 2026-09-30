@@ -215,25 +215,35 @@ class DocPreviewActivity : BaseActivity() {
     private fun renderPdfPage(pageIndex: Int) {
         val renderer = pdfRenderer ?: return
         val screenWidth = resources.displayMetrics.widthPixels
-        val page = renderer.openPage(pageIndex)
+        try {
+            val page = renderer.openPage(pageIndex)
+            try {
+                if (page.width <= 0 || page.height <= 0) {
+                    showError(getString(R.string.errCannotRenderPdf, "invalid page dimensions"))
+                    return
+                }
+                val scale = screenWidth.toFloat() / page.width
+                val bitmap = Bitmap.createBitmap(
+                    (page.width * scale).toInt(),
+                    (page.height * scale).toInt(),
+                    Bitmap.Config.ARGB_8888
+                )
+                Canvas(bitmap).drawColor(Color.WHITE)
+                page.render(bitmap, null, Matrix().apply { setScale(scale, scale) }, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
-        val scale = screenWidth.toFloat() / page.width
-        val bitmap = Bitmap.createBitmap(
-            (page.width * scale).toInt(),
-            (page.height * scale).toInt(),
-            Bitmap.Config.ARGB_8888
-        )
-        Canvas(bitmap).drawColor(Color.WHITE)
-        page.render(bitmap, null, Matrix().apply { setScale(scale, scale) }, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-        page.close()
+                scaleFactor = 1f
+                binding.imagePreview.scaleX = 1f
+                binding.imagePreview.scaleY = 1f
+                binding.imagePreview.setImageBitmap(bitmap)
 
-        scaleFactor = 1f
-        binding.imagePreview.scaleX = 1f
-        binding.imagePreview.scaleY = 1f
-        binding.imagePreview.setImageBitmap(bitmap)
-
-        binding.btnPrevPage.isEnabled = currentPage > 0
-        binding.btnNextPage.isEnabled = currentPage < totalPages - 1
+                binding.btnPrevPage.isEnabled = currentPage > 0
+                binding.btnNextPage.isEnabled = currentPage < totalPages - 1
+            } finally {
+                page.close()
+            }
+        } catch (e: Exception) {
+            showError(getString(R.string.errCannotRenderPdf, e.message))
+        }
     }
 
     private fun updatePageLabel() {

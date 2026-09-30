@@ -287,6 +287,7 @@ class BankDetailsActivity : BaseActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val bmp = Utility.renderPdfFirstPage(mActivity, uri)
                 withContext(Dispatchers.Main) {
+                    if (isDestroyed || isFinishing) return@withContext
                     if (bmp != null) Glide.with(mActivity as Context).load(bmp).into(card.ivPreviewProof)
                 }
             }
