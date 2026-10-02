@@ -76,7 +76,7 @@ class HdfcWebViewActivity : BaseActivity() {
 
         if (paymentUrl.isNotEmpty()) {
             if (!Utility.isInternetAvailable(mActivity)) {
-                ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+                ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet), inWindow = false)
                 finish()
                 return
             }
