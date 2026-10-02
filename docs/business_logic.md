@@ -281,7 +281,7 @@ amount > 40000           → fee = ₹30
 
 ### Response Fields (Plans — flat)
 - `success` (Boolean)
-- `plans[].plan_type` (Int), `plans[].amount` (Int), `plans[].description` (String), `plans[].validity` (String), `plans[].talktime` (Double), `plans[].data` (String)
+- `plans[].plan_type` (Int), `plans[].amount` (Int), `plans[].description` (String), `plans[].validity` (String), `plans[].data` (String)
 - `operator_id` (String), `circle_id` (String)
 
 ### Request Fields (Process Recharge)
@@ -425,7 +425,7 @@ Transaction IDs are **generated and returned by the backend** in the `process-pa
 ### Rules
 - Token is checked at Splash; no token → go to Login
 - Any 401 response → clear ALL SharedPreferences → launch LoginActivity with `FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK`
-- **Idle session timeout (API-call based):** `LAST_INTERACTION` is written by `SessionInterceptor` on every API call while the user is logged in (both `ApiClient` and `ApiAdminClient`), and once by `LoginViewModel` at login. `BaseActivity` calls `checkSessionTimeout()` in `onResume()` and then every 30 seconds (`SESSION_CHECK_INTERVAL_MS`) until `onPause()`. If the elapsed time since `LAST_INTERACTION` exceeds `SESSION_TIMEOUT_MS` (5 minutes), the session is cleared and `LoginActivity` is launched with a cleared back stack. Touch events do **not** reset the timer — the touch-based `onUserInteraction()` approach was intentionally removed in B2C-145.
+- **Idle session timeout (API-call based):** `LAST_INTERACTION` is written by `SessionInterceptor` on every API call while the user is logged in (both `ApiClient` and `ApiAdminClient`), and once by `LoginViewModel` at login. `BaseActivity` calls `checkSessionTimeout()` in `onResume()` and then every 30 seconds (`SESSION_CHECK_INTERVAL_MS`) until `onPause()`. If the elapsed time since `LAST_INTERACTION` exceeds `SESSION_TIMEOUT_MS` (10 minutes), the session is cleared and `LoginActivity` is launched with a cleared back stack. Touch events do **not** reset the timer — the touch-based `onUserInteraction()` approach was intentionally removed in B2C-145.
 - `isLoggedIn()` = token is not null AND userId > 0
 
 ---

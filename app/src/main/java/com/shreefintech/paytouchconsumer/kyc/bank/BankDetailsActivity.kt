@@ -398,7 +398,7 @@ class BankDetailsActivity : BaseActivity() {
                         onLoading = {},
                         onSuccess = {
                             showProgressSubmit.set(false)
-                            ToastUtil.showSuccess(mActivity, getString(R.string.msgBankDetailsSubmitSuccess))
+                            ToastUtil.showSuccess(mActivity, getString(R.string.msgBankDetailsSubmitSuccess), inWindow = false)
                             setResult(1)
                             finish()
                         },
