@@ -191,12 +191,12 @@ class SelfieCaptureActivity : BaseActivity() {
     }
 
     private fun onPermissionDenied() {
-        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionRequired))
+        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionRequired), inWindow = false)
         finish()
     }
 
     private fun openAppSettings() {
-        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionSettings))
+        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionSettings), inWindow = false)
         try {
             startActivity(
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null))
@@ -325,7 +325,7 @@ class SelfieCaptureActivity : BaseActivity() {
         .also { it.setAnalyzer(analysisExecutor, ::analyzeFrame) }
 
     private fun onCameraUnavailable() {
-        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraUnavailable))
+        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraUnavailable), inWindow = false)
         finish()
     }
 

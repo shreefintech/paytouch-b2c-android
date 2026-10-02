@@ -135,7 +135,7 @@ open class BaseActivity : AppCompatActivity() {
         if (System.currentTimeMillis() - last > Constant.SESSION_TIMEOUT_MS) {
             NotificationHelper.removeTokenDetached(this)
             SharedPreferenceHelper.clearSharedPreference(this)
-            ToastUtil.showExpired(this, getString(R.string.errUnauthorized))
+            ToastUtil.showExpired(this, getString(R.string.errUnauthorized), inWindow = false)
             val opts = ActivityOptions.makeCustomAnimation(
                 this, R.anim.anim_activity_fade_in, R.anim.anim_activity_fade_out
             )

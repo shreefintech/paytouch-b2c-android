@@ -35,7 +35,9 @@ class RecentTransactionAdp(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
-        bindItem(holder.binding, item)
+        val isSamePosition = holder.binding.root.tag == position
+        holder.binding.root.tag = position
+        bindItem(holder.binding, item, animate = isSamePosition)
 
         holder.binding.llHeader.setOnClickListener {
             val pos = holder.bindingAdapterPosition
@@ -62,7 +64,7 @@ class RecentTransactionAdp(
         }
     }
 
-    private fun bindItem(binding: ItemRecentTransactionBinding, item: RecentTransactionItem) {
+    private fun bindItem(binding: ItemRecentTransactionBinding, item: RecentTransactionItem, animate: Boolean = false) {
         with(binding) {
             val context = root.context
             Glide.with(mContext).load(item.categoryIconRes).placeholder(R.drawable.ic_file_not_found).into(ivCategoryIcon)
@@ -87,19 +89,15 @@ class RecentTransactionAdp(
             tvDetailAccountNumber.text = context.getString(accountLabelRes, item.accountNumber)
             tvDetailReference.text = context.getString(R.string.labelDetailReference, item.reference)
 
-            if (item.isExpanded) {
-                llExpandedContent.visibility = View.VISIBLE
-                llExpandedContent.alpha = 1f
-                ivChevron.animate().cancel()
-                ivChevron.animate().rotation(180f).setDuration(200)
-                    .setInterpolator(DecelerateInterpolator()).start()
+            val targetRotation = if (item.isExpanded) 180f else 0f
+            ivChevron.animate().cancel()
+            if (animate) {
+                ivChevron.animate().rotation(targetRotation).setDuration(200)
+                    .setInterpolator(if (item.isExpanded) DecelerateInterpolator() else AccelerateInterpolator()).start()
             } else {
-                ivChevron.animate().cancel()
-                ivChevron.animate().rotation(0f).setDuration(200)
-                    .setInterpolator(AccelerateInterpolator()).start()
-                llExpandedContent.visibility = View.GONE
-                llExpandedContent.alpha = 1f
+                ivChevron.rotation = targetRotation
             }
+            llExpandedContent.visibility = if (item.isExpanded) View.VISIBLE else View.GONE
         }
     }
 
