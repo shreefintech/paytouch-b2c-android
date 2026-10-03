@@ -337,7 +337,7 @@ class LoadWalletActivity : BaseActivity() {
             },
             onError = { msg ->
                 showProgressWithdraw.set(false)
-                ToastUtil.showDelete(mActivity, msg)
+                ToastUtil.showDelete(mActivity, msg, inWindow = false)
             }
         )
     }
@@ -426,7 +426,7 @@ class LoadWalletActivity : BaseActivity() {
                 }
                 val payUrl = data.paymentLinks?.web.orEmpty()
                 if (payUrl.isEmpty()) {
-                    ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                    ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
                     return@createHdfcOrder
                 }
                 Utility.hideKeyboard(mActivity)
@@ -441,7 +441,7 @@ class LoadWalletActivity : BaseActivity() {
             },
             onError = { msg ->
                 showProgressPay.set(false)
-                ToastUtil.showDelete(mActivity, msg)
+                ToastUtil.showDelete(mActivity, msg, inWindow = false)
             }
         )
     }

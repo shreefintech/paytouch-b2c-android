@@ -263,7 +263,7 @@ class HomeActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressLogout.get()) return@OnClickListener
                     if (!Utility.isInternetAvailable(mActivity)) {
-                        ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
+                        ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet), inWindow = false)
                         return@OnClickListener
                     }
                     viewModel.logout(
@@ -278,7 +278,7 @@ class HomeActivity : BaseActivity() {
                         },
                         onError = { msg ->
                             showProgressLogout.set(false)
-                            ToastUtil.showWarning(mActivity, msg)
+                            ToastUtil.showWarning(mActivity, msg, inWindow = false)
                         }
                     )
                 }
