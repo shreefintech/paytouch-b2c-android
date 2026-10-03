@@ -4,11 +4,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemRecentTransactionBinding
 import com.shreefintech.paytouchconsumer.transactions.model.RecentTransactionItem
@@ -33,6 +33,20 @@ class RecentTransactionAdp(
 
     private var expandedPosition = -1
 
+    companion object {
+        // Partial-bind payload: only the expand/collapse state changed, so the same ViewHolder is
+        // rebound (no cross-fade) and the chevron rotation can animate.
+        private const val PAYLOAD_EXPAND = "payload_expand"
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.contains(PAYLOAD_EXPAND)) {
+            bindExpandState(holder.binding, mArrayList[position], animate = true)
+            return
+        }
+        super.onBindViewHolder(holder, position, payloads)
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         bindItem(holder.binding, item)
@@ -43,22 +57,23 @@ class RecentTransactionAdp(
             if (pos == expandedPosition) {
                 mArrayList[pos].isExpanded = false
                 expandedPosition = -1
-                notifyItemChanged(pos)
+                notifyItemChanged(pos, PAYLOAD_EXPAND)
             } else {
                 val prev = expandedPosition
                 if (prev != -1) {
                     mArrayList[prev].isExpanded = false
-                    notifyItemChanged(prev)
+                    notifyItemChanged(prev, PAYLOAD_EXPAND)
                 }
                 mArrayList[pos].isExpanded = true
                 expandedPosition = pos
-                notifyItemChanged(pos)
+                notifyItemChanged(pos, PAYLOAD_EXPAND)
             }
         }
 
-        if (position !in animatedPositions) {
-            animatedPositions.add(position)
-            AnimationHelper.animateListRowEntrance(holder.binding.root, position, AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView))
+        // Only first-screen rows animate, so only they need tracking.
+        val visibleCount = AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView)
+        if (position < visibleCount && animatedPositions.add(position)) {
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position, visibleCount)
         }
     }
 
@@ -86,20 +101,21 @@ class RecentTransactionAdp(
             }
             tvDetailAccountNumber.text = context.getString(accountLabelRes, item.accountNumber)
             tvDetailReference.text = context.getString(R.string.labelDetailReference, item.reference)
+        }
+        bindExpandState(binding, item, animate = false)
+    }
 
-            if (item.isExpanded) {
-                llExpandedContent.visibility = View.VISIBLE
-                llExpandedContent.alpha = 1f
-                ivChevron.animate().cancel()
-                ivChevron.animate().rotation(180f).setDuration(200)
-                    .setInterpolator(DecelerateInterpolator()).start()
+    private fun bindExpandState(binding: ItemRecentTransactionBinding, item: RecentTransactionItem, animate: Boolean) {
+        with(binding) {
+            val targetRotation = if (item.isExpanded) 180f else 0f
+            ivChevron.animate().cancel()
+            if (animate) {
+                ivChevron.animate().rotation(targetRotation).setDuration(200)
+                    .setInterpolator(if (item.isExpanded) DecelerateInterpolator() else AccelerateInterpolator()).start()
             } else {
-                ivChevron.animate().cancel()
-                ivChevron.animate().rotation(0f).setDuration(200)
-                    .setInterpolator(AccelerateInterpolator()).start()
-                llExpandedContent.visibility = View.GONE
-                llExpandedContent.alpha = 1f
+                ivChevron.rotation = targetRotation
             }
+            llExpandedContent.visibility = if (item.isExpanded) View.VISIBLE else View.GONE
         }
     }
 

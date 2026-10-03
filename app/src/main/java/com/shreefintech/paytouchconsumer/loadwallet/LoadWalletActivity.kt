@@ -68,6 +68,8 @@ class LoadWalletActivity : BaseActivity() {
     private var pendingWithdrawNarration: String = ""
     private val showProgressWithdraw = ObservableBoolean(false)
 
+    private var isWalletEntrancePlayed = false
+
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
         private const val MODE_IMPS = "IMPS"
@@ -337,7 +339,7 @@ class LoadWalletActivity : BaseActivity() {
             },
             onError = { msg ->
                 showProgressWithdraw.set(false)
-                ToastUtil.showDelete(mActivity, msg)
+                ToastUtil.showDelete(mActivity, msg, inWindow = false)
             }
         )
     }
@@ -426,7 +428,7 @@ class LoadWalletActivity : BaseActivity() {
                 }
                 val payUrl = data.paymentLinks?.web.orEmpty()
                 if (payUrl.isEmpty()) {
-                    ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                    ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
                     return@createHdfcOrder
                 }
                 Utility.hideKeyboard(mActivity)
@@ -441,7 +443,7 @@ class LoadWalletActivity : BaseActivity() {
             },
             onError = { msg ->
                 showProgressPay.set(false)
-                ToastUtil.showDelete(mActivity, msg)
+                ToastUtil.showDelete(mActivity, msg, inWindow = false)
             }
         )
     }
@@ -499,12 +501,10 @@ class LoadWalletActivity : BaseActivity() {
         binding.llTotalBalanceContent.visibility = View.VISIBLE
     }
 
-    private var walletEntrancePlayed = false
-
     private fun populateWalletData(data: WalletDataItem) {
-        if (!walletEntrancePlayed) {
-            walletEntrancePlayed = true
-            AnimationHelper.animateChildren(binding.llTotalBalanceContent as ViewGroup)
+        if (!isWalletEntrancePlayed) {
+            isWalletEntrancePlayed = true
+            AnimationHelper.animateChildren(binding.llTotalBalanceContent)
         }
         currentWalletBalance = data.walletBalance
         binding.tvWalletBalance.text = Utility.formatAmount(data.walletBalance)

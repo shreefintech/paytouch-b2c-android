@@ -2,6 +2,7 @@ package com.shreefintech.paytouchconsumer.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -44,7 +45,7 @@ class DthPlanAdp(
             tvPlanAmount.text = Utility.formatAmount(item.amount?.toString(), trimZeros = true)
             tvPlanValidity.text = item.validity ?: "--"
             tvPlanDescription.text = item.description ?: "--"
-            cvDataChip.visibility = android.view.View.GONE
+            cvDataChip.visibility = View.GONE
         }
         holder.binding.root.setOnClickListener {
             val pos = holder.bindingAdapterPosition

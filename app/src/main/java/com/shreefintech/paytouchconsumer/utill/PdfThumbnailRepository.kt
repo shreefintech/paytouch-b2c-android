@@ -58,13 +58,14 @@ object PdfThumbnailRepository {
         return file
     }
 
-    private fun renderFirstPage(file: File): Bitmap {
+    private fun renderFirstPage(file: File): Bitmap? {
         val fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
         val renderer = PdfRenderer(fd)
         try {
             val page = renderer.openPage(0)
             try {
-                if (page.width <= 0 || page.height <= 0) throw IllegalStateException("invalid page dimensions")
+                // Invalid page size — no thumbnail; caller shows its placeholder.
+                if (page.width <= 0 || page.height <= 0) return null
                 val scale = 400f / page.width
                 val bmp = Bitmap.createBitmap(
                     (page.width * scale).toInt(),

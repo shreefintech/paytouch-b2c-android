@@ -143,6 +143,8 @@
     <string name="labelUseCamera">Use camera</string>
     <string name="labelPdfOrImage">PDF or image</string>
     <string name="msgCameraPermissionDenied">Camera permission is required to take a photo.</string>
+    <string name="msgCameraPermissionBlockedDoc">Camera access is blocked. Open Settings → Permissions → Camera and allow it to take a photo</string>
+    <string name="msgReselectDocument">Please select the document again</string>
 
     <!-- Create Virtual Account screen -->
     <string name="titleCreateVirtualAccount">Create Virtual Account</string>
@@ -203,7 +205,7 @@
     <string name="labelValidity">Validity</string>
     <string name="labelDataBenefit">Data</string>
     <string name="labelTalktime">Talktime</string>
-    <string name="labelViewMore">... View more</string>
+    <string name="labelViewMore">… View more</string>
 
     <!-- Electricity screen -->
     <string name="titleElectricityBill">Electricity Bill</string>
@@ -628,6 +630,7 @@
     <string name="errFailedToLoadImage">Failed to load image: %s</string>
     <string name="errPdfNoPages">PDF has no pages</string>
     <string name="errCannotRenderPdf">Cannot render PDF: %s</string>
+    <string name="errPdfInvalidPageDimensions">invalid page dimensions</string>
     <string name="errFailedToLoad">Failed to load: %s</string>
     <string name="labelPageIndicator">%1$d / %2$d</string>
     <string name="msgLoading">Loading…</string>

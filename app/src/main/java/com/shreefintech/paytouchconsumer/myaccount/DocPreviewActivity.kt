@@ -219,7 +219,7 @@ class DocPreviewActivity : BaseActivity() {
             val page = renderer.openPage(pageIndex)
             try {
                 if (page.width <= 0 || page.height <= 0) {
-                    showError(getString(R.string.errCannotRenderPdf, "invalid page dimensions"))
+                    showError(getString(R.string.errCannotRenderPdf, getString(R.string.errPdfInvalidPageDimensions)))
                     return
                 }
                 val scale = screenWidth.toFloat() / page.width

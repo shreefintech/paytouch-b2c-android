@@ -2,21 +2,32 @@ package com.shreefintech.paytouchconsumer.utill
 
 import android.Manifest
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.provider.OpenableColumns
+import android.provider.Settings
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.google.android.material.card.MaterialCardView
+import androidx.core.os.bundleOf
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.databinding.DialogSelectDocumentBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -51,6 +62,7 @@ class FilePickerUtil(activity: AppCompatActivity) {
         object FileTooLarge : FilePickerError()
         object UnableToReadFile : FilePickerError()
         object CameraPermissionDenied : FilePickerError()
+        object CameraPermissionBlocked : FilePickerError()
     }
 
     // ─── Config ───────────────────────────────────────────────────────────────
@@ -58,6 +70,10 @@ class FilePickerUtil(activity: AppCompatActivity) {
     companion object {
         private const val MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024 // 2MB
         private val ALLOWED_EXTENSIONS = listOf("pdf", "jpg", "jpeg")
+
+        private const val STATE_PROVIDER_KEY = "file_picker_util"
+        private const val STATE_CAMERA_OUTPUT_PATH = "camera_output_path"
+        private const val STATE_PENDING_CAMERA_DIR = "pending_camera_dir"
     }
 
     // ─── Callbacks ────────────────────────────────────────────────────────────
@@ -70,40 +86,101 @@ class FilePickerUtil(activity: AppCompatActivity) {
 
     // ─── Internals ────────────────────────────────────────────────────────────
 
+    private val hostActivity: AppCompatActivity = activity
     private val context: Context = activity
+    private val lifecycleOwner: LifecycleOwner = activity
+    private var sourceDialog: Dialog? = null
+
+    init {
+        // Dismiss the source chooser with its Activity so a recreation never leaks its window.
+        activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onDestroy(owner: LifecycleOwner) {
+                sourceDialog?.dismiss()
+                sourceDialog = null
+            }
+        })
+    }
 
     private val fileLauncher: ActivityResultLauncher<String> =
         activity.registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let { validate(it) }
         }
 
+    // Persisted via SavedStateRegistry — the process is often killed while the camera app or the
+    // permission dialog is in front, and the result must still find its output file / directory.
     private var cameraOutputFile: File? = null
-    private var cameraOutputUri: Uri? = null
     private var pendingCameraStorageDir: File? = null
 
     private val cameraPermissionLauncher: ActivityResultLauncher<String> =
         activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             val dir = pendingCameraStorageDir
             pendingCameraStorageDir = null
-            if (granted && dir != null) launchCamera(dir)
-            else if (!granted) onError?.invoke(FilePickerError.CameraPermissionDenied)
+            when {
+                granted -> {
+                    // A later revoke from Settings puts the permission back in "ask" state.
+                    SharedPreferenceHelper.setSharedPreferenceBoolean(context, Constant.KEY_CAMERA_DENIED, false)
+                    if (dir != null) launchCamera(dir) else onError?.invoke(FilePickerError.UnableToReadFile)
+                }
+                // Rationale after a denial = explicit "Deny". Remember it so a later denial with no
+                // rationale can be recognised as "Don't ask again" (same rule as SelfieCaptureActivity).
+                ActivityCompat.shouldShowRequestPermissionRationale(hostActivity, Manifest.permission.CAMERA) -> {
+                    SharedPreferenceHelper.setSharedPreferenceBoolean(context, Constant.KEY_CAMERA_DENIED, true)
+                    onError?.invoke(FilePickerError.CameraPermissionDenied)
+                }
+                // No rationale after an earlier explicit denial = blocked — the system dialog will never
+                // show again, so send the user to app settings instead of a dead-end toast loop.
+                SharedPreferenceHelper.getSharedPreferenceBoolean(context, Constant.KEY_CAMERA_DENIED, false) -> {
+                    onError?.invoke(FilePickerError.CameraPermissionBlocked)
+                    openAppSettings()
+                }
+                // No rationale and never explicitly denied = dialog dismissed (Back / tap outside).
+                else -> onError?.invoke(FilePickerError.CameraPermissionDenied)
+            }
         }
 
     private val cameraLauncher: ActivityResultLauncher<Uri> =
         activity.registerForActivityResult(ActivityResultContracts.TakePicture()) { _ ->
             val file = cameraOutputFile
-            val uri = cameraOutputUri
             cameraOutputFile = null
-            cameraOutputUri = null
-            if (file != null && uri != null && file.exists() && file.length() > 0) {
-                Thread {
-                    Utility.compressImageFile(file, cameraMaxBytes)
-                    Handler(Looper.getMainLooper()).post {
-                        onSuccess?.invoke(FileResult(uri, file.name, "jpg", file.length() / (1024.0 * 1024.0)))
+            if (file == null) {
+                // Capture state was lost — tell the user instead of silently dropping the photo.
+                onError?.invoke(FilePickerError.UnableToReadFile)
+                return@registerForActivityResult
+            }
+            if (!file.exists() || file.length() == 0L) {
+                // Capture cancelled — drop the empty placeholder the camera app may have created.
+                file.delete()
+                return@registerForActivityResult
+            }
+            val uri = fileProviderUri(file)
+            // lifecycleScope: if the Activity is destroyed mid-compression the callback is skipped.
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                Utility.compressImageFile(file, cameraMaxBytes)
+                val sizeBytes = file.length()
+                withContext(Dispatchers.Main) {
+                    if (sizeBytes > MAX_FILE_SIZE_BYTES) {
+                        onError?.invoke(FilePickerError.FileTooLarge)
+                    } else {
+                        onSuccess?.invoke(FileResult(uri, file.name, "jpg", sizeBytes / (1024.0 * 1024.0)))
                     }
-                }.start()
+                }
             }
         }
+
+    init {
+        // Constructed after super.onCreate(), so restored state is already available here.
+        val registry = activity.savedStateRegistry
+        registry.consumeRestoredStateForKey(STATE_PROVIDER_KEY)?.let { state ->
+            cameraOutputFile = state.getString(STATE_CAMERA_OUTPUT_PATH)?.let(::File)
+            pendingCameraStorageDir = state.getString(STATE_PENDING_CAMERA_DIR)?.let(::File)
+        }
+        registry.registerSavedStateProvider(STATE_PROVIDER_KEY) {
+            bundleOf(
+                STATE_CAMERA_OUTPUT_PATH to cameraOutputFile?.absolutePath,
+                STATE_PENDING_CAMERA_DIR to pendingCameraStorageDir?.absolutePath
+            )
+        }
+    }
 
     // ─── Open picker ──────────────────────────────────────────────────────────
 
@@ -125,16 +202,29 @@ class FilePickerUtil(activity: AppCompatActivity) {
     private fun launchCamera(storageDir: File) {
         storageDir.mkdirs()
         val file = File(storageDir, "doc_${System.currentTimeMillis()}.jpg")
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         cameraOutputFile = file
-        cameraOutputUri = uri
-        cameraLauncher.launch(uri)
+        cameraLauncher.launch(fileProviderUri(file))
+    }
+
+    private fun fileProviderUri(file: File): Uri =
+        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+
+    private fun openAppSettings() {
+        try {
+            context.startActivity(
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+            )
+        } catch (e: ActivityNotFoundException) {
+            e.printStackTrace()
+        }
     }
 
     fun showSourceChooser(storageDir: File) {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_select_document, null)
+        val dialogBinding = DialogSelectDocumentBinding.inflate(LayoutInflater.from(context))
+        sourceDialog?.dismiss()
         val dialog = Dialog(context)
-        dialog.setContentView(dialogView)
+        sourceDialog = dialog
+        dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
         dialog.window?.setLayout(
@@ -142,14 +232,27 @@ class FilePickerUtil(activity: AppCompatActivity) {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(true)
-        dialogView.findViewById<MaterialCardView>(R.id.cardCamera).setOnClickListener {
-            dialog.dismiss()
-            openCamera(storageDir)
+        dialog.setOnDismissListener { if (sourceDialog === dialog) sourceDialog = null }
+        // Per-dialog guard (not Utility.stopClick — the 800 ms global window was just consumed by
+        // the tap that opened this dialog) so a double tap cannot launch two pickers.
+        var isOptionChosen = false
+        val onClickListener = View.OnClickListener {
+            if (isOptionChosen) return@OnClickListener
+            when (it) {
+                dialogBinding.cardCamera -> {
+                    isOptionChosen = true
+                    dialog.dismiss()
+                    openCamera(storageDir)
+                }
+                dialogBinding.cardFiles -> {
+                    isOptionChosen = true
+                    dialog.dismiss()
+                    openPicker()
+                }
+            }
         }
-        dialogView.findViewById<MaterialCardView>(R.id.cardFiles).setOnClickListener {
-            dialog.dismiss()
-            openPicker()
-        }
+        dialogBinding.cardCamera.setOnClickListener(onClickListener)
+        dialogBinding.cardFiles.setOnClickListener(onClickListener)
         dialog.show()
     }
 
@@ -219,9 +322,10 @@ class FilePickerUtil(activity: AppCompatActivity) {
     // ─── Error messages ───────────────────────────────────────────────────────
 
     fun getErrorMessage(error: FilePickerError): String = when (error) {
-        is FilePickerError.InvalidExtension    -> context.getString(R.string.msgOnlyPdfJpgJpegAllowed)
-        is FilePickerError.FileTooLarge        -> context.getString(R.string.msgFileExceeds2mbLimit)
-        is FilePickerError.UnableToReadFile    -> context.getString(R.string.msgUnableToReadFileTryAgain)
-        is FilePickerError.CameraPermissionDenied -> context.getString(R.string.msgCameraPermissionDenied)
+        is FilePickerError.InvalidExtension        -> context.getString(R.string.msgOnlyPdfJpgJpegAllowed)
+        is FilePickerError.FileTooLarge            -> context.getString(R.string.msgFileExceeds2mbLimit)
+        is FilePickerError.UnableToReadFile        -> context.getString(R.string.msgUnableToReadFileTryAgain)
+        is FilePickerError.CameraPermissionDenied  -> context.getString(R.string.msgCameraPermissionDenied)
+        is FilePickerError.CameraPermissionBlocked -> context.getString(R.string.msgCameraPermissionBlockedDoc)
     }
 }
