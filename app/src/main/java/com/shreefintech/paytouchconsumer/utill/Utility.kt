@@ -197,8 +197,10 @@ object Utility {
                 Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
                     .also { if (it !== raw) raw.recycle() }
             } catch (e: OutOfMemoryError) {
+                // Leave the original file untouched — compression is best effort.
+                e.printStackTrace()
                 raw.recycle()
-                throw e
+                return
             }
         } else raw
 
@@ -219,13 +221,21 @@ object Utility {
         }
     }
 
-    /** Deletes a KYC working directory under filesDir. Safe to call when it does not exist. */
-    fun deleteKycDir(context: Context, relativePath: String) {
-        try {
-            File(context.filesDir, relativePath).deleteRecursively()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    /**
+     * Deletes KYC working directories under filesDir on a background thread (safe from onCreate /
+     * onDestroy, where lifecycleScope may already be cancelled). Safe to call when they do not exist.
+     */
+    fun deleteKycDirs(context: Context, vararg relativePaths: String) {
+        val filesDir = context.applicationContext.filesDir
+        Thread {
+            relativePaths.forEach { path ->
+                try {
+                    File(filesDir, path).deleteRecursively()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }.start()
     }
 
     fun calculatePlatformFee(amount: Double): Double {

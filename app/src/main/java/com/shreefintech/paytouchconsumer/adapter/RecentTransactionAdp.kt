@@ -4,11 +4,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemRecentTransactionBinding
 import com.shreefintech.paytouchconsumer.transactions.model.RecentTransactionItem
@@ -70,9 +70,10 @@ class RecentTransactionAdp(
             }
         }
 
-        if (position !in animatedPositions) {
-            animatedPositions.add(position)
-            AnimationHelper.animateListRowEntrance(holder.binding.root, position, AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView))
+        // Only first-screen rows animate, so only they need tracking.
+        val visibleCount = AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView)
+        if (position < visibleCount && animatedPositions.add(position)) {
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position, visibleCount)
         }
     }
 

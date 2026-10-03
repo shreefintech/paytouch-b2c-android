@@ -68,7 +68,7 @@ class BankDetailsActivity : BaseActivity() {
         setContentView(binding.root)
 
         // Fresh launch: nothing references earlier bank proofs, so drop any left by a killed process.
-        if (savedInstanceState == null) Utility.deleteKycDir(mActivity, Constant.KYC_BANK_DOCS_DIR)
+        if (savedInstanceState == null) Utility.deleteKycDirs(mActivity, Constant.KYC_BANK_DOCS_DIR)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -278,13 +278,22 @@ class BankDetailsActivity : BaseActivity() {
         filePickerUtil = FilePickerUtil(this)
         filePickerUtil.onSuccess = { result -> applyProofToActiveCard(result.uri) }
         filePickerUtil.onError   = { error ->
-            ToastUtil.showDelete(mActivity, filePickerUtil.getErrorMessage(error))
+            // Blocked → Settings opens on top, so an in-window toast would never be seen.
+            ToastUtil.showDelete(
+                mActivity,
+                filePickerUtil.getErrorMessage(error),
+                inWindow = error != FilePickerUtil.FilePickerError.CameraPermissionBlocked
+            )
         }
     }
 
     private fun applyProofToActiveCard(uri: Uri) {
         val index = activeCardIndex
-        if (index !in bankCardBindings.indices) return
+        if (index !in bankCardBindings.indices) {
+            // Target card did not survive process death — ask the user to pick again.
+            ToastUtil.showDelete(mActivity, getString(R.string.msgReselectDocument))
+            return
+        }
         proofUris[index] = uri
 
         val card = bankCardBindings[index]
@@ -448,7 +457,7 @@ class BankDetailsActivity : BaseActivity() {
 
     override fun onDestroy() {
         // Submitted, abandoned or logged out — the captured bank proofs are no longer needed.
-        if (isFinishing) Utility.deleteKycDir(mActivity, Constant.KYC_BANK_DOCS_DIR)
+        if (isFinishing) Utility.deleteKycDirs(mActivity, Constant.KYC_BANK_DOCS_DIR)
         super.onDestroy()
     }
 }

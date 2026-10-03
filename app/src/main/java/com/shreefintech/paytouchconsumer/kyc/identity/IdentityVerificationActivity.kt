@@ -30,6 +30,7 @@ import com.shreefintech.paytouchconsumer.kyc.identity.fragment.KycStep4Fragment
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -184,11 +185,21 @@ class IdentityVerificationActivity : BaseActivity() {
     private fun setupFilePicker() {
         filePickerUtil = FilePickerUtil(this)
         filePickerUtil.cameraMaxBytes = Constant.KYC_IMAGE_MAX_BYTES
-        filePickerUtil.onSuccess =
-            { result -> onDocumentPicked?.invoke(result.uri); onDocumentPicked = null }
+        filePickerUtil.onSuccess = { result ->
+            val callback = onDocumentPicked
+            onDocumentPicked = null
+            // Null after process death — the fragment callback is gone, so ask the user to pick again.
+            if (callback != null) callback(result.uri)
+            else ToastUtil.showDelete(mActivity, getString(R.string.msgReselectDocument))
+        }
         filePickerUtil.onError = { error ->
             onDocumentPicked = null
-            ToastUtil.showDelete(mActivity, filePickerUtil.getErrorMessage(error))
+            // Blocked → Settings opens on top, so an in-window toast would never be seen.
+            ToastUtil.showDelete(
+                mActivity,
+                filePickerUtil.getErrorMessage(error),
+                inWindow = error != FilePickerUtil.FilePickerError.CameraPermissionBlocked
+            )
         }
     }
 
@@ -277,6 +288,9 @@ class IdentityVerificationActivity : BaseActivity() {
                         }
                     )
                 }
+            } catch (e: CancellationException) {
+                // Activity destroyed mid-read — there is no UI to update, so skip the error toast.
+                e.printStackTrace()
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     showProgressSubmit.set(false)
@@ -316,8 +330,7 @@ class IdentityVerificationActivity : BaseActivity() {
     // ─── KYC file cleanup ───────────────────────────────────────────────────────
 
     private fun clearKycFiles() {
-        Utility.deleteKycDir(mActivity, Constant.KYC_IDENTITY_DOCS_DIR)
-        Utility.deleteKycDir(mActivity, Constant.KYC_SELFIE_DIR)
+        Utility.deleteKycDirs(mActivity, Constant.KYC_IDENTITY_DOCS_DIR, Constant.KYC_SELFIE_DIR)
     }
 
     override fun onDestroy() {

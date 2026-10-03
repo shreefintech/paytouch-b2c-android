@@ -16,10 +16,10 @@ import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityMyAccountBinding
-import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.myaccount.viewmodel.MyAccountViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility

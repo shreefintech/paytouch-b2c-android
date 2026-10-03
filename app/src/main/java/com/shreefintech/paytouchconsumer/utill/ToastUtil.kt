@@ -114,6 +114,8 @@ enum class ToastType(
 // ─────────────────────────────────────────────
 object ToastUtil {
 
+    private const val TAG_SLIDE_UP_TOAST = "slide_up_toast"
+
     /**
      * Show a styled custom toast using ViewBinding + MaterialCardView.
      *
@@ -171,8 +173,14 @@ object ToastUtil {
 
     private fun showSlideUpInActivity(activity: Activity, message: String, type: ToastType) {
         val contentRoot = activity.findViewById<FrameLayout>(android.R.id.content) ?: return
+        // Replace, don't stack — rapid validation taps would otherwise overlap toasts in one spot.
+        contentRoot.findViewWithTag<View>(TAG_SLIDE_UP_TOAST)?.let { previous ->
+            previous.animate().cancel()
+            contentRoot.removeView(previous)
+        }
         val toastBinding = LytCustomToastBinding.inflate(LayoutInflater.from(activity))
         bindToast(toastBinding, activity, type, message)
+        toastBinding.root.tag = TAG_SLIDE_UP_TOAST
 
         val res = activity.resources
         val bottomMargin = res.getDimensionPixelSize(R.dimen.toast_slide_bottom_margin)

@@ -14,10 +14,10 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionHistoryDetailBinding
-import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
 import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 
