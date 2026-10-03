@@ -28,6 +28,19 @@
 
     <style name="Theme.PaytouchConsumer" parent="Base.Theme.PaytouchConsumer" />
 
+    <!-- App lock — transparent window so the screen the user left stays visible behind the
+         prompt (GPay-style). A translucent Activity must not fix its orientation: API 26 crashes. -->
+    <style name="Theme.PaytouchConsumer.AppLock">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/AppLockWindowAnimation</item>
+    </style>
+
+    <style name="AppLockWindowAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/anim_activity_fade_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/anim_activity_fade_out</item>
+    </style>
+
     <!-- ── DatePicker Dialog ─────────────────────────────────────────────── -->
     <style name="Paytouch.DatePickerTheme" parent="Theme.MaterialComponents.Light.Dialog">
         <item name="colorPrimary">@color/primary</item>

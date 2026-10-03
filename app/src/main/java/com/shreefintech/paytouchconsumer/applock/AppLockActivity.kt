@@ -11,11 +11,13 @@ import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityAppLockBinding
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 /**
  * Lock screen shown by [AppLockHelper]. Verifies the user with the phone's own screen lock.
- * Cancel keeps this screen with an Unlock button; Back closes the app.
+ * Transparent window (GPay-style): the screen the user left stays visible behind the prompt, but
+ * this window still takes every touch. Cancel dims it and shows an Unlock panel; Back closes the app.
  */
 class AppLockActivity : BaseActivity() {
 
@@ -35,9 +37,11 @@ class AppLockActivity : BaseActivity() {
         binding = ActivityAppLockBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
+        // Scrim stays full-screen behind the system bars; only the panel clears the navigation bar.
+        val panelPaddingBottom = binding.clPanel.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(binding.clPanel) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, panelPaddingBottom + systemBars.bottom)
             insets
         }
 
@@ -45,7 +49,12 @@ class AppLockActivity : BaseActivity() {
 
         onBack()
         setupPrompt()
-        if (savedInstanceState == null) showPrompt()
+        if (savedInstanceState == null) {
+            showPrompt()
+        } else {
+            // Recreated (rotation / process restore) — the prompt may be gone, so keep Unlock reachable.
+            showUnlockPanel(animate = false)
+        }
     }
 
     private fun onBack() {
@@ -77,7 +86,11 @@ class AppLockActivity : BaseActivity() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     onUnlocked()
                 }
-                // Cancel / error: stay on this screen — the Unlock button shows the prompt again.
+
+                // Cancel / lockout / error: stay locked — the Unlock button shows the prompt again.
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    showUnlockPanel(animate = true)
+                }
             }
         )
     }
@@ -89,6 +102,13 @@ class AppLockActivity : BaseActivity() {
             return
         }
         biometricPrompt.authenticate(promptInfo)
+    }
+
+    private fun showUnlockPanel(animate: Boolean) {
+        if (binding.clPanel.visibility == View.VISIBLE) return
+        binding.viewBg.visibility = View.VISIBLE
+        binding.clPanel.visibility = View.VISIBLE
+        if (animate) AnimationHelper.animateEntrance(binding.clPanel, 0)
     }
 
     private fun onUnlocked() {

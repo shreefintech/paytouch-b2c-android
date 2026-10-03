@@ -532,7 +532,7 @@ All detail taps → TransactionDetailActivity ✅ (shared by all modules)
 - **Onboarding back stack:** Users cannot navigate back to a completed onboarding step. Use `FLAG_ACTIVITY_CLEAR_TOP` or equivalent.
 - **Post-login stack:** After successful login/registration, the back stack is cleared — the user cannot press Back to reach the login screen from Home.
 - **Forced logout (401):** Stack completely cleared with `FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK`.
-- **Forced logout (idle timeout):** `BaseActivity.onResume()` checks `LAST_INTERACTION` in SharedPreferences. If the user has been idle for more than 10 minutes (`SESSION_TIMEOUT_MS`), the session is cleared and `LoginActivity` is launched with a cleared back stack — same as a 401 forced logout.
+- **App lock (no idle logout):** `AppLockHelper` opens the transparent `AppLockActivity` on top of the current screen (cold start with a saved session, or back from background after the grace period). Unlocking finishes it and the user is on the same screen; Back on the lock closes the app (`finishAffinity()`). Only a 401 logs the user out.
 - **Within a category:** Back navigation returns to the Category Home screen.
 - **Result refresh:** Use `ActivityResultLauncher` when a child screen's data changes should trigger a refresh on the parent screen.
 

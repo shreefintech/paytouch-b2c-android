@@ -429,7 +429,7 @@ Transaction IDs are **generated and returned by the backend** in the `process-pa
   - When the app itself opened another app (camera, file picker, UPI app, HDFC gateway, share, browser), the grace period is `APP_LOCK_EXTERNAL_GRACE_MS` (5 min). `BaseActivity.startActivityForResult()` detects these launches, so no per-screen code is needed.
   - Time away is measured with `SystemClock.elapsedRealtime()`, so changing the phone clock can't skip the lock.
   - Exempt screens: Splash and the auth flow (Login, Create Account, OTP, Reset Password, Reset MPIN). A credential login (`LoginViewModel.saveSession()`) counts as unlocked.
-  - Lock screen: cancel keeps the screen with an Unlock button; Back closes the app. If the phone has no screen lock set, the lock is skipped.
+  - Lock screen (GPay-style): `AppLockActivity` is a transparent window, so the screen the user left stays visible behind the system prompt but cannot be touched. Cancel dims it and shows a bottom Unlock panel; Back closes the app. It must not set `screenOrientation` (a translucent Activity with a fixed orientation crashes on API 26). If the phone has no screen lock set, the lock is skipped.
 - `isLoggedIn()` = token is not null AND userId > 0
 
 ---
