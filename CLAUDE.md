@@ -138,7 +138,9 @@ com.shreefintech.paytouchconsumer/
 
 19. **Never use `getApplication()` / `applicationContext` for anything that involves a View, and never show a toast (`ToastUtil`) from a ViewModel.** Pass the message to the Activity via callback and show it with `mActivity`. The Application context has no Material theme, so inflating a view with it crashes with `InflateException`.
 
-20. **Never throw or rethrow an exception** — call `e.printStackTrace()` and return a fallback (`null` / early `return`).
+20. **Never throw or rethrow an exception** — log it and return a fallback (`null` / early `return`).
+    - **Unexpected failures** (image compression, PDF render, camera bind, receipt save/share): call `Utility.logError(e)` — prints the trace and reports a Crashlytics non-fatal.
+    - **Expected failures** (`ActivityNotFoundException`, network `onFailure`, coroutine `CancellationException`) and **`OutOfMemoryError`**: plain `e.printStackTrace()` — reporting these floods Crashlytics, and allocating during OOM can fail.
 
 ---
 

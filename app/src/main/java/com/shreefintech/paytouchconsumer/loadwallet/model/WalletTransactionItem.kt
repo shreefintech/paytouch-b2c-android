@@ -22,9 +22,6 @@ data class WalletTransactionItem(
             transactionId   = item.transactionId ?: "",
             categoryIconRes = sourceToIcon(item.serviceName)
         )
-
-        // TODO(B2C-183): switch to a stable backend service code — matching display text breaks
-        //  silently (falls back to the wallet icon) if the backend renames a service.
         @DrawableRes
         private fun sourceToIcon(source: String?): Int {
             val serviceName = source?.lowercase().orEmpty()

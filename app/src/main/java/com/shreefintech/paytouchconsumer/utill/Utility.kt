@@ -21,6 +21,7 @@ import androidx.annotation.ColorInt
 import androidx.core.graphics.createBitmap
 import androidx.core.widget.NestedScrollView
 import androidx.exifinterface.media.ExifInterface
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.shreefintech.paytouchconsumer.R
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -29,6 +30,19 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 object Utility {
+
+    /**
+     * Prints [e] and reports it to Crashlytics as a non-fatal. Use only for unexpected failures —
+     * expected ones (no app for an intent, network errors, OOM) stay on plain printStackTrace().
+     */
+    fun logError(e: Throwable) {
+        e.printStackTrace()
+        try {
+            FirebaseCrashlytics.getInstance().recordException(e)
+        } catch (reportError: Exception) {
+            reportError.printStackTrace()
+        }
+    }
 
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
@@ -145,7 +159,10 @@ object Utility {
                 }
             }
         }
-    } catch (_: Exception) { null }
+    } catch (e: Exception) {
+        logError(e)
+        null
+    }
 
     /**
      * Re-encodes [file] in place as an upright JPEG no larger than [maxBytes] (best effort).
@@ -158,7 +175,7 @@ object Utility {
         } catch (e: OutOfMemoryError) {
             e.printStackTrace()
         } catch (e: Exception) {
-            e.printStackTrace()
+            logError(e)
         }
     }
 

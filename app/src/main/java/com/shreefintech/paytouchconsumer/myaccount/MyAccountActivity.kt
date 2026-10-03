@@ -84,22 +84,27 @@ class MyAccountActivity : BaseActivity() {
         viewModel.getAccountInfo(
             onLoading = {
                 isAccountInfoLoading = true
-                binding.shimmerAccountInfo.visibility = View.VISIBLE
-                binding.shimmerAccountInfo.startShimmer()
                 binding.llAccountInfoContent.visibility = View.GONE
+                // shimmer only shown if Account Info tab is active when loading starts
+                if (currentTab == TAB_ACCOUNT_INFO) {
+                    binding.shimmerAccountInfo.visibility = View.VISIBLE
+                    binding.shimmerAccountInfo.startShimmer()
+                }
             },
             onSuccess = { data: AccountInfoItem ->
                 isAccountInfoLoading = false
                 binding.shimmerAccountInfo.stopShimmer()
                 binding.shimmerAccountInfo.visibility = View.GONE
-                binding.llAccountInfoContent.visibility = View.VISIBLE
+                binding.llAccountInfoContent.visibility =
+                    if (currentTab == TAB_ACCOUNT_INFO) View.VISIBLE else View.GONE
                 populateAccountInfo(data)
             },
             onError = { msg ->
                 isAccountInfoLoading = false
                 binding.shimmerAccountInfo.stopShimmer()
                 binding.shimmerAccountInfo.visibility = View.GONE
-                binding.llAccountInfoContent.visibility = View.VISIBLE
+                binding.llAccountInfoContent.visibility =
+                    if (currentTab == TAB_ACCOUNT_INFO) View.VISIBLE else View.GONE
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )
@@ -138,7 +143,8 @@ class MyAccountActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateAccountInfo(data: AccountInfoItem) {
-        AnimationHelper.animateChildren(binding.llAccountInfoContent)
+        // Hidden tab is animated by selectTab() when the user switches back to it
+        if (currentTab == TAB_ACCOUNT_INFO) AnimationHelper.animateChildren(binding.llAccountInfoContent)
         binding.tvMemberName.text = data.name ?: "--"
         binding.tvStatus.text = data.member?.status ?: "--"
         binding.tvMemberCode.text = data.member?.memberCode ?: "--"
