@@ -83,6 +83,8 @@ class LivenessChallengeHelper {
             emit(hint)
             return
         }
+        // Face is back in position — restore the blink prompt (emit() skips repeats)
+        emit(if (blinkCount == 0) LivenessInstruction.BLINK else LivenessInstruction.BLINK_AGAIN)
         val left = frame.leftEyeOpen ?: return
         val right = frame.rightEyeOpen ?: return
         val open = left > EYE_OPEN && right > EYE_OPEN
