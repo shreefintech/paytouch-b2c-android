@@ -3,7 +3,9 @@ package com.shreefintech.paytouchconsumer.utill
 import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.pdf.PdfRenderer
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -16,14 +18,21 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.core.graphics.createBitmap
 import androidx.core.widget.NestedScrollView
+import androidx.exifinterface.media.ExifInterface
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
-import androidx.core.graphics.createBitmap
 
 object Utility {
+
+    /** Long-edge cap for camera images before compression — still legible for Aadhaar/PAN. */
+    private const val MAX_IMAGE_EDGE_PX = 2048
 
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
@@ -141,6 +150,55 @@ object Utility {
             }
         }
     } catch (_: Exception) { null }
+
+    fun compressImageFile(file: File, maxBytes: Int = 2 * 1024 * 1024) {
+        val needsCompress = file.length() > maxBytes
+        val rotation = try {
+            when (ExifInterface(file.absolutePath).getAttributeInt(
+                ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL
+            )) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
+        } catch (_: Exception) { 0 }
+
+        if (!needsCompress && rotation == 0) return
+
+        // Read dimensions only, then decode downsampled — a full-res 50+ MP decode can OOM
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(file.absolutePath, bounds)
+        var sample = 1
+        while (maxOf(bounds.outWidth, bounds.outHeight) / sample > MAX_IMAGE_EDGE_PX) sample *= 2
+        val raw = BitmapFactory.decodeFile(
+            file.absolutePath,
+            BitmapFactory.Options().apply { inSampleSize = sample }
+        ) ?: return
+        val bitmap = if (rotation != 0) {
+            Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
+                .also { if (it !== raw) raw.recycle() }
+        } else raw
+
+        var quality = if (needsCompress) 85 else 95
+        while (true) {
+            val bos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
+            val bytes = bos.toByteArray()
+            if (bytes.size <= maxBytes || quality == 40) {
+                file.writeBytes(bytes)
+                break
+            }
+            quality -= 15
+        }
+        bitmap.recycle()
+    }
+
+    /** Removes captured KYC documents and selfies from filesDir (never auto-cleared by the OS). */
+    fun deleteKycImages(context: Context) {
+        File(context.filesDir, Constant.DIR_KYC_SELFIE).deleteRecursively()
+        File(context.filesDir, Constant.DIR_KYC_DOCS).deleteRecursively()
+    }
 
     fun calculatePlatformFee(amount: Double): Double {
         return when {

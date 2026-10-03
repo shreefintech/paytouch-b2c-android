@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <cache-path name="paytouch_receipts" path="receipts/" />
-    <cache-path name="paytouch_kyc" path="kyc/" />
+    <files-path name="paytouch_receipts" path="receipts/" />
+    <files-path name="paytouch_kyc" path="kyc/" />
+    <files-path name="paytouch_kyc_docs" path="kyc_docs/" />
     <external-path name="paytouch_pictures" path="Pictures/PayTouch/" />
 </paths>

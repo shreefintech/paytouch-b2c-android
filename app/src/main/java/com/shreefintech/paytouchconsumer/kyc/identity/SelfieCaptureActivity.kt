@@ -222,8 +222,17 @@ class SelfieCaptureActivity : BaseActivity() {
 
     private fun renderState(stage: LivenessStage, instruction: LivenessInstruction) {
         binding.tvInstruction.text = getString(instructionText(instruction))
-        val passedBlink = stage == LivenessStage.HOLD || stage == LivenessStage.DONE
-        val targetColor = ContextCompat.getColor(mActivity, if (passedBlink) R.color.selfie_circle_passed else R.color.white)
+        val colorRes = when (instruction) {
+            LivenessInstruction.ALIGN_FACE,
+            LivenessInstruction.SINGLE_FACE_ONLY -> R.color.selfie_circle_error
+            LivenessInstruction.MOVE_CLOSER,
+            LivenessInstruction.MOVE_BACK,
+            LivenessInstruction.LOOK_STRAIGHT,
+            LivenessInstruction.BLINK,
+            LivenessInstruction.BLINK_AGAIN -> R.color.selfie_circle_warning
+            else -> R.color.selfie_circle_passed
+        }
+        val targetColor = ContextCompat.getColor(mActivity, colorRes)
         val currentColor = binding.ovFaceCircle.currentStrokeColor
         if (currentColor == targetColor) return
         strokeColorAnimator?.cancel()
@@ -454,13 +463,20 @@ class SelfieCaptureActivity : BaseActivity() {
     private fun saveUpright(source: Bitmap, rotation: Int): Boolean {
         val path = outputPath ?: return false
         val bitmap = if (rotation != 0) {
-            Bitmap.createBitmap(
-                source, 0, 0, source.width, source.height,
-                Matrix().apply { postRotate(rotation.toFloat()) }, true
-            ).also { if (it !== source) source.recycle() }
+            try {
+                Bitmap.createBitmap(
+                    source, 0, 0, source.width, source.height,
+                    Matrix().apply { postRotate(rotation.toFloat()) }, true
+                ).also { if (it !== source) source.recycle() }
+            } catch (e: OutOfMemoryError) {
+                source.recycle()
+                return false
+            }
         } else source
         return try {
-            File(path).outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, it) }
+            val file = File(path)
+            file.parentFile?.mkdirs()
+            file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, it) }
         } finally {
             bitmap.recycle()
         }

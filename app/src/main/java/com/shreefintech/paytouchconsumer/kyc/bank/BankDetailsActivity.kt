@@ -16,6 +16,7 @@ import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityBankDetailsBinding
 import com.shreefintech.paytouchconsumer.databinding.ItemBankAccountBinding
@@ -132,7 +133,7 @@ class BankDetailsActivity : BaseActivity() {
         val openPicker = View.OnClickListener {
             if (Utility.stopClick()) return@OnClickListener
             activeCardIndex = bankCardBindings.indexOf(card)
-            filePickerUtil.openPicker()
+            filePickerUtil.showSourceChooser(java.io.File(filesDir, Constant.DIR_KYC_DOCS))
         }
         card.flUpload1.setOnClickListener(openPicker)
         card.ivEditProof1.setOnClickListener(openPicker)
@@ -359,6 +360,7 @@ class BankDetailsActivity : BaseActivity() {
                         onLoading = {},
                         onSuccess = {
                             showProgressSubmit.set(false)
+                            Utility.deleteKycImages(mActivity)
                             ToastUtil.showSuccess(mActivity, getString(R.string.msgBankDetailsSubmitSuccess), inWindow = false)
                             setResult(1)
                             finish()

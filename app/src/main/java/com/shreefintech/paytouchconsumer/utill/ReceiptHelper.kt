@@ -18,6 +18,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.google.android.material.card.MaterialCardView
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import java.io.File
 import java.io.FileOutputStream
@@ -101,7 +102,9 @@ object ReceiptHelper {
     fun shareReceipt(activity: Activity, view: View, title: String, onFailure: (() -> Unit)? = null) {
         val bitmap = captureViewAsBitmap(view)
         try {
-            val dir = File(activity.cacheDir, "receipts").also { it.mkdirs() }
+            val dir = File(activity.filesDir, Constant.DIR_RECEIPTS).also { it.mkdirs() }
+            // filesDir is never cleared by the OS — drop older receipts so only the latest is kept
+            dir.listFiles()?.forEach { it.delete() }
             val file = File(dir, "receipt_${System.currentTimeMillis()}.png")
             FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
             val uri = FileProvider.getUriForFile(activity, "${activity.packageName}.fileprovider", file)

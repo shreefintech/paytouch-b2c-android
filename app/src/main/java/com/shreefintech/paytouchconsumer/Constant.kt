@@ -74,4 +74,9 @@ object Constant {
     // Transaction type values returned by /api/transactions/{id}
     const val TRANSACTION_TYPE_HDFC = "hdfc_smartgateway"
 
+    // Image storage — sub-folders of filesDir; must match <files-path> entries in file_provider_paths.xml
+    const val DIR_KYC_SELFIE = "kyc"
+    const val DIR_KYC_DOCS = "kyc_docs"
+    const val DIR_RECEIPTS = "receipts"
+
 }
