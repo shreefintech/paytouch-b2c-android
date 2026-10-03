@@ -92,4 +92,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.4.2")
     implementation("androidx.camera:camera-view:1.4.2")
     implementation("com.google.mlkit:face-detection:16.1.7")
+
+    // App lock — phone's own screen lock (fingerprint / face / PIN / pattern)
+    implementation("androidx.biometric:biometric:1.1.0")
 }

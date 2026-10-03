@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/img_paytouch"
+            app:layout_constraintBottom_toTopOf="@+id/ivLock"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintWidth_max="200dp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLock"
+            android:layout_width="@dimen/icon_xlarge"
+            android:layout_height="@dimen/icon_xlarge"
+            android:layout_marginTop="@dimen/margin_xxlarge"
+            android:src="@drawable/ic_lock"
+            app:layout_constraintBottom_toTopOf="@+id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivLogo" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/titleAppLock"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_20"
+            app:layout_constraintBottom_toTopOf="@+id/tvMessage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivLock" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin_xxlarge"
+            android:layout_marginTop="@dimen/margin_small"
+            android:fontFamily="@font/proza_libre_regular"
+            android:gravity="center"
+            android:text="@string/msgAppLockPrompt"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintBottom_toTopOf="@+id/cvUnlock"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvUnlock"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginHorizontal="@dimen/margin_xxlarge"
+            android:layout_marginTop="@dimen/margin_xxlarge"
+            android:clickable="true"
+            android:focusable="true"
+            android:onClickListener="@{onClickListener}"
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="@dimen/button_corner_radius"
+            app:cardElevation="@dimen/card_elevation"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvMessage"
+            app:strokeWidth="0dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/btnUnlock"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_16"
+                android:textStyle="bold" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

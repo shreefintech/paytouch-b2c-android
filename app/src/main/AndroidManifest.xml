@@ -67,6 +67,10 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".applock.AppLockActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name="com.shreefintech.paytouchconsumer.kyc.KycActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

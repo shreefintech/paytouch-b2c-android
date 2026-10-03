@@ -50,9 +50,9 @@ object Constant {
     // Circle IDs for bill payment modules
     const val LOAN_CIRCLE_ID = "0"
 
-    // Session timeout
-    const val KEY_LAST_INTERACTION = "LAST_INTERACTION"
-    const val SESSION_TIMEOUT_MS = 10 * 60 * 1000L
+    // App lock — time away before the phone's screen lock is asked again
+    const val APP_LOCK_GRACE_MS = 60 * 1000L                // normal app switch
+    const val APP_LOCK_EXTERNAL_GRACE_MS = 5 * 60 * 1000L   // camera, file picker, UPI app, payment gateway, share, browser
 
     // Auth flow type extras
     const val EXTRA_FLOW_TYPE = "FLOW_TYPE"
