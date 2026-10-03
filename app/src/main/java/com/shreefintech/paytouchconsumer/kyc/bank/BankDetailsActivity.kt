@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.kyc.bank
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -38,6 +39,7 @@ import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class BankDetailsActivity : BaseActivity() {
 
@@ -64,6 +66,9 @@ class BankDetailsActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityBankDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Fresh launch: nothing references earlier bank proofs, so drop any left by a killed process.
+        if (savedInstanceState == null) Utility.deleteKycDir(mActivity, Constant.KYC_BANK_DOCS_DIR)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -105,7 +110,12 @@ class BankDetailsActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    if (Utility.stopClick()) return
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    } catch (e: ActivityNotFoundException) {
+                        ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                    }
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
@@ -170,7 +180,7 @@ class BankDetailsActivity : BaseActivity() {
         val openPicker = View.OnClickListener {
             if (Utility.stopClick()) return@OnClickListener
             activeCardIndex = bankCardBindings.indexOf(card)
-            filePickerUtil.showSourceChooser(java.io.File(filesDir, "kyc_docs"))
+            filePickerUtil.showSourceChooser(File(filesDir, Constant.KYC_BANK_DOCS_DIR))
         }
         card.flUpload1.setOnClickListener(openPicker)
         card.ivEditProof1.setOnClickListener(openPicker)
@@ -434,5 +444,11 @@ class BankDetailsActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        // Submitted, abandoned or logged out — the captured bank proofs are no longer needed.
+        if (isFinishing) Utility.deleteKycDir(mActivity, Constant.KYC_BANK_DOCS_DIR)
+        super.onDestroy()
     }
 }

@@ -47,7 +47,6 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivitySelfieCaptureBinding
 import com.shreefintech.paytouchconsumer.kyc.identity.model.LivenessFrameItem
 import com.shreefintech.paytouchconsumer.kyc.identity.model.LivenessInstruction
-import com.shreefintech.paytouchconsumer.kyc.identity.model.LivenessStage
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -208,7 +207,7 @@ class SelfieCaptureActivity : BaseActivity() {
     }
 
     private fun setupLiveness() {
-        liveness.onStateChanged = { stage, instruction -> renderState(stage, instruction) }
+        liveness.onStateChanged = { _, instruction -> renderState(instruction) }
         liveness.onPassed = { capturePhoto(attempt = 1) }
         liveness.onTimeout = {
             ToastUtil.showDelete(mActivity, getString(R.string.msgLivenessTimeout))
@@ -220,15 +219,19 @@ class SelfieCaptureActivity : BaseActivity() {
 
     private var strokeColorAnimator: ValueAnimator? = null
 
-    private fun renderState(stage: LivenessStage, instruction: LivenessInstruction) {
+    private fun renderState(instruction: LivenessInstruction) {
         binding.tvInstruction.text = getString(instructionText(instruction))
         val colorRes = when (instruction) {
             LivenessInstruction.ALIGN_FACE,
             LivenessInstruction.SINGLE_FACE_ONLY -> R.color.selfie_circle_error
             LivenessInstruction.MOVE_CLOSER,
             LivenessInstruction.MOVE_BACK,
-            LivenessInstruction.LOOK_STRAIGHT -> R.color.selfie_circle_warning
-            else -> R.color.selfie_circle_passed
+            LivenessInstruction.LOOK_STRAIGHT,
+            LivenessInstruction.BLINK,
+            LivenessInstruction.BLINK_AGAIN -> R.color.selfie_circle_warning
+            // Green only once the blink is verified (hold / capture).
+            LivenessInstruction.HOLD_STILL,
+            LivenessInstruction.CAPTURING -> R.color.selfie_circle_passed
         }
         val targetColor = ContextCompat.getColor(mActivity, colorRes)
         val currentColor = binding.ovFaceCircle.currentStrokeColor

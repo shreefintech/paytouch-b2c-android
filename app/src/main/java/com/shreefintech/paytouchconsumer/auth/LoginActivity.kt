@@ -239,7 +239,7 @@ class LoginActivity : BaseActivity() {
             onLoading = { showProgress.set(true) },
             onSuccess = { data ->
                 showProgress.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.msgLoginSuccess))
+                ToastUtil.showSuccess(mActivity, getString(R.string.msgLoginSuccess), inWindow = false)
                 navigateAfterLogin(data)
             },
             onError = { msg ->

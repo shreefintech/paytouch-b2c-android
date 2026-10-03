@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.lifecycleScope
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityIdentityVerificationBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -71,7 +72,7 @@ class IdentityVerificationActivity : BaseActivity() {
             onSelfieCaptured = null
             if (result.resultCode == RESULT_OK && file != null && file.exists() && uri != null && callback != null) {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    Utility.compressImageFile(file, 800 * 1024)
+                    Utility.compressImageFile(file, Constant.KYC_IMAGE_MAX_BYTES)
                     withContext(Dispatchers.Main) { callback(uri) }
                 }
             }
@@ -81,6 +82,9 @@ class IdentityVerificationActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityIdentityVerificationBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Fresh launch: nothing references earlier KYC files, so drop any left by a killed process.
+        if (savedInstanceState == null) clearKycFiles()
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -179,7 +183,7 @@ class IdentityVerificationActivity : BaseActivity() {
 
     private fun setupFilePicker() {
         filePickerUtil = FilePickerUtil(this)
-        filePickerUtil.cameraMaxBytes = 800 * 1024
+        filePickerUtil.cameraMaxBytes = Constant.KYC_IMAGE_MAX_BYTES
         filePickerUtil.onSuccess =
             { result -> onDocumentPicked?.invoke(result.uri); onDocumentPicked = null }
         filePickerUtil.onError = { error ->
@@ -190,11 +194,11 @@ class IdentityVerificationActivity : BaseActivity() {
 
     fun pickDocument(onPicked: (Uri) -> Unit) {
         onDocumentPicked = onPicked
-        filePickerUtil.showSourceChooser(java.io.File(filesDir, "kyc_docs"))
+        filePickerUtil.showSourceChooser(File(filesDir, Constant.KYC_IDENTITY_DOCS_DIR))
     }
 
     fun captureSelfie(onCaptured: (Uri) -> Unit) {
-        val dir = File(filesDir, "kyc").also { it.mkdirs() }
+        val dir = File(filesDir, Constant.KYC_SELFIE_DIR).also { it.mkdirs() }
         val file = File(dir, "selfie_${System.currentTimeMillis()}.jpg")
         val uri =
             FileProvider.getUriForFile(mActivity, "${mActivity.packageName}.fileprovider", file)
@@ -258,7 +262,8 @@ class IdentityVerificationActivity : BaseActivity() {
                             showProgressSubmit.set(false)
                             ToastUtil.showSuccess(
                                 mActivity,
-                                getString(R.string.msgIdentitySubmitSuccess)
+                                getString(R.string.msgIdentitySubmitSuccess),
+                                inWindow = false
                             )
                             resultCode = 1
                             setResult(resultCode)
@@ -306,5 +311,18 @@ class IdentityVerificationActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    // ─── KYC file cleanup ───────────────────────────────────────────────────────
+
+    private fun clearKycFiles() {
+        Utility.deleteKycDir(mActivity, Constant.KYC_IDENTITY_DOCS_DIR)
+        Utility.deleteKycDir(mActivity, Constant.KYC_SELFIE_DIR)
+    }
+
+    override fun onDestroy() {
+        // Submitted, abandoned or logged out — the captured ID images are no longer needed.
+        if (isFinishing) clearKycFiles()
+        super.onDestroy()
     }
 }

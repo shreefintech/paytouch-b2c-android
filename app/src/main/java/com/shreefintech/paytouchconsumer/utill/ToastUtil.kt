@@ -129,7 +129,11 @@ object ToastUtil {
         duration: Int = Toast.LENGTH_SHORT,
         inWindow: Boolean = true
     ) {
-        if (inWindow && context is Activity && !context.isFinishing && !context.isDestroyed) {
+        // hasWindowFocus() is false while a Dialog is showing above the Activity — an in-window
+        // toast would render underneath it, so fall back to the system toast in that case.
+        if (inWindow && context is Activity && !context.isFinishing && !context.isDestroyed &&
+            context.hasWindowFocus()
+        ) {
             showSlideUpInActivity(context, message, type)
             return
         }
@@ -260,14 +264,14 @@ object ToastUtil {
 
     // ── Convenience helpers ───────────────────────────────────
 
-    fun showUpload(context: Context, message: String = "File uploaded successfully") =
-        show(context, message, ToastType.SUCCESS_UPLOAD)
+    fun showUpload(context: Context, message: String = "File uploaded successfully", inWindow: Boolean = true) =
+        show(context, message, ToastType.SUCCESS_UPLOAD, inWindow = inWindow)
 
     fun showSuccess(context: Context, message: String = "Verification successfully", inWindow: Boolean = true) =
         show(context, message, ToastType.SUCCESS, inWindow = inWindow)
 
-    fun showEdit(context: Context, message: String = "Changes edited successfully") =
-        show(context, message, ToastType.EDIT)
+    fun showEdit(context: Context, message: String = "Changes edited successfully", inWindow: Boolean = true) =
+        show(context, message, ToastType.EDIT, inWindow = inWindow)
 
     fun showDelete(context: Context, message: String = "File has been deleted", inWindow: Boolean = true) =
         show(context, message, ToastType.DELETE, inWindow = inWindow)

@@ -147,7 +147,26 @@ object Utility {
         }
     } catch (_: Exception) { null }
 
+    /**
+     * Re-encodes [file] in place as an upright JPEG no larger than [maxBytes] (best effort).
+     * Never throws — on decode/encode failure or OOM the original file is left untouched.
+     * Must be called off the main thread.
+     */
     fun compressImageFile(file: File, maxBytes: Int = 2 * 1024 * 1024) {
+        try {
+            compressImageFileInternal(file, maxBytes)
+        } catch (e: OutOfMemoryError) {
+            e.printStackTrace()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    // Longest edge kept after power-of-two subsampling; camera photos (12–50 MP) would otherwise
+    // be decoded at full size (48–200 MB) and OOM on low-end devices.
+    private const val MAX_DECODE_DIMENSION = 1600
+
+    private fun compressImageFileInternal(file: File, maxBytes: Int) {
         val needsCompress = file.length() > maxBytes
         val rotation = try {
             when (ExifInterface(file.absolutePath).getAttributeInt(
@@ -162,24 +181,51 @@ object Utility {
 
         if (!needsCompress && rotation == 0) return
 
-        val raw = BitmapFactory.decodeFile(file.absolutePath) ?: return
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(file.absolutePath, bounds)
+        val longestEdge = maxOf(bounds.outWidth, bounds.outHeight)
+        if (longestEdge <= 0) return
+        var sampleSize = 1
+        while (longestEdge / (sampleSize * 2) >= MAX_DECODE_DIMENSION) sampleSize *= 2
+
+        val raw = BitmapFactory.decodeFile(
+            file.absolutePath,
+            BitmapFactory.Options().apply { inSampleSize = sampleSize }
+        ) ?: return
         val bitmap = if (rotation != 0) {
-            Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
-                .also { if (it !== raw) raw.recycle() }
+            try {
+                Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
+                    .also { if (it !== raw) raw.recycle() }
+            } catch (e: OutOfMemoryError) {
+                raw.recycle()
+                throw e
+            }
         } else raw
 
-        var quality = if (needsCompress) 85 else 95
-        while (true) {
-            val bos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
-            val bytes = bos.toByteArray()
-            if (bytes.size <= maxBytes || quality == 40) {
-                file.writeBytes(bytes)
-                break
+        try {
+            var quality = if (needsCompress) 85 else 95
+            while (true) {
+                val bos = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
+                val bytes = bos.toByteArray()
+                if (bytes.size <= maxBytes || quality == 40) {
+                    file.writeBytes(bytes)
+                    break
+                }
+                quality -= 15
             }
-            quality -= 15
+        } finally {
+            bitmap.recycle()
         }
-        bitmap.recycle()
+    }
+
+    /** Deletes a KYC working directory under filesDir. Safe to call when it does not exist. */
+    fun deleteKycDir(context: Context, relativePath: String) {
+        try {
+            File(context.filesDir, relativePath).deleteRecursively()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun calculatePlatformFee(amount: Double): Double {

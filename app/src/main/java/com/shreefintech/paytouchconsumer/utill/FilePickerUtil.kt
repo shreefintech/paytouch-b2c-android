@@ -5,8 +5,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,8 +13,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.card.MaterialCardView
 import com.shreefintech.paytouchconsumer.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -71,6 +75,18 @@ class FilePickerUtil(activity: AppCompatActivity) {
     // ─── Internals ────────────────────────────────────────────────────────────
 
     private val context: Context = activity
+    private val lifecycleOwner: LifecycleOwner = activity
+    private var sourceDialog: Dialog? = null
+
+    init {
+        // Dismiss the source chooser with its Activity so a recreation never leaks its window.
+        activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onDestroy(owner: LifecycleOwner) {
+                sourceDialog?.dismiss()
+                sourceDialog = null
+            }
+        })
+    }
 
     private val fileLauncher: ActivityResultLauncher<String> =
         activity.registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -95,13 +111,23 @@ class FilePickerUtil(activity: AppCompatActivity) {
             val uri = cameraOutputUri
             cameraOutputFile = null
             cameraOutputUri = null
-            if (file != null && uri != null && file.exists() && file.length() > 0) {
-                Thread {
-                    Utility.compressImageFile(file, cameraMaxBytes)
-                    Handler(Looper.getMainLooper()).post {
-                        onSuccess?.invoke(FileResult(uri, file.name, "jpg", file.length() / (1024.0 * 1024.0)))
+            if (file == null || uri == null) return@registerForActivityResult
+            if (!file.exists() || file.length() == 0L) {
+                // Capture cancelled — drop the empty placeholder the camera app may have created.
+                file.delete()
+                return@registerForActivityResult
+            }
+            // lifecycleScope: if the Activity is destroyed mid-compression the callback is skipped.
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                Utility.compressImageFile(file, cameraMaxBytes)
+                val sizeBytes = file.length()
+                withContext(Dispatchers.Main) {
+                    if (sizeBytes > MAX_FILE_SIZE_BYTES) {
+                        onError?.invoke(FilePickerError.FileTooLarge)
+                    } else {
+                        onSuccess?.invoke(FileResult(uri, file.name, "jpg", sizeBytes / (1024.0 * 1024.0)))
                     }
-                }.start()
+                }
             }
         }
 
@@ -133,7 +159,9 @@ class FilePickerUtil(activity: AppCompatActivity) {
 
     fun showSourceChooser(storageDir: File) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_select_document, null)
+        sourceDialog?.dismiss()
         val dialog = Dialog(context)
+        sourceDialog = dialog
         dialog.setContentView(dialogView)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
@@ -142,11 +170,19 @@ class FilePickerUtil(activity: AppCompatActivity) {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(true)
+        dialog.setOnDismissListener { if (sourceDialog === dialog) sourceDialog = null }
+        // Per-dialog guard (not Utility.stopClick — the 800 ms global window was just consumed by
+        // the tap that opened this dialog) so a double tap cannot launch two pickers.
+        var isOptionChosen = false
         dialogView.findViewById<MaterialCardView>(R.id.cardCamera).setOnClickListener {
+            if (isOptionChosen) return@setOnClickListener
+            isOptionChosen = true
             dialog.dismiss()
             openCamera(storageDir)
         }
         dialogView.findViewById<MaterialCardView>(R.id.cardFiles).setOnClickListener {
+            if (isOptionChosen) return@setOnClickListener
+            isOptionChosen = true
             dialog.dismiss()
             openPicker()
         }
