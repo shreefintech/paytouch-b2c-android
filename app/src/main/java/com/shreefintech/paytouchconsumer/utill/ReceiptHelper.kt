@@ -107,6 +107,8 @@ object ReceiptHelper {
         val bitmap = captureViewAsBitmap(view) ?: run { onFailure?.invoke(); return }
         try {
             val dir = File(activity.filesDir, Constant.DIR_RECEIPTS).also { it.mkdirs() }
+            // filesDir is never cleared by the OS — drop older receipts so only the latest is kept
+            dir.listFiles()?.forEach { it.delete() }
             val file = File(dir, "receipt_${System.currentTimeMillis()}.png")
             FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
             val uri = FileProvider.getUriForFile(activity, "${activity.packageName}.fileprovider", file)
