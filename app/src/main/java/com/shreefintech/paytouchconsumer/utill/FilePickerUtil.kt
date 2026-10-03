@@ -97,7 +97,7 @@ class FilePickerUtil(private val activity: AppCompatActivity) {
                 val file = File(path)
                 cameraOutputUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
                 cameraOutputFile = file
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
                 e.printStackTrace()
             }
         }
