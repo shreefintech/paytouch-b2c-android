@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.lifecycleScope
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityIdentityVerificationBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -190,11 +191,11 @@ class IdentityVerificationActivity : BaseActivity() {
 
     fun pickDocument(onPicked: (Uri) -> Unit) {
         onDocumentPicked = onPicked
-        filePickerUtil.showSourceChooser(java.io.File(filesDir, "kyc_docs"))
+        filePickerUtil.showSourceChooser(File(filesDir, Constant.DIR_KYC_DOCS))
     }
 
     fun captureSelfie(onCaptured: (Uri) -> Unit) {
-        val dir = File(filesDir, "kyc").also { it.mkdirs() }
+        val dir = File(filesDir, Constant.DIR_KYC_SELFIE).also { it.mkdirs() }
         val file = File(dir, "selfie_${System.currentTimeMillis()}.jpg")
         val uri =
             FileProvider.getUriForFile(mActivity, "${mActivity.packageName}.fileprovider", file)
@@ -256,6 +257,7 @@ class IdentityVerificationActivity : BaseActivity() {
                         selfieBytes = selfieBytes,
                         onSuccess = {
                             showProgressSubmit.set(false)
+                            Utility.deleteKycImages(mActivity)
                             ToastUtil.showSuccess(
                                 mActivity,
                                 getString(R.string.msgIdentitySubmitSuccess)

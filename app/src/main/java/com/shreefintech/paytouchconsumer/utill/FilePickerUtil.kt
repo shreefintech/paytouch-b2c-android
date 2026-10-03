@@ -5,8 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
+import android.os.Bundle
 import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,8 +14,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.google.android.material.card.MaterialCardView
+import androidx.lifecycle.lifecycleScope
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.databinding.DialogSelectDocumentBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -35,7 +38,7 @@ import java.io.File
  * Note: GetContent does not require explicit storage permissions — the system picker
  * grants URI read access automatically upon selection.
  */
-class FilePickerUtil(activity: AppCompatActivity) {
+class FilePickerUtil(private val activity: AppCompatActivity) {
 
     // ─── Models ───────────────────────────────────────────────────────────────
 
@@ -58,6 +61,8 @@ class FilePickerUtil(activity: AppCompatActivity) {
     companion object {
         private const val MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024 // 2MB
         private val ALLOWED_EXTENSIONS = listOf("pdf", "jpg", "jpeg")
+        private const val STATE_KEY = "file_picker_util_state"
+        private const val STATE_CAMERA_FILE = "camera_output_file"
     }
 
     // ─── Callbacks ────────────────────────────────────────────────────────────
@@ -81,6 +86,23 @@ class FilePickerUtil(activity: AppCompatActivity) {
     private var cameraOutputUri: Uri? = null
     private var pendingCameraStorageDir: File? = null
 
+    // The camera app may outlive our process — persist the output path so the photo isn't dropped
+    init {
+        val registry = activity.savedStateRegistry
+        registry.registerSavedStateProvider(STATE_KEY) {
+            Bundle().apply { putString(STATE_CAMERA_FILE, cameraOutputFile?.absolutePath) }
+        }
+        registry.consumeRestoredStateForKey(STATE_KEY)?.getString(STATE_CAMERA_FILE)?.let { path ->
+            try {
+                val file = File(path)
+                cameraOutputUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                cameraOutputFile = file
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     private val cameraPermissionLauncher: ActivityResultLauncher<String> =
         activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             val dir = pendingCameraStorageDir
@@ -96,12 +118,13 @@ class FilePickerUtil(activity: AppCompatActivity) {
             cameraOutputFile = null
             cameraOutputUri = null
             if (file != null && uri != null && file.exists() && file.length() > 0) {
-                Thread {
+                // lifecycleScope cancels on destroy, so onSuccess never reaches a dead Activity
+                activity.lifecycleScope.launch(Dispatchers.IO) {
                     Utility.compressImageFile(file, cameraMaxBytes)
-                    Handler(Looper.getMainLooper()).post {
+                    withContext(Dispatchers.Main) {
                         onSuccess?.invoke(FileResult(uri, file.name, "jpg", file.length() / (1024.0 * 1024.0)))
                     }
-                }.start()
+                }
             }
         }
 
@@ -132,9 +155,9 @@ class FilePickerUtil(activity: AppCompatActivity) {
     }
 
     fun showSourceChooser(storageDir: File) {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_select_document, null)
+        val dialogBinding = DialogSelectDocumentBinding.inflate(LayoutInflater.from(context))
         val dialog = Dialog(context)
-        dialog.setContentView(dialogView)
+        dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
         dialog.window?.setLayout(
@@ -142,11 +165,11 @@ class FilePickerUtil(activity: AppCompatActivity) {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(true)
-        dialogView.findViewById<MaterialCardView>(R.id.cardCamera).setOnClickListener {
+        dialogBinding.cardCamera.setOnClickListener {
             dialog.dismiss()
             openCamera(storageDir)
         }
-        dialogView.findViewById<MaterialCardView>(R.id.cardFiles).setOnClickListener {
+        dialogBinding.cardFiles.setOnClickListener {
             dialog.dismiss()
             openPicker()
         }

@@ -21,6 +21,7 @@ import androidx.annotation.ColorInt
 import androidx.core.graphics.createBitmap
 import androidx.core.widget.NestedScrollView
 import androidx.exifinterface.media.ExifInterface
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -29,6 +30,9 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 object Utility {
+
+    /** Long-edge cap for camera images before compression — still legible for Aadhaar/PAN. */
+    private const val MAX_IMAGE_EDGE_PX = 2048
 
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
@@ -162,7 +166,15 @@ object Utility {
 
         if (!needsCompress && rotation == 0) return
 
-        val raw = BitmapFactory.decodeFile(file.absolutePath) ?: return
+        // Read dimensions only, then decode downsampled — a full-res 50+ MP decode can OOM
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(file.absolutePath, bounds)
+        var sample = 1
+        while (maxOf(bounds.outWidth, bounds.outHeight) / sample > MAX_IMAGE_EDGE_PX) sample *= 2
+        val raw = BitmapFactory.decodeFile(
+            file.absolutePath,
+            BitmapFactory.Options().apply { inSampleSize = sample }
+        ) ?: return
         val bitmap = if (rotation != 0) {
             Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
                 .also { if (it !== raw) raw.recycle() }
@@ -180,6 +192,12 @@ object Utility {
             quality -= 15
         }
         bitmap.recycle()
+    }
+
+    /** Removes captured KYC documents and selfies from filesDir (never auto-cleared by the OS). */
+    fun deleteKycImages(context: Context) {
+        File(context.filesDir, Constant.DIR_KYC_SELFIE).deleteRecursively()
+        File(context.filesDir, Constant.DIR_KYC_DOCS).deleteRecursively()
     }
 
     fun calculatePlatformFee(amount: Double): Double {

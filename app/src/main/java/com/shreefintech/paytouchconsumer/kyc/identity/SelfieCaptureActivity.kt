@@ -227,7 +227,9 @@ class SelfieCaptureActivity : BaseActivity() {
             LivenessInstruction.SINGLE_FACE_ONLY -> R.color.selfie_circle_error
             LivenessInstruction.MOVE_CLOSER,
             LivenessInstruction.MOVE_BACK,
-            LivenessInstruction.LOOK_STRAIGHT -> R.color.selfie_circle_warning
+            LivenessInstruction.LOOK_STRAIGHT,
+            LivenessInstruction.BLINK,
+            LivenessInstruction.BLINK_AGAIN -> R.color.selfie_circle_warning
             else -> R.color.selfie_circle_passed
         }
         val targetColor = ContextCompat.getColor(mActivity, colorRes)
