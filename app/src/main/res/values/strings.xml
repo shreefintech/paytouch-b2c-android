@@ -663,7 +663,19 @@
     <!-- Withdraw validation -->
     <string name="errMinWithdrawAmount">Minimum withdrawal amount is ₹100</string>
     <string name="errInsufficientBalance">Insufficient wallet balance</string>
-    <string name="msgWithdrawInitiated">Withdrawal request submitted successfully</string>
+
+    <!-- Withdraw success dialog -->
+    <string name="titleWithdrawalRequestSent">Withdrawal request sent!</string>
+    <string name="msgWithdrawalReachBank">Usually reaches your bank within a few minutes.</string>
+    <string name="labelProcessing">Processing</string>
+    <string name="labelTo">To</string>
+    <string name="labelTransferMode">Transfer mode</string>
+    <string name="labelInstant">INSTANT</string>
+    <string name="labelRequestId">Request ID</string>
+    <string name="labelDateAndTime">Date &amp; time</string>
+    <string name="btnDone">Done</string>
+    <string name="labelBankAccountMasked">%1$s ••••%2$s</string>
+    <string name="msgRequestIdCopied">Request ID copied</string>
     <string name="labelCorporation">Corporation</string>
     <string name="hintSelectCorporation">Select Corporation</string>
     <string name="titleLogout">Logout</string>

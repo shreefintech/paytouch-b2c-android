@@ -75,6 +75,13 @@ object Constant {
     const val HDFC_STATUS_AUTHORIZATION_FAILED = "AUTHORIZATION_FAILED"
     const val HDFC_STATUS_AUTO_REFUNDED = "AUTO_REFUNDED"
 
+    // Wallet withdrawal — status values (compared case-insensitively)
+    const val WITHDRAW_STATUS_SUCCESS = "SUCCESS"
+    const val WITHDRAW_STATUS_COMPLETED = "COMPLETED"
+    const val WITHDRAW_STATUS_FAILED = "FAILED"
+    const val WITHDRAW_STATUS_REJECTED = "REJECTED"
+    const val WITHDRAW_STATUS_REVERSED = "REVERSED"
+
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 

@@ -1,7 +1,13 @@
 package com.shreefintech.paytouchconsumer.loadwallet
 
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.res.ColorStateList
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.core.widget.TextViewCompat
 import androidx.databinding.ObservableBoolean
 import android.content.Intent
 import android.os.Bundle
@@ -18,6 +24,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmPaymentBinding
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmWithdrawBinding
+import com.shreefintech.paytouchconsumer.databinding.DialogWithdrawSuccessBinding
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
@@ -29,6 +36,7 @@ import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
@@ -67,6 +75,10 @@ class LoadWalletActivity : BaseActivity() {
     private var pendingWithdrawMode: String = MODE_IMPS
     private var pendingWithdrawNarration: String = ""
     private val showProgressWithdraw = ObservableBoolean(false)
+
+    private var withdrawSuccessDialog: Dialog? = null
+    private var withdrawSuccessDialogBinding: DialogWithdrawSuccessBinding? = null
+    private var withdrawRequestId: String? = null
 
     private var isWalletEntrancePlayed = false
     private var isWalletLoading = false
@@ -173,6 +185,11 @@ class LoadWalletActivity : BaseActivity() {
                 )
             }
         )
+    }
+
+    override fun onDestroy() {
+        withdrawSuccessDialog?.dismiss()
+        super.onDestroy()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -333,10 +350,10 @@ class LoadWalletActivity : BaseActivity() {
             paymentMode = pendingWithdrawMode,
             narration = pendingWithdrawNarration,
             onLoading = { showProgressWithdraw.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { data ->
                 showProgressWithdraw.set(false)
                 withdrawConfirmDialog?.dismiss()
-                ToastUtil.showWarning(mActivity, getString(R.string.msgWithdrawInitiated))
+                showWithdrawSuccessDialog(data)
                 fetchWalletData()
             },
             onError = { msg ->
@@ -344,6 +361,100 @@ class LoadWalletActivity : BaseActivity() {
                 ToastUtil.showDelete(mActivity, msg, inWindow = false)
             }
         )
+    }
+
+    private fun showWithdrawSuccessDialog(data: WithdrawDataItem) {
+        if (isFinishing || isDestroyed) return
+        withdrawSuccessDialog?.dismiss()
+        withdrawRequestId = data.requestId
+
+        val dialogBinding = DialogWithdrawSuccessBinding.inflate(layoutInflater)
+        withdrawSuccessDialogBinding = dialogBinding
+        dialogBinding.onClickListener = onClickListener()
+
+        val dialog = Dialog(mActivity)
+        withdrawSuccessDialog = dialog
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.88).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setOnDismissListener {
+            withdrawSuccessDialog = null
+            withdrawSuccessDialogBinding = null
+            withdrawRequestId = null
+        }
+
+        val status = resolveWithdrawStatus(data.status)
+        Glide.with(mActivity).asGif().load(status.gifRes).into(dialogBinding.ivStatusGif)
+
+        dialogBinding.tvSubtitle.text = data.statusMessage?.takeIf { it.isNotBlank() }
+            ?: getString(R.string.msgWithdrawalReachBank)
+        dialogBinding.tvAmount.text = Utility.formatAmount(data.amount)
+        dialogBinding.tvStatus.text = data.status?.takeIf { it.isNotBlank() }
+            ?: getString(R.string.labelProcessing)
+        dialogBinding.tvStatus.setBackgroundResource(status.chipBgRes)
+        val chipTextColor = ContextCompat.getColor(mActivity, status.chipTextColorRes)
+        dialogBinding.tvStatus.setTextColor(chipTextColor)
+        TextViewCompat.setCompoundDrawableTintList(dialogBinding.tvStatus, ColorStateList.valueOf(chipTextColor))
+
+        val accountLast4 = data.accountNumberMasked?.takeLast(4).orEmpty()
+        dialogBinding.tvToBank.text = when {
+            data.bankName.isNullOrBlank() -> accountLast4.ifEmpty { "-" }
+            accountLast4.isEmpty() -> data.bankName
+            else -> getString(R.string.labelBankAccountMasked, data.bankName, accountLast4)
+        }
+
+        val transferMode = data.transferMode?.takeIf { it.isNotBlank() } ?: pendingWithdrawMode
+        dialogBinding.tvTransferMode.text = transferMode
+        dialogBinding.tvInstantBadge.visibility =
+            if (transferMode.equals(MODE_IMPS, ignoreCase = true)) View.VISIBLE else View.GONE
+
+        dialogBinding.tvRequestId.text = data.requestId?.takeIf { it.isNotBlank() } ?: "-"
+        dialogBinding.ivCopyRequestId.visibility =
+            if (data.requestId.isNullOrBlank()) View.GONE else View.VISIBLE
+        dialogBinding.tvDateTime.text = data.requestedAtDisplay?.takeIf { it.isNotBlank() } ?: "-"
+
+        dialog.show()
+    }
+
+    private data class WithdrawStatusDisplay(
+        @DrawableRes val gifRes: Int,
+        @DrawableRes val chipBgRes: Int,
+        @ColorRes val chipTextColorRes: Int
+    )
+
+    private fun resolveWithdrawStatus(status: String?): WithdrawStatusDisplay {
+        return when (status?.uppercase()) {
+            Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED -> WithdrawStatusDisplay(
+                gifRes = R.drawable.gif_success,
+                chipBgRes = R.drawable.bg_status_success,
+                chipTextColorRes = R.color.toast_text_success
+            )
+
+            Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> WithdrawStatusDisplay(
+                gifRes = R.drawable.gif_rejected,
+                chipBgRes = R.drawable.bg_status_failed,
+                chipTextColorRes = R.color.toast_text_delete
+            )
+
+            else -> WithdrawStatusDisplay(
+                gifRes = R.drawable.gif_pending,
+                chipBgRes = R.drawable.bg_status_pending,
+                chipTextColorRes = R.color.toast_text_warning
+            )
+        }
+    }
+
+    private fun copyWithdrawRequestId() {
+        val requestId = withdrawRequestId?.takeIf { it.isNotBlank() } ?: return
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("request_id", requestId))
+        ToastUtil.showSuccess(mActivity, getString(R.string.msgRequestIdCopied))
     }
 
     private fun loadData() {
@@ -649,6 +760,16 @@ class LoadWalletActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressWithdraw.get()) return@OnClickListener
                     startWithdraw()
+                }
+
+                withdrawSuccessDialogBinding?.ivCopyRequestId -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    copyWithdrawRequestId()
+                }
+
+                withdrawSuccessDialogBinding?.cardDone -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    withdrawSuccessDialog?.dismiss()
                 }
             }
         }
