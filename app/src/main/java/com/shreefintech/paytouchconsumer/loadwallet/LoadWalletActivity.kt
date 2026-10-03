@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.core.widget.TextViewCompat
 import androidx.databinding.ObservableBoolean
 import android.content.Intent
@@ -389,13 +390,20 @@ class LoadWalletActivity : BaseActivity() {
             withdrawRequestId = null
         }
 
+        bindWithdrawDetails(dialogBinding, data)
+        dialog.show()
+    }
+
+    private fun bindWithdrawDetails(dialogBinding: DialogWithdrawSuccessBinding, data: WithdrawDataItem) {
         val status = resolveWithdrawStatus(data.status)
         Glide.with(mActivity).asGif().load(status.gifRes).into(dialogBinding.ivStatusGif)
 
+        dialogBinding.tvTitle.setText(status.titleRes)
         dialogBinding.tvSubtitle.text = data.statusMessage?.takeIf { it.isNotBlank() }
-            ?: getString(R.string.msgWithdrawalReachBank)
+            ?: getString(status.subtitleRes)
         dialogBinding.tvAmount.text = Utility.formatAmount(data.amount)
-        dialogBinding.tvStatus.text = data.status?.takeIf { it.isNotBlank() }
+        dialogBinding.tvStatus.text = data.statusLabel?.takeIf { it.isNotBlank() }
+            ?: data.status?.takeIf { it.isNotBlank() }
             ?: getString(R.string.labelProcessing)
         dialogBinding.tvStatus.setBackgroundResource(status.chipBgRes)
         val chipTextColor = ContextCompat.getColor(mActivity, status.chipTextColorRes)
@@ -404,7 +412,7 @@ class LoadWalletActivity : BaseActivity() {
 
         val accountLast4 = data.accountNumberMasked?.takeLast(4).orEmpty()
         dialogBinding.tvToBank.text = when {
-            data.bankName.isNullOrBlank() -> accountLast4.ifEmpty { "-" }
+            data.bankName.isNullOrBlank() -> accountLast4.ifEmpty { "--" }
             accountLast4.isEmpty() -> data.bankName
             else -> getString(R.string.labelBankAccountMasked, data.bankName, accountLast4)
         }
@@ -414,15 +422,15 @@ class LoadWalletActivity : BaseActivity() {
         dialogBinding.tvInstantBadge.visibility =
             if (transferMode.equals(MODE_IMPS, ignoreCase = true)) View.VISIBLE else View.GONE
 
-        dialogBinding.tvRequestId.text = data.requestId?.takeIf { it.isNotBlank() } ?: "-"
+        dialogBinding.tvRequestId.text = data.requestId?.takeIf { it.isNotBlank() } ?: "--"
         dialogBinding.ivCopyRequestId.visibility =
             if (data.requestId.isNullOrBlank()) View.GONE else View.VISIBLE
-        dialogBinding.tvDateTime.text = data.requestedAtDisplay?.takeIf { it.isNotBlank() } ?: "-"
-
-        dialog.show()
+        dialogBinding.tvDateTime.text = data.requestedAtDisplay?.takeIf { it.isNotBlank() } ?: "--"
     }
 
     private data class WithdrawStatusDisplay(
+        @StringRes val titleRes: Int,
+        @StringRes val subtitleRes: Int,
         @DrawableRes val gifRes: Int,
         @DrawableRes val chipBgRes: Int,
         @ColorRes val chipTextColorRes: Int
@@ -431,18 +439,24 @@ class LoadWalletActivity : BaseActivity() {
     private fun resolveWithdrawStatus(status: String?): WithdrawStatusDisplay {
         return when (status?.uppercase()) {
             Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED -> WithdrawStatusDisplay(
+                titleRes = R.string.titleWithdrawalSuccessful,
+                subtitleRes = R.string.msgWithdrawalCredited,
                 gifRes = R.drawable.gif_success,
                 chipBgRes = R.drawable.bg_status_success,
                 chipTextColorRes = R.color.toast_text_success
             )
 
             Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> WithdrawStatusDisplay(
+                titleRes = R.string.titleWithdrawalFailed,
+                subtitleRes = R.string.msgWithdrawalFailed,
                 gifRes = R.drawable.gif_rejected,
                 chipBgRes = R.drawable.bg_status_failed,
                 chipTextColorRes = R.color.toast_text_delete
             )
 
             else -> WithdrawStatusDisplay(
+                titleRes = R.string.titleWithdrawalRequestSent,
+                subtitleRes = R.string.msgWithdrawalReachBank,
                 gifRes = R.drawable.gif_pending,
                 chipBgRes = R.drawable.bg_status_pending,
                 chipTextColorRes = R.color.toast_text_warning

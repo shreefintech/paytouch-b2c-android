@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
@@ -200,13 +201,16 @@ class PaymentStatusActivity : BaseActivity() {
         // Glide can deliver the resource again (e.g. memory-cache reload) — the sound plays once per screen.
         if (isSoundPlayed || isFinishing || isDestroyed) return
         isSoundPlayed = true
+        // Respect silent / vibrate mode — the media stream would otherwise play regardless.
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+        if (audioManager?.ringerMode != AudioManager.RINGER_MODE_NORMAL) return
         try {
             mediaPlayer = MediaPlayer.create(mActivity, soundRes)?.apply {
                 setOnCompletionListener { releaseSound() }
                 start()
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Utility.logError(e)
             releaseSound()
         }
     }

@@ -89,17 +89,26 @@ class AppLockActivity : BaseActivity() {
 
                 // Cancel / lockout / error: stay locked — the Unlock button shows the prompt again.
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    showUnlockPanel(animate = true)
+                    when (errorCode) {
+                        // The phone has no screen lock after all — same outcome as the pre-check.
+                        BiometricPrompt.ERROR_NO_DEVICE_CREDENTIAL,
+                        BiometricPrompt.ERROR_HW_NOT_PRESENT -> onUnlocked()
+                        else -> showUnlockPanel(animate = true)
+                    }
                 }
             }
         )
     }
 
     private fun showPrompt() {
-        if (BiometricManager.from(this).canAuthenticate(AUTHENTICATORS) != BiometricManager.BIOMETRIC_SUCCESS) {
+        when (BiometricManager.from(this).canAuthenticate(AUTHENTICATORS)) {
             // No screen lock set on this phone — there is nothing to verify against.
-            onUnlocked()
-            return
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED,
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
+                onUnlocked()
+                return
+            }
+            // Any other result (transient / unknown) must not skip the lock — let the prompt decide.
         }
         biometricPrompt.authenticate(promptInfo)
     }

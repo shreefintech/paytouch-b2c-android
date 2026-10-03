@@ -667,6 +667,10 @@
     <!-- Withdraw success dialog -->
     <string name="titleWithdrawalRequestSent">Withdrawal request sent!</string>
     <string name="msgWithdrawalReachBank">Usually reaches your bank within a few minutes.</string>
+    <string name="titleWithdrawalSuccessful">Withdrawal successful!</string>
+    <string name="msgWithdrawalCredited">The amount has been sent to your bank account.</string>
+    <string name="titleWithdrawalFailed">Withdrawal failed</string>
+    <string name="msgWithdrawalFailed">Your withdrawal could not be completed. Please try again later.</string>
     <string name="labelProcessing">Processing</string>
     <string name="labelTo">To</string>
     <string name="labelTransferMode">Transfer mode</string>

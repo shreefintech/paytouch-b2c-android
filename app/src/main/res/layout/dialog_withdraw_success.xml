@@ -28,7 +28,7 @@
                 android:layout_width="0dp"
                 android:layout_height="112dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/img_withdrawel_popup_bg"
+                android:src="@drawable/img_withdrawal_popup_bg"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
