@@ -80,6 +80,7 @@ class HomeActivity : BaseActivity() {
             rootView = binding.root as ViewGroup,
             cornerRadius = resources.getDimensionPixelSize(R.dimen.glass_frem_radius),
             distortion = 0f,
+            tintColor = ContextCompat.getColor(mActivity, R.color.home_card_bg),
             blur = resources.getDimensionPixelSize(R.dimen.glass_frem_blur)
         )
 
@@ -150,6 +151,7 @@ class HomeActivity : BaseActivity() {
         val fallback = imageView.drawable
         Glide.with(this)
             .load(animatedRes)
+            .placeholder(fallback)
             .error(fallback)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean): Boolean {
@@ -261,7 +263,7 @@ class HomeActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressLogout.get()) return@OnClickListener
                     if (!Utility.isInternetAvailable(mActivity)) {
-                        ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet))
+                        ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet), inWindow = false)
                         return@OnClickListener
                     }
                     viewModel.logout(
@@ -276,7 +278,7 @@ class HomeActivity : BaseActivity() {
                         },
                         onError = { msg ->
                             showProgressLogout.set(false)
-                            ToastUtil.showWarning(mActivity, msg)
+                            ToastUtil.showWarning(mActivity, msg, inWindow = false)
                         }
                     )
                 }

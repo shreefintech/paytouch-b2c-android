@@ -26,6 +26,7 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPaymentStatusBinding
 import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -185,6 +186,8 @@ class PaymentStatusActivity : BaseActivity() {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(ClipData.newPlainText("order_id", orderId))
         ToastUtil.showSuccess(mActivity, getString(R.string.msgOrderIdCopied))
+        binding.ivCopyOrderId.setImageResource(R.drawable.ic_toast_tick)
+        autoFinishHandler.postDelayed({ binding.ivCopyOrderId.setImageResource(R.drawable.ic_copy) }, 1500L)
     }
 
     private fun goToWallet() {

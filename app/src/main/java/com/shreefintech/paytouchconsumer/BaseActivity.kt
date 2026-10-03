@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer
 
 import android.app.Activity
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -134,10 +135,16 @@ open class BaseActivity : AppCompatActivity() {
         if (System.currentTimeMillis() - last > Constant.SESSION_TIMEOUT_MS) {
             NotificationHelper.removeTokenDetached(this)
             SharedPreferenceHelper.clearSharedPreference(this)
-            ToastUtil.showExpired(this, getString(R.string.errUnauthorized))
-            startActivity(Intent(this, LoginActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            })
+            ToastUtil.showExpired(this, getString(R.string.errUnauthorized), inWindow = false)
+            val opts = ActivityOptions.makeCustomAnimation(
+                this, R.anim.anim_activity_fade_in, R.anim.anim_activity_fade_out
+            )
+            startActivity(
+                Intent(this, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                },
+                opts.toBundle()
+            )
         }
     }
 

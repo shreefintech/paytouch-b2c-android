@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.auth
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -94,9 +95,13 @@ class SplashActivity : BaseActivity() {
     }
 
     private fun navigate(intent: Intent) {
-        startActivity(intent.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        })
+        val opts = ActivityOptions.makeCustomAnimation(
+            this, R.anim.anim_activity_fade_in, R.anim.anim_activity_fade_out
+        )
+        startActivity(
+            intent.apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK },
+            opts.toBundle()
+        )
         finish()
     }
 }

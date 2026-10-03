@@ -39,8 +39,8 @@
 
         <FrameLayout
             android:id="@+id/flLogout"
-            android:layout_width="@dimen/back_btn_size"
-            android:layout_height="@dimen/back_btn_size"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_margin="@dimen/margin_medium"
             android:elevation="15dp"
             android:visibility="gone"
@@ -53,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:onClick="@{onClickListener}"
-                android:src="@drawable/ic_logout"
+                android:src="@drawable/img_logout"
                 android:background="?selectableItemBackgroundBorderless"/>
 
         </FrameLayout>

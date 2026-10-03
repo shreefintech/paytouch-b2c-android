@@ -20,6 +20,7 @@ import com.shreefintech.paytouchconsumer.adapter.KycDocumentAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycDetailsBinding
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDocumentDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -59,6 +60,9 @@ class KycDetailsActivity : BaseActivity() {
         documentAdp = KycDocumentAdp(urlResolver = ::resolveFileUrl)
         documentAdp.onItemClick = { url, label -> DocPreviewActivity.start(this, url, label) }
         binding.vpDocuments.adapter = documentAdp
+        binding.vpDocuments.setPageTransformer { page, position ->
+            page.alpha = 1f - kotlin.math.abs(position) * 0.4f
+        }
         binding.vpDocuments.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 updateDots(position)

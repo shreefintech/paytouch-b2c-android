@@ -7,6 +7,5 @@ data class PrepaidPlanItem(
     @field:SerializedName("amount")      val amount: Int?,
     @field:SerializedName("description") val description: String?,
     @field:SerializedName("validity")    val validity: String?,
-    @field:SerializedName("talktime")    val talktime: Double?,
     @field:SerializedName("data")        val data: String?
 )

@@ -33,6 +33,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
+import android.animation.ValueAnimator
+import android.view.animation.DecelerateInterpolator
 import androidx.lifecycle.lifecycleScope
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
@@ -189,12 +191,12 @@ class SelfieCaptureActivity : BaseActivity() {
     }
 
     private fun onPermissionDenied() {
-        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionRequired))
+        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionRequired), inWindow = false)
         finish()
     }
 
     private fun openAppSettings() {
-        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionSettings))
+        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraPermissionSettings), inWindow = false)
         try {
             startActivity(
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null))
@@ -216,13 +218,21 @@ class SelfieCaptureActivity : BaseActivity() {
 
     // ─── UI state ───────────────────────────────────────────────────────────────
 
+    private var strokeColorAnimator: ValueAnimator? = null
+
     private fun renderState(stage: LivenessStage, instruction: LivenessInstruction) {
         binding.tvInstruction.text = getString(instructionText(instruction))
-        // Circle turns green once the blink is verified (hold / capture).
         val passedBlink = stage == LivenessStage.HOLD || stage == LivenessStage.DONE
-        binding.ovFaceCircle.setStrokeColor(
-            ContextCompat.getColor(mActivity, if (passedBlink) R.color.selfie_circle_passed else R.color.white)
-        )
+        val targetColor = ContextCompat.getColor(mActivity, if (passedBlink) R.color.selfie_circle_passed else R.color.white)
+        val currentColor = binding.ovFaceCircle.currentStrokeColor
+        if (currentColor == targetColor) return
+        strokeColorAnimator?.cancel()
+        strokeColorAnimator = ValueAnimator.ofArgb(currentColor, targetColor).apply {
+            duration = 200
+            interpolator = DecelerateInterpolator()
+            addUpdateListener { binding.ovFaceCircle.setStrokeColor(it.animatedValue as Int) }
+            start()
+        }
     }
 
     private fun instructionText(instruction: LivenessInstruction): Int = when (instruction) {
@@ -315,7 +325,7 @@ class SelfieCaptureActivity : BaseActivity() {
         .also { it.setAnalyzer(analysisExecutor, ::analyzeFrame) }
 
     private fun onCameraUnavailable() {
-        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraUnavailable))
+        ToastUtil.showDelete(mActivity, getString(R.string.msgCameraUnavailable), inWindow = false)
         finish()
     }
 
@@ -482,6 +492,7 @@ class SelfieCaptureActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        strokeColorAnimator?.cancel()
         imageAnalysis?.clearAnalyzer()
         analysisExecutor.shutdown()
         liveness.onStateChanged = null

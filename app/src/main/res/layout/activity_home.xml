@@ -513,65 +513,108 @@
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cvLoadWallet"
                         android:layout_width="match_parent"
-                        android:layout_height="72dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/margin_large"
                         android:layout_marginTop="@dimen/margin_small_medium"
                         android:layout_marginEnd="@dimen/margin_large"
                         android:layout_marginBottom="@dimen/margin_large"
                         android:onClickListener="@{onClickListener}"
-                        app:cardBackgroundColor="@color/primary"
+                        app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="?selectableItemBackground"
-                            android:clipChildren="true">
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/img_wallet_banner_bg"
+                            android:minHeight="100dp"
+                            android:paddingStart="@dimen/margin_large"
+                            android:paddingTop="@dimen/margin_medium"
+                            android:paddingEnd="@dimen/margin_medium"
+                            android:paddingBottom="@dimen/margin_medium">
 
-                            <!-- Decorative wallet illustration clipped on right -->
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/ivWalletDecor"
-                                android:layout_width="188dp"
-                                android:layout_height="60dp"
-                                android:layout_marginEnd="-10dp"
-                                android:alpha="0.5"
-                                android:src="@drawable/img_wallet_bg"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintVertical_bias="1.0" />
-
-                            <!-- Icon + Label on left -->
+                            <!-- Left: title + subtitle + button -->
                             <LinearLayout
+                                android:id="@+id/llLoadWalletContent"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/margin_large"
                                 android:gravity="center_vertical"
-                                android:orientation="horizontal"
+                                android:orientation="vertical"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/ivLoadWallet"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent">
-
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:id="@+id/ivLoadWallet"
-                                    android:layout_width="28dp"
-                                    android:layout_height="28dp"
-                                    android:src="@drawable/ic_wallet" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="@dimen/margin_small_medium"
                                     android:fontFamily="@font/proza_libre_bold"
                                     android:includeFontPadding="false"
                                     android:text="@string/btnLoadWallet"
                                     android:textColor="@color/white"
-                                    android:textSize="@dimen/text_size_16" />
+                                    android:textSize="@dimen/text_size_18" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/msgLoadWalletSubtitle"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small_medium"
+                                    app:cardBackgroundColor="@color/white"
+                                    app:cardCornerRadius="20dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal"
+                                        android:paddingStart="@dimen/margin_small_medium"
+                                        android:paddingTop="6dp"
+                                        android:paddingEnd="@dimen/margin_small_medium"
+                                        android:paddingBottom="6dp">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/titleAddMoney"
+                                            android:textColor="?attr/colorPrimary"
+                                            android:textSize="@dimen/text_size_12" />
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:layout_width="14dp"
+                                            android:layout_height="14dp"
+                                            android:layout_marginStart="4dp"
+                                            android:src="@drawable/ic_arrow_up"
+                                            android:tint="?attr/colorPrimary" />
+
+                                    </LinearLayout>
+
+                                </com.google.android.material.card.MaterialCardView>
 
                             </LinearLayout>
+
+                            <!-- Right: animated wallet image -->
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/ivLoadWallet"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:src="@drawable/ic_wallet"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 

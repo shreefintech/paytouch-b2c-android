@@ -208,7 +208,7 @@ class CreateAccountActivity : BaseActivity() {
             onLoading = { showProgress.set(true) },
             onSuccess = {
                 showProgress.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.msgAccountCreatedSuccessfully))
+                ToastUtil.showSuccess(mActivity, getString(R.string.msgAccountCreatedSuccessfully), inWindow = false)
                 val intent = Intent(mActivity, LoginActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 }

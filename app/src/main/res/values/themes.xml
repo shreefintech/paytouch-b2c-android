@@ -149,4 +149,10 @@
         <item name="android:includeFontPadding">false</item>
     </style>
 
+
+    <style name="DialogScaleFadeAnimation">
+        <item name="android:windowEnterAnimation">@anim/anim_dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/anim_dialog_exit</item>
+    </style>
+
 </resources>

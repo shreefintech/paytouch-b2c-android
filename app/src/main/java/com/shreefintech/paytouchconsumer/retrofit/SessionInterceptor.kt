@@ -17,7 +17,7 @@ class SessionInterceptor(private val context: Context) : Interceptor {
             )
         }
         val response = chain.proceed(chain.request())
-        if (response.code == 401) {
+        if (response.code == 401 && SharedPreferenceHelper.isLoggedIn(context)) {
             SharedPreferenceHelper.clearSharedPreference(context)
             context.startActivity(Intent(context, LoginActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

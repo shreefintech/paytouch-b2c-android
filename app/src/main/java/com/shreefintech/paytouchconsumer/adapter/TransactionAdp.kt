@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemTransactionBinding
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 class TransactionAdp(
@@ -17,6 +18,7 @@ class TransactionAdp(
 ) : RecyclerView.Adapter<TransactionAdp.ViewHolder>() {
 
     var onClickItem: ((TransactionItem) -> Unit)? = null
+    private val animatedPositions = mutableSetOf<Int>()
 
     inner class ViewHolder(val binding: ItemTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -31,7 +33,7 @@ class TransactionAdp(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         holder.binding.apply {
-            Glide.with(mContext).load(item.categoryIconRes).into(ivCategoryIcon)
+            Glide.with(mContext).load(item.categoryIconRes).placeholder(R.drawable.ic_file_not_found).into(ivCategoryIcon)
             tvMobile.text = Utility.maskNumber(item.mobileNumber)
             tvTransactionId.text = item.transactionId
             tvAmount.text = item.amount
@@ -61,9 +63,15 @@ class TransactionAdp(
                 onClickItem?.invoke(mArrayList[pos])
             }
         }
+
+        if (position !in animatedPositions) {
+            animatedPositions.add(position)
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position, AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView))
+        }
     }
 
     fun updateList(items: List<TransactionItem>) {
+        animatedPositions.clear()
         mArrayList.clear()
         mArrayList.addAll(items)
         notifyDataSetChanged()

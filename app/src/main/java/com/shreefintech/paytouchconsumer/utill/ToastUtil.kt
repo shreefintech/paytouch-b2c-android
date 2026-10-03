@@ -8,6 +8,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -124,40 +126,84 @@ object ToastUtil {
         context: Context,
         message: String,
         type: ToastType,
-        duration: Int = Toast.LENGTH_SHORT
+        duration: Int = Toast.LENGTH_SHORT,
+        inWindow: Boolean = true
     ) {
+        if (inWindow && context is Activity && !context.isFinishing && !context.isDestroyed) {
+            showSlideUpInActivity(context, message, type)
+            return
+        }
         val binding = LytCustomToastBinding.inflate(LayoutInflater.from(context))
+        bindToast(binding, context, type, message)
 
-        // ── Outer pill card ───────────────────────────────────
-        binding.toastRoot.apply {
-            setCardBackgroundColor(ContextCompat.getColor(context, type.backgroundColor))
-            strokeColor = ContextCompat.getColor(context, type.borderColor)
-        }
-
-        // ── Inner icon card ───────────────────────────────────
-        LiquidGlassEffect.attach( targetView = binding.toastIconContainer, rootView = (binding.root as ViewGroup), cornerRadius = context.resources.getDimensionPixelSize(R.dimen.toast_radius), distortion = 0f,blur= context.resources.getDimensionPixelSize(R.dimen.toast_blure))
-        /*binding.toastIconContainer.setCardBackgroundColor(
-            ContextCompat.getColor(context, type.iconBackgroundColor)
-        )*/
-
-        // ── Icon drawable & tint ──────────────────────────────
-        binding.toastIcon.apply {
-            setImageResource(type.iconRes)
-            setImageTintList(ContextCompat.getColorStateList(context, type.iconTintColor))
-        }
-
-        // ── Message text & color ──────────────────────────────
-        binding.toastMessage.apply {
-            text = message
-            setTextColor(ContextCompat.getColor(context, type.textColor))
-        }
-
-        // ── Show ──────────────────────────────────────────────
         @Suppress("DEPRECATION")
         Toast(context).apply {
             this.duration = duration
             this.view     = binding.root
         }.show()
+    }
+
+    private fun bindToast(binding: LytCustomToastBinding, context: Context, type: ToastType, message: String) {
+        binding.toastRoot.apply {
+            setCardBackgroundColor(ContextCompat.getColor(context, type.backgroundColor))
+            strokeColor = ContextCompat.getColor(context, type.borderColor)
+        }
+        LiquidGlassEffect.attach(
+            targetView = binding.toastIconContainer,
+            rootView = binding.root as ViewGroup,
+            cornerRadius = context.resources.getDimensionPixelSize(R.dimen.toast_radius),
+            distortion = 0f,
+            blur = context.resources.getDimensionPixelSize(R.dimen.toast_blure)
+        )
+        binding.toastIcon.apply {
+            setImageResource(type.iconRes)
+            setImageTintList(ContextCompat.getColorStateList(context, type.iconTintColor))
+        }
+        binding.toastMessage.apply {
+            text = message
+            setTextColor(ContextCompat.getColor(context, type.textColor))
+        }
+    }
+
+    private fun showSlideUpInActivity(activity: Activity, message: String, type: ToastType) {
+        val contentRoot = activity.findViewById<FrameLayout>(android.R.id.content) ?: return
+        val toastBinding = LytCustomToastBinding.inflate(LayoutInflater.from(activity))
+        bindToast(toastBinding, activity, type, message)
+
+        val res = activity.resources
+        val bottomMargin = res.getDimensionPixelSize(R.dimen.toast_slide_bottom_margin)
+        val params = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+            setMargins(0, 0, 0, bottomMargin)
+        }
+
+        toastBinding.root.alpha = 0f
+        toastBinding.root.translationY = res.getDimensionPixelSize(R.dimen.toast_slide_translate_enter).toFloat()
+        contentRoot.addView(toastBinding.root, params)
+
+        toastBinding.root.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(300)
+            .setInterpolator(DecelerateInterpolator(1.2f))
+            .start()
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (!activity.isDestroyed && toastBinding.root.parent != null) {
+                toastBinding.root.animate()
+                    .alpha(0f)
+                    .translationY(res.getDimensionPixelSize(R.dimen.toast_slide_translate_exit).toFloat())
+                    .setDuration(200)
+                    .setInterpolator(AccelerateInterpolator())
+                    .withEndAction {
+                        if (toastBinding.root.parent != null) contentRoot.removeView(toastBinding.root)
+                    }
+                    .start()
+            }
+        }, 2000L)
     }
 
     /**
@@ -176,29 +222,7 @@ object ToastUtil {
     ) {
         val contentRoot = activity.findViewById<FrameLayout>(android.R.id.content)
         val toastBinding = LytCustomToastBinding.inflate(LayoutInflater.from(activity))
-
-        toastBinding.toastRoot.apply {
-            setCardBackgroundColor(ContextCompat.getColor(activity, type.backgroundColor))
-            strokeColor = ContextCompat.getColor(activity, type.borderColor)
-        }
-
-        LiquidGlassEffect.attach(
-            targetView = toastBinding.toastIconContainer,
-            rootView = toastBinding.root as ViewGroup,
-            cornerRadius = activity.resources.getDimensionPixelSize(R.dimen.toast_radius),
-            distortion = 0f,
-            blur = activity.resources.getDimensionPixelSize(R.dimen.toast_blure)
-        )
-
-        toastBinding.toastIcon.apply {
-            setImageResource(type.iconRes)
-            setImageTintList(ContextCompat.getColorStateList(activity, type.iconTintColor))
-        }
-
-        toastBinding.toastMessage.apply {
-            text = message
-            setTextColor(ContextCompat.getColor(activity, type.textColor))
-        }
+        bindToast(toastBinding, activity, type, message)
 
         toastBinding.toastDivider.apply {
             visibility = View.VISIBLE
@@ -239,18 +263,18 @@ object ToastUtil {
     fun showUpload(context: Context, message: String = "File uploaded successfully") =
         show(context, message, ToastType.SUCCESS_UPLOAD)
 
-    fun showSuccess(context: Context, message: String = "Verification successfully") =
-        show(context, message, ToastType.SUCCESS)
+    fun showSuccess(context: Context, message: String = "Verification successfully", inWindow: Boolean = true) =
+        show(context, message, ToastType.SUCCESS, inWindow = inWindow)
 
     fun showEdit(context: Context, message: String = "Changes edited successfully") =
         show(context, message, ToastType.EDIT)
 
-    fun showDelete(context: Context, message: String = "File has been deleted") =
-        show(context, message, ToastType.DELETE)
+    fun showDelete(context: Context, message: String = "File has been deleted", inWindow: Boolean = true) =
+        show(context, message, ToastType.DELETE, inWindow = inWindow)
 
-    fun showWarning(context: Context, message: String = "Your file is pending") =
-        show(context, message, ToastType.WARNING)
+    fun showWarning(context: Context, message: String = "Your file is pending", inWindow: Boolean = true) =
+        show(context, message, ToastType.WARNING, inWindow = inWindow)
 
-    fun showExpired(context: Context, message: String = "Expired") =
-        show(context, message, ToastType.EXPIRED)
+    fun showExpired(context: Context, message: String = "Expired", inWindow: Boolean = true) =
+        show(context, message, ToastType.EXPIRED, inWindow = inWindow)
 }

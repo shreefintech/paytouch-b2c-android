@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemWalletTransactionBinding
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 
 class WalletTransactionAdp(
     private val mContext: Context,
@@ -15,6 +17,7 @@ class WalletTransactionAdp(
 ) : RecyclerView.Adapter<WalletTransactionAdp.ViewHolder>() {
 
     var onClickItem: ((transactionId: String) -> Unit)? = null
+    private val animatedPositions = mutableSetOf<Int>()
 
     class ViewHolder(val binding: ItemWalletTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -38,25 +41,29 @@ class WalletTransactionAdp(
         holder.binding.apply {
             tvTitle.text = item.title
             tvDate.text = item.date
+            Glide.with(mContext).load(item.categoryIconRes).placeholder(R.drawable.ic_file_not_found).into(ivIcon)
             if (item.isCredit) {
                 cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_success)
-                ivIcon.setImageResource(R.drawable.ic_credit)
                 tvAmount.text = root.context.getString(R.string.textCreditSign, item.amount)
                 tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_success))
             } else {
                 cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_reject)
-                ivIcon.setImageResource(R.drawable.ic_debit)
                 tvAmount.text = root.context.getString(R.string.textDebitSign, item.amount)
                 tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_reject))
             }
         }
+        if (position !in animatedPositions) {
+            animatedPositions.add(position)
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position, AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView))
+        }
     }
 
+    override fun getItemCount(): Int = mArrayList.size
+
     fun updateList(items: List<WalletTransactionItem>) {
+        animatedPositions.clear()
         mArrayList.clear()
         mArrayList.addAll(items)
         notifyDataSetChanged()
     }
-
-    override fun getItemCount(): Int = mArrayList.size
 }

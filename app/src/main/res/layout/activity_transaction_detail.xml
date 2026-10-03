@@ -361,33 +361,80 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- View Receipt button -->
-                    <LinearLayout
+                    <!-- View Receipt card -->
+                    <com.google.android.material.card.MaterialCardView
                         android:id="@+id/llViewReceipt"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/btn_height"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_medium"
-                        android:background="@drawable/bg_toggle_selected"
-                        android:gravity="center"
-                        android:orientation="horizontal"
-                        android:onClickListener="@{onClickListener}">
+                        android:onClickListener="@{onClickListener}"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="@dimen/normal_card_radius"
+                        app:cardElevation="0dp"
+                        app:strokeColor="?attr/colorPrimary"
+                        app:strokeWidth="1.5dp">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_marginEnd="@dimen/margin_extra_small"
-                            android:src="@drawable/ic_report"
-                            android:tint="@color/white" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/proza_libre_semi_bold"
-                            android:includeFontPadding="false"
-                            android:text="@string/btnViewReceipt"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/text_size_14" />
-                    </LinearLayout>
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="@dimen/margin_small_medium">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:cardBackgroundColor="@color/primary_light"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="44dp"
+                                    android:layout_height="44dp"
+                                    android:padding="8dp"
+                                    android:src="@drawable/img_view_receipt" />
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_small_medium"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/btnViewReceipt"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/msgViewReceiptSubtitle"
+                                    android:textColor="?attr/colorTextSubtitle"
+                                    android:textSize="@dimen/text_size_12" />
+
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:src="@drawable/ic_right_arrow"
+                                android:tint="?attr/colorPrimary" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
             </ScrollView>
