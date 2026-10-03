@@ -273,7 +273,7 @@ class SelfieCaptureActivity : BaseActivity() {
 
                 bindUseCases(provider, selector)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Utility.logError(e)
                 onCameraUnavailable()
             }
         }, ContextCompat.getMainExecutor(mActivity))
@@ -451,7 +451,7 @@ class SelfieCaptureActivity : BaseActivity() {
     private fun saveProxy(proxy: ImageProxy): Boolean = try {
         saveUpright(proxy.toBitmap(), proxy.imageInfo.rotationDegrees)
     } catch (e: Exception) {
-        e.printStackTrace()
+        Utility.logError(e)
         false
     } catch (e: OutOfMemoryError) {
         e.printStackTrace()

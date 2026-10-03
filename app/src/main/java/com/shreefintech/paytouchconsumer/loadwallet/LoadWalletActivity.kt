@@ -69,6 +69,8 @@ class LoadWalletActivity : BaseActivity() {
     private val showProgressWithdraw = ObservableBoolean(false)
 
     private var isWalletEntrancePlayed = false
+    private var isWalletLoading = false
+    private var hasWalletData = false
 
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
@@ -489,23 +491,34 @@ class LoadWalletActivity : BaseActivity() {
         )
     }
 
+    // Shimmer and balance content belong to the Total Balance tab only — selectTab() re-applies
+    // this state when the user switches tabs mid-load.
     private fun showLoading() {
+        isWalletLoading = true
+        binding.llTotalBalanceContent.visibility = View.GONE
+        if (currentTab != TAB_TOTAL_BALANCE) return
         binding.shimmerWallet.visibility = View.VISIBLE
         binding.shimmerWallet.startShimmer()
-        binding.llTotalBalanceContent.visibility = View.GONE
     }
 
     private fun hideLoading() {
+        isWalletLoading = false
         binding.shimmerWallet.stopShimmer()
         binding.shimmerWallet.visibility = View.GONE
-        binding.llTotalBalanceContent.visibility = View.VISIBLE
+        binding.llTotalBalanceContent.visibility =
+            if (currentTab == TAB_TOTAL_BALANCE) View.VISIBLE else View.GONE
+    }
+
+    // Deferred until the Total Balance tab is visible so the entrance never plays on a hidden view.
+    private fun playWalletEntranceIfNeeded() {
+        if (isWalletEntrancePlayed || !hasWalletData || currentTab != TAB_TOTAL_BALANCE) return
+        isWalletEntrancePlayed = true
+        AnimationHelper.animateChildren(binding.llTotalBalanceContent)
     }
 
     private fun populateWalletData(data: WalletDataItem) {
-        if (!isWalletEntrancePlayed) {
-            isWalletEntrancePlayed = true
-            AnimationHelper.animateChildren(binding.llTotalBalanceContent)
-        }
+        hasWalletData = true
+        playWalletEntranceIfNeeded()
         currentWalletBalance = data.walletBalance
         binding.tvWalletBalance.text = Utility.formatAmount(data.walletBalance)
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
@@ -547,7 +560,16 @@ class LoadWalletActivity : BaseActivity() {
     private fun selectTab(tab: Int) {
         currentTab = tab
         val isTotalBalance = tab == TAB_TOTAL_BALANCE
-        binding.llTotalBalanceContent.visibility = if (isTotalBalance) View.VISIBLE else View.GONE
+        if (isTotalBalance && isWalletLoading) {
+            binding.shimmerWallet.visibility = View.VISIBLE
+            binding.shimmerWallet.startShimmer()
+        } else {
+            binding.shimmerWallet.stopShimmer()
+            binding.shimmerWallet.visibility = View.GONE
+        }
+        val showContent = isTotalBalance && !isWalletLoading
+        binding.llTotalBalanceContent.visibility = if (showContent) View.VISIBLE else View.GONE
+        if (showContent) playWalletEntranceIfNeeded()
         binding.tvComingSoon.visibility = if (isTotalBalance) View.GONE else View.VISIBLE
     }
 

@@ -80,7 +80,7 @@ object ReceiptHelper {
                 FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Utility.logError(e)
             null
         }
     }
@@ -119,7 +119,7 @@ object ReceiptHelper {
             }
             activity.startActivity(Intent.createChooser(intent, title))
         } catch (e: Exception) {
-            e.printStackTrace()
+            Utility.logError(e)
             onFailure?.invoke()
         }
     }
