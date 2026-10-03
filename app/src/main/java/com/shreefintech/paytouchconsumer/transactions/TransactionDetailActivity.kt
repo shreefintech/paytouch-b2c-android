@@ -13,7 +13,6 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
-import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.dth.transactions.DthSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.enums.CategoryType
@@ -25,6 +24,7 @@ import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxS
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 class TransactionDetailActivity : BaseActivity() {

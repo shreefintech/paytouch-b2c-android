@@ -76,6 +76,16 @@
                 android:clipToPadding="false"
                 android:paddingBottom="@dimen/page_margin_vertical">
 
+                <!-- Shimmer skeleton shown while wallet data loads -->
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmerWallet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <include layout="@layout/lyt_shimmer_load_wallet" />
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
                 <!-- ── Total Balance tab content ── -->
                 <LinearLayout
                     android:id="@+id/llTotalBalanceContent"
@@ -719,28 +729,6 @@
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
-
-        <View
-            android:id="@+id/viewDimmer"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="#99000000"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ProgressBar
-            android:id="@+id/pbLoading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminateTint="@color/white"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

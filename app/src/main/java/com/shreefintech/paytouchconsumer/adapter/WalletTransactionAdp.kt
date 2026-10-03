@@ -52,9 +52,10 @@ class WalletTransactionAdp(
                 tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_reject))
             }
         }
-        if (position !in animatedPositions) {
-            animatedPositions.add(position)
-            AnimationHelper.animateListRowEntrance(holder.binding.root, position, AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView))
+        // Only first-screen rows animate, so only they need tracking.
+        val visibleCount = AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView)
+        if (position < visibleCount && animatedPositions.add(position)) {
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position, visibleCount)
         }
     }
 

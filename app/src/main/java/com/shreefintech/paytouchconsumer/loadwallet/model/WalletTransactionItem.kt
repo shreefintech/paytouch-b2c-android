@@ -22,7 +22,6 @@ data class WalletTransactionItem(
             transactionId   = item.transactionId ?: "",
             categoryIconRes = sourceToIcon(item.serviceName)
         )
-
         @DrawableRes
         private fun sourceToIcon(source: String?): Int {
             val serviceName = source?.lowercase().orEmpty()

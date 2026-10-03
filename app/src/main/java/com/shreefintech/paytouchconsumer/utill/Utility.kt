@@ -21,7 +21,7 @@ import androidx.annotation.ColorInt
 import androidx.core.graphics.createBitmap
 import androidx.core.widget.NestedScrollView
 import androidx.exifinterface.media.ExifInterface
-import com.shreefintech.paytouchconsumer.Constant
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.shreefintech.paytouchconsumer.R
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -31,8 +31,18 @@ import java.util.Locale
 
 object Utility {
 
-    /** Long-edge cap for camera images before compression — still legible for Aadhaar/PAN. */
-    private const val MAX_IMAGE_EDGE_PX = 2048
+    /**
+     * Prints [e] and reports it to Crashlytics as a non-fatal. Use only for unexpected failures —
+     * expected ones (no app for an intent, network errors, OOM) stay on plain printStackTrace().
+     */
+    fun logError(e: Throwable) {
+        e.printStackTrace()
+        try {
+            FirebaseCrashlytics.getInstance().recordException(e)
+        } catch (reportError: Exception) {
+            reportError.printStackTrace()
+        }
+    }
 
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
@@ -149,9 +159,31 @@ object Utility {
                 }
             }
         }
-    } catch (_: Exception) { null }
+    } catch (e: Exception) {
+        logError(e)
+        null
+    }
 
+    /**
+     * Re-encodes [file] in place as an upright JPEG no larger than [maxBytes] (best effort).
+     * Never throws — on decode/encode failure or OOM the original file is left untouched.
+     * Must be called off the main thread.
+     */
     fun compressImageFile(file: File, maxBytes: Int = 2 * 1024 * 1024) {
+        try {
+            compressImageFileInternal(file, maxBytes)
+        } catch (e: OutOfMemoryError) {
+            e.printStackTrace()
+        } catch (e: Exception) {
+            logError(e)
+        }
+    }
+
+    // Longest edge kept after power-of-two subsampling; camera photos (12–50 MP) would otherwise
+    // be decoded at full size (48–200 MB) and OOM on low-end devices.
+    private const val MAX_DECODE_DIMENSION = 1600
+
+    private fun compressImageFileInternal(file: File, maxBytes: Int) {
         val needsCompress = file.length() > maxBytes
         val rotation = try {
             when (ExifInterface(file.absolutePath).getAttributeInt(
@@ -166,38 +198,61 @@ object Utility {
 
         if (!needsCompress && rotation == 0) return
 
-        // Read dimensions only, then decode downsampled — a full-res 50+ MP decode can OOM
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(file.absolutePath, bounds)
-        var sample = 1
-        while (maxOf(bounds.outWidth, bounds.outHeight) / sample > MAX_IMAGE_EDGE_PX) sample *= 2
+        val longestEdge = maxOf(bounds.outWidth, bounds.outHeight)
+        if (longestEdge <= 0) return
+        var sampleSize = 1
+        while (longestEdge / (sampleSize * 2) >= MAX_DECODE_DIMENSION) sampleSize *= 2
+
         val raw = BitmapFactory.decodeFile(
             file.absolutePath,
-            BitmapFactory.Options().apply { inSampleSize = sample }
+            BitmapFactory.Options().apply { inSampleSize = sampleSize }
         ) ?: return
         val bitmap = if (rotation != 0) {
-            Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
-                .also { if (it !== raw) raw.recycle() }
+            try {
+                Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
+                    .also { if (it !== raw) raw.recycle() }
+            } catch (e: OutOfMemoryError) {
+                // Leave the original file untouched — compression is best effort.
+                e.printStackTrace()
+                raw.recycle()
+                return
+            }
         } else raw
 
-        var quality = if (needsCompress) 85 else 95
-        while (true) {
-            val bos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
-            val bytes = bos.toByteArray()
-            if (bytes.size <= maxBytes || quality == 40) {
-                file.writeBytes(bytes)
-                break
+        try {
+            var quality = if (needsCompress) 85 else 95
+            while (true) {
+                val bos = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
+                val bytes = bos.toByteArray()
+                if (bytes.size <= maxBytes || quality == 40) {
+                    file.writeBytes(bytes)
+                    break
+                }
+                quality -= 15
             }
-            quality -= 15
+        } finally {
+            bitmap.recycle()
         }
-        bitmap.recycle()
     }
 
-    /** Removes captured KYC documents and selfies from filesDir (never auto-cleared by the OS). */
-    fun deleteKycImages(context: Context) {
-        File(context.filesDir, Constant.DIR_KYC_SELFIE).deleteRecursively()
-        File(context.filesDir, Constant.DIR_KYC_DOCS).deleteRecursively()
+    /**
+     * Deletes KYC working directories under filesDir on a background thread (safe from onCreate /
+     * onDestroy, where lifecycleScope may already be cancelled). Safe to call when they do not exist.
+     */
+    fun deleteKycDirs(context: Context, vararg relativePaths: String) {
+        val filesDir = context.applicationContext.filesDir
+        Thread {
+            relativePaths.forEach { path ->
+                try {
+                    File(filesDir, path).deleteRecursively()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }.start()
     }
 
     fun calculatePlatformFee(amount: Double): Double {

@@ -7,7 +7,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -17,10 +16,10 @@ import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityMyAccountBinding
-import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.myaccount.viewmodel.MyAccountViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -62,7 +61,7 @@ class MyAccountActivity : BaseActivity() {
         }
 
         binding.onClickListener = onClickListener()
-        selectTab(TAB_ACCOUNT_INFO)
+        selectTab(TAB_ACCOUNT_INFO, animate = false)
         onBack()
 
         retryCallback = { loadData() }
@@ -85,22 +84,27 @@ class MyAccountActivity : BaseActivity() {
         viewModel.getAccountInfo(
             onLoading = {
                 isAccountInfoLoading = true
-                binding.shimmerAccountInfo.visibility = View.VISIBLE
-                binding.shimmerAccountInfo.startShimmer()
                 binding.llAccountInfoContent.visibility = View.GONE
+                // shimmer only shown if Account Info tab is active when loading starts
+                if (currentTab == TAB_ACCOUNT_INFO) {
+                    binding.shimmerAccountInfo.visibility = View.VISIBLE
+                    binding.shimmerAccountInfo.startShimmer()
+                }
             },
             onSuccess = { data: AccountInfoItem ->
                 isAccountInfoLoading = false
                 binding.shimmerAccountInfo.stopShimmer()
                 binding.shimmerAccountInfo.visibility = View.GONE
-                binding.llAccountInfoContent.visibility = View.VISIBLE
+                binding.llAccountInfoContent.visibility =
+                    if (currentTab == TAB_ACCOUNT_INFO) View.VISIBLE else View.GONE
                 populateAccountInfo(data)
             },
             onError = { msg ->
                 isAccountInfoLoading = false
                 binding.shimmerAccountInfo.stopShimmer()
                 binding.shimmerAccountInfo.visibility = View.GONE
-                binding.llAccountInfoContent.visibility = View.VISIBLE
+                binding.llAccountInfoContent.visibility =
+                    if (currentTab == TAB_ACCOUNT_INFO) View.VISIBLE else View.GONE
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )
@@ -139,7 +143,8 @@ class MyAccountActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateAccountInfo(data: AccountInfoItem) {
-        AnimationHelper.animateChildren(binding.llAccountInfoContent as ViewGroup)
+        // Hidden tab is animated by selectTab() when the user switches back to it
+        if (currentTab == TAB_ACCOUNT_INFO) AnimationHelper.animateChildren(binding.llAccountInfoContent)
         binding.tvMemberName.text = data.name ?: "--"
         binding.tvStatus.text = data.member?.status ?: "--"
         binding.tvMemberCode.text = data.member?.memberCode ?: "--"
@@ -177,7 +182,7 @@ class MyAccountActivity : BaseActivity() {
 
     // ── Tab Switching ─────────────────────────────────────────
 
-    private fun selectTab(tab: Int) {
+    private fun selectTab(tab: Int, animate: Boolean = true) {
         currentTab = tab
         val isAccountInfo = tab == TAB_ACCOUNT_INFO
 
@@ -190,6 +195,7 @@ class MyAccountActivity : BaseActivity() {
             } else {
                 binding.shimmerAccountInfo.visibility = View.GONE
                 binding.llAccountInfoContent.visibility = View.VISIBLE
+                if (animate) AnimationHelper.animateChildren(binding.llAccountInfoContent)
             }
             binding.shimmerReferEarn.stopShimmer()
             binding.shimmerReferEarn.visibility = View.GONE
@@ -202,7 +208,7 @@ class MyAccountActivity : BaseActivity() {
             } else {
                 binding.shimmerReferEarn.visibility = View.GONE
                 binding.llReferEarnContent.visibility = View.VISIBLE
-                AnimationHelper.animateChildren(binding.llReferEarnContent as ViewGroup)
+                if (animate) AnimationHelper.animateChildren(binding.llReferEarnContent)
             }
             binding.shimmerAccountInfo.stopShimmer()
             binding.shimmerAccountInfo.visibility = View.GONE

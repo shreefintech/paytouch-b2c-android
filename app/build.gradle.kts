@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -12,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.shreefintech.paytouchconsumer"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 5
         versionName = "1.4"
 
@@ -77,6 +78,7 @@ dependencies {
     // Firebase — versions managed by the BoM
     implementation(platform("com.google.firebase:firebase-bom:34.14.0"))
     implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-crashlytics")
 
     // Location — single current-location fetch + "turn on location" resolution dialog
     implementation("com.google.android.gms:play-services-location:21.3.0")

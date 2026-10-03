@@ -36,6 +36,13 @@ object Constant {
     // A later denial with no rationale then means "Don't ask again" rather than a tap-outside dismiss.
     const val KEY_CAMERA_DENIED = "CAMERA_DENIED"
 
+    // KYC local files (under filesDir, exposed via file_provider_paths.xml) — each owning
+    // Activity deletes its own directory when it finishes so ID documents are not retained.
+    const val KYC_SELFIE_DIR = "kyc"
+    const val KYC_IDENTITY_DOCS_DIR = "kyc_docs/identity"
+    const val KYC_BANK_DOCS_DIR = "kyc_docs/bank"
+    const val KYC_IMAGE_MAX_BYTES = 800 * 1024
+
     // External URLs
     const val URL_PLATFORM_TERMS = "https://www.paytouch.in/terms/platform"
     const val URL_GOOGLE_DOC_VIEWER = "https://docs.google.com/gviewer?embedded=true&url="
@@ -74,9 +81,7 @@ object Constant {
     // Transaction type values returned by /api/transactions/{id}
     const val TRANSACTION_TYPE_HDFC = "hdfc_smartgateway"
 
-    // Image storage — sub-folders of filesDir; must match <files-path> entries in file_provider_paths.xml
-    const val DIR_KYC_SELFIE = "kyc"
-    const val DIR_KYC_DOCS = "kyc_docs"
+    // Image storage — sub-folder of filesDir; must match <files-path> entries in file_provider_paths.xml
     const val DIR_RECEIPTS = "receipts"
 
 }

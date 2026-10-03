@@ -1,15 +1,23 @@
 package com.shreefintech.paytouchconsumer.kyc.bank
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
@@ -31,6 +39,7 @@ import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class BankDetailsActivity : BaseActivity() {
 
@@ -58,6 +67,9 @@ class BankDetailsActivity : BaseActivity() {
         binding = ActivityBankDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Fresh launch: nothing references earlier bank proofs, so drop any left by a killed process.
+        if (savedInstanceState == null) Utility.deleteKycDirs(mActivity, Constant.KYC_BANK_DOCS_DIR)
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val imeInsets  = insets.getInsets(WindowInsetsCompat.Type.ime())
@@ -82,7 +94,42 @@ class BankDetailsActivity : BaseActivity() {
 
         onBack()
         setupFilePicker()
+        setupTermsText()
         initBankCards()
+    }
+
+    private fun setupTermsText() {
+        val fullText = getString(R.string.msgAgreeTAndC)
+        val linkText = getString(R.string.labelTermsAndConditions)
+        val start = fullText.indexOf(linkText)
+        if (start < 0) {
+            binding.tvTerms.text = fullText
+            return
+        }
+        val spannable = SpannableString(fullText)
+        spannable.setSpan(
+            object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    if (Utility.stopClick()) return
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    } catch (e: ActivityNotFoundException) {
+                        ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                    }
+                }
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = ContextCompat.getColor(mActivity, R.color.primary)
+                    ds.isUnderlineText = true
+                }
+            },
+            start,
+            start + linkText.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        binding.tvTerms.text = spannable
+        binding.tvTerms.movementMethod = LinkMovementMethod.getInstance()
+        binding.tvTerms.highlightColor = Color.TRANSPARENT
     }
 
     private fun onBack() {
@@ -133,7 +180,7 @@ class BankDetailsActivity : BaseActivity() {
         val openPicker = View.OnClickListener {
             if (Utility.stopClick()) return@OnClickListener
             activeCardIndex = bankCardBindings.indexOf(card)
-            filePickerUtil.showSourceChooser(java.io.File(filesDir, Constant.DIR_KYC_DOCS))
+            filePickerUtil.showSourceChooser(File(filesDir, Constant.KYC_BANK_DOCS_DIR))
         }
         card.flUpload1.setOnClickListener(openPicker)
         card.ivEditProof1.setOnClickListener(openPicker)
@@ -231,13 +278,22 @@ class BankDetailsActivity : BaseActivity() {
         filePickerUtil = FilePickerUtil(this)
         filePickerUtil.onSuccess = { result -> applyProofToActiveCard(result.uri) }
         filePickerUtil.onError   = { error ->
-            ToastUtil.showDelete(mActivity, filePickerUtil.getErrorMessage(error))
+            // Blocked → Settings opens on top, so an in-window toast would never be seen.
+            ToastUtil.showDelete(
+                mActivity,
+                filePickerUtil.getErrorMessage(error),
+                inWindow = error != FilePickerUtil.FilePickerError.CameraPermissionBlocked
+            )
         }
     }
 
     private fun applyProofToActiveCard(uri: Uri) {
         val index = activeCardIndex
-        if (index !in bankCardBindings.indices) return
+        if (index !in bankCardBindings.indices) {
+            // Target card did not survive process death — ask the user to pick again.
+            ToastUtil.showDelete(mActivity, getString(R.string.msgReselectDocument))
+            return
+        }
         proofUris[index] = uri
 
         val card = bankCardBindings[index]
@@ -250,6 +306,7 @@ class BankDetailsActivity : BaseActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val bmp = Utility.renderPdfFirstPage(mActivity, uri)
                 withContext(Dispatchers.Main) {
+                    if (isDestroyed || isFinishing) return@withContext
                     if (bmp != null) Glide.with(mActivity as Context).load(bmp).into(card.ivPreviewProof)
                 }
             }
@@ -360,7 +417,6 @@ class BankDetailsActivity : BaseActivity() {
                         onLoading = {},
                         onSuccess = {
                             showProgressSubmit.set(false)
-                            Utility.deleteKycImages(mActivity)
                             ToastUtil.showSuccess(mActivity, getString(R.string.msgBankDetailsSubmitSuccess), inWindow = false)
                             setResult(1)
                             finish()
@@ -397,5 +453,11 @@ class BankDetailsActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        // Submitted, abandoned or logged out — the captured bank proofs are no longer needed.
+        if (isFinishing) Utility.deleteKycDirs(mActivity, Constant.KYC_BANK_DOCS_DIR)
+        super.onDestroy()
     }
 }

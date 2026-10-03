@@ -25,28 +25,32 @@ import java.io.FileOutputStream
 
 object ReceiptHelper {
 
-    fun captureViewAsBitmap(view: View): Bitmap {
+    fun captureViewAsBitmap(view: View): Bitmap? {
         val scale = 2f
-        val bitmap = Bitmap.createBitmap(
-            (view.width * scale).toInt().coerceAtLeast(1),
-            (view.height * scale).toInt().coerceAtLeast(1),
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-        canvas.scale(scale, scale)
-        val cornerRadius = (view as? MaterialCardView)?.radius ?: 0f
-        if (cornerRadius > 0f) {
-            val path = Path().apply {
-                addRoundRect(
-                    RectF(0f, 0f, view.width.toFloat(), view.height.toFloat()),
-                    cornerRadius, cornerRadius,
-                    Path.Direction.CW
-                )
+        return try {
+            val bitmap = Bitmap.createBitmap(
+                (view.width * scale).toInt().coerceAtLeast(1),
+                (view.height * scale).toInt().coerceAtLeast(1),
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            canvas.scale(scale, scale)
+            val cornerRadius = (view as? MaterialCardView)?.radius ?: 0f
+            if (cornerRadius > 0f) {
+                val path = Path().apply {
+                    addRoundRect(
+                        RectF(0f, 0f, view.width.toFloat(), view.height.toFloat()),
+                        cornerRadius, cornerRadius,
+                        Path.Direction.CW
+                    )
+                }
+                canvas.clipPath(path)
             }
-            canvas.clipPath(path)
+            view.draw(canvas)
+            bitmap
+        } catch (e: OutOfMemoryError) {
+            null
         }
-        view.draw(canvas)
-        return bitmap
     }
 
     fun saveBitmapAndGetUri(context: Context, bitmap: Bitmap): Uri? {
@@ -76,7 +80,7 @@ object ReceiptHelper {
                 FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Utility.logError(e)
             null
         }
     }
@@ -95,12 +99,12 @@ object ReceiptHelper {
     }
 
     fun performDownload(context: Context, view: View): Uri? {
-        val bitmap = captureViewAsBitmap(view)
+        val bitmap = captureViewAsBitmap(view) ?: return null
         return saveBitmapAndGetUri(context, bitmap)
     }
 
     fun shareReceipt(activity: Activity, view: View, title: String, onFailure: (() -> Unit)? = null) {
-        val bitmap = captureViewAsBitmap(view)
+        val bitmap = captureViewAsBitmap(view) ?: run { onFailure?.invoke(); return }
         try {
             val dir = File(activity.filesDir, Constant.DIR_RECEIPTS).also { it.mkdirs() }
             // filesDir is never cleared by the OS — drop older receipts so only the latest is kept
@@ -115,7 +119,7 @@ object ReceiptHelper {
             }
             activity.startActivity(Intent.createChooser(intent, title))
         } catch (e: Exception) {
-            e.printStackTrace()
+            Utility.logError(e)
             onFailure?.invoke()
         }
     }
