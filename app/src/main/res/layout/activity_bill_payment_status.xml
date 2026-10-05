@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg">
+
+        <!-- Toolbar -->
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <!-- GIF -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivGif"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@id/tvStatusLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar" />
+
+        <!-- Status title -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvStatusLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:fontFamily="@font/proza_libre_bold"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_20"
+            app:layout_constraintBottom_toTopOf="@id/tvStatusDescription"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Status description -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvStatusDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginBottom="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_regular"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintBottom_toTopOf="@id/cvDetails"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Details card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvDetails"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+            android:layout_marginBottom="@dimen/margin_xlarge"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="@dimen/normal_card_radius"
+            app:cardElevation="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/margin_extra_large"
+                android:paddingVertical="@dimen/margin_large">
+
+                <!-- Amount label -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAmountLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/sub_text_color"
+                    android:textSize="@dimen/text_size_13" />
+
+                <!-- Amount value -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="@dimen/margin_medium"
+                    android:background="@color/sheet_divider" />
+
+                <!-- Transaction ID row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:includeFontPadding="false"
+                        android:text="@string/labelOrderId"
+                        android:textColor="@color/sub_text_color"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvTransactionId"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_small"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivCopyId"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="@dimen/margin_small"
+                        android:onClickListener="@{onClickListener}"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_copy"
+                        app:tint="@color/black" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

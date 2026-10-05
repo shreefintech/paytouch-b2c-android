@@ -1,14 +1,11 @@
 package com.shreefintech.paytouchconsumer.retrofit.model.postpaid
 
 import com.google.gson.annotations.SerializedName
+import com.shreefintech.paytouchconsumer.retrofit.model.BillPaymentDataItem
 
 data class PostpaidPaymentItem(
     @field:SerializedName("success")        val success: Boolean?,
     @field:SerializedName("message")        val message: String?,
-    @field:SerializedName("req_id")         val reqId: String?,
-    @field:SerializedName("amount")         val amount: Double?,
-    @field:SerializedName("platform_fee")   val platformFee: Double?,
-    @field:SerializedName("total_payable")  val totalPayable: Double?,
-    @field:SerializedName("status")         val status: String?,
-    @field:SerializedName("transaction_id") val transactionId: String?
+    @field:SerializedName("payment_status") val paymentStatus: String?,
+    @field:SerializedName("data")           val data: BillPaymentDataItem?
 )

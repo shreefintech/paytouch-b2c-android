@@ -27,6 +27,8 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityGasBinding
 import com.shreefintech.paytouchconsumer.gas.transactions.GasRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.gas.transactions.GasSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionReportActivity
 import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.gas.viewmodel.GasViewModel
@@ -242,9 +244,17 @@ class GasActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                GasSmsReceiptActivity.start(mActivity, fromPayment = true)
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_GAS
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
