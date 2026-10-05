@@ -4,16 +4,16 @@ import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.content.res.ColorStateList
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.content.res.ColorStateList
+import android.os.Bundle
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.widget.TextViewCompat
 import androidx.databinding.ObservableBoolean
-import android.content.Intent
-import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -475,6 +475,7 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun playWithdrawSound(soundRes: Int) {
+        releaseWithdrawSound()
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager
         if (audioManager?.ringerMode != AudioManager.RINGER_MODE_NORMAL) return
         try {
