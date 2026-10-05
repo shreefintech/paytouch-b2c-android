@@ -28,6 +28,8 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityFastagBinding
 import com.shreefintech.paytouchconsumer.fastag.transactions.FastagRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.fastag.transactions.FastagSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.fastag.transactions.FastagTransactionReportActivity
 import com.shreefintech.paytouchconsumer.fastag.transactions.FastagTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.fastag.viewmodel.FastagViewModel
@@ -198,9 +200,17 @@ class FastagActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                FastagSmsReceiptActivity.start(mActivity, true)
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_FASTAG
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)

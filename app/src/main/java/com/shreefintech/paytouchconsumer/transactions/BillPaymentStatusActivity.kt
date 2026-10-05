@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.loadwallet
+package com.shreefintech.paytouchconsumer.transactions
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -23,27 +23,34 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.databinding.ActivityPaymentStatusBinding
-import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
-import com.shreefintech.paytouchconsumer.utill.AnimationHelper
+import com.shreefintech.paytouchconsumer.databinding.ActivityBillPaymentStatusBinding
+import com.shreefintech.paytouchconsumer.dth.transactions.DthSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.fastag.transactions.FastagSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.gas.transactions.GasSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.loan.transactions.LoanSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.utill.StatusSoundPlayer
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 
-class PaymentStatusActivity : BaseActivity() {
+class BillPaymentStatusActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityPaymentStatusBinding
+    private lateinit var binding: ActivityBillPaymentStatusBinding
 
-    private val passItem: PaymentStatusItem? by lazy {
+    private val passItem: BillPaymentStatusItem? by lazy {
         intent.getStringExtra(EXTRA_ITEM)
-            ?.let { Gson().fromJson(it, PaymentStatusItem::class.java) }
+            ?.let { Gson().fromJson(it, BillPaymentStatusItem::class.java) }
     }
-    private val orderId: String by lazy { passItem?.orderId ?: "" }
+    private val transactionId: String by lazy { passItem?.transactionId ?: "--" }
     private val amount: String by lazy { passItem?.amount ?: "" }
     private val statusStr: String by lazy { passItem?.status ?: "" }
+    private val category: String by lazy { passItem?.category ?: "" }
 
     private val autoFinishHandler = Handler(Looper.getMainLooper())
     private var isNavigating = false
@@ -51,11 +58,22 @@ class PaymentStatusActivity : BaseActivity() {
     private var isSoundPlayed = false
 
     companion object {
-        private const val EXTRA_ITEM = "extra_item"
+        const val CATEGORY_ELECTRICITY  = "ELECTRICITY"
+        const val CATEGORY_DTH          = "DTH"
+        const val CATEGORY_GAS          = "GAS"
+        const val CATEGORY_LOAN         = "LOAN"
+        const val CATEGORY_MUNICIPAL_TAX = "MUNICIPAL_TAX"
+        const val CATEGORY_PREPAID      = "PREPAID"
+        const val CATEGORY_FASTAG       = "FASTAG"
+        const val CATEGORY_POSTPAID     = "POSTPAID"
 
-        fun start(context: Context, item: PaymentStatusItem) {
+        private const val EXTRA_ITEM    = "extra_item"
+        private const val STATUS_SUCCESS = "SUCCESS"
+        private const val STATUS_FAILED  = "FAILED"
+
+        fun start(context: Context, item: BillPaymentStatusItem) {
             context.startActivity(
-                Intent(context, PaymentStatusActivity::class.java).apply {
+                Intent(context, BillPaymentStatusActivity::class.java).apply {
                     putExtra(EXTRA_ITEM, Gson().toJson(item))
                 }
             )
@@ -64,7 +82,7 @@ class PaymentStatusActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPaymentStatusBinding.inflate(layoutInflater)
+        binding = ActivityBillPaymentStatusBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { view, insets ->
@@ -76,7 +94,7 @@ class PaymentStatusActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.lytToolbar.ivBack.gone()
         populateStatus(statusStr)
-        autoFinishHandler.postDelayed({ goToWallet() }, 5000L)
+        autoFinishHandler.postDelayed({ openReceipt() }, 5000L)
         onBack()
     }
 
@@ -93,7 +111,8 @@ class PaymentStatusActivity : BaseActivity() {
         binding.tvStatusLabel.setTextColor(statusColor)
         binding.tvStatusDescription.text = display.description
         binding.tvAmountLabel.text = display.amountLabel
-        binding.tvOrderId.text = orderId
+        binding.tvTransactionId.text = transactionId
+        binding.ivCopyId.visibility = if (transactionId == "--") View.GONE else View.VISIBLE
         binding.tvAmount.text = Utility.formatAmount(amount)
         binding.tvAmount.setTextColor(statusColor)
         loadGif(display.gifRes, display.soundRes)
@@ -110,7 +129,7 @@ class PaymentStatusActivity : BaseActivity() {
 
     private fun resolveStatus(status: String): StatusDisplay {
         return when (status.uppercase()) {
-            Constant.HDFC_STATUS_CHARGED, Constant.HDFC_STATUS_AUTHORIZED -> StatusDisplay(
+            STATUS_SUCCESS -> StatusDisplay(
                 label = getString(R.string.msgPaymentSuccessful),
                 description = getString(R.string.msgPaymentSuccessDescription),
                 amountLabel = getString(R.string.labelAmountPaid),
@@ -118,26 +137,7 @@ class PaymentStatusActivity : BaseActivity() {
                 gifRes = R.drawable.gif_success,
                 soundRes = R.raw.success_sound
             )
-
-            Constant.HDFC_STATUS_NEW -> StatusDisplay(
-                label = getString(R.string.msgPaymentInitiated),
-                description = getString(R.string.msgPaymentInitiatedDescription),
-                amountLabel = getString(R.string.labelAmountPending),
-                statusColorRes = R.color.colorStatusPending,
-                gifRes = R.drawable.gif_pending,
-                soundRes = R.raw.pending_sound
-            )
-
-            Constant.HDFC_STATUS_PENDING_VBV, Constant.HDFC_STATUS_AUTHORIZING, Constant.HDFC_STATUS_STARTED -> StatusDisplay(
-                label = getString(R.string.msgPaymentProcessing),
-                description = getString(R.string.msgPaymentPendingDescription),
-                amountLabel = getString(R.string.labelAmountPending),
-                statusColorRes = R.color.colorStatusPending,
-                gifRes = R.drawable.gif_pending,
-                soundRes = R.raw.pending_sound
-            )
-
-            Constant.HDFC_STATUS_JUSPAY_DECLINED, Constant.HDFC_STATUS_AUTHENTICATION_FAILED, Constant.HDFC_STATUS_AUTHORIZATION_FAILED -> StatusDisplay(
+            STATUS_FAILED -> StatusDisplay(
                 label = getString(R.string.msgPaymentFailed),
                 description = getString(R.string.msgPaymentFailedDescription),
                 amountLabel = getString(R.string.labelAmountFailed),
@@ -145,16 +145,6 @@ class PaymentStatusActivity : BaseActivity() {
                 gifRes = R.drawable.gif_rejected,
                 soundRes = R.raw.failed_sound
             )
-
-            Constant.HDFC_STATUS_AUTO_REFUNDED -> StatusDisplay(
-                label = getString(R.string.msgAmountRefunded),
-                description = getString(R.string.msgPaymentRefundedDescription),
-                amountLabel = getString(R.string.labelAmountRefunded),
-                statusColorRes = R.color.colorStatusFailed,
-                gifRes = R.drawable.gif_rejected,
-                soundRes = R.raw.failed_sound
-            )
-
             else -> StatusDisplay(
                 label = getString(R.string.msgPaymentPending),
                 description = getString(R.string.msgPaymentPendingDescription),
@@ -174,21 +164,14 @@ class PaymentStatusActivity : BaseActivity() {
             .error(R.drawable.ic_file_not_found)
             .listener(object : RequestListener<GifDrawable> {
                 override fun onLoadFailed(
-                    p0: GlideException?,
-                    p1: Any?,
-                    p2: Target<GifDrawable?>,
-                    p3: Boolean
+                    p0: GlideException?, p1: Any?, p2: Target<GifDrawable?>, p3: Boolean
                 ): Boolean = false
 
                 override fun onResourceReady(
-                    resource: GifDrawable,
-                    model: Any,
-                    target: Target<GifDrawable>?,
-                    dataSource: DataSource,
-                    isFirstResource: Boolean
+                    resource: GifDrawable, model: Any,
+                    target: Target<GifDrawable>?, dataSource: DataSource, isFirstResource: Boolean
                 ): Boolean {
                     resource.setLoopCount(1)
-                    // Glide starts the GIF right after this returns — start the sound with it.
                     playSound(soundRes)
                     return false
                 }
@@ -197,37 +180,41 @@ class PaymentStatusActivity : BaseActivity() {
     }
 
     private fun playSound(@RawRes soundRes: Int) {
-        // Glide can deliver the resource again (e.g. memory-cache reload) — the sound plays once per screen.
         if (isSoundPlayed || isFinishing || isDestroyed) return
         isSoundPlayed = true
         soundPlayer.play(mActivity, soundRes)
     }
 
-    private fun copyOrderId() {
+    private fun copyTransactionId() {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("order_id", orderId))
+        clipboard.setPrimaryClip(ClipData.newPlainText("transaction_id", transactionId))
         ToastUtil.showSuccess(mActivity, getString(R.string.msgOrderIdCopied))
-        binding.ivCopyOrderId.setImageResource(R.drawable.ic_toast_tick)
-        autoFinishHandler.postDelayed({ binding.ivCopyOrderId.setImageResource(R.drawable.ic_copy) }, 1500L)
+        binding.ivCopyId.setImageResource(R.drawable.ic_toast_tick)
+        autoFinishHandler.postDelayed({ binding.ivCopyId.setImageResource(R.drawable.ic_copy) }, 1500L)
     }
 
-    private fun goToWallet() {
+    private fun openReceipt() {
         if (isNavigating) return
         isNavigating = true
         autoFinishHandler.removeCallbacksAndMessages(null)
-        startActivity(
-            Intent(this, LoadWalletActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                putExtra(Constant.EXTRA_FROM_PAYMENT, true)
-            }
-        )
+        when (category) {
+            CATEGORY_ELECTRICITY   -> SmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_DTH           -> DthSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_GAS           -> GasSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_LOAN          -> LoanSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_MUNICIPAL_TAX -> MunicipalTaxSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_PREPAID       -> PrepaidSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_FASTAG        -> FastagSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_POSTPAID      -> PostpaidSmsReceiptActivity.start(mActivity, fromPayment = true)
+            else -> Utility.logError(IllegalStateException("BillPaymentStatusActivity: unknown category $category"))
+        }
         finish()
     }
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                goToWallet()
+                openReceipt()
             }
         })
     }
@@ -235,11 +222,12 @@ class PaymentStatusActivity : BaseActivity() {
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->
             when (view) {
-                binding.ivCopyOrderId -> {
+                binding.ivCopyId -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    copyOrderId()
+                    copyTransactionId()
                 }
             }
         }
     }
+
 }

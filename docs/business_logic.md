@@ -420,12 +420,16 @@ Transaction IDs are **generated and returned by the backend** in the `process-pa
 | `AUTH` | `PENDING_ORDER_ID` | String | HDFC order ID in progress (cleared after status check) |
 | `AUTH` | `PENDING_AMOUNT` | String | HDFC payment amount in progress (cleared after status check) |
 | `app_prefs` | `mpin_created` | Boolean | MPIN setup complete |
-| `app_prefs` | `LAST_INTERACTION` | String (Long ms) | Timestamp of last API call — used for idle session timeout |
 
 ### Rules
 - Token is checked at Splash; no token → go to Login
 - Any 401 response → clear ALL SharedPreferences → launch LoginActivity with `FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK`
-- **Idle session timeout (API-call based):** `LAST_INTERACTION` is written by `SessionInterceptor` on every API call while the user is logged in (both `ApiClient` and `ApiAdminClient`), and once by `LoginViewModel` at login. `BaseActivity` calls `checkSessionTimeout()` in `onResume()` and then every 30 seconds (`SESSION_CHECK_INTERVAL_MS`) until `onPause()`. If the elapsed time since `LAST_INTERACTION` exceeds `SESSION_TIMEOUT_MS` (10 minutes), the session is cleared and `LoginActivity` is launched with a cleared back stack. Touch events do **not** reset the timer — the touch-based `onUserInteraction()` approach was intentionally removed in B2C-145.
+- **App lock (replaces the old 10-minute idle logout):** `applock/AppLockHelper` (registered in `MyApp`) shows `AppLockActivity`, which asks for the phone's own screen lock (fingerprint / face / PIN / pattern via `BiometricPrompt`, `BIOMETRIC_WEAK or DEVICE_CREDENTIAL`). The app does **not** log out; only a 401 does.
+  - Locks on a cold start with a saved session, and when the app returns from the background after more than `APP_LOCK_GRACE_MS` (1 min).
+  - When the app itself opened another app (camera, file picker, UPI app, HDFC gateway, share, browser), the grace period is `APP_LOCK_EXTERNAL_GRACE_MS` (5 min). `BaseActivity.startActivityForResult()` detects these launches, so no per-screen code is needed.
+  - Time away is measured with `SystemClock.elapsedRealtime()`, so changing the phone clock can't skip the lock.
+  - Exempt screens: Splash and the auth flow (Login, Create Account, OTP, Reset Password, Reset MPIN). A credential login (`LoginViewModel.saveSession()`) counts as unlocked.
+  - Lock screen (GPay-style): `AppLockActivity` is a transparent window, so the screen the user left stays visible behind the system prompt but cannot be touched. Cancel dims it and shows a bottom Unlock panel; Back closes the app. It must not set `screenOrientation` (a translucent Activity with a fixed orientation crashes on API 26). If the phone has no screen lock set, the lock is skipped.
 - `isLoggedIn()` = token is not null AND userId > 0
 
 ---

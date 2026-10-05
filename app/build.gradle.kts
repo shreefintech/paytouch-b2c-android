@@ -14,8 +14,8 @@ android {
         applicationId = "com.shreefintech.paytouchconsumer"
         minSdk = 24
         targetSdk = 37
-        versionCode = 5
-        versionName = "1.4"
+        versionCode = 7
+        versionName = "1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,6 +38,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
     }
 }
 
@@ -65,8 +70,7 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
-    // Animated WebP decoding on API < 28 (version suffix must match the Glide version)
-    implementation("com.github.zjupure:webpdecoder:2.6.4.16.0")
+    implementation("com.github.zjupure:webpdecoder:2.7.4.16.0")
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
@@ -88,4 +92,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.4.2")
     implementation("androidx.camera:camera-view:1.4.2")
     implementation("com.google.mlkit:face-detection:16.1.7")
+
+    // App lock — phone's own screen lock (fingerprint / face / PIN / pattern)
+    implementation("androidx.biometric:biometric:1.1.0")
 }

@@ -28,6 +28,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityMunicipalTaxBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxTransactionReportActivity
 import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.municipaltax.viewmodel.MunicipalTaxViewModel
@@ -243,10 +245,18 @@ class MunicipalTaxActivity : BaseActivity() {
             dueDate      = fetchedBillItem?.dueDate ?: "",
             opName       = selectedOperatorName ?: "",
             onLoading    = { showProgressPay.set(true) },
-            onSuccess    = { _ ->
+            onSuccess    = { body ->
                 showProgressPay.set(false)
-                MunicipalTaxSmsReceiptActivity.start(mActivity, fromPayment = true)
                 onReset()
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_MUNICIPAL_TAX
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)

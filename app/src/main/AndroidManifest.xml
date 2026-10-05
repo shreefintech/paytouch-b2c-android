@@ -67,6 +67,10 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".applock.AppLockActivity"
+            android:exported="false"
+            android:theme="@style/Theme.PaytouchConsumer.AppLock" />
+        <activity
             android:name="com.shreefintech.paytouchconsumer.kyc.KycActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -327,6 +331,10 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".loadwallet.PaymentStatusActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".transactions.BillPaymentStatusActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 

@@ -50,9 +50,9 @@ object Constant {
     // Circle IDs for bill payment modules
     const val LOAN_CIRCLE_ID = "0"
 
-    // Session timeout
-    const val KEY_LAST_INTERACTION = "LAST_INTERACTION"
-    const val SESSION_TIMEOUT_MS = 10 * 60 * 1000L
+    // App lock — time away before the phone's screen lock is asked again
+    const val APP_LOCK_GRACE_MS = 60 * 1000L                // normal app switch
+    const val APP_LOCK_EXTERNAL_GRACE_MS = 5 * 60 * 1000L   // camera, file picker, UPI app, payment gateway, share, browser
 
     // Auth flow type extras
     const val EXTRA_FLOW_TYPE = "FLOW_TYPE"
@@ -74,6 +74,13 @@ object Constant {
     const val HDFC_STATUS_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED"
     const val HDFC_STATUS_AUTHORIZATION_FAILED = "AUTHORIZATION_FAILED"
     const val HDFC_STATUS_AUTO_REFUNDED = "AUTO_REFUNDED"
+
+    // Wallet withdrawal — status values (compared case-insensitively)
+    const val WITHDRAW_STATUS_SUCCESS = "SUCCESS"
+    const val WITHDRAW_STATUS_COMPLETED = "COMPLETED"
+    const val WITHDRAW_STATUS_FAILED = "FAILED"
+    const val WITHDRAW_STATUS_REJECTED = "REJECTED"
+    const val WITHDRAW_STATUS_REVERSED = "REVERSED"
 
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"

@@ -27,6 +27,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransactionReportActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidViewModel
@@ -238,9 +240,17 @@ class PrepaidActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                PrepaidSmsReceiptActivity.start(mActivity, fromPayment = true)
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_PREPAID
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)

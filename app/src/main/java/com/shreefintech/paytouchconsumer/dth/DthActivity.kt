@@ -26,6 +26,8 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDthBinding
 import com.shreefintech.paytouchconsumer.dth.transactions.DthRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.dth.transactions.DthSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.dth.transactions.DthTransactionReportActivity
 import com.shreefintech.paytouchconsumer.dth.transactions.DthTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.dth.viewmodel.DthViewModel
@@ -216,9 +218,17 @@ class DthActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                DthSmsReceiptActivity.start(mActivity, fromPayment = true)
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_DTH
+                    )
+                )
                 finish()
             },
             onError = { msg ->

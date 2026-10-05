@@ -56,6 +56,7 @@ Write production-ready Kotlin/MVVM Android code — readable, performant, scalab
 ```
 com.shreefintech.paytouchconsumer/
 ├── auth/           # Login, OTP, password/MPIN flows, create-account
+├── applock/        # AppLockHelper (lifecycle-based lock rules) + AppLockActivity (phone screen lock prompt)
 ├── kyc/            # KYC hub (KycActivity), identity verification (kyc/identity/IdentityVerificationActivity), bank details (kyc/bank/BankDetailsActivity), KYC status (KycStatusActivity); virtual account is handled server-side — no client Activity
 ├── home/           # Home/Dashboard screen (HomeActivity — currently at root level, will move here)
 ├── electricity/    # Electricity bill payment + transaction history (canonical module template)

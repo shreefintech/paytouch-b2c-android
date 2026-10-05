@@ -30,6 +30,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityLoanBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loan.transactions.LoanRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.loan.transactions.LoanSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.loan.transactions.LoanTransactionReportActivity
 import com.shreefintech.paytouchconsumer.loan.transactions.LoanTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.loan.viewmodel.LoanViewModel
@@ -244,10 +246,18 @@ class LoanActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                LoanSmsReceiptActivity.start(mActivity, fromPayment = true)
                 onReset()
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_LOAN
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
