@@ -164,6 +164,21 @@ class CreateAccountActivity : BaseActivity() {
                 getString(R.string.msgPasswordShort)
             }
 
+            !password.any { it.isUpperCase() } -> {
+                binding.etPassword.requestFocus()
+                getString(R.string.msgPasswordWeak)
+            }
+
+            !password.any { it.isDigit() } -> {
+                binding.etPassword.requestFocus()
+                getString(R.string.msgPasswordWeak)
+            }
+
+            !password.any { !it.isLetterOrDigit() } -> {
+                binding.etPassword.requestFocus()
+                getString(R.string.msgPasswordWeak)
+            }
+
             confirmPassword.isEmpty() -> {
                 binding.etConfirmPassword.requestFocus()
                 getString(R.string.msgConfirmPasswordEmpty)
