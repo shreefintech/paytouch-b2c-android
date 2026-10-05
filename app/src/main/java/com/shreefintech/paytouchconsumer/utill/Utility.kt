@@ -28,6 +28,7 @@ import java.io.File
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 
 object Utility {
 
@@ -47,6 +48,8 @@ object Utility {
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
         val cleaned = createdAt.substringBefore(".").substringBefore("+")
+        val utc = TimeZone.getTimeZone("UTC")
+        val ist = TimeZone.getTimeZone("Asia/Kolkata")
         val inputFormats = listOf(
             "yyyy-MM-dd'T'HH:mm:ss",
             "dd/MM/yyyy hh:mm a",
@@ -54,10 +57,10 @@ object Utility {
             "dd/MM/yyyy",
             "yyyy-MM-dd"
         )
-        val output = SimpleDateFormat(format, Locale.getDefault())
+        val output = SimpleDateFormat(format, Locale.getDefault()).apply { timeZone = ist }
         for (pattern in inputFormats) {
             try {
-                val date = SimpleDateFormat(pattern, Locale.getDefault()).parse(cleaned)
+                val date = SimpleDateFormat(pattern, Locale.getDefault()).apply { timeZone = utc }.parse(cleaned)
                 if (date != null) return output.format(date)
             } catch (_: Exception) {
             }
