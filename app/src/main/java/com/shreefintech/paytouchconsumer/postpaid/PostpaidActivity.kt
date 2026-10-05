@@ -27,6 +27,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityPostpaidBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionReportActivity
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidViewModel
@@ -211,9 +213,17 @@ class PostpaidActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                PostpaidSmsReceiptActivity.start(mActivity, true)
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_POSTPAID
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)

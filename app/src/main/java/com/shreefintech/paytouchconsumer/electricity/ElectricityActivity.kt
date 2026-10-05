@@ -29,6 +29,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
 import com.shreefintech.paytouchconsumer.electricity.transactions.ElectricityTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.electricity.viewmodel.ElectricityViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -242,9 +244,17 @@ class ElectricityActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                SmsReceiptActivity.start(mActivity, fromPayment = true)
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_ELECTRICITY
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
