@@ -229,6 +229,7 @@ class DthActivity : BaseActivity() {
                         category = BillPaymentStatusActivity.CATEGORY_DTH
                     )
                 )
+                finish()
             },
             onError = { msg ->
                 showProgressPay.set(false)
