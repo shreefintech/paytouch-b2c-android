@@ -6,22 +6,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/img_screen_bg">
 
-    <!-- TODO(B2C-189): seasonal Navratri artwork — remove after the festival. -->
-    <androidx.appcompat.widget.AppCompatImageView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:importantForAccessibility="no"
-        app:layout_constraintWidth_max="270dp"
-        app:layout_constraintHeight_max="270dp"
-        android:src="@drawable/img_navratri_splash_bg"
-        android:alpha="0.5"
-        android:adjustViewBounds="true"
-        android:layout_marginBottom="@dimen/margin_medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivSplash"
         android:layout_width="match_parent"
