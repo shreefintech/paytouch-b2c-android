@@ -219,8 +219,9 @@ class BillPaymentStatusActivity : BaseActivity() {
             CATEGORY_LOAN          -> LoanSmsReceiptActivity.start(mActivity, fromPayment = true)
             CATEGORY_MUNICIPAL_TAX -> MunicipalTaxSmsReceiptActivity.start(mActivity, fromPayment = true)
             CATEGORY_PREPAID       -> PrepaidSmsReceiptActivity.start(mActivity, fromPayment = true)
-            CATEGORY_FASTAG        -> FastagSmsReceiptActivity.start(mActivity, true)
-            CATEGORY_POSTPAID      -> PostpaidSmsReceiptActivity.start(mActivity, true)
+            CATEGORY_FASTAG        -> FastagSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_POSTPAID      -> PostpaidSmsReceiptActivity.start(mActivity, fromPayment = true)
+            else -> Utility.logError(IllegalStateException("BillPaymentStatusActivity: unknown category $category"))
         }
         finish()
     }

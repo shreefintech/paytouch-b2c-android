@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.content.res.ColorStateList
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -80,6 +82,7 @@ class LoadWalletActivity : BaseActivity() {
     private var withdrawSuccessDialog: Dialog? = null
     private var withdrawSuccessDialogBinding: DialogWithdrawSuccessBinding? = null
     private var withdrawRequestId: String? = null
+    private var withdrawMediaPlayer: MediaPlayer? = null
 
     private var isWalletEntrancePlayed = false
     private var isWalletLoading = false
@@ -190,6 +193,7 @@ class LoadWalletActivity : BaseActivity() {
 
     override fun onDestroy() {
         withdrawSuccessDialog?.dismiss()
+        releaseWithdrawSound()
         super.onDestroy()
     }
 
@@ -391,6 +395,12 @@ class LoadWalletActivity : BaseActivity() {
         }
 
         bindWithdrawDetails(dialogBinding, data)
+        val soundRes = when (data.status?.uppercase()) {
+            Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED -> R.raw.success_sound
+            Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> R.raw.failed_sound
+            else -> R.raw.pending_sound
+        }
+        playWithdrawSound(soundRes)
         dialog.show()
     }
 
@@ -462,6 +472,25 @@ class LoadWalletActivity : BaseActivity() {
                 chipTextColorRes = R.color.toast_text_warning
             )
         }
+    }
+
+    private fun playWithdrawSound(soundRes: Int) {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+        if (audioManager?.ringerMode != AudioManager.RINGER_MODE_NORMAL) return
+        try {
+            withdrawMediaPlayer = MediaPlayer.create(mActivity, soundRes)?.apply {
+                setOnCompletionListener { releaseWithdrawSound() }
+                start()
+            }
+        } catch (e: Exception) {
+            Utility.logError(e)
+            releaseWithdrawSound()
+        }
+    }
+
+    private fun releaseWithdrawSound() {
+        withdrawMediaPlayer?.release()
+        withdrawMediaPlayer = null
     }
 
     private fun copyWithdrawRequestId() {
