@@ -333,6 +333,10 @@
             android:name=".loadwallet.PaymentStatusActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".transactions.BillPaymentStatusActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".fcm.MyFirebaseMessagingService"
