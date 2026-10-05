@@ -6,8 +6,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.media.AudioManager
-import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -43,6 +41,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
+import com.shreefintech.paytouchconsumer.utill.StatusSoundPlayer
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -82,7 +81,7 @@ class LoadWalletActivity : BaseActivity() {
     private var withdrawSuccessDialog: Dialog? = null
     private var withdrawSuccessDialogBinding: DialogWithdrawSuccessBinding? = null
     private var withdrawRequestId: String? = null
-    private var withdrawMediaPlayer: MediaPlayer? = null
+    private val withdrawSoundPlayer = StatusSoundPlayer()
 
     private var isWalletEntrancePlayed = false
     private var isWalletLoading = false
@@ -193,7 +192,7 @@ class LoadWalletActivity : BaseActivity() {
 
     override fun onDestroy() {
         withdrawSuccessDialog?.dismiss()
-        releaseWithdrawSound()
+        withdrawSoundPlayer.release()
         super.onDestroy()
     }
 
@@ -400,7 +399,7 @@ class LoadWalletActivity : BaseActivity() {
             Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> R.raw.failed_sound
             else -> R.raw.pending_sound
         }
-        playWithdrawSound(soundRes)
+        withdrawSoundPlayer.play(mActivity, soundRes)
         dialog.show()
     }
 
@@ -472,26 +471,6 @@ class LoadWalletActivity : BaseActivity() {
                 chipTextColorRes = R.color.toast_text_warning
             )
         }
-    }
-
-    private fun playWithdrawSound(soundRes: Int) {
-        releaseWithdrawSound()
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager
-        if (audioManager?.ringerMode != AudioManager.RINGER_MODE_NORMAL) return
-        try {
-            withdrawMediaPlayer = MediaPlayer.create(mActivity, soundRes)?.apply {
-                setOnCompletionListener { releaseWithdrawSound() }
-                start()
-            }
-        } catch (e: Exception) {
-            Utility.logError(e)
-            releaseWithdrawSound()
-        }
-    }
-
-    private fun releaseWithdrawSound() {
-        withdrawMediaPlayer?.release()
-        withdrawMediaPlayer = null
     }
 
     private fun copyWithdrawRequestId() {

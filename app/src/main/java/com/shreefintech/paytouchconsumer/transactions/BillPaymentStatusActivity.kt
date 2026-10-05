@@ -4,8 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -36,6 +34,7 @@ import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxS
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
+import com.shreefintech.paytouchconsumer.utill.StatusSoundPlayer
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -55,7 +54,7 @@ class BillPaymentStatusActivity : BaseActivity() {
 
     private val autoFinishHandler = Handler(Looper.getMainLooper())
     private var isNavigating = false
-    private var mediaPlayer: MediaPlayer? = null
+    private val soundPlayer = StatusSoundPlayer()
     private var isSoundPlayed = false
 
     companion object {
@@ -102,7 +101,7 @@ class BillPaymentStatusActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         autoFinishHandler.removeCallbacksAndMessages(null)
-        releaseSound()
+        soundPlayer.release()
     }
 
     private fun populateStatus(status: String) {
@@ -113,6 +112,7 @@ class BillPaymentStatusActivity : BaseActivity() {
         binding.tvStatusDescription.text = display.description
         binding.tvAmountLabel.text = display.amountLabel
         binding.tvTransactionId.text = transactionId
+        binding.ivCopyId.visibility = if (transactionId == "--") View.GONE else View.VISIBLE
         binding.tvAmount.text = Utility.formatAmount(amount)
         binding.tvAmount.setTextColor(statusColor)
         loadGif(display.gifRes, display.soundRes)
@@ -182,22 +182,7 @@ class BillPaymentStatusActivity : BaseActivity() {
     private fun playSound(@RawRes soundRes: Int) {
         if (isSoundPlayed || isFinishing || isDestroyed) return
         isSoundPlayed = true
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager
-        if (audioManager?.ringerMode != AudioManager.RINGER_MODE_NORMAL) return
-        try {
-            mediaPlayer = MediaPlayer.create(mActivity, soundRes)?.apply {
-                setOnCompletionListener { releaseSound() }
-                start()
-            }
-        } catch (e: Exception) {
-            Utility.logError(e)
-            releaseSound()
-        }
-    }
-
-    private fun releaseSound() {
-        mediaPlayer?.release()
-        mediaPlayer = null
+        soundPlayer.play(mActivity, soundRes)
     }
 
     private fun copyTransactionId() {
