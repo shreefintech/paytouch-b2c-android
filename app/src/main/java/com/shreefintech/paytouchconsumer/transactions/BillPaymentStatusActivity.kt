@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import androidx.activity.viewModels
 import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
@@ -34,6 +35,7 @@ import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxS
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
+import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
 import com.shreefintech.paytouchconsumer.utill.StatusSoundPlayer
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -51,6 +53,8 @@ class BillPaymentStatusActivity : BaseActivity() {
     private val amount: String by lazy { passItem?.amount ?: "" }
     private val statusStr: String by lazy { passItem?.status ?: "" }
     private val category: String by lazy { passItem?.category ?: "" }
+
+    private val detailViewModel: TransactionHistoryDetailViewModel by viewModels()
 
     private val autoFinishHandler = Handler(Looper.getMainLooper())
     private var isNavigating = false
@@ -94,6 +98,7 @@ class BillPaymentStatusActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.lytToolbar.ivBack.gone()
         populateStatus(statusStr)
+        fetchConfirmedStatus()
         autoFinishHandler.postDelayed({ openReceipt() }, 5000L)
         onBack()
     }
@@ -193,19 +198,32 @@ class BillPaymentStatusActivity : BaseActivity() {
         autoFinishHandler.postDelayed({ binding.ivCopyId.setImageResource(R.drawable.ic_copy) }, 1500L)
     }
 
+    private fun fetchConfirmedStatus() {
+        if (transactionId == "--") return
+        detailViewModel.loadDetail(
+            transactionId = transactionId,
+            onLoading = {},
+            onSuccess = { item ->
+                val confirmedStatus = item.status ?: return@loadDetail
+                if (confirmedStatus.uppercase() != statusStr.uppercase()) populateStatus(confirmedStatus)
+            },
+            onError = {}
+        )
+    }
+
     private fun openReceipt() {
         if (isNavigating) return
         isNavigating = true
         autoFinishHandler.removeCallbacksAndMessages(null)
         when (category) {
-            CATEGORY_ELECTRICITY   -> SmsReceiptActivity.start(mActivity, fromPayment = true)
-            CATEGORY_DTH           -> DthSmsReceiptActivity.start(mActivity, fromPayment = true)
-            CATEGORY_GAS           -> GasSmsReceiptActivity.start(mActivity, fromPayment = true)
-            CATEGORY_LOAN          -> LoanSmsReceiptActivity.start(mActivity, fromPayment = true)
-            CATEGORY_MUNICIPAL_TAX -> MunicipalTaxSmsReceiptActivity.start(mActivity, fromPayment = true)
-            CATEGORY_PREPAID       -> PrepaidSmsReceiptActivity.start(mActivity, fromPayment = true)
-            CATEGORY_FASTAG        -> FastagSmsReceiptActivity.start(mActivity, fromPayment = true)
-            CATEGORY_POSTPAID      -> PostpaidSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_ELECTRICITY   -> SmsReceiptActivity.start(mActivity, transactionId)
+            CATEGORY_DTH           -> DthSmsReceiptActivity.start(mActivity, transactionId)
+            CATEGORY_GAS           -> GasSmsReceiptActivity.start(mActivity, transactionId)
+            CATEGORY_LOAN          -> LoanSmsReceiptActivity.start(mActivity, transactionId)
+            CATEGORY_MUNICIPAL_TAX -> MunicipalTaxSmsReceiptActivity.start(mActivity, transactionId)
+            CATEGORY_PREPAID       -> PrepaidSmsReceiptActivity.start(mActivity, transactionId)
+            CATEGORY_FASTAG        -> FastagSmsReceiptActivity.start(mActivity, transactionId)
+            CATEGORY_POSTPAID      -> PostpaidSmsReceiptActivity.start(mActivity, transactionId)
             else -> Utility.logError(IllegalStateException("BillPaymentStatusActivity: unknown category $category"))
         }
         finish()
