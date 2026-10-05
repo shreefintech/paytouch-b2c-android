@@ -292,6 +292,7 @@ class IdentityVerificationActivity : BaseActivity() {
                 // Activity destroyed mid-read — there is no UI to update, so skip the error toast.
                 e.printStackTrace()
             } catch (e: Exception) {
+                Utility.logError(e)
                 withContext(Dispatchers.Main) {
                     showProgressSubmit.set(false)
                     ToastUtil.showDelete(
