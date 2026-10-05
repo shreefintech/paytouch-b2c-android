@@ -4,14 +4,14 @@ import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.os.Bundle
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.widget.TextViewCompat
 import androidx.databinding.ObservableBoolean
-import android.content.Intent
-import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -41,6 +41,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
+import com.shreefintech.paytouchconsumer.utill.StatusSoundPlayer
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -80,6 +81,7 @@ class LoadWalletActivity : BaseActivity() {
     private var withdrawSuccessDialog: Dialog? = null
     private var withdrawSuccessDialogBinding: DialogWithdrawSuccessBinding? = null
     private var withdrawRequestId: String? = null
+    private val withdrawSoundPlayer = StatusSoundPlayer()
 
     private var isWalletEntrancePlayed = false
     private var isWalletLoading = false
@@ -190,6 +192,7 @@ class LoadWalletActivity : BaseActivity() {
 
     override fun onDestroy() {
         withdrawSuccessDialog?.dismiss()
+        withdrawSoundPlayer.release()
         super.onDestroy()
     }
 
@@ -391,6 +394,12 @@ class LoadWalletActivity : BaseActivity() {
         }
 
         bindWithdrawDetails(dialogBinding, data)
+        val soundRes = when (data.status?.uppercase()) {
+            Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED -> R.raw.success_sound
+            Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> R.raw.failed_sound
+            else -> R.raw.pending_sound
+        }
+        withdrawSoundPlayer.play(mActivity, soundRes)
         dialog.show()
     }
 

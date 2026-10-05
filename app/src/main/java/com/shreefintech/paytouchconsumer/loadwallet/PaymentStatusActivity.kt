@@ -4,8 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -30,6 +28,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPaymentStatusBinding
 import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
+import com.shreefintech.paytouchconsumer.utill.StatusSoundPlayer
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -48,7 +47,7 @@ class PaymentStatusActivity : BaseActivity() {
 
     private val autoFinishHandler = Handler(Looper.getMainLooper())
     private var isNavigating = false
-    private var mediaPlayer: MediaPlayer? = null
+    private val soundPlayer = StatusSoundPlayer()
     private var isSoundPlayed = false
 
     companion object {
@@ -84,7 +83,7 @@ class PaymentStatusActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         autoFinishHandler.removeCallbacksAndMessages(null)
-        releaseSound()
+        soundPlayer.release()
     }
 
     private fun populateStatus(status: String) {
@@ -201,23 +200,7 @@ class PaymentStatusActivity : BaseActivity() {
         // Glide can deliver the resource again (e.g. memory-cache reload) — the sound plays once per screen.
         if (isSoundPlayed || isFinishing || isDestroyed) return
         isSoundPlayed = true
-        // Respect silent / vibrate mode — the media stream would otherwise play regardless.
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager
-        if (audioManager?.ringerMode != AudioManager.RINGER_MODE_NORMAL) return
-        try {
-            mediaPlayer = MediaPlayer.create(mActivity, soundRes)?.apply {
-                setOnCompletionListener { releaseSound() }
-                start()
-            }
-        } catch (e: Exception) {
-            Utility.logError(e)
-            releaseSound()
-        }
-    }
-
-    private fun releaseSound() {
-        mediaPlayer?.release()
-        mediaPlayer = null
+        soundPlayer.play(mActivity, soundRes)
     }
 
     private fun copyOrderId() {
