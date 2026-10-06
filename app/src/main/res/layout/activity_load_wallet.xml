@@ -168,67 +168,85 @@
                             app:cardElevation="0dp"
                             app:strokeWidth="0dp">
 
-                            <LinearLayout
+                            <FrameLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:padding="12dp">
+                                android:clipChildren="false"
+                                android:clipToPadding="false">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="65dp"
+                                    android:layout_height="65dp"
+                                    android:layout_gravity="bottom|end"
+                                    android:layout_marginBottom="-25dp"
+                                    android:layout_marginEnd="-15dp"
+                                    app:cardBackgroundColor="@color/wallet_bg_circle"
+                                    app:shapeAppearance="@style/CircleCard"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp" />
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelBonusWallet"
+                                            android:textColor="@color/primary"
+                                            android:textSize="@dimen/text_size_12" />
+
+                                        <com.google.android.material.card.MaterialCardView
+                                            android:layout_width="28dp"
+                                            android:layout_height="28dp"
+                                            app:cardBackgroundColor="@color/primary"
+                                            app:cardCornerRadius="14dp"
+                                            app:cardElevation="0dp"
+                                            app:strokeWidth="0dp">
+
+                                            <androidx.appcompat.widget.AppCompatImageView
+                                                android:layout_width="16dp"
+                                                android:layout_height="16dp"
+                                                android:layout_gravity="center"
+                                                android:src="@drawable/ic_gift"
+                                                android:tint="@color/white" />
+                                        </com.google.android.material.card.MaterialCardView>
+                                    </LinearLayout>
 
                                     <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="0dp"
+                                        android:id="@+id/tvBonusBalance"
+                                        android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:layout_marginTop="4dp"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
                                         android:includeFontPadding="false"
-                                        android:text="@string/labelBonusWallet"
+                                        tools:text="₹0.00"
                                         android:textColor="@color/primary"
-                                        android:textSize="@dimen/text_size_12" />
+                                        android:textSize="@dimen/text_size_19" />
 
-                                    <com.google.android.material.card.MaterialCardView
-                                        android:layout_width="28dp"
-                                        android:layout_height="28dp"
-                                        app:cardBackgroundColor="@color/primary"
-                                        app:cardCornerRadius="8dp"
-                                        app:cardElevation="0dp"
-                                        app:strokeWidth="0dp">
-
-                                        <androidx.appcompat.widget.AppCompatImageView
-                                            android:layout_width="16dp"
-                                            android:layout_height="16dp"
-                                            android:layout_gravity="center"
-                                            android:src="@drawable/ic_gift"
-                                            android:tint="@color/white" />
-                                    </com.google.android.material.card.MaterialCardView>
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:lineSpacingMultiplier="1.35"
+                                        android:text="@string/labelBonusWalletDesc"
+                                        android:textColor="@color/sub_text_color"
+                                        android:textSize="@dimen/text_size_10" />
                                 </LinearLayout>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvBonusBalance"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:fontFamily="@font/proza_libre_semi_bold"
-                                    android:includeFontPadding="false"
-                                    tools:text="₹0.00"
-                                    android:textColor="@color/primary"
-                                    android:textSize="@dimen/text_size_19" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:fontFamily="@font/proza_libre_regular"
-                                    android:includeFontPadding="false"
-                                    android:lineSpacingMultiplier="1.35"
-                                    android:text="@string/labelBonusWalletDesc"
-                                    android:textColor="@color/sub_text_color"
-                                    android:textSize="@dimen/text_size_10" />
-                            </LinearLayout>
+                            </FrameLayout>
                         </com.google.android.material.card.MaterialCardView>
 
                         <!-- Earning Wallet card -->
@@ -247,67 +265,85 @@
                             app:cardElevation="0dp"
                             app:strokeWidth="0dp">
 
-                            <LinearLayout
+                            <FrameLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:padding="12dp">
+                                android:clipChildren="false"
+                                android:clipToPadding="false">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="65dp"
+                                    android:layout_height="65dp"
+                                    android:layout_gravity="bottom|end"
+                                    android:layout_marginBottom="-25dp"
+                                    android:layout_marginEnd="-15dp"
+                                    app:cardBackgroundColor="@color/wallet_bg_circle"
+                                    app:shapeAppearance="@style/CircleCard"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp" />
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelEarningWallet"
+                                            android:textColor="@color/primary"
+                                            android:textSize="@dimen/text_size_12" />
+
+                                        <com.google.android.material.card.MaterialCardView
+                                            android:layout_width="28dp"
+                                            android:layout_height="28dp"
+                                            app:cardBackgroundColor="@color/primary"
+                                            app:cardCornerRadius="14dp"
+                                            app:cardElevation="0dp"
+                                            app:strokeWidth="0dp">
+
+                                            <androidx.appcompat.widget.AppCompatImageView
+                                                android:layout_width="16dp"
+                                                android:layout_height="16dp"
+                                                android:layout_gravity="center"
+                                                android:src="@drawable/ic_lock"
+                                                android:tint="@color/white" />
+                                        </com.google.android.material.card.MaterialCardView>
+                                    </LinearLayout>
 
                                     <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="0dp"
+                                        android:id="@+id/tvEarningBalance"
+                                        android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:layout_marginTop="4dp"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
                                         android:includeFontPadding="false"
-                                        android:text="@string/labelEarningWallet"
+                                        tools:text="₹0.00"
                                         android:textColor="@color/primary"
-                                        android:textSize="@dimen/text_size_12" />
+                                        android:textSize="@dimen/text_size_19" />
 
-                                    <com.google.android.material.card.MaterialCardView
-                                        android:layout_width="28dp"
-                                        android:layout_height="28dp"
-                                        app:cardBackgroundColor="@color/primary"
-                                        app:cardCornerRadius="8dp"
-                                        app:cardElevation="0dp"
-                                        app:strokeWidth="0dp">
-
-                                        <androidx.appcompat.widget.AppCompatImageView
-                                            android:layout_width="16dp"
-                                            android:layout_height="16dp"
-                                            android:layout_gravity="center"
-                                            android:src="@drawable/ic_lock"
-                                            android:tint="@color/white" />
-                                    </com.google.android.material.card.MaterialCardView>
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:lineSpacingMultiplier="1.35"
+                                        android:text="@string/labelEarningWalletDesc"
+                                        android:textColor="@color/sub_text_color"
+                                        android:textSize="@dimen/text_size_10" />
                                 </LinearLayout>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvEarningBalance"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:fontFamily="@font/proza_libre_semi_bold"
-                                    android:includeFontPadding="false"
-                                    tools:text="₹0.00"
-                                    android:textColor="@color/primary"
-                                    android:textSize="@dimen/text_size_19" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:fontFamily="@font/proza_libre_regular"
-                                    android:includeFontPadding="false"
-                                    android:lineSpacingMultiplier="1.35"
-                                    android:text="@string/labelEarningWalletDesc"
-                                    android:textColor="@color/sub_text_color"
-                                    android:textSize="@dimen/text_size_10" />
-                            </LinearLayout>
+                            </FrameLayout>
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
 
@@ -339,8 +375,8 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/ivTierBadge"
-                                android:layout_width="26dp"
-                                android:layout_height="29dp"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
                                 android:src="@drawable/ic_shield_bronze" />
 
                             <LinearLayout
