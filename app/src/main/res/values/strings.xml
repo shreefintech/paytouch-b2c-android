@@ -14,8 +14,8 @@
     <string name="forgot_password">Forgot Password?</string>
     <string name="labelForgotMpin">Forgot MPIN?</string>
     <string name="sign_in">Sign In</string>
-    <string name="no_account">Don\'t Have an account?</string>
-    <string name="create_account">Create Account</string>
+    <string name="no_account">New to paytouch?</string>
+    <string name="create_account">SignUp</string>
 
     <string name="msgLoginSuccess">Login successful</string>
 

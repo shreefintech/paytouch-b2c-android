@@ -467,55 +467,42 @@
                             android:textColor="?attr/colorTextHint"
                             android:textSize="@dimen/text_size_12"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/cvCreateAccount"
+                            app:layout_constraintEnd_toStartOf="@id/llCreateAccount"
                             app:layout_constraintHorizontal_bias="1.0"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/cvCreateAccount"
+                        <LinearLayout
+                            android:id="@+id/llCreateAccount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:cardBackgroundColor="@android:color/transparent"
-                            app:strokeWidth="1dp"
-                            app:cardCornerRadius="3dp"
-                            app:strokeColor="?attr/colorPrimary"
+                            android:background="@drawable/bg_signup_btn"
+                            android:clipToOutline="true"
+                            android:outlineProvider="background"
+                            android:paddingHorizontal="@dimen/margin_large"
+                            android:paddingVertical="6dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClickListener="@{onClickListener}"
+                            android:gravity="center"
+                            android:orientation="horizontal"
                             app:layout_constraintStart_toEndOf="@id/tvNewAccDes"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent">
 
-                            <LinearLayout
-                                android:id="@+id/llCreateAccount"
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:paddingHorizontal="@dimen/margin_small"
-                                android:paddingVertical="@dimen/margin_small"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:onClickListener="@{onClickListener}"
-                                android:gravity="center"
-                                android:orientation="horizontal">
+                                android:text="@string/create_account"
+                                android:textColor="@color/white"
+                                android:includeFontPadding="false"
+                                android:fontFamily="@font/proza_libre_semi_bold"
+                                android:maxLines="1"
+                                android:ellipsize="end"
+                                android:textSize="@dimen/text_size_13" />
 
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="16dp"
-                                    android:layout_height="16dp"
-                                    android:layout_marginEnd="4dp"
-                                    android:src="@drawable/ic_create_account" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/create_account"
-                                    android:textColor="@color/primary"
-                                    android:includeFontPadding="false"
-                                    android:fontFamily="@font/proza_libre_medium"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"
-                                    android:textSize="@dimen/text_size_12" />
-
-                            </LinearLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
