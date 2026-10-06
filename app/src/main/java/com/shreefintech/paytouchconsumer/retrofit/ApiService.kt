@@ -92,6 +92,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationReq
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRemoveRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.ReferralWalletItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawRequest
@@ -231,6 +234,21 @@ interface ApiService {
     ): Call<MpinItem>
 
     // ── Wallet ────────────────────────────────────────────────────────────────
+
+    @GET("${AUTH}referral-wallet")
+    fun getReferralWallet(
+        @Header("Authorization") authorization: String
+    ): Call<General<ReferralWalletItem?>>
+
+    @GET("${AUTH}earning-wallet")
+    fun getEarningWallet(
+        @Header("Authorization") authorization: String
+    ): Call<General<EarningWalletItem?>>
+
+    @GET("${AUTH}level")
+    fun getRewardsLevel(
+        @Header("Authorization") authorization: String
+    ): Call<General<RewardsLevelItem?>>
 
     @GET("${AUTH}wallet/user-data")
     fun getUserWalletData(

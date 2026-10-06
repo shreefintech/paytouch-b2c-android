@@ -8,6 +8,8 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.ReferralWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
@@ -145,6 +147,70 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 }
 
                 override fun onFailure(call: Call<General<WalletHistoryPageItem>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+    }
+
+    fun fetchReferralWallet(
+        onSuccess: (ReferralWalletItem) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        ApiClient.apiService.getReferralWallet(bearerToken())
+            .enqueue(object : Callback<General<ReferralWalletItem?>> {
+                override fun onResponse(
+                    call: Call<General<ReferralWalletItem?>>,
+                    response: Response<General<ReferralWalletItem?>>
+                ) {
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        onSuccess(data)
+                    } else {
+                        onError(
+                            ApiHelper.parseErrorMessage(
+                                getApplication(), response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<General<ReferralWalletItem?>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+    }
+
+    fun fetchEarningWallet(
+        onSuccess: (EarningWalletItem) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        ApiClient.apiService.getEarningWallet(bearerToken())
+            .enqueue(object : Callback<General<EarningWalletItem?>> {
+                override fun onResponse(
+                    call: Call<General<EarningWalletItem?>>,
+                    response: Response<General<EarningWalletItem?>>
+                ) {
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        onSuccess(data)
+                    } else {
+                        onError(
+                            ApiHelper.parseErrorMessage(
+                                getApplication(), response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<General<EarningWalletItem?>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })

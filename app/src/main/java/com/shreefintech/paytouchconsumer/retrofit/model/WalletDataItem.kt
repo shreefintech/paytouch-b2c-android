@@ -16,7 +16,9 @@ data class WalletDataItem(
     @field:SerializedName("bank_name") val bankName: String?,
     @field:SerializedName("has_virtual_account") val hasVirtualAccount: Boolean?,
     @field:SerializedName("can_create_virtual_account") val canCreateVirtualAccount: Boolean?,
-    @field:SerializedName("wallet") val wallet: WalletInfoItem?
+    @field:SerializedName("wallet") val wallet: WalletInfoItem?,
+    @field:SerializedName("bonus_balance") val bonusBalance: String?,
+    @field:SerializedName("earning_balance") val earningBalance: String?
 )
 
 data class WalletInfoItem(

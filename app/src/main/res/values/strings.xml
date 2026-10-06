@@ -498,6 +498,26 @@
     <string name="hintPaymentDescription">Payment Description</string>
     <string name="btnProceedPayment">Proceed Payment</string>
 
+    <!-- Rewards Wallet & Level -->
+    <string name="labelBonusWallet">Bonus Wallet</string>
+    <string name="labelEarningWallet">Earning Wallet</string>
+    <string name="labelBonusWalletDesc">Spend only · up to 50% of a bill</string>
+    <string name="labelEarningWalletDesc">11% p.a. after 30 days locked</string>
+    <string name="msgFestiveCashback">Festive season: flat ₹5 cashback on bills ₹50+</string>
+    <string name="labelLocked">Locked</string>
+    <string name="labelYourLevel">Your Level</string>
+    <string name="labelViewMyRank">View My Rank</string>
+    <string name="labelReferrals">Referrals</string>
+    <string name="msgEarningWalletHint">From rewards &amp; referrals</string>
+    <string name="labelBronze">Bronze</string>
+    <string name="labelSilver">Silver</string>
+    <string name="labelGold">Gold</string>
+    <string name="labelPlatinum">Platinum</string>
+    <string name="msgTopTier">You\'ve reached the top tier!</string>
+    <string name="labelCashbackPct">%1$.2f%% cashback</string>
+    <string name="labelMoreToNextLevel">%1$s more to next level</string>
+    <string name="msgWalletInfo">Bills use Bonus Wallet first (up to 50%), the rest from Wallet Balance. Only Wallet Balance can be withdrawn.</string>
+
     <!-- HDFC Payment flow -->
     <string name="titlePaymentStatus">Payment Status</string>
     <string name="msgPaymentSuccessful">Payment Successful</string>

@@ -97,4 +97,16 @@
     <color name="normal_card_bg_glass">#66FFFFFF</color>
 
     <color name="home_card_bg">#72FFFFFF</color>
+
+    <!-- Rewards tier colors -->
+    <color name="tierBronzeBg">#FBEBDD</color>
+    <color name="tierBronzeText">#7A3A16</color>
+    <color name="tierBronzeMid">#C2733A</color>
+    <color name="tierSilverBg">#ECEFF4</color>
+    <color name="tierSilverText">#4D5868</color>
+    <color name="tierGoldBg">#FFF3D1</color>
+    <color name="tierGoldText">#8A5800</color>
+    <color name="tierPlatinumBg">#EEE9FF</color>
+    <color name="tierPlatinumText">#4A2DA6</color>
+    <color name="other_wallet_color">#CCFFFFFF</color>
 </resources>
