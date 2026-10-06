@@ -61,6 +61,7 @@ object Constant {
 
     // Circle IDs for bill payment modules
     const val LOAN_CIRCLE_ID = "0"
+    const val POSTPAID_CIRCLE_ID = "00"
 
     // App lock — time away before the phone's screen lock is asked again
     const val APP_LOCK_GRACE_MS = 60 * 1000L                // normal app switch
