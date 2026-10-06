@@ -109,4 +109,5 @@
     <color name="tierPlatinumBg">#EEE9FF</color>
     <color name="tierPlatinumText">#4A2DA6</color>
     <color name="other_wallet_color">#CCFFFFFF</color>
+    <color name="wallet_bg_circle">#66D52662</color>
 </resources>

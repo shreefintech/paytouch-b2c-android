@@ -494,15 +494,22 @@ class LoadWalletActivity : BaseActivity() {
         fetchRecentHistory()
         fetchReferralWallet()
         fetchEarningWallet()
+        fetchRewardsLevel()
     }
 
     private fun fetchReferralWallet() {
         viewModel.fetchReferralWallet(
             onSuccess = { data ->
                 binding.tvBonusBalance.text = Utility.formatAmount(data.referralWallet)
-                data.level?.let { populateLevel(it) }
             },
             onError = { /* non-critical; bonus card shows ₹0.00 by default */ }
+        )
+    }
+
+    private fun fetchRewardsLevel() {
+        viewModel.fetchRewardsLevel(
+            onSuccess = { data -> populateLevel(data) },
+            onError = { /* non-critical; level card shows defaults */ }
         )
     }
 
@@ -516,32 +523,22 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun populateLevel(data: RewardsLevelItem) {
-        val tier = RewardsTier.from(data.tier)
-        binding.tvTierName.text = buildTierLabel(tier, data.subLevel)
-        binding.tvCashbackPct.text = getString(R.string.labelCashbackPct, data.cashbackPct ?: 0.0)
+        val tier = RewardsTier.from(data.stage)
+        binding.tvTierName.text = data.label ?: getString(tier.labelRes)
+        binding.tvCashbackPct.text = getString(R.string.labelCashbackPct, data.cashbackPercent ?: 0.0)
         binding.ivTierBadge.setImageResource(tier.badgeRes)
 
-        val nextAmount = data.nextLevelAmount ?: 0.0
+        val next = data.next
+        val remaining = next?.remaining ?: 0.0
         binding.tvNextLevel.text = when {
-            !data.promoText.isNullOrBlank() -> data.promoText
-            nextAmount > 0 -> getString(R.string.labelMoreToNextLevel, Utility.formatAmount(nextAmount))
+            remaining > 0 -> getString(R.string.labelMoreToNextLevel, Utility.formatAmount(remaining.toString()))
             else -> getString(R.string.msgTopTier)
         }
 
-        val lifetimePaid = data.lifetimePaid ?: 0.0
-        val progress = if (nextAmount > 0) {
-            (lifetimePaid / (lifetimePaid + nextAmount)).toFloat().coerceIn(0f, 1f)
-        } else 1f
+        val current = next?.current ?: 0.0
+        val target = next?.target ?: 0.0
+        val progress = if (target > 0) (current / target).toFloat().coerceIn(0f, 1f) else 1f
         animateLevelProgress(progress)
-    }
-
-    private fun buildTierLabel(tier: RewardsTier, subLevel: Int?): String {
-        val tierName = getString(tier.labelRes)
-        return when (subLevel) {
-            1 -> "$tierName I"
-            2 -> "$tierName II"
-            else -> "$tierName III"
-        }
     }
 
     private fun animateLevelProgress(progress: Float) {
