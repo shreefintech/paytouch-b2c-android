@@ -29,6 +29,7 @@ import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidSmsReceiptVi
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
 import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
+import com.shreefintech.paytouchconsumer.utill.InAppReviewHelper
 import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -183,6 +184,7 @@ class PostpaidSmsReceiptActivity : BaseActivity() {
         binding.tvCcf.text            = Utility.formatAmount(item.platformFee)
         binding.tvReceiptStatus.text  = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
+        if (isFromPayment) InAppReviewHelper.onPaymentReceiptShown(this, item.transactionId, status)
 
         val smsBodyText = getString(R.string.msgPostpaidSmsBody, amount, mobileNo)
         val spannable   = SpannableString(smsBodyText)

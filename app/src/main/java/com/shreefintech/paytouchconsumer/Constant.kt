@@ -36,6 +36,18 @@ object Constant {
     // A later denial with no rationale then means "Don't ask again" rather than a tap-outside dismiss.
     const val KEY_CAMERA_DENIED = "CAMERA_DENIED"
 
+    // In-app review — device-level, kept through logout (see SharedPreferenceHelper.clearSharedPreference)
+    const val KEY_REVIEW_SUCCESS_COUNT = "REVIEW_SUCCESS_COUNT"   // successful bill payments counted so far
+    const val KEY_REVIEW_LAST_TXN_ID = "REVIEW_LAST_TXN_ID"       // last counted transaction — stops double counting on retry
+    const val KEY_REVIEW_LAST_ASKED_AT = "REVIEW_LAST_ASKED_AT"   // epoch millis of the last review flow launch
+    const val REVIEW_MIN_SUCCESS_PAYMENTS = 3
+    const val REVIEW_MIN_INSTALL_DAYS = 3L
+    const val REVIEW_COOLDOWN_DAYS = 90L
+    const val REVIEW_DELAY_MS = 1500L
+
+    // Bill payment receipt — success status (compared case-insensitively)
+    const val PAYMENT_STATUS_SUCCESS = "success"
+
     // KYC local files (under filesDir, exposed via file_provider_paths.xml) — each owning
     // Activity deletes its own directory when it finishes so ID documents are not retained.
     const val KYC_SELFIE_DIR = "kyc"
@@ -49,6 +61,7 @@ object Constant {
 
     // Circle IDs for bill payment modules
     const val LOAN_CIRCLE_ID = "0"
+    const val POSTPAID_CIRCLE_ID = "00"
 
     // App lock — time away before the phone's screen lock is asked again
     const val APP_LOCK_GRACE_MS = 60 * 1000L                // normal app switch

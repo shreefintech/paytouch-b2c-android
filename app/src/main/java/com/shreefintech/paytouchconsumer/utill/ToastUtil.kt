@@ -253,7 +253,7 @@ object ToastUtil {
             }
         }
 
-        val bottomMargin = (88 * activity.resources.displayMetrics.density).toInt()
+        val bottomMargin = activity.resources.getDimensionPixelSize(R.dimen.toast_slide_bottom_margin)
         val params = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.WRAP_CONTENT,
             FrameLayout.LayoutParams.WRAP_CONTENT

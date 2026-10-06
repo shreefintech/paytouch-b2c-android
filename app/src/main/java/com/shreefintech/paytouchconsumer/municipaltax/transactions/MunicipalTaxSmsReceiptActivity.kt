@@ -30,6 +30,7 @@ import com.shreefintech.paytouchconsumer.municipaltax.viewmodel.MunicipalTaxSmsR
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
 import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
+import com.shreefintech.paytouchconsumer.utill.InAppReviewHelper
 import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -183,6 +184,7 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
         binding.tvCcf.text             = Utility.formatAmount(item.platformFee)
         binding.tvReceiptStatus.text   = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
+        if (isFromPayment) InAppReviewHelper.onPaymentReceiptShown(this, item.transactionId, status)
 
         val smsBodyText = getString(R.string.msgMunicipalTaxSmsBody, amount, consumerNo)
         val spannable   = SpannableString(smsBodyText)

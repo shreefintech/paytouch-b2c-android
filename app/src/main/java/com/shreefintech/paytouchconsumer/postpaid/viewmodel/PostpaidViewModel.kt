@@ -138,7 +138,8 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
             bearerToken(),
             PostpaidFetchBillRequest(
                 mobileNumber = mobileNumber,
-                operatorId = operatorId
+                operatorId = operatorId,
+                circleId = Constant.POSTPAID_CIRCLE_ID
             )
         ).enqueue(object : Callback<PostpaidFetchBillResponseItem> {
             override fun onResponse(
