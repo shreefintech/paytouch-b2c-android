@@ -95,6 +95,7 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
             PostpaidProcessPaymentRequest(
                 mobileNumber = mobileNumber,
                 operatorId = operatorId,
+                circleId = Constant.POSTPAID_CIRCLE_ID,
                 amount = amount,
                 platformFee = fee,
                 totalPayable = total
