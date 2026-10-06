@@ -80,7 +80,7 @@ PostpaidActivity
                             └── onSuccess ──────────► PostpaidSmsReceiptActivity (fromPayment=true)
 ```
 
-`PostpaidActivity` validates Proceed in this order: mobile number present (10 digits) → operator selected → bill fetched → terms accepted → amount > 0. If "Proceed" is tapped without a fetched bill, `fetchBill()` is called automatically instead of showing an error. No circle is needed for Postpaid.
+`PostpaidActivity` validates Proceed in this order: mobile number present (10 digits) → operator selected → bill fetched → terms accepted → amount > 0. If "Proceed" is tapped without a fetched bill, `fetchBill()` is called automatically instead of showing an error. Postpaid sends `circle_id = "00"` (via `Constant.POSTPAID_CIRCLE_ID`) in the fetch-bill request.
 
 ---
 
@@ -218,7 +218,7 @@ All endpoints are declared in `ApiService.kt` under the `// ── Mobile Postpa
 |---|---|---|---|
 | Bill fetch step | Required (server-fetched amount) | None | **Required** (server-fetched amount) |
 | Plan selection | N/A | `PrepaidPlanSelectionActivity` | None |
-| Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from live `GET api/states` list | Not required |
+| Circle / region | Hardcoded `"0"` or `"00"` per request | User picks from live `GET api/states` list | Hardcoded `"00"` (`Constant.POSTPAID_CIRCLE_ID`) in fetch-bill request |
 | Transactions type param | `"electricity"` / `"gas"` | `"mobile_recharge"` | `"mobile_postpaid"` |
 | Status search field | Transaction ID | Mobile number | Transaction ID |
 | SMS ViewModel base | `BaseBillViewModel` subclass | Standalone `AndroidViewModel` | Standalone `AndroidViewModel` |
