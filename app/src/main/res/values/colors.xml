@@ -109,5 +109,26 @@
     <color name="tierPlatinumBg">#EEE9FF</color>
     <color name="tierPlatinumText">#4A2DA6</color>
     <color name="other_wallet_color">#CCFFFFFF</color>
-    <color name="wallet_bg_circle">#66D52662</color>
+    <color name="wallet_bg_circle">#59D52662</color>
+
+    <!-- Earning Wallet design tokens -->
+    <color name="earningCardBg">#F2FFF8F5</color>
+    <color name="earningSuccessBg">#E3F5E8</color>
+    <color name="earningSuccessText">#1E7A46</color>
+    <color name="earningSuccessTextDark">#1E5E36</color>
+    <color name="earningSuccessBar">#22B573</color>
+    <color name="earningWarnBg">#FFF3D1</color>
+    <color name="earningWarnBorder">#F3D48A</color>
+    <color name="earningWarnTitle">#5A3A00</color>
+    <color name="earningDisabledBg">#F1E1E7</color>
+    <color name="earningDisabledText">#B79CA8</color>
+    <color name="earningDisabledOutline">#D9C3CB</color>
+    <color name="earningCloseBg">#F7EEF1</color>
+    <color name="earningChipBorder">#F3B7CB</color>
+    <color name="earningChipBg">#FFF7F9</color>
+    <color name="earningDecoTop">#FBE7EE</color>
+    <color name="earningDecoBottom">#E6A9BF</color>
+    <color name="earningInk">#1C1C1C</color>
+    <color name="earningMuted">#5C5C5C</color>
+    <color name="earningError">#D3122E</color>
 </resources>

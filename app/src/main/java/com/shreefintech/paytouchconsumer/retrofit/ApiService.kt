@@ -92,6 +92,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationReq
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRemoveRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletActionDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletAmountRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.ReferralWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
@@ -267,6 +269,23 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: WithdrawRequest
     ): Call<General<WithdrawDataItem>>
+
+    @POST("${AUTH}earning-wallet/opt-in")
+    fun postEarningWalletOptIn(
+        @Header("Authorization") authorization: String
+    ): Call<General<EarningWalletActionDataItem>>
+
+    @POST("${AUTH}earning-wallet/lock")
+    fun postEarningWalletLock(
+        @Header("Authorization") authorization: String,
+        @Body request: EarningWalletAmountRequest
+    ): Call<General<EarningWalletActionDataItem>>
+
+    @POST("${AUTH}earning-wallet/withdraw")
+    fun postEarningWalletWithdraw(
+        @Header("Authorization") authorization: String,
+        @Body request: EarningWalletAmountRequest
+    ): Call<General<EarningWalletActionDataItem>>
 
     // ── Transaction Detail ────────────────────────────────────────────────────
 

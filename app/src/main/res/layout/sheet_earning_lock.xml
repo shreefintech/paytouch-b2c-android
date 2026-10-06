@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgressLock"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bottom_sheet_bg"
+        android:clickable="true"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="0dp"
+        app:behavior_skipCollapsed="true"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <!-- Horizontal margin anchor -->
+        <View
+            android:id="@+id/dummyView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Title row -->
+        <LinearLayout
+            android:id="@+id/llLockTitleRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:text="@string/titleLockMoney"
+                android:textColor="@color/earningInk"
+                android:textSize="20sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/ivCloseLock"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:onClickListener="@{onClickListener}"
+                app:cardBackgroundColor="@color/earningCloseBg"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_cross"
+                    android:tint="@color/primary" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- Wallet balance row -->
+        <LinearLayout
+            android:id="@+id/llWalletBalanceRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_info_row_pink"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/llLockTitleRow">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_semi_bold"
+                android:includeFontPadding="false"
+                android:text="@string/labelWalletBalance"
+                android:textColor="@color/primary"
+                android:textSize="13sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLockWalletBalance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:textColor="@color/primary"
+                android:textSize="13sp"
+                tools:text="₹11,120.50" />
+
+        </LinearLayout>
+
+        <!-- Amount label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAmountLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelAmount"
+            android:textColor="@color/earningMuted"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/llWalletBalanceRow" />
+
+        <!-- Amount input field -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardLockAmount"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="6dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/primary"
+            app:strokeWidth="1.5dp"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/tvAmountLabel">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:includeFontPadding="false"
+                    android:text="₹"
+                    android:textColor="@color/primary"
+                    android:textSize="26sp" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etLockAmount"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:hint="@string/hintAmount"
+                    android:imeOptions="actionDone"
+                    android:inputType="numberDecimal"
+                    android:singleLine="true"
+                    android:textColor="@color/earningInk"
+                    android:textColorHint="@color/earningMuted"
+                    android:textSize="26sp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Chips row -->
+        <LinearLayout
+            android:id="@+id/llChips"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/cardLockAmount">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/chipLock500"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:onClickListener="@{onClickListener}"
+                app:cardBackgroundColor="@color/earningChipBg"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/earningChipBorder"
+                app:strokeWidth="1dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="₹500"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/chipLock1000"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:onClickListener="@{onClickListener}"
+                app:cardBackgroundColor="@color/earningChipBg"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/earningChipBorder"
+                app:strokeWidth="1dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="₹1,000"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/chipLockAll"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:onClickListener="@{onClickListener}"
+                app:cardBackgroundColor="@color/earningChipBg"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/earningChipBorder"
+                app:strokeWidth="1dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelAll"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- Inline error -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvLockError"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/errNotEnoughBalance"
+            android:textColor="@color/earningError"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/llChips" />
+
+        <!-- Info row: min lock note -->
+        <LinearLayout
+            android:id="@+id/llLockInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="top"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/tvLockError">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="1dp"
+                android:src="@drawable/ic_info"
+                android:tint="@color/primary" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_regular"
+                android:includeFontPadding="false"
+                android:lineSpacingMultiplier="1.45"
+                android:text="@string/msgLockInfo"
+                android:textColor="@color/earningMuted"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Starts earning row (green) -->
+        <LinearLayout
+            android:id="@+id/llStartsEarningRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_green_row"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/llLockInfo">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_trend_up"
+                android:tint="@color/earningSuccessText" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvStartsEarning"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_medium"
+                android:includeFontPadding="false"
+                android:textColor="@color/earningSuccessTextDark"
+                android:textSize="12.5sp"
+                tools:text="Starts earning 11% a year on 2 Nov 2026" />
+
+        </LinearLayout>
+
+        <!-- Lock button -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnLock"
+            android:layout_width="0dp"
+            android:layout_height="51dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="28dp"
+            android:onClickListener="@{onClickListener}"
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/llStartsEarningRow"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="17dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivBtnLockIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_lock"
+                    android:tint="@color/white"
+                    android:visibility="@{showProgressLock ? View.GONE : View.VISIBLE}" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvBtnLockLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="@string/btnLock"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:visibility="@{showProgressLock ? View.GONE : View.VISIBLE}" />
+
+                <ProgressBar
+                    android:id="@+id/pbLock"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:indeterminateTint="@color/white"
+                    android:visibility="@{showProgressLock ? View.VISIBLE : View.GONE}" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
