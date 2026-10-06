@@ -119,8 +119,9 @@ class EarningWalletActivity : BaseActivity() {
     private fun setupInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, maxOf(ime.bottom, systemBars.bottom))
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, maxOf(imeInsets.bottom, systemBars.bottom))
+            if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
             optInSheet.root.setPadding(0, 0, 0, systemBars.bottom)
             lockSheet.root.setPadding(0, 0, 0, systemBars.bottom)
             withdrawSheet.root.setPadding(0, 0, 0, systemBars.bottom)
@@ -211,7 +212,8 @@ class EarningWalletActivity : BaseActivity() {
             binding.cardInterestPill.gone()
         }
 
-        if (isOptedIn && lockedBalance > 0.0) {
+        val agingMs = if (lockedBalance > 0.0) parseIsoDateMs(item.agingStartedAt) else null
+        if (agingMs != null) {
             binding.cardStatus.visible()
             updateStatusCard(item.agingStartedAt)
         } else {

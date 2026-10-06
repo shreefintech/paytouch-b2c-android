@@ -170,6 +170,47 @@
 
                                 </com.google.android.material.card.MaterialCardView>
 
+                                <!-- Pending withdrawal pill -->
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/llPendingPill"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:visibility="gone"
+                                    app:cardBackgroundColor="@color/earningCardInteratstBg"
+                                    app:cardCornerRadius="10dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal"
+                                        android:paddingHorizontal="9dp"
+                                        android:paddingVertical="4dp">
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:layout_width="13dp"
+                                            android:layout_height="13dp"
+                                            android:src="@drawable/ic_clock"
+                                            android:tint="@color/wallet_pending_stroke" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvPendingPill"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="5dp"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:textColor="@color/wallet_pending_stroke"
+                                            android:textSize="12sp"
+                                            tools:text="₹1,000 arriving on 5 Oct" />
+
+                                    </LinearLayout>
+
+                                </com.google.android.material.card.MaterialCardView>
+
                             </LinearLayout>
 
                         </FrameLayout>
@@ -262,32 +303,6 @@
                         </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Pending withdrawal pill -->
-                    <LinearLayout
-                        android:id="@+id/llPendingPill"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:background="@color/wallet_pending_bg"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="10dp"
-                        android:visibility="gone">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/tvPendingPill"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/proza_libre_medium"
-                            android:includeFontPadding="false"
-                            android:textColor="@color/wallet_pending_stroke"
-                            android:textSize="12sp"
-                            tools:text="₹1,000 arriving on 5 Oct" />
-
-                    </LinearLayout>
 
                     <!-- How it works title -->
                     <androidx.appcompat.widget.AppCompatTextView
