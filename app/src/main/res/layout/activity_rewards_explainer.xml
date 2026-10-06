@@ -1,0 +1,2553 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg"
+        tools:context=".rewards.RewardsExplainerActivity">
+
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvScreenTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:fontFamily="@font/proza_libre_bold"
+            android:includeFontPadding="false"
+            android:text="@string/titlePayTouchRewards"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_18"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvScreenTitle">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/page_margin_vertical">
+
+                <!-- ═══ SECTION 1: HERO CARD ═══ -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    app:cardBackgroundColor="#2A0B30"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivHeroBg"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:minHeight="230dp"
+                            android:scaleType="centerCrop" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="20dp">
+
+                            <!-- Festive chip -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:cardBackgroundColor="#30FCCFA1"
+                                app:cardCornerRadius="20dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvFestiveChip"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:paddingHorizontal="12dp"
+                                    android:paddingVertical="5dp"
+                                    android:text="@string/labelFestiveSeason"
+                                    android:textColor="#FCCFA1"
+                                    android:textSize="@dimen/text_size_11" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <!-- Headline -->
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:fontFamily="@font/proza_libre_bold"
+                                android:includeFontPadding="false"
+                                android:lineSpacingMultiplier="1.1"
+                                android:text="@string/titleRewardsHeroLine1"
+                                android:textColor="#FFFFFFFF"
+                                android:textSize="@dimen/text_size_25" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/proza_libre_bold"
+                                android:includeFontPadding="false"
+                                android:text="@string/titleRewardsHeroHighlight"
+                                android:textColor="#FCCFA1"
+                                android:textSize="@dimen/text_size_25" />
+
+                            <!-- Subtitle -->
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/proza_libre_regular"
+                                android:includeFontPadding="false"
+                                android:lineSpacingMultiplier="1.4"
+                                android:text="@string/subtitleRewardsHero"
+                                android:textColor="#80F5EBF0"
+                                android:textSize="@dimen/text_size_12" />
+
+                            <!-- Divider -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="16dp"
+                                android:background="#20FFFFFF" />
+
+                            <!-- Your level mini-card -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                app:cardBackgroundColor="#1AFFFFFF"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelYourLevel"
+                                            android:textColor="#80F5EBF0"
+                                            android:textSize="@dimen/text_size_11" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelCashback"
+                                            android:textColor="#80F5EBF0"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="6dp"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:id="@+id/ivYourBadge"
+                                            android:layout_width="32dp"
+                                            android:layout_height="32dp"
+                                            android:src="@drawable/ic_shield_bronze" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvYourTierName"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="8dp"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
+                                            android:includeFontPadding="false"
+                                            android:textColor="#FFFFFFFF"
+                                            android:textSize="@dimen/text_size_15"
+                                            tools:text="Bronze II" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvYourCashback"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_bold"
+                                            android:includeFontPadding="false"
+                                            android:textColor="#FCCFA1"
+                                            android:textSize="@dimen/text_size_15"
+                                            tools:text="0.10%" />
+                                    </LinearLayout>
+
+                                    <FrameLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="5dp"
+                                        android:layout_marginTop="10dp"
+                                        android:background="@drawable/bg_progress_track">
+
+                                        <View
+                                            android:id="@+id/viewProgressFill"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:background="@drawable/bg_progress_fill"
+                                            android:scaleX="0" />
+                                    </FrameLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="6dp"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvProgressNext"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:textColor="#80F5EBF0"
+                                            android:textSize="@dimen/text_size_11"
+                                            tools:text="₹3,000 more to next level" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvMyRank"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:background="?selectableItemBackground"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
+                                            android:includeFontPadding="false"
+                                            android:onClick="@{onClickListener}"
+                                            android:paddingStart="8dp"
+                                            android:text="@string/labelMyRank"
+                                            android:textColor="#FCCFA1"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ═══ SECTION 2: CASHBACK GROWS EVERY LEVEL ═══ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:background="@color/white"
+                    android:orientation="vertical"
+                    android:padding="@dimen/page_margin_horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/proza_libre_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/titleCashbackGrows"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_18" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/proza_libre_regular"
+                        android:includeFontPadding="false"
+                        android:lineSpacingMultiplier="1.35"
+                        android:text="@string/subtitleCashbackGrows"
+                        android:textColor="@color/sub_text_color"
+                        android:textSize="@dimen/text_size_12" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/ic_cashback_levels_chart" />
+                </LinearLayout>
+
+                <!-- ═══ SECTION 3: HOW IT WORKS ═══ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/page_margin_horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/proza_libre_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/titleHowItWorks"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_18" />
+
+                    <!-- Step 1 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="14dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                app:cardBackgroundColor="@color/tierBronzeBg"
+                                app:cardCornerRadius="21dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_ruppes"
+                                    android:tint="@color/tierBronzeText" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/stepPayBillsTitle"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.35"
+                                    android:text="@string/stepPayBillsDesc"
+                                    android:textColor="@color/sub_text_color"
+                                    android:textSize="@dimen/text_size_12" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Step 2 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="14dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                app:cardBackgroundColor="@color/tierSilverBg"
+                                app:cardCornerRadius="21dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_user_1"
+                                    android:tint="@color/tierSilverText" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/stepReferFriendsTitle"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.35"
+                                    android:text="@string/stepReferFriendsDesc"
+                                    android:textColor="@color/sub_text_color"
+                                    android:textSize="@dimen/text_size_12" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Step 3 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="14dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                app:cardBackgroundColor="@color/tierGoldBg"
+                                app:cardCornerRadius="21dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_lock"
+                                    android:tint="@color/tierGoldText" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/stepLockMoneyTitle"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.35"
+                                    android:text="@string/stepLockMoneyDesc"
+                                    android:textColor="@color/sub_text_color"
+                                    android:textSize="@dimen/text_size_12" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Step 4 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="14dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                app:cardBackgroundColor="@color/tierPlatinumBg"
+                                app:cardCornerRadius="21dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_shield_platinum"
+                                    android:tint="@color/tierPlatinumText" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/stepHoldGoldTitle"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.35"
+                                    android:text="@string/stepHoldGoldDesc"
+                                    android:textColor="@color/sub_text_color"
+                                    android:textSize="@dimen/text_size_12" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- ═══ SECTION 4: ALL LEVELS ═══ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/page_margin_horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/proza_libre_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/titleAllLevels"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_18" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/proza_libre_regular"
+                        android:includeFontPadding="false"
+                        android:text="@string/subtitleAllLevels"
+                        android:textColor="@color/sub_text_color"
+                        android:textSize="@dimen/text_size_12" />
+
+                    <!-- Tab row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_toggle_container"
+                        android:orientation="horizontal"
+                        android:padding="3dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tabBronze"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_toggle_selected"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
+                            android:onClick="@{onClickListener}"
+                            android:text="@string/labelBronze"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tabSilver"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_toggle_unselected"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
+                            android:onClick="@{onClickListener}"
+                            android:text="@string/labelSilver"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tabGold"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_toggle_unselected"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
+                            android:onClick="@{onClickListener}"
+                            android:text="@string/labelGold"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tabPlatinum"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_toggle_unselected"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
+                            android:onClick="@{onClickListener}"
+                            android:text="@string/labelPlatAbbrev"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_12" />
+                    </LinearLayout>
+
+                    <!-- ── BRONZE PANEL ── -->
+                    <LinearLayout
+                        android:id="@+id/panelBronze"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical">
+
+                        <!-- Bronze sub-levels -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+                                <!-- Gradient header with decorative circles -->
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="88dp"
+                                    android:background="@drawable/bg_tier_bronze_header"
+                                    android:clipToOutline="true">
+
+                                    <com.google.android.material.card.MaterialCardView
+                                        android:layout_width="120dp"
+                                        android:layout_height="120dp"
+                                        android:layout_gravity="end|top"
+                                        android:layout_marginTop="-28dp"
+                                        android:layout_marginEnd="-38dp"
+                                        app:cardBackgroundColor="#20FFFFFF"
+                                        app:cardCornerRadius="60dp"
+                                        app:cardElevation="0dp"
+                                        app:strokeWidth="0dp" />
+
+                                    <com.google.android.material.card.MaterialCardView
+                                        android:layout_width="80dp"
+                                        android:layout_height="80dp"
+                                        android:layout_gravity="end|bottom"
+                                        android:layout_marginEnd="12dp"
+                                        android:layout_marginBottom="-22dp"
+                                        app:cardBackgroundColor="#16FFFFFF"
+                                        app:cardCornerRadius="40dp"
+                                        app:cardElevation="0dp"
+                                        app:strokeWidth="0dp" />
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal"
+                                        android:padding="16dp">
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:layout_width="40dp"
+                                            android:layout_height="40dp"
+                                            android:src="@drawable/ic_shield_bronze" />
+
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="12dp"
+                                            android:layout_weight="1"
+                                            android:orientation="vertical">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/labelBronze"
+                                                android:textColor="@color/white"
+                                                android:textSize="@dimen/text_size_20" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginTop="5dp"
+                                                app:cardBackgroundColor="#28FFFFFF"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeWidth="0dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_medium"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="10dp"
+                                                    android:paddingVertical="3dp"
+                                                    android:text="@string/labelLifetimePayments"
+                                                    android:textColor="@color/white"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+                                    </LinearLayout>
+                                </FrameLayout>
+
+                                <!-- Bronze III -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_shield_bronze" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_semi_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/levelBronzeIII"
+                                                android:textColor="@color/black"
+                                                android:textSize="@dimen/text_size_13" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/chipBronzeIII"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="6dp"
+                                                android:visibility="gone"
+                                                app:cardBackgroundColor="@color/primary_light"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeColor="@color/primary"
+                                                app:strokeWidth="1dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="8dp"
+                                                    android:paddingVertical="2dp"
+                                                    android:text="@string/labelYou"
+                                                    android:textColor="@color/primary"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/levelBronzeIIITrigger"
+                                            android:textColor="@color/sub_text_color"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/cashback005"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginHorizontal="10dp"
+                                    android:background="@color/sheet_divider" />
+
+                                <!-- Bronze II -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_shield_bronze" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_semi_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/levelBronzeII"
+                                                android:textColor="@color/black"
+                                                android:textSize="@dimen/text_size_13" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/chipBronzeII"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="6dp"
+                                                android:visibility="gone"
+                                                app:cardBackgroundColor="@color/primary_light"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeColor="@color/primary"
+                                                app:strokeWidth="1dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="8dp"
+                                                    android:paddingVertical="2dp"
+                                                    android:text="@string/labelYou"
+                                                    android:textColor="@color/primary"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/levelBronzeIITrigger"
+                                            android:textColor="@color/sub_text_color"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/cashback010"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginHorizontal="10dp"
+                                    android:background="@color/sheet_divider" />
+
+                                <!-- Bronze I -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_shield_bronze" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_semi_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/levelBronzeI"
+                                                android:textColor="@color/black"
+                                                android:textSize="@dimen/text_size_13" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/chipBronzeI"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="6dp"
+                                                android:visibility="gone"
+                                                app:cardBackgroundColor="@color/primary_light"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeColor="@color/primary"
+                                                app:strokeWidth="1dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="8dp"
+                                                    android:paddingVertical="2dp"
+                                                    android:text="@string/labelYou"
+                                                    android:textColor="@color/primary"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/levelBronzeITrigger"
+                                            android:textColor="@color/sub_text_color"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/cashback015"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Bronze hint -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:src="@drawable/ic_info"
+                                android:tint="@color/sub_text_color" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_regular"
+                                android:includeFontPadding="false"
+                                android:lineSpacingMultiplier="1.35"
+                                android:text="@string/levelBronzeHint"
+                                android:textColor="@color/sub_text_color"
+                                android:textSize="@dimen/text_size_11" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- ── SILVER PANEL ── -->
+                    <LinearLayout
+                        android:id="@+id/panelSilver"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <!-- Gradient header with decorative circles -->
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="88dp"
+                            android:background="@drawable/bg_tier_silver_header"
+                            android:clipToOutline="true">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:layout_gravity="end|top"
+                                android:layout_marginTop="-28dp"
+                                android:layout_marginEnd="-38dp"
+                                app:cardBackgroundColor="#20FFFFFF"
+                                app:cardCornerRadius="60dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp" />
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:layout_gravity="end|bottom"
+                                android:layout_marginEnd="12dp"
+                                android:layout_marginBottom="-22dp"
+                                app:cardBackgroundColor="#16FFFFFF"
+                                app:cardCornerRadius="40dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="16dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@drawable/ic_shield_silver" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="12dp"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelSilver"
+                                        android:textColor="@color/white"
+                                        android:textSize="@dimen/text_size_20" />
+
+                                    <com.google.android.material.card.MaterialCardView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp"
+                                        app:cardBackgroundColor="#28FFFFFF"
+                                        app:cardCornerRadius="20dp"
+                                        app:cardElevation="0dp"
+                                        app:strokeWidth="0dp">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:paddingHorizontal="10dp"
+                                            android:paddingVertical="3dp"
+                                            android:text="@string/labelPaymentsReferrals"
+                                            android:textColor="@color/white"
+                                            android:textSize="@dimen/text_size_10" />
+                                    </com.google.android.material.card.MaterialCardView>
+                                </LinearLayout>
+                            </LinearLayout>
+                        </FrameLayout>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="4dp">
+
+                                <!-- Silver III -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_shield_silver" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_semi_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/levelSilverIII"
+                                                android:textColor="@color/black"
+                                                android:textSize="@dimen/text_size_13" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/chipSilverIII"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="6dp"
+                                                android:visibility="gone"
+                                                app:cardBackgroundColor="@color/primary_light"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeColor="@color/primary"
+                                                app:strokeWidth="1dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="8dp"
+                                                    android:paddingVertical="2dp"
+                                                    android:text="@string/labelYou"
+                                                    android:textColor="@color/primary"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/levelSilverIIITrigger"
+                                            android:textColor="@color/sub_text_color"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/cashback020"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginHorizontal="10dp"
+                                    android:background="@color/sheet_divider" />
+
+                                <!-- Silver II -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_shield_silver" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_semi_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/levelSilverII"
+                                                android:textColor="@color/black"
+                                                android:textSize="@dimen/text_size_13" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/chipSilverII"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="6dp"
+                                                android:visibility="gone"
+                                                app:cardBackgroundColor="@color/primary_light"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeColor="@color/primary"
+                                                app:strokeWidth="1dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="8dp"
+                                                    android:paddingVertical="2dp"
+                                                    android:text="@string/labelYou"
+                                                    android:textColor="@color/primary"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/levelSilverIITrigger"
+                                            android:textColor="@color/sub_text_color"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/cashback025"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginHorizontal="10dp"
+                                    android:background="@color/sheet_divider" />
+
+                                <!-- Silver I -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_shield_silver" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_semi_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/levelSilverI"
+                                                android:textColor="@color/black"
+                                                android:textSize="@dimen/text_size_13" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/chipSilverI"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="6dp"
+                                                android:visibility="gone"
+                                                app:cardBackgroundColor="@color/primary_light"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeColor="@color/primary"
+                                                app:strokeWidth="1dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="8dp"
+                                                    android:paddingVertical="2dp"
+                                                    android:text="@string/labelYou"
+                                                    android:textColor="@color/primary"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/levelSilverITrigger"
+                                            android:textColor="@color/sub_text_color"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/cashback030"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:src="@drawable/ic_info"
+                                android:tint="@color/sub_text_color" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_regular"
+                                android:includeFontPadding="false"
+                                android:lineSpacingMultiplier="1.35"
+                                android:text="@string/levelSilverHint"
+                                android:textColor="@color/sub_text_color"
+                                android:textSize="@dimen/text_size_11" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- ── GOLD PANEL ── -->
+                    <LinearLayout
+                        android:id="@+id/panelGold"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <!-- Gradient header with decorative circles -->
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="88dp"
+                            android:background="@drawable/bg_tier_gold_header"
+                            android:clipToOutline="true">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:layout_gravity="end|top"
+                                android:layout_marginTop="-28dp"
+                                android:layout_marginEnd="-38dp"
+                                app:cardBackgroundColor="#20FFFFFF"
+                                app:cardCornerRadius="60dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp" />
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:layout_gravity="end|bottom"
+                                android:layout_marginEnd="12dp"
+                                android:layout_marginBottom="-22dp"
+                                app:cardBackgroundColor="#16FFFFFF"
+                                app:cardCornerRadius="40dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="16dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@drawable/ic_shield_gold" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="12dp"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelGold"
+                                        android:textColor="@color/white"
+                                        android:textSize="@dimen/text_size_20" />
+
+                                    <com.google.android.material.card.MaterialCardView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp"
+                                        app:cardBackgroundColor="#28FFFFFF"
+                                        app:cardCornerRadius="20dp"
+                                        app:cardElevation="0dp"
+                                        app:strokeWidth="0dp">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:paddingHorizontal="10dp"
+                                            android:paddingVertical="3dp"
+                                            android:text="@string/labelReferralsLocking"
+                                            android:textColor="@color/white"
+                                            android:textSize="@dimen/text_size_10" />
+                                    </com.google.android.material.card.MaterialCardView>
+                                </LinearLayout>
+                            </LinearLayout>
+                        </FrameLayout>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="4dp">
+
+                                <!-- Gold III -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_shield_gold" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_semi_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/levelGoldIII"
+                                                android:textColor="@color/black"
+                                                android:textSize="@dimen/text_size_13" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/chipGoldIII"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="6dp"
+                                                android:visibility="gone"
+                                                app:cardBackgroundColor="@color/primary_light"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeColor="@color/primary"
+                                                app:strokeWidth="1dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="8dp"
+                                                    android:paddingVertical="2dp"
+                                                    android:text="@string/labelYou"
+                                                    android:textColor="@color/primary"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/levelGoldIIITrigger"
+                                            android:textColor="@color/sub_text_color"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/cashback035"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginHorizontal="10dp"
+                                    android:background="@color/sheet_divider" />
+
+                                <!-- Gold II -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_shield_gold" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_semi_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/levelGoldII"
+                                                android:textColor="@color/black"
+                                                android:textSize="@dimen/text_size_13" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/chipGoldII"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="6dp"
+                                                android:visibility="gone"
+                                                app:cardBackgroundColor="@color/primary_light"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeColor="@color/primary"
+                                                app:strokeWidth="1dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="8dp"
+                                                    android:paddingVertical="2dp"
+                                                    android:text="@string/labelYou"
+                                                    android:textColor="@color/primary"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/levelGoldIITrigger"
+                                            android:textColor="@color/sub_text_color"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/cashback040"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginHorizontal="10dp"
+                                    android:background="@color/sheet_divider" />
+
+                                <!-- Gold I -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_shield_gold" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_semi_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/levelGoldI"
+                                                android:textColor="@color/black"
+                                                android:textSize="@dimen/text_size_13" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/chipGoldI"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="6dp"
+                                                android:visibility="gone"
+                                                app:cardBackgroundColor="@color/primary_light"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeColor="@color/primary"
+                                                app:strokeWidth="1dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="8dp"
+                                                    android:paddingVertical="2dp"
+                                                    android:text="@string/labelYou"
+                                                    android:textColor="@color/primary"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/levelGoldITrigger"
+                                            android:textColor="@color/sub_text_color"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/cashback045"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:src="@drawable/ic_info"
+                                android:tint="@color/sub_text_color" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_regular"
+                                android:includeFontPadding="false"
+                                android:lineSpacingMultiplier="1.35"
+                                android:text="@string/levelGoldHint"
+                                android:textColor="@color/sub_text_color"
+                                android:textSize="@dimen/text_size_11" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- ── PLATINUM PANEL ── -->
+                    <LinearLayout
+                        android:id="@+id/panelPlatinum"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <!-- Gradient header with decorative circles -->
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="88dp"
+                            android:background="@drawable/bg_tier_platinum_header"
+                            android:clipToOutline="true">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:layout_gravity="end|top"
+                                android:layout_marginTop="-28dp"
+                                android:layout_marginEnd="-38dp"
+                                app:cardBackgroundColor="#20FFFFFF"
+                                app:cardCornerRadius="60dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp" />
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:layout_gravity="end|bottom"
+                                android:layout_marginEnd="12dp"
+                                android:layout_marginBottom="-22dp"
+                                app:cardBackgroundColor="#16FFFFFF"
+                                app:cardCornerRadius="40dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="16dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:src="@drawable/ic_shield_platinum" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="12dp"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelPlatinum"
+                                        android:textColor="@color/white"
+                                        android:textSize="@dimen/text_size_20" />
+
+                                    <com.google.android.material.card.MaterialCardView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp"
+                                        app:cardBackgroundColor="#28FFFFFF"
+                                        app:cardCornerRadius="20dp"
+                                        app:cardElevation="0dp"
+                                        app:strokeWidth="0dp">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:paddingHorizontal="10dp"
+                                            android:paddingVertical="3dp"
+                                            android:text="@string/labelHoldGoldI90"
+                                            android:textColor="@color/white"
+                                            android:textSize="@dimen/text_size_10" />
+                                    </com.google.android.material.card.MaterialCardView>
+                                </LinearLayout>
+                            </LinearLayout>
+                        </FrameLayout>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="4dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:padding="10dp">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:src="@drawable/ic_shield_platinum" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:orientation="horizontal">
+
+                                            <androidx.appcompat.widget.AppCompatTextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:fontFamily="@font/proza_libre_semi_bold"
+                                                android:includeFontPadding="false"
+                                                android:text="@string/labelPlatinum"
+                                                android:textColor="@color/black"
+                                                android:textSize="@dimen/text_size_13" />
+
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/chipPlatinum"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="6dp"
+                                                android:visibility="gone"
+                                                app:cardBackgroundColor="@color/primary_light"
+                                                app:cardCornerRadius="20dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeColor="@color/primary"
+                                                app:strokeWidth="1dp">
+
+                                                <androidx.appcompat.widget.AppCompatTextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:fontFamily="@font/proza_libre_bold"
+                                                    android:includeFontPadding="false"
+                                                    android:paddingHorizontal="8dp"
+                                                    android:paddingVertical="2dp"
+                                                    android:text="@string/labelYou"
+                                                    android:textColor="@color/primary"
+                                                    android:textSize="@dimen/text_size_10" />
+                                            </com.google.android.material.card.MaterialCardView>
+                                        </LinearLayout>
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/levelPlatinumTrigger"
+                                            android:textColor="@color/sub_text_color"
+                                            android:textSize="@dimen/text_size_11" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/cashback050"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_13" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:src="@drawable/ic_info"
+                                android:tint="@color/sub_text_color" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_regular"
+                                android:includeFontPadding="false"
+                                android:lineSpacingMultiplier="1.35"
+                                android:text="@string/levelPlatinumHint"
+                                android:textColor="@color/sub_text_color"
+                                android:textSize="@dimen/text_size_11" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- ═══ SECTION 5: YOUR WALLETS ═══ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:background="@color/white"
+                    android:orientation="vertical"
+                    android:padding="@dimen/page_margin_horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/proza_libre_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/titleYourWallets"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_18" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <!-- Bonus Wallet -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            app:cardBackgroundColor="@color/tierBronzeBg"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="14dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="28dp"
+                                    android:layout_height="28dp"
+                                    android:src="@drawable/ic_gift"
+                                    android:tint="@color/tierBronzeText" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelBonusWallet"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="12dp"
+                                        android:layout_height="12dp"
+                                        android:src="@drawable/ic_check_white"
+                                        android:tint="@color/tierBronzeText" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:lineSpacingMultiplier="1.3"
+                                        android:text="@string/descBonusWallet"
+                                        android:textColor="@color/sub_text_color"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="12dp"
+                                        android:layout_height="12dp"
+                                        android:src="@drawable/ic_check_white"
+                                        android:tint="@color/tierBronzeText" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:lineSpacingMultiplier="1.3"
+                                        android:text="@string/descBonusWalletPays"
+                                        android:textColor="@color/sub_text_color"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="12dp"
+                                        android:layout_height="12dp"
+                                        android:src="@drawable/ic_check_white"
+                                        android:tint="@color/tierBronzeText" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:lineSpacingMultiplier="1.3"
+                                        android:text="@string/descBonusWalletSpend"
+                                        android:textColor="@color/sub_text_color"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Earning Wallet -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            app:cardBackgroundColor="@color/earningSuccessBg"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="14dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="28dp"
+                                    android:layout_height="28dp"
+                                    android:src="@drawable/ic_piggy"
+                                    android:tint="@color/earningSuccessTextDark" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelEarningWallet"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_13" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="12dp"
+                                        android:layout_height="12dp"
+                                        android:src="@drawable/ic_check_white"
+                                        android:tint="@color/earningSuccessTextDark" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:lineSpacingMultiplier="1.3"
+                                        android:text="@string/descEarningWalletRate"
+                                        android:textColor="@color/sub_text_color"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="12dp"
+                                        android:layout_height="12dp"
+                                        android:src="@drawable/ic_check_white"
+                                        android:tint="@color/earningSuccessTextDark" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:lineSpacingMultiplier="1.3"
+                                        android:text="@string/descEarningWalletUnlocks"
+                                        android:textColor="@color/sub_text_color"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="12dp"
+                                        android:layout_height="12dp"
+                                        android:src="@drawable/ic_check_white"
+                                        android:tint="@color/earningSuccessTextDark" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="6dp"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:lineSpacingMultiplier="1.3"
+                                        android:text="@string/descEarningWalletWithdraw"
+                                        android:textColor="@color/sub_text_color"
+                                        android:textSize="@dimen/text_size_11" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- ═══ SECTION 6: GOOD TO KNOW ═══ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/page_margin_horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/proza_libre_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/titleGoodToKnow"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_18" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <!-- FAQ 1 -->
+                            <LinearLayout
+                                android:id="@+id/rowFaq1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?selectableItemBackground"
+                                android:orientation="vertical"
+                                android:padding="16dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvFaq1Question"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/faqQ1"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_13" />
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivFaq1Arrow"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:src="@drawable/ic_down_arrow"
+                                        android:tint="@color/sub_text_color" />
+                                </LinearLayout>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvFaq1Answer"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.4"
+                                    android:text="@string/faqA1"
+                                    android:textColor="@color/sub_text_color"
+                                    android:textSize="@dimen/text_size_12"
+                                    android:visibility="gone" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginHorizontal="16dp"
+                                android:background="@color/sheet_divider" />
+
+                            <!-- FAQ 2 -->
+                            <LinearLayout
+                                android:id="@+id/rowFaq2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?selectableItemBackground"
+                                android:orientation="vertical"
+                                android:padding="16dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvFaq2Question"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/faqQ2"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_13" />
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivFaq2Arrow"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:src="@drawable/ic_down_arrow"
+                                        android:tint="@color/sub_text_color" />
+                                </LinearLayout>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvFaq2Answer"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.4"
+                                    android:text="@string/faqA2"
+                                    android:textColor="@color/sub_text_color"
+                                    android:textSize="@dimen/text_size_12"
+                                    android:visibility="gone" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginHorizontal="16dp"
+                                android:background="@color/sheet_divider" />
+
+                            <!-- FAQ 3 -->
+                            <LinearLayout
+                                android:id="@+id/rowFaq3"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?selectableItemBackground"
+                                android:orientation="vertical"
+                                android:padding="16dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvFaq3Question"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/faqQ3"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_13" />
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivFaq3Arrow"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:src="@drawable/ic_down_arrow"
+                                        android:tint="@color/sub_text_color" />
+                                </LinearLayout>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvFaq3Answer"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.4"
+                                    android:text="@string/faqA3"
+                                    android:textColor="@color/sub_text_color"
+                                    android:textSize="@dimen/text_size_12"
+                                    android:visibility="gone" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginHorizontal="16dp"
+                                android:background="@color/sheet_divider" />
+
+                            <!-- FAQ 4 -->
+                            <LinearLayout
+                                android:id="@+id/rowFaq4"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?selectableItemBackground"
+                                android:orientation="vertical"
+                                android:padding="16dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvFaq4Question"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/faqQ4"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_13" />
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/ivFaq4Arrow"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:src="@drawable/ic_down_arrow"
+                                        android:tint="@color/sub_text_color" />
+                                </LinearLayout>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvFaq4Answer"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.4"
+                                    android:text="@string/faqA4"
+                                    android:textColor="@color/sub_text_color"
+                                    android:textSize="@dimen/text_size_12"
+                                    android:visibility="gone" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
