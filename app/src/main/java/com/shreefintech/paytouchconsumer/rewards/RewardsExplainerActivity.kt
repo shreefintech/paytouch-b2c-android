@@ -89,19 +89,40 @@ class RewardsExplainerActivity : BaseActivity() {
         binding.tvYourTierName.text = data.label ?: getString(tier.labelRes)
         binding.tvYourCashback.text = "%.2f%%".format(data.cashbackPercent ?: 0.0)
 
-        val remaining = data.next?.remaining ?: 0.0
-        binding.tvProgressNext.text = if (remaining > 0)
-            getString(R.string.labelMoreToNextLevel, Utility.formatAmount(remaining.toString()))
-        else
-            getString(R.string.msgTopTier)
+        val next = data.next
+        if (next == null) {
+            binding.tvProgressNext.text = getString(R.string.msgHighestLevelPermanent)
+            animateLevelProgress(1f)
+        } else {
+            val current = next.current ?: 0.0
+            val target  = next.target  ?: 0.0
+            val metric  = next.metric?.lowercase() ?: ""
 
-        val current  = data.next?.current ?: 0.0
-        val target   = data.next?.target  ?: 1.0
-        val progress = if (target > 0) (current / target).toFloat().coerceIn(0f, 1f) else 1f
-        animateLevelProgress(progress)
+            val amountPart = getString(
+                R.string.labelProgressAmountFormat,
+                progressValueText(current, metric),
+                progressValueWithUnitText(target, metric)
+            )
+            binding.tvProgressNext.text = next.label?.let {
+                getString(R.string.labelProgressToNextFormat, amountPart, it)
+            } ?: amountPart
+
+            val progress = if (target > 0) (current / target).toFloat().coerceIn(0f, 1f) else 1f
+            animateLevelProgress(progress)
+        }
 
         selectTierTab(tier)
         markYouBadge(data.label)
+    }
+
+    private fun progressValueText(value: Double, metric: String): String =
+        if (metric == "referrals" || metric.endsWith("days")) value.toLong().toString()
+        else Utility.formatAmount(value.toString(), trimZeros = true)
+
+    private fun progressValueWithUnitText(value: Double, metric: String): String = when {
+        metric == "referrals" -> "${value.toLong()} ${getString(R.string.labelReferrals).lowercase()}"
+        metric.endsWith("days") -> "${value.toLong()} ${getString(R.string.labelDays)}"
+        else -> Utility.formatAmount(value.toString(), trimZeros = true)
     }
 
     private fun animateLevelProgress(progress: Float) {

@@ -8,6 +8,7 @@ import android.os.Looper
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
@@ -85,6 +86,7 @@ class SplashActivity : BaseActivity() {
     }
 
     private fun redirect() {
+        NotificationHelper.syncToken(mActivity)
         val intent = when {
             sessionData?.requiresKyc == true  -> Intent(mActivity, KycActivity::class.java)
             sessionData?.requiresMpin == true -> ResetMpinActivity.buildCreateIntent(mActivity)

@@ -6,6 +6,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MpinItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
@@ -131,14 +132,15 @@ interface ApiService {
 
     @POST("${AUTH}logout")
     fun logout(
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        @Body body: LogoutRequest
     ): Call<MessageItem>
 
     // ── Push Notifications ────────────────────────────────────────────────────
 
     @POST("${AUTH}device-token")
     fun registerDeviceToken(
-        @Header("Authorization") authorization: String,
+        @Header("Authorization") authorization: String?,
         @Body body: DeviceTokenRequest
     ): Call<MessageItem>
 

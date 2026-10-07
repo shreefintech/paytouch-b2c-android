@@ -20,7 +20,6 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.SplashActivity
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
-import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRemoveRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper.bearerToken
@@ -111,7 +110,6 @@ object NotificationHelper {
      */
     fun syncToken(context: Context, token: String? = null) {
         val appContext = context.applicationContext
-        if (!SharedPreferenceHelper.isLoggedIn(appContext)) return
         if (token != null) {
             registerToken(appContext, token)
             return
@@ -119,55 +117,6 @@ object NotificationHelper {
         FirebaseMessaging.getInstance().token
             .addOnSuccessListener { fcmToken -> registerToken(appContext, fcmToken) }
             .addOnFailureListener { it.printStackTrace() }
-    }
-
-    /**
-     * Fire-and-forget token removal for session timeout. Captures the FCM token and bearer
-     * before the caller clears prefs, so the request goes out even after SharedPreferences
-     * are wiped on the next line.
-     */
-    fun removeTokenDetached(context: Context) {
-        val appContext = context.applicationContext
-        val fcmToken = SharedPreferenceHelper.getSharedPreferenceString(
-            appContext, Constant.KEY_FCM_TOKEN, ""
-        ) ?: ""
-        if (fcmToken.isEmpty() || !Utility.isInternetAvailable(appContext)) return
-        val bearer = bearerToken(appContext)
-        ApiClient.apiService.removeDeviceToken(bearer, DeviceTokenRemoveRequest(fcmToken))
-            .enqueue(object : Callback<MessageItem> {
-                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {}
-                override fun onFailure(call: Call<MessageItem>, t: Throwable) { t.printStackTrace() }
-            })
-    }
-
-    /**
-     * Unregisters this device's token so a logged-out device stops receiving the user's pushes.
-     * Must run before the logout API (it needs a valid bearer token). [onDone] is always invoked,
-     * on success, failure, or skip — logout must never be blocked by this call.
-     */
-    fun removeToken(context: Context, onDone: () -> Unit) {
-        val appContext = context.applicationContext
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            appContext, Constant.KEY_FCM_TOKEN, ""
-        ) ?: ""
-        if (token.isEmpty() || !Utility.isInternetAvailable(appContext)) {
-            onDone()
-            return
-        }
-        ApiClient.apiService.removeDeviceToken(SharedPreferenceHelper.bearerToken(appContext), DeviceTokenRemoveRequest(token))
-            .enqueue(object : Callback<MessageItem> {
-                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
-                    if (!response.isSuccessful) {
-                        IllegalStateException("removeDeviceToken failed: HTTP ${response.code()}").printStackTrace()
-                    }
-                    onDone()
-                }
-
-                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
-                    t.printStackTrace()
-                    onDone()
-                }
-            })
     }
 
     // Synchronized: onNewToken runs on an FCM worker thread while Login/Home sync on main
@@ -181,12 +130,14 @@ object NotificationHelper {
         if (token == registered) return
 
         pendingToken = token
+        val bearer = if (SharedPreferenceHelper.isLoggedIn(context)) bearerToken(context) else null
         val body = DeviceTokenRequest(
             fcmToken = token,
             platform = Constant.FCM_PLATFORM_ANDROID,
-            deviceId = deviceId(context)
+            deviceId = deviceId(context),
+            language = "en"
         )
-        ApiClient.apiService.registerDeviceToken(SharedPreferenceHelper.bearerToken(context), body)
+        ApiClient.apiService.registerDeviceToken(bearer, body)
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     pendingToken = null

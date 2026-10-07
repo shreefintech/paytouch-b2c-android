@@ -3,11 +3,13 @@ package com.shreefintech.paytouchconsumer
 import android.app.Application
 import android.location.Location
 import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import retrofit2.Call
@@ -22,10 +24,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         onLoading()
-        // Unregister push token first — it needs the bearer token that logout invalidates
-        NotificationHelper.removeToken(getApplication()) {
-            callLogout(onComplete, onError)
-        }
+        callLogout(onComplete, onError)
     }
 
     /** Fire-and-forget — used for payment risk checks; failures are not shown to the user. */
@@ -51,12 +50,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun callLogout(onComplete: () -> Unit, onError: (String) -> Unit) {
-        ApiClient.apiService.logout(bearerToken())
+        val fcmToken = SharedPreferenceHelper.getSharedPreferenceString(
+            getApplication(), Constant.KEY_FCM_TOKEN, ""
+        )?.ifEmpty { null }
+        ApiClient.apiService.logout(bearerToken(), LogoutRequest(fcmToken))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     // /logout response body only ever contains "message" (no "success" key),
                     // so checking body?.success == true would always be false. isSuccessful alone is correct here.
                     if (response.isSuccessful) {
+                        SharedPreferenceHelper.setSharedPreferenceString(
+                            getApplication(), Constant.KEY_FCM_TOKEN, ""
+                        )
                         onComplete()
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))

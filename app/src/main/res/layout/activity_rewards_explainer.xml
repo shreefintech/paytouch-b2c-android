@@ -29,22 +29,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:onClickListener="@{onClickListener}" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvScreenTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/page_margin_horizontal"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:layout_marginEnd="@dimen/page_margin_horizontal"
-            android:fontFamily="@font/proza_libre_bold"
-            android:includeFontPadding="false"
-            android:text="@string/titlePayTouchRewards"
-            android:textColor="@color/primary"
-            android:textSize="@dimen/text_size_18"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/lytToolbar" />
-
         <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -52,7 +36,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvScreenTitle">
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -103,24 +87,6 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
-
-                            <!-- Festive pill -->
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/tvFestiveChip"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/bg_rw_hero_pill"
-                                android:drawableStart="@drawable/ic_rw_spark"
-                                android:drawablePadding="6dp"
-                                android:fontFamily="@font/proza_libre_extra_bold"
-                                android:gravity="center_vertical"
-                                android:includeFontPadding="false"
-                                android:letterSpacing="0.05"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="5dp"
-                                android:text="@string/labelFestiveSeason"
-                                android:textColor="#FCCFA1"
-                                android:textSize="11sp" />
 
                             <!-- Headline (one TextView, "0.50% back" coloured in code) -->
                             <androidx.appcompat.widget.AppCompatTextView
@@ -265,7 +231,7 @@
                                 android:id="@+id/cardYourLevel"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="20dp"
+                                android:layout_marginTop="40dp"
                                 android:background="@drawable/bg_rw_level_card"
                                 android:foreground="?selectableItemBackground"
                                 android:onClick="@{onClickListener}"
@@ -542,7 +508,7 @@
                                             android:layout_marginTop="2dp"
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
-                                            android:lineSpacingMultiplier="1.4"
+                                            android:lineSpacingMultiplier="1.2"
                                             android:text="@string/stepPayBillsDesc"
                                             android:textColor="@color/rw_muted"
                                             android:textSize="13sp" />
@@ -607,7 +573,7 @@
                                             android:layout_marginTop="2dp"
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
-                                            android:lineSpacingMultiplier="1.4"
+                                            android:lineSpacingMultiplier="1.2"
                                             android:text="@string/stepReferFriendsDesc"
                                             android:textColor="@color/rw_muted"
                                             android:textSize="13sp" />
@@ -672,7 +638,7 @@
                                             android:layout_marginTop="2dp"
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
-                                            android:lineSpacingMultiplier="1.4"
+                                            android:lineSpacingMultiplier="1.2"
                                             android:text="@string/stepLockMoneyDesc"
                                             android:textColor="@color/rw_muted"
                                             android:textSize="13sp" />
@@ -726,7 +692,7 @@
                                             android:layout_marginTop="2dp"
                                             android:fontFamily="@font/proza_libre_regular"
                                             android:includeFontPadding="false"
-                                            android:lineSpacingMultiplier="1.4"
+                                            android:lineSpacingMultiplier="1.2"
                                             android:text="@string/stepHoldGoldDesc"
                                             android:textColor="@color/rw_muted"
                                             android:textSize="13sp" />
@@ -2328,7 +2294,7 @@
                                         android:layout_weight="1"
                                         android:fontFamily="@font/proza_libre_regular"
                                         android:includeFontPadding="false"
-                                        android:lineSpacingMultiplier="1.4"
+                                        android:lineSpacingMultiplier="1.2"
                                         android:text="@string/descBonusWallet"
                                         android:textColor="@color/rw_muted"
                                         android:textSize="12sp" />
@@ -2355,7 +2321,7 @@
                                         android:layout_weight="1"
                                         android:fontFamily="@font/proza_libre_regular"
                                         android:includeFontPadding="false"
-                                        android:lineSpacingMultiplier="1.4"
+                                        android:lineSpacingMultiplier="1.2"
                                         android:text="@string/descBonusWalletPays"
                                         android:textColor="@color/rw_muted"
                                         android:textSize="12sp" />
@@ -2382,7 +2348,7 @@
                                         android:layout_weight="1"
                                         android:fontFamily="@font/proza_libre_regular"
                                         android:includeFontPadding="false"
-                                        android:lineSpacingMultiplier="1.4"
+                                        android:lineSpacingMultiplier="1.2"
                                         android:text="@string/descBonusWalletSpend"
                                         android:textColor="@color/rw_muted"
                                         android:textSize="12sp" />
@@ -2454,7 +2420,7 @@
                                         android:layout_weight="1"
                                         android:fontFamily="@font/proza_libre_regular"
                                         android:includeFontPadding="false"
-                                        android:lineSpacingMultiplier="1.4"
+                                        android:lineSpacingMultiplier="1.2"
                                         android:text="@string/descEarningWalletRate"
                                         android:textColor="@color/rw_muted"
                                         android:textSize="12sp" />
@@ -2481,7 +2447,7 @@
                                         android:layout_weight="1"
                                         android:fontFamily="@font/proza_libre_regular"
                                         android:includeFontPadding="false"
-                                        android:lineSpacingMultiplier="1.4"
+                                        android:lineSpacingMultiplier="1.2"
                                         android:text="@string/descEarningWalletUnlocks"
                                         android:textColor="@color/rw_muted"
                                         android:textSize="12sp" />
@@ -2508,7 +2474,7 @@
                                         android:layout_weight="1"
                                         android:fontFamily="@font/proza_libre_regular"
                                         android:includeFontPadding="false"
-                                        android:lineSpacingMultiplier="1.4"
+                                        android:lineSpacingMultiplier="1.2"
                                         android:text="@string/descEarningWalletWithdraw"
                                         android:textColor="@color/rw_muted"
                                         android:textSize="12sp" />
@@ -2592,7 +2558,7 @@
                                     android:layout_marginTop="8dp"
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
-                                    android:lineSpacingMultiplier="1.4"
+                                    android:lineSpacingMultiplier="1.2"
                                     android:text="@string/faqA1"
                                     android:textColor="@color/sub_text_color"
                                     android:textSize="@dimen/text_size_12"
@@ -2646,7 +2612,7 @@
                                     android:layout_marginTop="8dp"
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
-                                    android:lineSpacingMultiplier="1.4"
+                                    android:lineSpacingMultiplier="1.2"
                                     android:text="@string/faqA2"
                                     android:textColor="@color/sub_text_color"
                                     android:textSize="@dimen/text_size_12"
@@ -2700,7 +2666,7 @@
                                     android:layout_marginTop="8dp"
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
-                                    android:lineSpacingMultiplier="1.4"
+                                    android:lineSpacingMultiplier="1.2"
                                     android:text="@string/faqA3"
                                     android:textColor="@color/sub_text_color"
                                     android:textSize="@dimen/text_size_12"
@@ -2754,7 +2720,7 @@
                                     android:layout_marginTop="8dp"
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
-                                    android:lineSpacingMultiplier="1.4"
+                                    android:lineSpacingMultiplier="1.2"
                                     android:text="@string/faqA4"
                                     android:textColor="@color/sub_text_color"
                                     android:textSize="@dimen/text_size_12"

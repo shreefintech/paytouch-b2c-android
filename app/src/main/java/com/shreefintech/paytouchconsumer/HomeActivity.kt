@@ -16,7 +16,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Lifecycle
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -27,7 +26,6 @@ import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
-import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.fastag.FastagActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -58,12 +56,7 @@ class HomeActivity : BaseActivity() {
     // Field-initialised: activity-result launchers must be registered before onStart()
     private val locationHelper = LocationPermissionHelper(this) { location ->
         location?.let { viewModel.sendLocation(it) }
-        // Asked after the location flow ends so the two system permission popups never overlap
-        requestNotificationPermission()
     }
-
-    // True when the location flow ended while Home was not in front — asked again in onResume()
-    private var isNotificationPermissionPending = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,24 +96,8 @@ class HomeActivity : BaseActivity() {
 
         // Skip on config change / process restore — once per Home launch is enough
         if (savedInstanceState == null) {
-            NotificationHelper.syncToken(mActivity)
             locationHelper.start()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (isNotificationPermissionPending) requestNotificationPermission()
-    }
-
-    // Never pop the system dialog over another screen (e.g. a category opened mid location fix)
-    private fun requestNotificationPermission() {
-        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            isNotificationPermissionPending = true
-            return
-        }
-        isNotificationPermissionPending = false
-        NotificationHelper.requestPermission(mActivity)
     }
 
     // Animated WebP — decoded on all API levels via the webpdecoder Glide integration.
