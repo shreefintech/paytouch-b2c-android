@@ -153,4 +153,10 @@
     <color name="rank_tint_silver">#C8D2E1</color>
     <color name="rank_tint_gold">#FFD65C</color>
     <color name="rank_tint_platinum">#BEAFFF</color>
+
+
+    <color name="rank_primary_light">#FFEEF4</color>
+    <color name="rank_peach">#FCCFA1</color>
+    <color name="rank_white_70">#B3FFFFFF</color>
+
 </resources>

@@ -894,4 +894,41 @@
     <string name="rank_replay">Replay celebration</string>
     <string name="rank_error">Could not load your level. Please try again.</string>
 
+    <string name="lu_close">Close</string>
+    <string name="lu_replay">Replay</string>
+    <string name="lu_level_up">LEVEL UP</string>
+    <string name="lu_highest_level">HIGHEST LEVEL</string>
+    <string name="lu_you_are">You are %1$s!</string>
+    <string name="lu_your_new_cashback">YOUR NEW CASHBACK</string>
+    <string name="lu_your_permanent_cashback">YOUR PERMANENT CASHBACK</string>
+    <string name="lu_cashback_word">cashback</string>
+    <string name="lu_cash_note_festive">On every bill after the festive season · until then flat ₹5 on every bill of ₹50+</string>
+    <string name="lu_cash_note_active">On every bill you pay</string>
+    <string name="lu_cash_note_platinum">Highest rate on every bill · never expires</string>
+    <string name="lu_tier_progress">%1$s progress</string>
+    <string name="lu_of_three">%1$d of 3</string>
+    <string name="lu_next">Next: %1$s</string>
+    <string name="lu_req_txn">₹%1$s in lifetime payments</string>
+    <string name="lu_req_referrals">%1$s friends complete KYC</string>
+    <string name="lu_req_locked">₹%1$s locked 30+ days in Earning Wallet</string>
+    <string name="lu_req_gold_days">Stay at Gold I for %1$s days in a row</string>
+    <string name="lu_perm_title">Platinum is permanent</string>
+    <string name="lu_perm_body">You will never drop from this level</string>
+    <string name="lu_continue">Continue</string>
+    <string name="lu_medal_bronze">Bronze</string>
+    <string name="lu_medal_silver">Silver</string>
+    <string name="lu_medal_gold">Gold</string>
+
+    <!-- one line under the title, per level -->
+    <string name="lu_sub_bronze_3">Welcome to PayTouch Rewards. Your journey starts now.</string>
+    <string name="lu_sub_bronze_2">You crossed ₹1,000 in lifetime payments.</string>
+    <string name="lu_sub_bronze_1">You crossed ₹4,000 in lifetime payments.</string>
+    <string name="lu_sub_silver_3">₹10,000 in lifetime payments. Now invite friends to climb.</string>
+    <string name="lu_sub_silver_2">5 friends joined and completed KYC.</string>
+    <string name="lu_sub_silver_1">20 friends joined. Your circle is growing.</string>
+    <string name="lu_sub_gold_3">30 referrals. You will never drop below Gold now.</string>
+    <string name="lu_sub_gold_2">₹1,000 locked in your Earning Wallet for 30+ days.</string>
+    <string name="lu_sub_gold_1">₹4,000 locked for 30+ days. Platinum is in sight.</string>
+    <string name="lu_sub_platinum">90 days in a row at Gold I. This level is yours forever.</string>
+
 </resources>
