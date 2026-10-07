@@ -346,6 +346,10 @@
             android:name=".transactions.BillPaymentStatusActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".rewards.MyRankActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".fcm.MyFirebaseMessagingService"

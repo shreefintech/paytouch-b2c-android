@@ -143,4 +143,14 @@
     <color name="rw_gold_icon">#8A5800</color>
     <!--  card shadow tint, used on API 28+ = rgba(213,38,98,0.2)  -->
     <color name="rw_card_shadow">#33D52662</color>
+
+    <color name="rank_primary">#D52662</color>
+    <color name="rank_ink">#2B0B33</color>
+    <color name="rank_muted">#6E5763</color>
+    <color name="rank_card_shadow">#33D52662</color>
+    <!--  tier glow / rays tint  -->
+    <color name="rank_tint_bronze">#F6AA6E</color>
+    <color name="rank_tint_silver">#C8D2E1</color>
+    <color name="rank_tint_gold">#FFD65C</color>
+    <color name="rank_tint_platinum">#BEAFFF</color>
 </resources>

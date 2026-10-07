@@ -197,9 +197,9 @@ class RewardsExplainerActivity : BaseActivity() {
                 binding.tabSilver   -> { if (Utility.stopClick()) return@OnClickListener; selectTierTab(RewardsTier.SILVER) }
                 binding.tabGold     -> { if (Utility.stopClick()) return@OnClickListener; selectTierTab(RewardsTier.GOLD) }
                 binding.tabPlatinum -> { if (Utility.stopClick()) return@OnClickListener; selectTierTab(RewardsTier.PLATINUM) }
-                binding.tvMyRank    -> {
+                binding.cardYourLevel    -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-205): navigate to MyRankActivity when implemented
+                    startActivity(Intent(mActivity, MyRankActivity::class.java))
                 }
             }
         }

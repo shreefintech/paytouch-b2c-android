@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg"
+        tools:context=".rewards.MyRankActivity">
+
+        <!-- ═══ TOOLBAR ═══ -->
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+            <LinearLayout
+                android:id="@+id/llContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="28dp"
+                android:visibility="invisible"
+                tools:visibility="visible">
+
+                <!-- ═══ HERO: dark card with rays, glow, shield, name, cashback ═══ -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="340dp"
+                    app:cardBackgroundColor="#00000000"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="10dp"
+                    app:strokeWidth="0dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_rank_hero">
+
+                        <!-- rays: 520dp square, centre 140dp from top, tinted per tier -->
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivRays"
+                            android:layout_width="520dp"
+                            android:layout_height="520dp"
+                            android:layout_gravity="center_horizontal|top"
+                            android:layout_marginTop="-120dp"
+                            android:importantForAccessibility="no"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/img_rank_rays"
+                            app:tint="@color/rank_tint_silver" />
+
+                        <!-- soft glow behind shield, tinted per tier -->
+                        <View
+                            android:id="@+id/viewGlow"
+                            android:layout_width="260dp"
+                            android:layout_height="260dp"
+                            android:layout_gravity="center_horizontal|top"
+                            android:layout_marginTop="10dp"
+                            android:background="@drawable/bg_rank_glow"
+                            android:backgroundTint="@color/rank_tint_silver" />
+
+                        <!-- shield + level name in capsule -->
+                        <FrameLayout
+                            android:id="@+id/flBadge"
+                            android:layout_width="168dp"
+                            android:layout_height="192dp"
+                            android:layout_gravity="center_horizontal|top"
+                            android:layout_marginTop="44dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/ivShield"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/ic_rank_shield_silver" />
+                        </FrameLayout>
+
+                        <!-- name + cashback pill -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="240dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="16dp">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvRankName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/proza_libre_extra_bold"
+                                android:includeFontPadding="false"
+                                android:letterSpacing="-0.01"
+                                android:textColor="#FFFFFF"
+                                android:textSize="22sp"
+                                tools:text="Silver III" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvCashPill"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_rank_cash_pill"
+                                android:fontFamily="@font/proza_libre_regular"
+                                android:includeFontPadding="false"
+                                android:paddingHorizontal="14dp"
+                                android:paddingVertical="6dp"
+                                android:textColor="#FFFFFF"
+                                android:textSize="12sp"
+                                tools:text="0.20% cashback on every bill" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ═══ ROAD TO NEXT LEVEL ═══ -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardRoad"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:outlineAmbientShadowColor="@color/rank_card_shadow"
+                    android:outlineSpotShadowColor="@color/rank_card_shadow"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="22dp"
+                    app:cardElevation="6dp"
+                    app:strokeWidth="0dp"
+                    tools:targetApi="p">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvRoadTitle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_extra_bold"
+                                android:includeFontPadding="false"
+                                android:textColor="@color/rank_ink"
+                                android:textSize="16sp"
+                                tools:text="Road to Silver II" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvNextCashChip"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:background="@drawable/bg_rank_next_chip"
+                                android:fontFamily="@font/proza_libre_extra_bold"
+                                android:includeFontPadding="false"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="4dp"
+                                android:textColor="@color/rank_primary"
+                                android:textSize="12sp"
+                                tools:text="0.25%" />
+                        </LinearLayout>
+
+                        <!-- A) progress bar (Bronze, Silver, Gold III / II) -->
+                        <LinearLayout
+                            android:id="@+id/llBar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:orientation="vertical">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="12dp"
+                                android:background="@drawable/bg_rank_bar_track">
+
+                                <View
+                                    android:id="@+id/viewBarFill"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/bg_rank_bar_fill"
+                                    android:scaleX="0"
+                                    android:transformPivotX="0dp" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvProgress"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/rank_ink"
+                                    android:textSize="13sp"
+                                    tools:text="0 of 5 referrals" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvProgressPct"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/rank_muted"
+                                    android:textSize="13sp"
+                                    tools:text="0%" />
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvRule"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/proza_libre_regular"
+                                android:includeFontPadding="false"
+                                android:lineSpacingMultiplier="1.45"
+                                android:textColor="@color/rank_muted"
+                                android:textSize="12sp"
+                                tools:text="A friend counts once they complete KYC after you reached Silver." />
+                        </LinearLayout>
+
+                        <!-- B) Gold I → Platinum countdown ring -->
+                        <LinearLayout
+                            android:id="@+id/llCountdown"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <FrameLayout
+                                android:layout_width="92dp"
+                                android:layout_height="92dp">
+
+                                <com.shreefintech.paytouchconsumer.rewards.ProgressRingView
+                                    android:id="@+id/ringDays"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvRingValue"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_extra_bold"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/rank_primary"
+                                        android:textSize="24sp"
+                                        tools:text="62" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvRingTotal"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:textColor="@color/rank_muted"
+                                        android:textSize="11sp"
+                                        tools:text="of 90 days" />
+                                </LinearLayout>
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvDaysToGo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_extra_bold"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/rank_ink"
+                                    android:textSize="15sp"
+                                    tools:text="28 days to go" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.45"
+                                    android:text="@string/rank_countdown_rule"
+                                    android:textColor="@color/rank_muted"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ═══ PLATINUM: permanent card (shown when next == null) ═══ -->
+                <LinearLayout
+                    android:id="@+id/llPlatinum"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_rank_platinum_card"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:visibility="gone">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_rank_infinity" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_extra_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/rank_platinum_title"
+                            android:textColor="#FFFFFF"
+                            android:textSize="15sp" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/proza_libre_regular"
+                            android:includeFontPadding="false"
+                            android:text="@string/rank_platinum_body"
+                            android:textColor="#D9FFFFFF"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- pushes the button to the bottom on tall screens -->
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:minHeight="24dp" />
+
+                <!-- ═══ REPLAY CELEBRATION ═══ -->
+                <LinearLayout
+                    android:id="@+id/btnReplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_rank_btn_primary"
+                    android:elevation="6dp"
+                    android:foreground="?selectableItemBackground"
+                    android:gravity="center"
+                    android:onClick="@{onClickListener}"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_rank_replay" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="@font/proza_libre_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/rank_replay"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmerLayout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+            <include layout="@layout/lyt_shimmer_rank" />
+        </com.facebook.shimmer.ShimmerFrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
