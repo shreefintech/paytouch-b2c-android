@@ -616,6 +616,19 @@
     <string name="labelTermsAndConditions">Terms &amp; Conditions</string>
     <string name="msgBankDetailsSubmitSuccess">Bank details submitted successfully</string>
 
+    <!-- Edit Bank Details -->
+    <string name="titleEditBankDetails">Edit Bank Details</string>
+    <string name="msgWithdrawalBankNote">This is your withdrawal account. Your next withdrawal will go to the new details.</string>
+    <string name="labelAccountHolderName">Account Holder Name</string>
+    <string name="hintAccountHolderName">Enter account holder name</string>
+    <string name="msgAccountHolderNameEmpty">Please enter account holder name.</string>
+    <string name="msgAccountNumberRange">Account number must be 9 to 18 digits.</string>
+    <string name="labelLoginPassword">Login Password</string>
+    <string name="hintLoginPassword">Password</string>
+    <string name="msgBankProofOptional">Optional — your current proof is kept if you don\'t upload a new one.</string>
+    <string name="msgLoginPasswordNote">Enter your login password to confirm this change.</string>
+    <string name="btnUpdateBankDetails">Update Bank Details</string>
+
     <!-- KYC module — bank validation -->
     <string name="msgAccountNumberEmpty">Please enter account number</string>
     <string name="msgAccountNumberInvalid">Please enter a valid account number</string>

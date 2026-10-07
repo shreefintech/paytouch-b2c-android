@@ -367,7 +367,7 @@
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- Header: title LEFT | Verified RIGHT -->
+                        <!-- Header: title LEFT | Verified RIGHT | Edit button -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -433,6 +433,7 @@
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:orientation="vertical">
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -453,6 +454,18 @@
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_13" />
                             </LinearLayout>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/ivEditBank"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:layout_marginStart="@dimen/margin_small"
+                                android:foreground="?selectableItemBackgroundBorderless"
+                                android:padding="4dp"
+                                android:background="@drawable/bg_close"
+                                android:src="@drawable/ic_toast_edit"
+                                android:tint="@color/primary"
+                                android:visibility="visible" />
                         </LinearLayout>
 
                         <!-- Bank Name (with icon) | IFSC code (no icon) — two columns -->
