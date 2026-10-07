@@ -83,6 +83,7 @@
                             android:layout_width="0dp"
                             android:layout_height="0dp"
                             android:scaleType="fitXY"
+                            app:layout_constraintHeight_min="459dp"
                             android:src="@drawable/img_hero_background_with_levels"
                             app:layout_constraintBottom_toBottomOf="@id/llHeroContent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -93,7 +94,7 @@
                         <LinearLayout
                             android:id="@+id/llHeroContent"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
                             android:orientation="vertical"
                             android:paddingStart="18dp"
                             android:paddingTop="22dp"
