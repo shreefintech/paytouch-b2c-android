@@ -2,7 +2,11 @@ package com.shreefintech.paytouchconsumer.rewards
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -14,6 +18,9 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityRewardsExplainerBin
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.utill.Utility
+import androidx.core.graphics.toColorInt
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 class RewardsExplainerActivity : BaseActivity() {
 
@@ -31,11 +38,20 @@ class RewardsExplainerActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRewardsExplainerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
+            )
+            insets
+        }
         binding.onClickListener = onClickListener()
 
         Glide.with(this).load(R.drawable.img_hero_background_with_levels).into(binding.ivHeroBg)
-
+        setupHeroHeadline()
         setupFaq()
         onBack()
         loadLevel()
@@ -46,6 +62,24 @@ class RewardsExplainerActivity : BaseActivity() {
             onSuccess = { data -> populateHero(data) },
             onError   = { /* non-critical — defaults already visible */ }
         )
+    }
+
+    private fun setupHeroHeadline() {
+        val full = getString(R.string.titleRewardsHero)
+        val highlight = "0.50% back"
+        val start = full.indexOf(highlight)
+
+        binding.tvHeroHeadline.text = if (start >= 0) {
+            SpannableString(full).apply {
+                setSpan(
+                    ForegroundColorSpan("#FCCFA1".toColorInt()),
+                    start, start + highlight.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        } else {
+            full   // text changed and highlight not found: show plain, don't crash
+        }
     }
 
     private fun populateHero(data: RewardsLevelItem) {

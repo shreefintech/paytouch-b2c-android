@@ -132,4 +132,15 @@
     <color name="earningInk">#1C1C1C</color>
     <color name="earningMuted">#5C5C5C</color>
     <color name="earningError">#D3122E</color>
+
+    <color name="rw_primary">#D52662</color>
+    <color name="rw_primary_dark">#B81D52</color>
+    <color name="rw_primary_light">#FFEEF4</color>
+    <color name="rw_ink">#2B0B33</color>
+    <color name="rw_muted">#6E5763</color>
+    <color name="rw_line">#F5C4D5</color>
+    <color name="rw_gold_tile">#FFF3D1</color>
+    <color name="rw_gold_icon">#8A5800</color>
+    <!--  card shadow tint, used on API 28+ = rgba(213,38,98,0.2)  -->
+    <color name="rw_card_shadow">#33D52662</color>
 </resources>

@@ -769,7 +769,7 @@
     <string name="labelGoldAllCaps">GOLD</string>
     <string name="labelPlatinumAllCaps">PLATINUM</string>
     <string name="labelCashback">Cashback</string>
-    <string name="labelMyRank">My Rank →</string>
+    <string name="labelMyRank">My Rank </string>
     <string name="titleCashbackGrows">Cashback grows every level</string>
     <string name="subtitleCashbackGrows">From 0.05% at Bronze III up to 0.50% at Platinum — your cashback rate increases as you level up.</string>
     <string name="labelPlatAbbrev">Plat.</string>
@@ -852,4 +852,7 @@
     <string name="faqQ4">How does the Earning Wallet interest work?</string>
     <string name="faqA4">Money you lock in the Earning Wallet earns 11% per annum, calculated daily and credited monthly. Funds are locked for a minimum of 30 days; you can withdraw after that at any time.</string>
 
+
+
+    <string name="titleRewardsHero">Level up and earn\nup to 0.50% back</string>
 </resources>
