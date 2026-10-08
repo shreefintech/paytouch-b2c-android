@@ -344,20 +344,23 @@
                                     </LinearLayout>
                                 </LinearLayout>
 
-                                <FrameLayout
+                                <com.google.android.material.card.MaterialCardView
                                     android:layout_width="match_parent"
                                     android:layout_height="10dp"
                                     android:layout_marginTop="10dp"
-                                    android:background="@drawable/bg_progress_track">
+                                    app:cardBackgroundColor="@color/progress_track"
+                                    app:cardCornerRadius="5dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
 
                                     <View
                                         android:id="@+id/viewProgressFill"
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
-                                        android:background="@drawable/bg_progress_fill"
+                                        android:background="@color/primary"
                                         android:scaleX="0"
                                         android:transformPivotX="0dp" />
-                                </FrameLayout>
+                                </com.google.android.material.card.MaterialCardView>
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
