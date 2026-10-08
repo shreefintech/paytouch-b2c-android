@@ -177,7 +177,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
                                     android:visibility="gone"
-                                    app:cardBackgroundColor="@color/earningCardInteratstBg"
+                                    app:cardBackgroundColor="@color/earningCardInterestBg"
                                     app:cardCornerRadius="10dp"
                                     app:cardElevation="0dp"
                                     app:strokeWidth="0dp">
