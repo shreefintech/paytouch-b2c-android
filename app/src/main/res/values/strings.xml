@@ -863,25 +863,24 @@
     <string name="titleRewardsHero">Level up and earn\nup to 0.50% back</string>
 
     <string name="labelRewardsHeroHighlight">0.50% back</string>
-    <string name="rank_cash_suffix"> cashback on every bill</string>
-    <string name="rank_road_to">Road to %1$s</string>
-    <string name="rank_percent">%1$s%%</string>
+    <string name="labelCashbackSuffix"> cashback on every bill</string>
+    <string name="titleRoadToLevel">Road to %1$s</string>
     <!--  progress line per next.metric  -->
-    <string name="rank_progress_txn">₹%1$s of ₹%2$s lifetime payments</string>
-    <string name="rank_progress_referrals">%1$s of %2$s referrals</string>
-    <string name="rank_progress_locked">₹%1$s of ₹%2$s locked 30+ days</string>
+    <string name="msgRankProgressTxn">%1$s of %2$s lifetime payments</string>
+    <string name="msgRankProgressReferrals">%1$s of %2$s referrals</string>
+    <string name="msgRankProgressLocked">%1$s of %2$s locked 30+ days</string>
     <!--  rule line per next.metric  -->
-    <string name="rank_rule_txn">Every successful payment counts toward your next level.</string>
-    <string name="rank_rule_referrals">A friend counts once they complete KYC after you reached Silver.</string>
-    <string name="rank_rule_locked">Money kept 30+ days in your Earning Wallet counts. You never drop below Gold III.</string>
+    <string name="msgRankRuleTxn">Every successful payment counts toward your next level.</string>
+    <string name="msgRankRuleReferrals">A friend counts once they complete KYC after you reached Silver.</string>
+    <string name="msgRankRuleLocked">Money kept 30+ days in your Earning Wallet counts. You never drop below Gold III.</string>
     <!--  Gold I countdown  -->
-    <string name="rank_days_of">of %1$d days</string>
-    <string name="rank_days_to_go">%1$d days to go</string>
-    <string name="rank_countdown_rule">Stay at Gold I every day. If your locked balance drops below ₹4,000, the count restarts.</string>
+    <string name="labelDaysOf">of %1$d days</string>
+    <string name="msgDaysToGo">%1$d days to go</string>
+    <string name="msgRankCountdownRule">Stay at Gold I every day. If your locked balance drops below ₹4,000, the count restarts.</string>
     <!--  Platinum  -->
-    <string name="rank_platinum_title">Highest level · permanent</string>
-    <string name="rank_platinum_body">You will never drop from Platinum.</string>
-    <string name="rank_replay">Replay celebration</string>
-    <string name="rank_error">Could not load your level. Please try again.</string>
+    <string name="titleRankPlatinum">Highest level · permanent</string>
+    <string name="msgRankPlatinumBody">You will never drop from Platinum.</string>
+    <string name="btnReplayCelebration">Replay celebration</string>
+    <string name="errRankLoad">Could not load your level. Please try again.</string>
 
 </resources>
