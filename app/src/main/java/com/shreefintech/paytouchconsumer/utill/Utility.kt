@@ -72,6 +72,24 @@ object Utility {
         return createdAt
     }
 
+    fun parseIsoMillis(raw: String?): Long? {
+        if (raw.isNullOrBlank()) return null
+        val cleaned = raw.substringBefore(".").substringBefore("+")
+        val utc = TimeZone.getTimeZone("UTC")
+        for (pattern in listOf("yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd")) {
+            try {
+                val date = SimpleDateFormat(pattern, Locale.getDefault()).apply { timeZone = utc }.parse(cleaned)
+                if (date != null) return date.time
+            } catch (e: Exception) { e.printStackTrace() }
+        }
+        return null
+    }
+
+    fun formatMillis(ms: Long, format: String): String {
+        val ist = TimeZone.getTimeZone("Asia/Kolkata")
+        return SimpleDateFormat(format, Locale.getDefault()).apply { timeZone = ist }.format(java.util.Date(ms))
+    }
+
     fun isPasswordStrong(password: String): Boolean =
         password.any { it.isUpperCase() } &&
         password.any { it.isDigit() } &&
