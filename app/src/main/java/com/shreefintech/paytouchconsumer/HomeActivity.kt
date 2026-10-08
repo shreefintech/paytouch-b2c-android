@@ -41,6 +41,7 @@ import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
+import com.shreefintech.paytouchconsumer.rewards.LevelUpActivity
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
@@ -117,6 +118,12 @@ class HomeActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        viewModel.checkLevelUp { levelData ->
+            // Skip if the user already left Home (e.g. opened a module) before the response arrived.
+            if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                LevelUpActivity.start(mActivity, levelData)
+            }
+        }
         if (isNotificationPermissionPending) requestNotificationPermission()
     }
 

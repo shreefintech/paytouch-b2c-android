@@ -29,7 +29,7 @@ class BannerSliderHelper(
     }
 
     init {
-        viewPager.adapter = BannerAdp(context, banners)
+        viewPager.adapter = BannerAdp(banners)
         viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 

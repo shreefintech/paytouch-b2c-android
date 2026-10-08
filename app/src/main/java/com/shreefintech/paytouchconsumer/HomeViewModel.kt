@@ -4,11 +4,14 @@ import android.app.Application
 import android.location.Location
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
+import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
+import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -44,6 +47,40 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onFailure(call: Call<MessageItem>, t: Throwable) {
+                    t.printStackTrace()
+                }
+            })
+    }
+
+    /**
+     * Silently checks /api/level on every Dashboard appear.
+     * Saves the level first so each level shows exactly once; the first level seen
+     * after install or login is only recorded, never celebrated.
+     * No toast on failure — matches iOS "the level check is silent" spec.
+     */
+    fun checkLevelUp(onLevelUp: (RewardsLevelItem) -> Unit) {
+        if (!Utility.isInternetAvailable(getApplication())) return
+        ApiClient.apiService.getRewardsLevel(bearerToken())
+            .enqueue(object : Callback<General<RewardsLevelItem?>> {
+                override fun onResponse(
+                    call: Call<General<RewardsLevelItem?>>,
+                    response: Response<General<RewardsLevelItem?>>
+                ) {
+                    val data = if (response.isSuccessful) response.body()?.data else null
+                    if (data == null) return
+                    val newLevel = data.level ?: return
+                    val saved = SharedPreferenceHelper.getSharedPreferenceString(
+                        getApplication(), Constant.KEY_LAST_SEEN_LEVEL, ""
+                    ).orEmpty()
+                    SharedPreferenceHelper.setSharedPreferenceString(
+                        getApplication(), Constant.KEY_LAST_SEEN_LEVEL, newLevel
+                    )
+                    // First sighting (fresh install / re-login): record the level without celebrating.
+                    if (saved.isEmpty()) return
+                    if (RewardsTier.shouldShowLevelUp(newLevel, saved)) onLevelUp(data)
+                }
+
+                override fun onFailure(call: Call<General<RewardsLevelItem?>>, t: Throwable) {
                     t.printStackTrace()
                 }
             })

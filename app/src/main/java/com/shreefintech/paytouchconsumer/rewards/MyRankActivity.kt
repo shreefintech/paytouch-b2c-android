@@ -234,7 +234,7 @@ class MyRankActivity : BaseActivity() {
     // ───────────────────────── NAV ─────────────────────────
 
     private fun openCelebration() {
-        levelData ?: return
-        // TODO(B2C-207): navigate to level-up celebration Activity when implemented
+        val d = levelData ?: return
+        LevelUpActivity.start(this, d)
     }
 }

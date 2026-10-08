@@ -1,0 +1,861 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <FrameLayout
+        android:id="@+id/flRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_lu_screen"
+        android:clipChildren="true"
+        tools:context=".rewards.LevelUpActivity">
+
+        <!-- ═══ STAGE: everything above the bottom sheet (positions = design px from top) ═══ -->
+        <FrameLayout
+            android:id="@+id/flStage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false">
+
+            <!-- rotating rays (620dp, centre 228dp from top) -->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivRays"
+                android:layout_width="620dp"
+                android:layout_height="620dp"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="-82dp"
+                android:alpha="1.0"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                android:src="@drawable/img_lu_rays" />
+
+            <!-- pulse rings (180dp, centre 222dp) — behind glow so the glow stays visually static -->
+            <View
+                android:id="@+id/viewRing1"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="132dp"
+                android:alpha="0"
+                android:background="@drawable/bg_lu_ring" />
+
+            <View
+                android:id="@+id/viewRing2"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="132dp"
+                android:alpha="0"
+                android:background="@drawable/bg_lu_ring" />
+
+            <!-- glow (300dp, centre 228dp) — static layer drawn on top of the rings -->
+            <View
+                android:id="@+id/viewGlow"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="78dp"
+                android:background="@drawable/bg_lu_glow" />
+
+            <!-- sparkles: fixed positions from the design (390dp-wide frame, centred) -->
+            <FrameLayout
+                android:layout_width="390dp"
+                android:layout_height="340dp"
+                android:layout_gravity="center_horizontal|top">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivSparkle0"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="52dp"
+                    android:layout_marginTop="150dp"
+                    android:alpha="0"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_lu_sparkle" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivSparkle1"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="318dp"
+                    android:layout_marginTop="132dp"
+                    android:alpha="0"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_lu_sparkle" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivSparkle2"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="70dp"
+                    android:layout_marginTop="300dp"
+                    android:alpha="0"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_lu_sparkle" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivSparkle3"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="306dp"
+                    android:layout_marginTop="290dp"
+                    android:alpha="0"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_lu_sparkle" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivSparkle4"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="226dp"
+                    android:alpha="0"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_lu_sparkle" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivSparkle5"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="336dp"
+                    android:layout_marginTop="214dp"
+                    android:alpha="0"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_lu_sparkle" />
+
+            </FrameLayout>
+
+            <!-- "LEVEL UP" pill -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLevelPill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="50dp"
+                android:alpha="0"
+                android:fontFamily="@font/proza_libre_extra_bold"
+                android:includeFontPadding="false"
+                android:letterSpacing="0.25"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="6dp"
+                android:text="@string/labelLevelUpPill"
+                android:textSize="12sp"
+                tools:textColor="#F6C29A" />
+
+            <!-- shield (pop + float) -->
+            <FrameLayout
+                android:id="@+id/flBadgePop"
+                android:layout_width="168dp"
+                android:layout_height="192dp"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="118dp"
+                android:scaleX="0"
+                android:scaleY="0">
+
+                <FrameLayout
+                    android:id="@+id/flBadge"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivShield"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_rank_shield_bronze" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- title + subtitle (322dp) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginTop="322dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0"
+                    android:fontFamily="@font/proza_libre_extra_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:letterSpacing="-0.017"
+                    android:textColor="#FFFFFF"
+                    android:textSize="25sp"
+                    tools:alpha="1"
+                    tools:text="You are Bronze II!" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvSubtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:alpha="0"
+                    android:fontFamily="@font/proza_libre_regular"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="3"
+                    android:textAlignment="center"
+                    android:textColor="#D1FFFFFF"
+                    android:textSize="11sp"
+                    tools:alpha="1"
+                    tools:text="You crossed ₹1,000 in lifetime payments." />
+            </LinearLayout>
+
+            <!-- tier pips (III / II / I) — bronze/silver/gold only -->
+            <LinearLayout
+                android:id="@+id/llPips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="412dp"
+                android:alpha="0"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPip0"
+                    android:layout_width="52dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_lu_pip_off"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="III"
+                    android:textColor="#D9FFFFFF"
+                    android:textSize="15sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPip1"
+                    android:layout_width="52dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/bg_lu_pip_off"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="II"
+                    android:textColor="#D9FFFFFF"
+                    android:textSize="15sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPip2"
+                    android:layout_width="52dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/bg_lu_pip_off"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="I"
+                    android:textColor="#D9FFFFFF"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <!-- Platinum only: completed medals -->
+            <LinearLayout
+                android:id="@+id/llMedals"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="404dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/llMedalBronze"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="36dp"
+                            android:layout_height="41dp"
+                            android:layout_gravity="center"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_lu_medal_bronze" />
+
+                        <FrameLayout
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="end|bottom"
+                            android:background="@drawable/bg_lu_check_dot">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="11dp"
+                                android:layout_height="11dp"
+                                android:layout_gravity="center"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/ic_lu_check" />
+                        </FrameLayout>
+                    </FrameLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/labelLevelUpMedalBronze"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llMedalSilver"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="26dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="36dp"
+                            android:layout_height="41dp"
+                            android:layout_gravity="center"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_lu_medal_silver" />
+
+                        <FrameLayout
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="end|bottom"
+                            android:background="@drawable/bg_lu_check_dot">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="11dp"
+                                android:layout_height="11dp"
+                                android:layout_gravity="center"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/ic_lu_check" />
+                        </FrameLayout>
+                    </FrameLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/labelLevelUpMedalSilver"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llMedalGold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="26dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="36dp"
+                            android:layout_height="41dp"
+                            android:layout_gravity="center"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_lu_medal_gold" />
+
+                        <FrameLayout
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="end|bottom"
+                            android:background="@drawable/bg_lu_check_dot">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="11dp"
+                                android:layout_height="11dp"
+                                android:layout_gravity="center"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/ic_lu_check" />
+                        </FrameLayout>
+                    </FrameLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/labelLevelUpMedalGold"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- ═══ CONFETTI (full screen, on top of the stage) ═══ -->
+        <com.shreefintech.paytouchconsumer.rewards.ConfettiView
+            android:id="@+id/confetti"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- ═══ TOP BAR ═══ -->
+        <LinearLayout
+            android:id="@+id/llTopBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="5dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnClose"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:clickable="true"
+                android:contentDescription="@string/btnLevelUpClose"
+                android:focusable="true"
+                android:onClick="@{onClickListener}"
+                app:cardBackgroundColor="@color/rank_pill_bg"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_lu_close" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnReplay"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:onClick="@{onClickListener}"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/rank_pill_bg"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_lu_replay" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/btnLevelUpReplay"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- ═══ BOTTOM SHEET ═══ -->
+        <LinearLayout
+            android:id="@+id/llSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bg_lu_sheet"
+            android:elevation="16dp"
+            android:orientation="vertical"
+            android:paddingHorizontal="22dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="24dp"
+            android:translationY="600dp">
+
+            <!-- scrollable content: label + cashback + tier progress/permanent -->
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/svSheet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvSheetLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/proza_libre_extra_bold"
+                        android:includeFontPadding="false"
+                        android:letterSpacing="0.1"
+                        android:text="@string/labelLevelUpNewCashback"
+                        android:textColor="#D52662"
+                        android:textSize="12sp" />
+
+                    <!-- cashback block -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/llCashBlock"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:alpha="0"
+                        app:cardBackgroundColor="@color/primary_light"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="8dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="52dp"
+                                android:layout_height="52dp"
+                                app:cardBackgroundColor="@color/secondary"
+                                app:cardCornerRadius="16dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:fontFamily="@font/proza_libre_extra_bold"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="%"
+                                    android:textColor="#7A3A16"
+                                    android:textSize="22sp" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="bottom"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvCash"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_extra_bold"
+                                        android:includeFontPadding="false"
+                                        android:letterSpacing="-0.02"
+                                        android:textColor="#D52662"
+                                        android:textSize="22sp"
+                                        tools:text="0.10%" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:layout_marginBottom="2dp"
+                                        android:fontFamily="@font/proza_libre_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelLevelUpCashbackWord"
+                                        android:textColor="#2B0B33"
+                                        android:textSize="14sp" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvCashOld"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:layout_marginBottom="2dp"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:textColor="#6E5763"
+                                        android:textSize="11sp"
+                                        tools:text="0.05%" />
+                                </LinearLayout>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvCashNote"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.35"
+                                    android:textColor="#6E5763"
+                                    android:textSize="11sp"
+                                    tools:text="@string/msgLevelUpCashNoteFestive" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- tier progress + next (Bronze / Silver / Gold) -->
+                    <LinearLayout
+                        android:id="@+id/llProgress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:alpha="0"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvTierProgress"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_semi_bold"
+                                android:includeFontPadding="false"
+                                android:textColor="#6E5763"
+                                android:textSize="13sp"
+                                tools:text="Bronze progress" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvTierCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/proza_libre_semi_bold"
+                                android:includeFontPadding="false"
+                                android:textColor="#2B0B33"
+                                android:textSize="13sp"
+                                tools:text="2 of 3" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/lu_seg_track"
+                                app:cardCornerRadius="4dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <View
+                                    android:id="@+id/viewSeg0"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleX="0"
+                                    android:transformPivotX="0dp" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/lu_seg_track"
+                                app:cardCornerRadius="4dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <View
+                                    android:id="@+id/viewSeg1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleX="0"
+                                    android:transformPivotX="0dp" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/lu_seg_track"
+                                app:cardCornerRadius="4dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <View
+                                    android:id="@+id/viewSeg2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleX="0"
+                                    android:transformPivotX="0dp" />
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/llNext"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/rw_line"
+                            app:strokeWidth="1.5dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="10dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:importantForAccessibility="no"
+                                    android:src="@drawable/ic_lu_arrow" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvNext"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.35"
+                                    android:textColor="#2B0B33"
+                                    android:textSize="13sp"
+                                    tools:text="Next: Bronze I · ₹4,000 in lifetime payments" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <!-- Platinum only: permanent row -->
+                    <LinearLayout
+                        android:id="@+id/llPermanent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:alpha="0"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            app:cardBackgroundColor="@color/lu_perm_tile"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/ic_lu_infinity" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/proza_libre_bold"
+                                android:includeFontPadding="false"
+                                android:text="@string/titleLevelUpPermanent"
+                                android:textColor="#2B0B33"
+                                android:textSize="15sp" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/proza_libre_regular"
+                                android:includeFontPadding="false"
+                                android:text="@string/msgLevelUpPermanentBody"
+                                android:textColor="#6E5763"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+
+            <!-- Continue — always anchored at the bottom, outside the scroll -->
+            <LinearLayout
+                android:id="@+id/btnContinue"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_lu_btn_continue"
+                android:elevation="0dp"
+                android:foreground="?selectableItemBackground"
+                android:gravity="center"
+                android:onClick="@{onClickListener}"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/btnLevelUpContinue"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_lu_arrow_white" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+</layout>
