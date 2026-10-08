@@ -15,7 +15,9 @@ data class RewardsLevelItem(
 )
 
 data class RewardsHistoryItem(
-    @field:SerializedName("level") val level: String?
+    @field:SerializedName("level") val level: String?,
+    @field:SerializedName("label") val label: String?,
+    @field:SerializedName("reached_at") val reachedAt: String?
 )
 
 data class RewardsLevelNextItem(

@@ -147,4 +147,7 @@
     <color name="rank_peach">#FCCFA1</color>
     <color name="rank_white_70">#B3FFFFFF</color>
 
+    <!--  cash pill on hero card  -->
+    <color name="rank_pill_bg">#1FFFFFFF</color>
+    <color name="rank_pill_stroke">#2EFFFFFF</color>
 </resources>
