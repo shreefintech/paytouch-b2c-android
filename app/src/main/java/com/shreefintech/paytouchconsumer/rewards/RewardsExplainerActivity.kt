@@ -60,7 +60,11 @@ class RewardsExplainerActivity : BaseActivity() {
     }
 
     private fun loadLevel() {
-        if (!Utility.isInternetAvailable(mActivity)) return
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.fetchLevel(
             onSuccess = { data -> populateHero(data) },
             onError   = { msg -> ToastUtil.showDelete(mActivity, msg) }

@@ -72,6 +72,7 @@ class EarningWalletActivity : BaseActivity() {
         setupInsets()
         bindClickListeners()
         onBack()
+        retryCallback = { loadData() }
         loadData()
     }
 
@@ -166,6 +167,11 @@ class EarningWalletActivity : BaseActivity() {
     // region Data Loading
 
     private fun loadData() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.fetchEarningWallet(
             onLoading = {},
             onSuccess = { populateEarningWallet(it) },
@@ -409,7 +415,7 @@ class EarningWalletActivity : BaseActivity() {
             onSuccess = { msg ->
                 showProgressWithdraw.set(false)
                 withdrawBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
+                if (msg.isNotEmpty()) ToastUtil.showSuccess(mActivity, msg)
                 refreshData()
             },
             onError = { msg ->

@@ -2,12 +2,13 @@ package com.shreefintech.paytouchconsumer.rewards
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import androidx.core.content.ContextCompat
+import com.shreefintech.paytouchconsumer.R
 
 /** Gold I → Platinum countdown ring: light pink track + pink arc, 10dp stroke. */
 class ProgressRingView @JvmOverloads constructor(
@@ -16,11 +17,12 @@ class ProgressRingView @JvmOverloads constructor(
 
     private val stroke = 10f * resources.displayMetrics.density
     private val track = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE; strokeWidth = stroke; color = Color.parseColor("#FFEEF4")
+        style = Paint.Style.STROKE; strokeWidth = stroke
+        color = ContextCompat.getColor(context, R.color.primary_light)
     }
     private val arc = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE; strokeWidth = stroke; strokeCap = Paint.Cap.ROUND
-        color = Color.parseColor("#D52662")
+        color = ContextCompat.getColor(context, R.color.primary)
     }
     private val oval = RectF()
     private var progress = 0f
