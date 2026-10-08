@@ -286,8 +286,8 @@ class ElectricityActivity : BaseActivity() {
     private fun showBillDetails() {
         val bill = fetchedBillItem ?: return
         binding.tvBillCustomerName.text = bill.userName ?: "-"
-        binding.tvBillDueDate.text = bill.dueDate ?: "-"
-        binding.tvBillDate.text = bill.billDate ?: "-"
+        binding.tvBillDueDate.text = Utility.formatDate(bill.dueDate, "dd/MM/yyyy")
+        binding.tvBillDate.text = Utility.formatDate(bill.billDate, "dd/MM/yyyy")
         binding.tvBillAmount.text = bill.billAmount ?: "-"
         binding.tvBillConnectionNumber.text =
             bill.cellNumber ?: binding.etConsumerNumber.text?.toString()?.trim() ?: "-"
