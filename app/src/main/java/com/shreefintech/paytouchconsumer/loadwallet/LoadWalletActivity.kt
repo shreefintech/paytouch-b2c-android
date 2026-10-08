@@ -530,9 +530,8 @@ class LoadWalletActivity : BaseActivity() {
             },
             onError = {
                 showProgressRewards.set(false)
-                val tier = RewardsTier.BRONZE
-                binding.tvTierName.text = getString(tier.labelRes)
-                binding.ivTierBadge.setImageResource(tier.badgeRes)
+                binding.tvTierName.text = "--"
+                binding.ivTierBadge.setImageDrawable(null)
                 binding.tvCashbackPct.text = "--"
                 binding.tvNextLevel.text = "--"
             }
