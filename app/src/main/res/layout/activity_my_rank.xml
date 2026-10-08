@@ -123,19 +123,28 @@
                                 android:textSize="22sp"
                                 tools:text="Silver III" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/tvCashPill"
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:background="@drawable/bg_rank_cash_pill"
-                                android:fontFamily="@font/proza_libre_regular"
-                                android:includeFontPadding="false"
-                                android:paddingHorizontal="14dp"
-                                android:paddingVertical="6dp"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp"
-                                tools:text="0.20% cashback on every bill" />
+                                app:cardBackgroundColor="@color/rank_pill_bg"
+                                app:cardCornerRadius="14dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="@color/rank_pill_stroke"
+                                app:strokeWidth="1dp">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvCashPill"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:paddingHorizontal="14dp"
+                                    android:paddingVertical="6dp"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="12sp"
+                                    tools:text="0.20% cashback on every bill" />
+                            </com.google.android.material.card.MaterialCardView>
                         </LinearLayout>
                     </FrameLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -146,8 +155,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:outlineAmbientShadowColor="@color/rank_card_shadow"
-                    android:outlineSpotShadowColor="@color/rank_card_shadow"
+                    android:outlineAmbientShadowColor="@color/rw_card_shadow"
+                    android:outlineSpotShadowColor="@color/rw_card_shadow"
                     app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="22dp"
                     app:cardElevation="6dp"
@@ -173,23 +182,32 @@
                                 android:layout_weight="1"
                                 android:fontFamily="@font/proza_libre_extra_bold"
                                 android:includeFontPadding="false"
-                                android:textColor="@color/rank_ink"
+                                android:textColor="@color/rw_ink"
                                 android:textSize="16sp"
                                 tools:text="Road to Silver II" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/tvNextCashChip"
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/cardNextCash"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
-                                android:background="@drawable/bg_rank_next_chip"
-                                android:fontFamily="@font/proza_libre_extra_bold"
-                                android:includeFontPadding="false"
-                                android:paddingHorizontal="10dp"
-                                android:paddingVertical="4dp"
-                                android:textColor="@color/rank_primary"
-                                android:textSize="12sp"
-                                tools:text="0.25%" />
+                                app:cardBackgroundColor="@color/primary_light"
+                                app:cardCornerRadius="10dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvNextCashChip"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_extra_bold"
+                                    android:includeFontPadding="false"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="4dp"
+                                    android:textColor="@color/primary"
+                                    android:textSize="12sp"
+                                    tools:text="0.25%" />
+                            </com.google.android.material.card.MaterialCardView>
                         </LinearLayout>
 
                         <!-- A) progress bar (Bronze, Silver, Gold III / II) -->
@@ -200,10 +218,13 @@
                             android:layout_marginTop="14dp"
                             android:orientation="vertical">
 
-                            <FrameLayout
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="match_parent"
                                 android:layout_height="12dp"
-                                android:background="@drawable/bg_rank_bar_track">
+                                app:cardBackgroundColor="@color/primary_light"
+                                app:cardCornerRadius="6dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
 
                                 <View
                                     android:id="@+id/viewBarFill"
@@ -212,7 +233,7 @@
                                     android:background="@drawable/bg_rank_bar_fill"
                                     android:scaleX="0"
                                     android:transformPivotX="0dp" />
-                            </FrameLayout>
+                            </com.google.android.material.card.MaterialCardView>
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -227,7 +248,7 @@
                                     android:layout_weight="1"
                                     android:fontFamily="@font/proza_libre_bold"
                                     android:includeFontPadding="false"
-                                    android:textColor="@color/rank_ink"
+                                    android:textColor="@color/rw_ink"
                                     android:textSize="13sp"
                                     tools:text="0 of 5 referrals" />
 
@@ -238,7 +259,7 @@
                                     android:layout_marginStart="8dp"
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
-                                    android:textColor="@color/rank_muted"
+                                    android:textColor="@color/rw_muted"
                                     android:textSize="13sp"
                                     tools:text="0%" />
                             </LinearLayout>
@@ -251,7 +272,7 @@
                                 android:fontFamily="@font/proza_libre_regular"
                                 android:includeFontPadding="false"
                                 android:lineSpacingMultiplier="1.45"
-                                android:textColor="@color/rank_muted"
+                                android:textColor="@color/rw_muted"
                                 android:textSize="12sp"
                                 tools:text="A friend counts once they complete KYC after you reached Silver." />
                         </LinearLayout>
@@ -287,7 +308,7 @@
                                         android:layout_height="wrap_content"
                                         android:fontFamily="@font/proza_libre_extra_bold"
                                         android:includeFontPadding="false"
-                                        android:textColor="@color/rank_primary"
+                                        android:textColor="@color/primary"
                                         android:textSize="24sp"
                                         tools:text="62" />
 
@@ -298,7 +319,7 @@
                                         android:layout_marginTop="2dp"
                                         android:fontFamily="@font/proza_libre_regular"
                                         android:includeFontPadding="false"
-                                        android:textColor="@color/rank_muted"
+                                        android:textColor="@color/rw_muted"
                                         android:textSize="11sp"
                                         tools:text="of 90 days" />
                                 </LinearLayout>
@@ -317,7 +338,7 @@
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/proza_libre_extra_bold"
                                     android:includeFontPadding="false"
-                                    android:textColor="@color/rank_ink"
+                                    android:textColor="@color/rw_ink"
                                     android:textSize="15sp"
                                     tools:text="28 days to go" />
 
@@ -328,8 +349,8 @@
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
                                     android:lineSpacingMultiplier="1.45"
-                                    android:text="@string/rank_countdown_rule"
-                                    android:textColor="@color/rank_muted"
+                                    android:text="@string/msgRankCountdownRule"
+                                    android:textColor="@color/rw_muted"
                                     android:textSize="12sp" />
                             </LinearLayout>
                         </LinearLayout>
@@ -366,7 +387,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/proza_libre_extra_bold"
                             android:includeFontPadding="false"
-                            android:text="@string/rank_platinum_title"
+                            android:text="@string/titleRankPlatinum"
                             android:textColor="#FFFFFF"
                             android:textSize="15sp" />
 
@@ -376,7 +397,7 @@
                             android:layout_marginTop="2dp"
                             android:fontFamily="@font/proza_libre_regular"
                             android:includeFontPadding="false"
-                            android:text="@string/rank_platinum_body"
+                            android:text="@string/msgRankPlatinumBody"
                             android:textColor="#D9FFFFFF"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -413,7 +434,7 @@
                         android:layout_marginStart="8dp"
                         android:fontFamily="@font/proza_libre_bold"
                         android:includeFontPadding="false"
-                        android:text="@string/rank_replay"
+                        android:text="@string/btnReplayCelebration"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
