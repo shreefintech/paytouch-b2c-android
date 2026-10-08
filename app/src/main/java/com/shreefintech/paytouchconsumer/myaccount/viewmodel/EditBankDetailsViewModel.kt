@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.myaccount
+package com.shreefintech.paytouchconsumer.myaccount.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -28,7 +28,7 @@ class EditBankDetailsViewModel(application: Application) : AndroidViewModel(appl
         branchName: String,
         password: String,
         proofBytes: ByteArray?,
-        proofMimeType: String?,
+        proofExtension: String,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
@@ -46,12 +46,11 @@ class EditBankDetailsViewModel(application: Application) : AndroidViewModel(appl
         parts += MultipartBody.Part.createFormData("bank_name", bankName)
         parts += MultipartBody.Part.createFormData("branch_name", branchName)
         proofBytes?.let {
-            val ext = if (proofMimeType == "application/pdf") "pdf" else "jpg"
-            val mediaType = (proofMimeType ?: "image/jpeg").toMediaTypeOrNull()
+            val isPdf = proofExtension.equals("pdf", ignoreCase = true)
             parts += MultipartBody.Part.createFormData(
                 "bank_proof",
-                "bank_proof.$ext",
-                it.toRequestBody(mediaType)
+                "bank_proof.$proofExtension",
+                it.toRequestBody((if (isPdf) "application/pdf" else "image/jpeg").toMediaTypeOrNull())
             )
         }
 
