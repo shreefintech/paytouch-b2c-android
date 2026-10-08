@@ -45,7 +45,6 @@ import com.shreefintech.paytouchconsumer.rewards.viewmodel.RewardsViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import java.util.Locale
-import kotlin.getValue
 
 class LevelUpActivity : BaseActivity() {
 

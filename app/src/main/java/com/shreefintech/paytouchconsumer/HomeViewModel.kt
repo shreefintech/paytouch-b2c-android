@@ -5,11 +5,11 @@ import android.location.Location
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
+import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRemoveRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
@@ -28,7 +28,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         onLoading()
-        callLogout(onComplete, onError)
+        NotificationHelper.removeToken(getApplication()) { callLogout(onComplete, onError) }
     }
 
     /** Fire-and-forget — used for payment risk checks; failures are not shown to the user. */
@@ -55,8 +55,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Silently checks /api/level on every Dashboard appear.
-     * Saves the level first so each level shows exactly once; the first level seen
-     * after install or login is only recorded, never celebrated.
+     * Saves the level first so each level shows exactly once. With no saved level
+     * (fresh install / re-login) the current level is celebrated once.
      * No toast on failure — matches iOS "the level check is silent" spec.
      */
     fun checkLevelUp(onLevelUp: (RewardsLevelItem) -> Unit) {
@@ -76,8 +76,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     SharedPreferenceHelper.setSharedPreferenceString(
                         getApplication(), Constant.KEY_LAST_SEEN_LEVEL, newLevel
                     )
-                    // First sighting (fresh install / re-login): record the level without celebrating.
-                    if (saved.isEmpty()) return
                     if (RewardsTier.shouldShowLevelUp(newLevel, saved)) onLevelUp(data)
                 }
 
@@ -91,13 +89,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val fcmToken = SharedPreferenceHelper.getSharedPreferenceString(
             getApplication(), Constant.KEY_FCM_TOKEN, ""
         )?.ifEmpty { null }
-        if (!fcmToken.isNullOrEmpty()) {
-            ApiClient.apiService.removeDeviceToken(bearerToken(), DeviceTokenRemoveRequest(fcmToken))
-                .enqueue(object : Callback<MessageItem> {
-                    override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {}
-                    override fun onFailure(call: Call<MessageItem>, t: Throwable) { t.printStackTrace() }
-                })
-        }
         ApiClient.apiService.logout(bearerToken(), LogoutRequest(fcmToken))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {

@@ -169,7 +169,7 @@ class FastagSmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: FastagLatestPaymentDataItem) {
-        val amount    = Utility.formatAmount(item.billAmount ?: item.amount)
+        val amount    = Utility.formatAmount(item.billAmount ?: item.totalPayable)
         val vehicleNo = item.vehicleNumber ?: "--"
         val txnId     = item.transactionId ?: "--"
         val date      = Utility.formatDate(item.createdAt)

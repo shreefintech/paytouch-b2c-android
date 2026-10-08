@@ -13,8 +13,7 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 
 class ReferralHistoryAdp(
     private val mContext: Context,
-    private val mArrayList: ArrayList<BonusWalletHistoryItem>,
-    var itemsClickable: Boolean = true
+    private val mArrayList: ArrayList<BonusWalletHistoryItem>
 ) : RecyclerView.Adapter<ReferralHistoryAdp.ViewHolder>() {
 
     class ViewHolder(val binding: ItemWalletTransactionBinding) :
@@ -41,8 +40,6 @@ class ReferralHistoryAdp(
             item.tvAmount.text = mContext.getString(R.string.textDebitSign, amount)
             item.tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_reject))
         }
-        item.llContainer.isClickable = itemsClickable
-        item.llContainer.isFocusable = itemsClickable
     }
 
     override fun getItemCount(): Int = mArrayList.size

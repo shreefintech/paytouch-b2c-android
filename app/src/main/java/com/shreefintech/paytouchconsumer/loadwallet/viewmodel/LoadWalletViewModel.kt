@@ -9,7 +9,6 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
-import com.shreefintech.paytouchconsumer.retrofit.model.rewards.ReferralWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
