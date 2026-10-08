@@ -84,7 +84,7 @@
                             android:layout_height="0dp"
                             android:scaleType="fitXY"
                             app:layout_constraintHeight_min="459dp"
-                            android:src="@drawable/img_hero_background_with_levels"
+                            tools:src="@drawable/img_hero_background_with_levels"
                             app:layout_constraintBottom_toBottomOf="@id/llHeroContent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -105,22 +105,30 @@
                             app:layout_constraintTop_toTopOf="parent">
 
                             <!-- Festive pill -->
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/tvFestiveChip"
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:background="@drawable/bg_rw_hero_pill"
-                                android:drawableStart="@drawable/ic_rw_spark"
-                                android:drawablePadding="6dp"
-                                android:fontFamily="@font/proza_libre_extra_bold"
-                                android:gravity="center_vertical"
-                                android:includeFontPadding="false"
-                                android:letterSpacing="0.05"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="5dp"
-                                android:text="@string/labelFestiveSeason"
-                                android:textColor="#FCCFA1"
-                                android:textSize="11sp" />
+                                app:cardBackgroundColor="#2EFCCFA1"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvFestiveChip"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:drawableStart="@drawable/ic_rw_spark"
+                                    android:drawablePadding="6dp"
+                                    android:fontFamily="@font/proza_libre_extra_bold"
+                                    android:gravity="center_vertical"
+                                    android:includeFontPadding="false"
+                                    android:letterSpacing="0.05"
+                                    android:paddingHorizontal="12dp"
+                                    android:paddingVertical="5dp"
+                                    android:text="@string/labelFestiveSeason"
+                                    android:textColor="#FCCFA1"
+                                    android:textSize="11sp" />
+                            </com.google.android.material.card.MaterialCardView>
 
                             <!-- Headline (one TextView, "0.50% back" coloured in code) -->
                             <androidx.appcompat.widget.AppCompatTextView
@@ -180,7 +188,7 @@
                                         android:fontFamily="@font/proza_libre_bold"
                                         android:includeFontPadding="false"
                                         android:letterSpacing="0.09"
-                                        android:text="BRONZE"
+                                        android:text="@string/labelBronzeAllCaps"
                                         android:textColor="#F6C29A"
                                         android:textSize="11sp" />
                                 </LinearLayout>
@@ -204,7 +212,7 @@
                                         android:fontFamily="@font/proza_libre_bold"
                                         android:includeFontPadding="false"
                                         android:letterSpacing="0.09"
-                                        android:text="SILVER"
+                                        android:text="@string/labelSilverAllCaps"
                                         android:textColor="#F1F4F8"
                                         android:textSize="11sp" />
                                 </LinearLayout>
@@ -228,7 +236,7 @@
                                         android:fontFamily="@font/proza_libre_bold"
                                         android:includeFontPadding="false"
                                         android:letterSpacing="0.09"
-                                        android:text="GOLD"
+                                        android:text="@string/labelGoldAllCaps"
                                         android:textColor="#FFE28F"
                                         android:textSize="11sp" />
                                 </LinearLayout>
@@ -253,7 +261,7 @@
                                         android:fontFamily="@font/proza_libre_bold"
                                         android:includeFontPadding="false"
                                         android:letterSpacing="0.09"
-                                        android:text="PLATINUM"
+                                        android:text="@string/labelPlatinumAllCaps"
                                         android:textColor="#DDF6FF"
                                         android:textSize="11sp" />
                                 </LinearLayout>
@@ -261,16 +269,23 @@
 
                             <!-- Your level card: paste the white card block from my previous message here
                                  (LinearLayout id cardYourLevel, marginTop 14dp) -->
-                            <LinearLayout
+                            <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/cardYourLevel"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="20dp"
-                                android:background="@drawable/bg_rw_level_card"
                                 android:foreground="?selectableItemBackground"
                                 android:onClick="@{onClickListener}"
-                                android:orientation="vertical"
-                                android:padding="14dp">
+                                app:cardBackgroundColor="@color/white"
+                                app:cardCornerRadius="18dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="14dp">
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -396,6 +411,7 @@
                                         android:textSize="13sp" />
                                 </LinearLayout>
                             </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -574,18 +590,21 @@
                                     android:baselineAligned="false"
                                     android:orientation="horizontal">
 
-                                    <FrameLayout
+                                    <com.google.android.material.card.MaterialCardView
                                         android:layout_width="44dp"
                                         android:layout_height="44dp"
-                                        android:background="@drawable/bg_rw_step_tile">
+                                        app:cardBackgroundColor="@color/primary_light"
+                                        app:cardCornerRadius="14dp"
+                                        app:cardElevation="0dp"
+                                        app:strokeWidth="0dp">
 
                                         <androidx.appcompat.widget.AppCompatImageView
                                             android:layout_width="22dp"
                                             android:layout_height="22dp"
                                             android:layout_gravity="center"
                                             android:src="@drawable/ic_rw_users"
-                                            app:tint="@color/rw_primary" />
-                                    </FrameLayout>
+                                            app:tint="@color/primary" />
+                                    </com.google.android.material.card.MaterialCardView>
 
                                     <LinearLayout
                                         android:layout_width="0dp"
@@ -639,18 +658,21 @@
                                     android:baselineAligned="false"
                                     android:orientation="horizontal">
 
-                                    <FrameLayout
+                                    <com.google.android.material.card.MaterialCardView
                                         android:layout_width="44dp"
                                         android:layout_height="44dp"
-                                        android:background="@drawable/bg_rw_step_tile">
+                                        app:cardBackgroundColor="@color/primary_light"
+                                        app:cardCornerRadius="14dp"
+                                        app:cardElevation="0dp"
+                                        app:strokeWidth="0dp">
 
                                         <androidx.appcompat.widget.AppCompatImageView
                                             android:layout_width="22dp"
                                             android:layout_height="22dp"
                                             android:layout_gravity="center"
                                             android:src="@drawable/ic_rw_piggy"
-                                            app:tint="@color/rw_primary" />
-                                    </FrameLayout>
+                                            app:tint="@color/primary" />
+                                    </com.google.android.material.card.MaterialCardView>
 
                                     <LinearLayout
                                         android:layout_width="0dp"
@@ -693,18 +715,21 @@
                                     android:baselineAligned="false"
                                     android:orientation="horizontal">
 
-                                    <FrameLayout
+                                    <com.google.android.material.card.MaterialCardView
                                         android:layout_width="44dp"
                                         android:layout_height="44dp"
-                                        android:background="@drawable/bg_rw_step_tile">
+                                        app:cardBackgroundColor="@color/primary_light"
+                                        app:cardCornerRadius="14dp"
+                                        app:cardElevation="0dp"
+                                        app:strokeWidth="0dp">
 
                                         <androidx.appcompat.widget.AppCompatImageView
                                             android:layout_width="22dp"
                                             android:layout_height="22dp"
                                             android:layout_gravity="center"
                                             android:src="@drawable/ic_rw_crown"
-                                            app:tint="@color/rw_primary" />
-                                    </FrameLayout>
+                                            app:tint="@color/primary" />
+                                    </com.google.android.material.card.MaterialCardView>
 
                                     <LinearLayout
                                         android:layout_width="0dp"
@@ -1190,39 +1215,47 @@
                                 </LinearLayout>
 
                                 <!-- Bronze hint -->
-                                <LinearLayout
+                                <com.google.android.material.card.MaterialCardView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="16dp"
                                     android:layout_marginTop="2dp"
                                     android:layout_marginEnd="16dp"
                                     android:layout_marginBottom="16dp"
-                                    android:background="@drawable/bg_rw_note"
-                                    android:baselineAligned="false"
-                                    android:gravity="top"
-                                    android:orientation="horizontal"
-                                    android:paddingHorizontal="12dp"
-                                    android:paddingVertical="10dp">
+                                    app:cardBackgroundColor="#FFF7F9"
+                                    app:cardCornerRadius="14dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
 
-                                    <androidx.appcompat.widget.AppCompatImageView
-                                        android:layout_width="16dp"
-                                        android:layout_height="16dp"
-                                        android:layout_marginTop="1dp"
-                                        android:src="@drawable/ic_info"
-                                        app:tint="#D52662" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="0dp"
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginStart="8dp"
-                                        android:layout_weight="1"
-                                        android:fontFamily="@font/proza_libre_regular"
-                                        android:includeFontPadding="false"
-                                        android:lineSpacingMultiplier="1.45"
-                                        android:text="@string/levelBronzeHint"
-                                        android:textColor="#6E5763"
-                                        android:textSize="12sp" />
-                                </LinearLayout>
+                                        android:baselineAligned="false"
+                                        android:gravity="top"
+                                        android:orientation="horizontal"
+                                        android:paddingHorizontal="12dp"
+                                        android:paddingVertical="10dp">
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:layout_marginTop="1dp"
+                                            android:src="@drawable/ic_info"
+                                            app:tint="#D52662" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="8dp"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:lineSpacingMultiplier="1.45"
+                                            android:text="@string/levelBronzeHint"
+                                            android:textColor="#6E5763"
+                                            android:textSize="12sp" />
+                                    </LinearLayout>
+                                </com.google.android.material.card.MaterialCardView>
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
@@ -1584,39 +1617,47 @@
                                 </LinearLayout>
 
                                 <!-- Silver hint -->
-                                <LinearLayout
+                                <com.google.android.material.card.MaterialCardView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="16dp"
                                     android:layout_marginTop="2dp"
                                     android:layout_marginEnd="16dp"
                                     android:layout_marginBottom="16dp"
-                                    android:background="@drawable/bg_rw_note"
-                                    android:baselineAligned="false"
-                                    android:gravity="top"
-                                    android:orientation="horizontal"
-                                    android:paddingHorizontal="12dp"
-                                    android:paddingVertical="10dp">
+                                    app:cardBackgroundColor="#FFF7F9"
+                                    app:cardCornerRadius="14dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
 
-                                    <androidx.appcompat.widget.AppCompatImageView
-                                        android:layout_width="16dp"
-                                        android:layout_height="16dp"
-                                        android:layout_marginTop="1dp"
-                                        android:src="@drawable/ic_info"
-                                        app:tint="#D52662" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="0dp"
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginStart="8dp"
-                                        android:layout_weight="1"
-                                        android:fontFamily="@font/proza_libre_regular"
-                                        android:includeFontPadding="false"
-                                        android:lineSpacingMultiplier="1.45"
-                                        android:text="@string/levelSilverHint"
-                                        android:textColor="#6E5763"
-                                        android:textSize="12sp" />
-                                </LinearLayout>
+                                        android:baselineAligned="false"
+                                        android:gravity="top"
+                                        android:orientation="horizontal"
+                                        android:paddingHorizontal="12dp"
+                                        android:paddingVertical="10dp">
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:layout_marginTop="1dp"
+                                            android:src="@drawable/ic_info"
+                                            app:tint="#D52662" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="8dp"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:lineSpacingMultiplier="1.45"
+                                            android:text="@string/levelSilverHint"
+                                            android:textColor="#6E5763"
+                                            android:textSize="12sp" />
+                                    </LinearLayout>
+                                </com.google.android.material.card.MaterialCardView>
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
@@ -1978,39 +2019,47 @@
                                 </LinearLayout>
 
                                 <!-- Gold hint -->
-                                <LinearLayout
+                                <com.google.android.material.card.MaterialCardView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="16dp"
                                     android:layout_marginTop="2dp"
                                     android:layout_marginEnd="16dp"
                                     android:layout_marginBottom="16dp"
-                                    android:background="@drawable/bg_rw_note"
-                                    android:baselineAligned="false"
-                                    android:gravity="top"
-                                    android:orientation="horizontal"
-                                    android:paddingHorizontal="12dp"
-                                    android:paddingVertical="10dp">
+                                    app:cardBackgroundColor="#FFF7F9"
+                                    app:cardCornerRadius="14dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
 
-                                    <androidx.appcompat.widget.AppCompatImageView
-                                        android:layout_width="16dp"
-                                        android:layout_height="16dp"
-                                        android:layout_marginTop="1dp"
-                                        android:src="@drawable/ic_info"
-                                        app:tint="#D52662" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="0dp"
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginStart="8dp"
-                                        android:layout_weight="1"
-                                        android:fontFamily="@font/proza_libre_regular"
-                                        android:includeFontPadding="false"
-                                        android:lineSpacingMultiplier="1.45"
-                                        android:text="@string/levelGoldHint"
-                                        android:textColor="#6E5763"
-                                        android:textSize="12sp" />
-                                </LinearLayout>
+                                        android:baselineAligned="false"
+                                        android:gravity="top"
+                                        android:orientation="horizontal"
+                                        android:paddingHorizontal="12dp"
+                                        android:paddingVertical="10dp">
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:layout_marginTop="1dp"
+                                            android:src="@drawable/ic_info"
+                                            app:tint="#D52662" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="8dp"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:lineSpacingMultiplier="1.45"
+                                            android:text="@string/levelGoldHint"
+                                            android:textColor="#6E5763"
+                                            android:textSize="12sp" />
+                                    </LinearLayout>
+                                </com.google.android.material.card.MaterialCardView>
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -2201,39 +2250,47 @@
                                 </LinearLayout>
 
                                 <!-- Platinum hint -->
-                                <LinearLayout
+                                <com.google.android.material.card.MaterialCardView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="16dp"
                                     android:layout_marginTop="2dp"
                                     android:layout_marginEnd="16dp"
                                     android:layout_marginBottom="16dp"
-                                    android:background="@drawable/bg_rw_note"
-                                    android:baselineAligned="false"
-                                    android:gravity="top"
-                                    android:orientation="horizontal"
-                                    android:paddingHorizontal="12dp"
-                                    android:paddingVertical="10dp">
+                                    app:cardBackgroundColor="#FFF7F9"
+                                    app:cardCornerRadius="14dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
 
-                                    <androidx.appcompat.widget.AppCompatImageView
-                                        android:layout_width="16dp"
-                                        android:layout_height="16dp"
-                                        android:layout_marginTop="1dp"
-                                        android:src="@drawable/ic_info"
-                                        app:tint="#D52662" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="0dp"
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginStart="8dp"
-                                        android:layout_weight="1"
-                                        android:fontFamily="@font/proza_libre_regular"
-                                        android:includeFontPadding="false"
-                                        android:lineSpacingMultiplier="1.45"
-                                        android:text="@string/levelPlatinumHint"
-                                        android:textColor="#6E5763"
-                                        android:textSize="12sp" />
-                                </LinearLayout>
+                                        android:baselineAligned="false"
+                                        android:gravity="top"
+                                        android:orientation="horizontal"
+                                        android:paddingHorizontal="12dp"
+                                        android:paddingVertical="10dp">
+
+                                        <androidx.appcompat.widget.AppCompatImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:layout_marginTop="1dp"
+                                            android:src="@drawable/ic_info"
+                                            app:tint="#D52662" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="8dp"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_regular"
+                                            android:includeFontPadding="false"
+                                            android:lineSpacingMultiplier="1.45"
+                                            android:text="@string/levelPlatinumHint"
+                                            android:textColor="#6E5763"
+                                            android:textSize="12sp" />
+                                    </LinearLayout>
+                                </com.google.android.material.card.MaterialCardView>
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
@@ -2287,18 +2344,21 @@
                                 android:orientation="vertical"
                                 android:padding="14dp">
 
-                                <FrameLayout
+                                <com.google.android.material.card.MaterialCardView
                                     android:layout_width="40dp"
                                     android:layout_height="40dp"
-                                    android:background="@drawable/bg_rw_wallet_tile_pink">
+                                    app:cardBackgroundColor="@color/primary_light"
+                                    app:cardCornerRadius="12dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="22dp"
                                         android:layout_height="22dp"
                                         android:layout_gravity="center"
                                         android:src="@drawable/ic_rw_gift"
-                                        app:tint="@color/rw_primary" />
-                                </FrameLayout>
+                                        app:tint="@color/primary" />
+                                </com.google.android.material.card.MaterialCardView>
 
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:layout_width="match_parent"
@@ -2322,7 +2382,7 @@
                                         android:layout_height="12dp"
                                         android:layout_marginTop="2dp"
                                         android:src="@drawable/ic_rw_check"
-                                        app:tint="@color/rw_primary" />
+                                        app:tint="@color/primary" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="0dp"
@@ -2349,7 +2409,7 @@
                                         android:layout_height="12dp"
                                         android:layout_marginTop="2dp"
                                         android:src="@drawable/ic_rw_check"
-                                        app:tint="@color/rw_primary" />
+                                        app:tint="@color/primary" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="0dp"
@@ -2376,7 +2436,7 @@
                                         android:layout_height="12dp"
                                         android:layout_marginTop="2dp"
                                         android:src="@drawable/ic_rw_check"
-                                        app:tint="@color/rw_primary" />
+                                        app:tint="@color/primary" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="0dp"
@@ -2413,10 +2473,13 @@
                                 android:orientation="vertical"
                                 android:padding="14dp">
 
-                                <FrameLayout
+                                <com.google.android.material.card.MaterialCardView
                                     android:layout_width="40dp"
                                     android:layout_height="40dp"
-                                    android:background="@drawable/bg_rw_wallet_tile_gold">
+                                    app:cardBackgroundColor="@color/earningWarnBg"
+                                    app:cardCornerRadius="12dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="22dp"
@@ -2424,7 +2487,7 @@
                                         android:layout_gravity="center"
                                         android:src="@drawable/ic_rw_piggy"
                                         app:tint="@color/rw_gold_icon" />
-                                </FrameLayout>
+                                </com.google.android.material.card.MaterialCardView>
 
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:layout_width="match_parent"
@@ -2560,6 +2623,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="?selectableItemBackground"
+                                android:onClickListener="@{onClickListener}"
                                 android:orientation="vertical"
                                 android:padding="16dp">
 
@@ -2614,6 +2678,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="?selectableItemBackground"
+                                android:onClickListener="@{onClickListener}"
                                 android:orientation="vertical"
                                 android:padding="16dp">
 
@@ -2668,6 +2733,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="?selectableItemBackground"
+                                android:onClickListener="@{onClickListener}"
                                 android:orientation="vertical"
                                 android:padding="16dp">
 
@@ -2722,6 +2788,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="?selectableItemBackground"
+                                android:onClickListener="@{onClickListener}"
                                 android:orientation="vertical"
                                 android:padding="16dp">
 
