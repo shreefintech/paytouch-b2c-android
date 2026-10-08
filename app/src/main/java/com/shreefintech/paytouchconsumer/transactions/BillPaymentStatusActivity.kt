@@ -22,6 +22,7 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
 import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
@@ -99,7 +100,9 @@ class BillPaymentStatusActivity : BaseActivity() {
         binding.lytToolbar.ivBack.gone()
         populateStatus(statusStr)
         fetchConfirmedStatus()
-        autoFinishHandler.postDelayed({ openReceipt() }, 5000L)
+        autoFinishHandler.postDelayed({
+            if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) openReceipt()
+        }, 5000L)
         onBack()
     }
 
