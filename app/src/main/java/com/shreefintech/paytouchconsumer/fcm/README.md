@@ -8,22 +8,21 @@ registered with the backend for the logged-in user.
 | File                            | Role                                                                    |
 |---------------------------------|-------------------------------------------------------------------------|
 | `MyFirebaseMessagingService.kt` | FCM service — handles token rotation and incoming messages              |
-| `NotificationHelper.kt`         | Channel, permission, notification display, token register/remove calls |
+| `NotificationHelper.kt`         | Channel, notification display, token registration                       |
 
-Related: request DTOs in `retrofit/model/notification/` (`DeviceTokenRequest.kt`, `DeviceTokenRemoveRequest.kt`),
-keys `KEY_FCM_TOKEN` / `FCM_PLATFORM_ANDROID` in `Constant.kt`, channel strings
+Related: request DTO `retrofit/model/notification/DeviceTokenRequest.kt`,
+keys `KEY_FCM_TOKEN` / `KEY_FCM_TOKEN_AUTHED` / `FCM_PLATFORM_ANDROID` / `FCM_LANGUAGE_DEFAULT` in `Constant.kt`, channel strings
 `labelNotificationChannelId` / `labelNotificationChannel`, and the service + default channel/icon
 meta-data in `AndroidManifest.xml`.
 
 ## APIs
 
-| Method   | Endpoint            | Body                                      | Response      |
-|----------|---------------------|-------------------------------------------|---------------|
-| `POST`   | `/api/device-token` | `DeviceTokenRequest` (`fcm_token`, `platform`, `device_id`) | `MessageItem` |
-| `DELETE` | `/api/device-token` | `DeviceTokenRemoveRequest` (`fcm_token`)  | `MessageItem` |
+| Method   | Endpoint            | Body                                                        | Response      |
+|----------|---------------------|-------------------------------------------------------------|---------------|
+| `POST`   | `/api/device-token` | `DeviceTokenRequest` (`fcm_token`, `platform`, `device_id`, `language`) | `MessageItem` |
 
-Both need the bearer token. `DELETE` carries a JSON body, so it is declared with
-`@HTTP(method = "DELETE", hasBody = true)` — plain `@DELETE` cannot send a body.
+Bearer token is optional — `null` registers the device without linking to a user. After login,
+`syncToken()` is called again with a bearer token so the server links the device to the account.
 
 ---
 
@@ -31,25 +30,22 @@ Both need the bearer token. `DELETE` carries a JSON body, so it is declared with
 
 | When                                  | Call                                  | Where                           |
 |---------------------------------------|---------------------------------------|---------------------------------|
-| App start                             | `createChannel()`                     | `MyApp.onCreate()`              |
+| App start (Splash)                    | `createChannel()`                     | `MyApp.onCreate()`              |
+| Splash redirect (logged out or in)    | `syncToken()`                         | `SplashActivity.redirect()`     |
 | Login success (any route)             | `syncToken()`                         | `LoginViewModel.saveSession()`  |
 | Home opened (covers already-logged-in users) | `syncToken()`                  | `HomeActivity.onCreate()`       |
-| Location flow finished (Home)         | `requestPermission()` — after location so the two system popups never overlap | `LocationPermissionHelper` callback in `HomeActivity` |
+| POST_NOTIFICATIONS permission         | `ActivityResultLauncher`              | `HomeActivity` (after location flow) |
 | FCM rotates the token                 | `syncToken(token)`                    | `onNewToken()`                  |
-| Logout                                | `removeToken()` → then logout API     | `HomeViewModel.logout()`        |
+| Logout                                | `fcm_token` in logout body            | `HomeViewModel.callLogout()`    |
 
 ### `syncToken(context, token?)`
 
-Skips when logged out, offline, already in flight, or when the token equals the one saved under
-`Constant.KEY_FCM_TOKEN` (last token the backend accepted). The key is only written after a
-`success == true` response, so a failed call retries on the next trigger. `registerToken()` is
-`@Synchronized` because `onNewToken` runs on an FCM worker thread while Login/Home sync on main.
-`KEY_FCM_TOKEN` is wiped by `clearSharedPreference()` on logout, so the next login registers again.
-
-### `removeToken(context, onDone)`
-
-Must run **before** the logout API — logout invalidates the bearer token the delete call needs.
-`onDone` is always invoked (success, failure, offline) so logout is never blocked.
+Skips when offline or already in flight. If the same token was registered while logged out
+(`KEY_FCM_TOKEN_AUTHED = false`), it is re-sent after login with a bearer token so the server
+links the device to the account. `registerToken()` is `@Synchronized` because `onNewToken` runs
+on an FCM worker thread while Login/Home sync on main. Both `KEY_FCM_TOKEN` and
+`KEY_FCM_TOKEN_AUTHED` are wiped by `clearSharedPreference()` on session timeout, and explicitly
+cleared on logout, so the next login always registers as authenticated.
 
 ### `device_id`
 
