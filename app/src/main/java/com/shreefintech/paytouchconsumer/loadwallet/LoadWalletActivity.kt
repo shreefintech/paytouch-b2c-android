@@ -1,5 +1,7 @@
 package com.shreefintech.paytouchconsumer.loadwallet
 
+import android.animation.ValueAnimator
+import android.graphics.Rect
 import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -7,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.animation.DecelerateInterpolator
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -37,6 +40,8 @@ import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.enums.RewardsTier
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
@@ -82,6 +87,10 @@ class LoadWalletActivity : BaseActivity() {
     private var withdrawSuccessDialogBinding: DialogWithdrawSuccessBinding? = null
     private var withdrawRequestId: String? = null
     private val withdrawSoundPlayer = StatusSoundPlayer()
+
+    private val showProgressBonus   = ObservableBoolean(false)
+    private val showProgressEarning = ObservableBoolean(false)
+    private val showProgressRewards = ObservableBoolean(false)
 
     private var isWalletEntrancePlayed = false
     private var isWalletLoading = false
@@ -150,6 +159,9 @@ class LoadWalletActivity : BaseActivity() {
         )
 
         binding.onClickListener = onClickListener()
+        binding.showProgressBonus   = showProgressBonus
+        binding.showProgressEarning = showProgressEarning
+        binding.showProgressRewards = showProgressRewards
         setupRecyclerView()
         setupPaymentSheet()
         setupWithdrawSheet()
@@ -488,6 +500,92 @@ class LoadWalletActivity : BaseActivity() {
         hideNoInternet()
         fetchWalletData()
         fetchRecentHistory()
+        fetchReferralWallet()
+        fetchEarningWallet()
+        fetchRewardsLevel()
+    }
+
+    private fun fetchReferralWallet() {
+        showProgressBonus.set(true)
+        viewModel.fetchReferralWallet(
+            onSuccess = { data ->
+                showProgressBonus.set(false)
+                binding.tvBonusBalance.text = Utility.formatAmount(data.referralWallet)
+            },
+            onError = {
+                showProgressBonus.set(false)
+                binding.tvBonusBalance.text = "--"
+            }
+        )
+    }
+
+    private fun fetchRewardsLevel() {
+        showProgressRewards.set(true)
+        viewModel.fetchRewardsLevel(
+            onSuccess = { data ->
+                showProgressRewards.set(false)
+                populateLevel(data)
+            },
+            onError = {
+                showProgressRewards.set(false)
+                binding.tvTierName.text = "--"
+                binding.ivTierBadge.setImageDrawable(null)
+                binding.tvCashbackPct.text = "--"
+                binding.tvNextLevel.text = "--"
+            }
+        )
+    }
+
+    private fun fetchEarningWallet() {
+        showProgressEarning.set(true)
+        viewModel.fetchEarningWallet(
+            onSuccess = { data ->
+                showProgressEarning.set(false)
+                binding.tvEarningBalance.text = Utility.formatAmount(data.principal)
+            },
+            onError = {
+                showProgressEarning.set(false)
+                binding.tvEarningBalance.text = "--"
+            }
+        )
+    }
+
+    private fun populateLevel(data: RewardsLevelItem) {
+        val tier = RewardsTier.from(data.stage)
+        binding.tvTierName.text = data.label ?: getString(tier.labelRes)
+        binding.tvCashbackPct.text = getString(R.string.labelCashbackPct, data.cashbackPercent ?: 0.0)
+        binding.ivTierBadge.setImageResource(tier.badgeRes)
+
+        val next = data.next
+        val remaining = next?.remaining ?: 0.0
+        binding.tvNextLevel.text = when {
+            remaining > 0 -> getString(R.string.labelMoreToNextLevel, Utility.formatAmount(remaining.toString()))
+            else -> getString(R.string.msgTopTier)
+        }
+
+        val current = next?.current ?: 0.0
+        val target = next?.target ?: 0.0
+        val progress = if (target > 0) (current / target).toFloat().coerceIn(0f, 1f) else 1f
+        animateLevelProgress(progress)
+    }
+
+    private fun animateLevelProgress(progress: Float) {
+        // Start hidden; post waits for layout so width is known before animating
+        binding.viewProgressFill.clipBounds = Rect(0, 0, 0, 0)
+        binding.viewProgressFill.post {
+            val totalWidth = binding.viewProgressFill.width
+            if (totalWidth == 0) return@post
+            ValueAnimator.ofFloat(0f, progress).apply {
+                duration = 1200
+                startDelay = 600
+                interpolator = DecelerateInterpolator()
+                addUpdateListener { anim ->
+                    val w = (totalWidth * (anim.animatedValue as Float)).toInt().coerceAtLeast(0)
+                    binding.viewProgressFill.clipBounds = Rect(0, 0, w, binding.viewProgressFill.height)
+                }
+                start()
+            }
+        }
     }
 
     private fun validateAndShowConfirmDialog() {
@@ -729,6 +827,16 @@ class LoadWalletActivity : BaseActivity() {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
+                }
+
+                binding.cardEarningWallet -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    // TODO(B2C-199): navigate to EarningWalletActivity when implemented
+                }
+
+                binding.cardRewardsLevel -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    // TODO(B2C-199): navigate to RewardsRankingActivity when implemented
                 }
 
                 binding.llMakePayment -> {

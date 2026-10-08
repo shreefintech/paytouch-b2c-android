@@ -97,4 +97,8 @@
     <color name="normal_card_bg_glass">#66FFFFFF</color>
 
     <color name="home_card_bg">#72FFFFFF</color>
+
+    <color name="progressTrack">#F7D6E2</color>
+    <color name="other_wallet_color">#CCFFFFFF</color>
+    <color name="wallet_bg_circle">#66D52662</color>
 </resources>
