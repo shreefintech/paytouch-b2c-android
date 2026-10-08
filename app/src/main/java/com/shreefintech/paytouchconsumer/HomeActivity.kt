@@ -9,8 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -56,6 +60,10 @@ class HomeActivity : BaseActivity() {
     private val showProgressLogout = ObservableBoolean(false)
 
     // Field-initialised: activity-result launchers must be registered before onStart()
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* granted or denied — either way nothing to do; FCM delivers as long as permission holds */ }
+
     private val locationHelper = LocationPermissionHelper(this) { location ->
         location?.let { viewModel.sendLocation(it) }
         // Asked after the location flow ends so the two system permission popups never overlap
@@ -94,6 +102,7 @@ class HomeActivity : BaseActivity() {
 
         loadCategoryIcons()
 
+        // TODO(B2C-194): seasonal Navratri — revert after festival
         BannerSliderHelper(this, binding.incBannerSlider.vpBanner).attachToLifecycle(this)
 
         val listener = onClickListener()
@@ -120,7 +129,12 @@ class HomeActivity : BaseActivity() {
             return
         }
         isNotificationPermissionPending = false
-        NotificationHelper.requestPermission(mActivity)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(mActivity, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     // Animated WebP — decoded on all API levels via the webpdecoder Glide integration.

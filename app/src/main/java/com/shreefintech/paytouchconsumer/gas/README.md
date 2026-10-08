@@ -146,10 +146,10 @@ The receipt card (`cvReceiptCard`) is captured via the shared `ReceiptHelper` (i
 
 ## Intent Data Passing
 
-`GasSmsReceiptActivity` is started with only `context` and `fromPayment`:
+`GasSmsReceiptActivity` is started from `BillPaymentStatusActivity` with `context`, `transactionId`, and `fromPayment = true`:
 
 ```kotlin
-GasSmsReceiptActivity.start(context, fromPayment = true)
+GasSmsReceiptActivity.start(mActivity, transactionId, fromPayment = true)
 ```
 
 `GasTransactionReportActivity` / `GasTransactionStatusActivity` navigate to the **shared** `TransactionDetailActivity` (not a gas-specific detail screen) using the generic `TransactionItem`, serialized to JSON exactly as every other module does:

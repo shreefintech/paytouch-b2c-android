@@ -156,10 +156,10 @@ The receipt card (`cvReceiptCard`) is captured via the shared `ReceiptHelper` fo
 
 ## Intent Data Passing
 
-`PostpaidSmsReceiptActivity` is started with only `context` and `fromPayment`:
+`PostpaidSmsReceiptActivity` is started from `BillPaymentStatusActivity` with `context`, `transactionId`, and `fromPayment = true`:
 
 ```kotlin
-PostpaidSmsReceiptActivity.start(context, fromPayment = true)
+PostpaidSmsReceiptActivity.start(mActivity, transactionId, fromPayment = true)
 ```
 
 `PostpaidTransactionReportActivity` / `PostpaidTransactionStatusActivity` navigate to the **shared** `TransactionDetailActivity`:

@@ -17,24 +17,30 @@ class BannerSliderHelper(
     private val handler = Handler(Looper.getMainLooper())
 
     private val banners = listOf(
-        R.drawable.banner_1, R.drawable.banner_2, R.drawable.banner_3,
-        R.drawable.banner_4, R.drawable.banner_5, R.drawable.banner_6,
-        R.drawable.banner_8, R.drawable.banner_9
+        R.drawable.img_banner_1, R.drawable.img_banner_2, R.drawable.img_banner_3,
+        R.drawable.img_banner_4, R.drawable.img_banner_5, R.drawable.img_banner_6,
+        R.drawable.img_banner_8, R.drawable.img_banner_9
     )
 
     private val autoScrollRunnable = Runnable { scrollToNext() }
 
+    private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) = scheduleNext()
+    }
+
     init {
         viewPager.adapter = BannerAdp(context, banners)
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) = scheduleNext()
-        })
+        viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
     fun attachToLifecycle(owner: LifecycleOwner) = owner.lifecycle.addObserver(this)
 
     override fun onResume(owner: LifecycleOwner) = scheduleNext()
     override fun onPause(owner: LifecycleOwner) = handler.removeCallbacks(autoScrollRunnable)
+    override fun onDestroy(owner: LifecycleOwner) {
+        viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
+        handler.removeCallbacks(autoScrollRunnable)
+    }
 
     private fun scheduleNext() {
         handler.removeCallbacks(autoScrollRunnable)
@@ -42,7 +48,8 @@ class BannerSliderHelper(
     }
 
     private fun scrollToNext() {
-        viewPager.setCurrentItem((viewPager.currentItem + 1) % banners.size, true)
+        val next = (viewPager.currentItem + 1) % banners.size
+        viewPager.setCurrentItem(next, next != 0)
     }
 
     companion object {

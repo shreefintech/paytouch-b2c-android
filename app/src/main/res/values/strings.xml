@@ -14,8 +14,8 @@
     <string name="forgot_password">Forgot Password?</string>
     <string name="labelForgotMpin">Forgot MPIN?</string>
     <string name="sign_in">Sign In</string>
-    <string name="no_account">New to paytouch?</string>
-    <string name="create_account">SignUp</string>
+    <string name="no_account">New to PayTouch?</string>
+    <string name="create_account">Sign Up</string>
 
     <string name="msgLoginSuccess">Login successful</string>
 
@@ -856,6 +856,7 @@
 
     <string name="titleRewardsHero">Level up and earn\nup to 0.50% back</string>
 
+    <string name="labelRewardsHeroHighlight">0.50% back</string>
     <string name="rank_cash_suffix"> cashback on every bill</string>
     <string name="rank_road_to">Road to %1$s</string>
     <string name="rank_percent">%1$s%%</string>
