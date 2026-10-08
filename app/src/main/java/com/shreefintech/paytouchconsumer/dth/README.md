@@ -168,10 +168,10 @@ Receipt card captured via shared `ReceiptHelper` for download and share.
 
 ## Intent Data Passing
 
-`DthSmsReceiptActivity` is started with only `context` and `fromPayment`:
+`DthSmsReceiptActivity` is started from `BillPaymentStatusActivity` with `context`, `transactionId`, and `fromPayment = true`:
 
 ```kotlin
-DthSmsReceiptActivity.start(context, fromPayment = true)
+DthSmsReceiptActivity.start(mActivity, transactionId, fromPayment = true)
 ```
 
 `DthTransactionReportActivity` / `DthTransactionStatusActivity` navigate to the **shared** `TransactionDetailActivity` (not a DTH-specific detail screen):
