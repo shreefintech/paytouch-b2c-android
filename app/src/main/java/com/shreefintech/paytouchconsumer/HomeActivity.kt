@@ -39,6 +39,7 @@ import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
 import androidx.databinding.ObservableBoolean
+import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -92,6 +93,9 @@ class HomeActivity : BaseActivity() {
         binding.lytToolbar.ivLogo.requestLayout()
 
         loadCategoryIcons()
+
+        // TODO(B2C-194): seasonal Navratri — revert after festival
+        BannerSliderHelper(this, binding.incBannerSlider.vpBanner).attachToLifecycle(this)
 
         val listener = onClickListener()
         binding.onClickListener = listener

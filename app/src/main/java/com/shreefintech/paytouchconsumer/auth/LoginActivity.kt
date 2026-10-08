@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.HomeActivity
@@ -26,6 +27,7 @@ import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
+import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -69,10 +71,16 @@ class LoginActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.showProgress = showProgress
 
+        // TODO(B2C-194): seasonal Navratri — revert after festival
+        Glide.with(this).load(R.drawable.img_garba_couple).into(binding.ivWalletIllustration)
+
         onBack()
         setupInputFilters()
         setupMpinBoxes()
         updateToggleUi(LoginMode.PASSWORD)
+
+        // TODO(B2C-194): seasonal Navratri — revert after festival
+        BannerSliderHelper(this, binding.incBannerSlider.vpBanner).attachToLifecycle(this)
     }
 
 
