@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.earningwallet
+package com.shreefintech.paytouchconsumer.earningwallet.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

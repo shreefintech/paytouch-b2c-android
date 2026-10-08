@@ -107,4 +107,8 @@ object Constant {
     // Image storage — sub-folder of filesDir; must match <files-path> entries in file_provider_paths.xml
     const val DIR_RECEIPTS = "receipts"
 
+    // Earning Wallet
+    const val EARNING_LOCK_DAYS = 30
+    const val EARNING_DEFAULT_LOCK_AMOUNT = 1000
+
 }
