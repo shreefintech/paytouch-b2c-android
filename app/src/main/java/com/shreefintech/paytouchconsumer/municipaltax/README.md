@@ -149,10 +149,10 @@ The receipt card (`cvReceiptCard`) is captured via the shared `ReceiptHelper` fo
 
 ## Intent Data Passing
 
-`MunicipalTaxSmsReceiptActivity` is started with only `context` and `fromPayment`:
+`MunicipalTaxSmsReceiptActivity` is started from `BillPaymentStatusActivity` with `context`, `transactionId`, and `fromPayment = true`:
 
 ```kotlin
-MunicipalTaxSmsReceiptActivity.start(context, fromPayment = true)
+MunicipalTaxSmsReceiptActivity.start(mActivity, transactionId, fromPayment = true)
 ```
 
 `MunicipalTaxTransactionReportActivity` / `MunicipalTaxTransactionStatusActivity` navigate to the **shared** `TransactionDetailActivity`:

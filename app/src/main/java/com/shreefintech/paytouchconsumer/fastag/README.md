@@ -201,10 +201,10 @@ The receipt card (`cvReceiptCard`) is captured via the shared `ReceiptHelper` (i
 
 ## Intent Data Passing
 
-`FastagSmsReceiptActivity` is started with only `context` and `fromPayment`:
+`FastagSmsReceiptActivity` is started from `BillPaymentStatusActivity` with `context`, `transactionId`, and `fromPayment = true`:
 
 ```kotlin
-FastagSmsReceiptActivity.start(context, fromPayment = true)
+FastagSmsReceiptActivity.start(mActivity, transactionId, fromPayment = true)
 ```
 
 `FastagTransactionReportActivity` / `FastagTransactionStatusActivity` navigate to the shared `TransactionDetailActivity`:
