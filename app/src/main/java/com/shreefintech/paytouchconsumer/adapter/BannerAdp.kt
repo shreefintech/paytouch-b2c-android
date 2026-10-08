@@ -25,4 +25,9 @@ class BannerAdp(
     }
 
     override fun getItemCount() = banners.size
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        Glide.with(context).clear(holder.binding.ivBanner)
+        super.onViewRecycled(holder)
+    }
 }
