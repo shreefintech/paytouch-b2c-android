@@ -16,6 +16,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityRewardsExplainerBinding
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
+import com.shreefintech.paytouchconsumer.rewards.viewmodel.RewardsViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import androidx.core.view.ViewCompat
@@ -53,7 +54,6 @@ class RewardsExplainerActivity : BaseActivity() {
 
         Glide.with(this).load(R.drawable.img_hero_background_with_levels).into(binding.ivHeroBg)
         setupHeroHeadline()
-        setupFaq(listener)
         onBack()
         retryCallback = { loadLevel() }
         loadLevel()
@@ -94,7 +94,7 @@ class RewardsExplainerActivity : BaseActivity() {
 
         binding.ivYourBadge.setImageResource(tier.badgeRes)
         binding.tvYourTierName.text = data.label ?: getString(tier.labelRes)
-        binding.tvYourCashback.text = "%.2f%%".format(data.cashbackPercent ?: 0.0)
+        binding.tvYourCashback.text = getString(R.string.fmtPercent, data.cashbackPercent ?: 0.0)
 
         val remaining = data.next?.remaining ?: 0.0
         binding.tvProgressNext.text = if (remaining > 0)
@@ -162,13 +162,6 @@ class RewardsExplainerActivity : BaseActivity() {
     }
 
     // ── FAQ accordion ───────────────────────────────────────────────────────
-
-    private fun setupFaq(listener: View.OnClickListener) {
-        binding.rowFaq1.setOnClickListener(listener)
-        binding.rowFaq2.setOnClickListener(listener)
-        binding.rowFaq3.setOnClickListener(listener)
-        binding.rowFaq4.setOnClickListener(listener)
-    }
 
     private fun toggleFaq(index: Int) {
         val answers   = listOf(binding.tvFaq1Answer,   binding.tvFaq2Answer,   binding.tvFaq3Answer,   binding.tvFaq4Answer)
