@@ -167,7 +167,7 @@ class DthSmsReceiptActivity : BaseActivity() {
     }
 
     private fun populateReceiptFromApi(item: DthLatestPaymentDataItem) {
-        val amount   = Utility.formatAmount(item.totalPayable)
+        val amount   = Utility.formatAmount(item.billAmount ?: item.totalPayable)
         val mobileNo = item.mobileNo ?: item.subscriberNo ?: "--"
         val txnId    = item.transactionId ?: "--"
         val date     = Utility.formatDate(item.createdAt)

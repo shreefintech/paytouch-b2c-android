@@ -168,7 +168,7 @@ class PostpaidSmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: PostpaidLatestPaymentDataItem) {
-        val amount   = Utility.formatAmount(item.totalPayable)
+        val amount   = Utility.formatAmount(item.billAmount ?: item.totalPayable)
         val mobileNo = item.connectionNumber ?: item.subscriberNo ?: "--"
         val txnId    = item.transactionId ?: "--"
         val date     = Utility.formatDate(item.createdAt)

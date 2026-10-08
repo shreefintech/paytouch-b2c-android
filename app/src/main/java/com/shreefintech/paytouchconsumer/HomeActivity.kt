@@ -258,7 +258,8 @@ class HomeActivity : BaseActivity() {
 
                 binding.llFastag -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, FastagActivity::class.java))
+                    ToastUtil.showWarning(mActivity, getString(R.string.coming_soon))
+                    //startActivity(Intent(mActivity, FastagActivity::class.java))
                 }
 
                 binding.llLoan -> {

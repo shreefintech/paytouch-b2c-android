@@ -7,6 +7,7 @@ data class FastagLatestPaymentDataItem(
     @field:SerializedName("vehicle_number") val vehicleNumber: String?,
     @field:SerializedName("operator")       val operator: String?,
     @field:SerializedName("operator_name")  val operatorName: String?,
+    @field:SerializedName("bill_amount")    val billAmount: String?,
     @field:SerializedName("amount")         val amount: String?,
     @field:SerializedName("platform_fee")   val platformFee: String?,
     @field:SerializedName("total_payable")  val totalPayable: String?,

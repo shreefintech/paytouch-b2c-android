@@ -9,7 +9,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
-import com.shreefintech.paytouchconsumer.retrofit.model.rewards.ReferralWalletItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
@@ -153,19 +153,19 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             })
     }
 
-    fun fetchReferralWallet(
-        onSuccess: (ReferralWalletItem) -> Unit,
+    fun fetchBonusWallet(
+        onSuccess: (BonusWalletItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
             onError(getString(R.string.msgNoInternet))
             return
         }
-        ApiClient.apiService.getReferralWallet(bearerToken())
-            .enqueue(object : Callback<General<ReferralWalletItem?>> {
+        ApiClient.apiService.getBonusWallet(bearerToken())
+            .enqueue(object : Callback<General<BonusWalletItem?>> {
                 override fun onResponse(
-                    call: Call<General<ReferralWalletItem?>>,
-                    response: Response<General<ReferralWalletItem?>>
+                    call: Call<General<BonusWalletItem?>>,
+                    response: Response<General<BonusWalletItem?>>
                 ) {
                     val data = response.body()?.data
                     if (response.isSuccessful && data != null) {
@@ -179,7 +179,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     }
                 }
 
-                override fun onFailure(call: Call<General<ReferralWalletItem?>>, t: Throwable) {
+                override fun onFailure(call: Call<General<BonusWalletItem?>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })

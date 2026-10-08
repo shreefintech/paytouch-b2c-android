@@ -182,7 +182,7 @@ class EarningWalletActivity : BaseActivity() {
         )
         viewModel.fetchLevel(
             onSuccess = { isGoldStage = it.stage?.equals("gold", ignoreCase = true) == true },
-            onError = {}
+            onError = { /* non-critical enrichment — isGoldStage defaults false; gold-stage withdrawal warning silently hidden on failure */ }
         )
     }
 

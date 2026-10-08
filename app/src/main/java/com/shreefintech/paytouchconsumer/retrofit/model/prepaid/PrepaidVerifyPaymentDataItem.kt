@@ -7,6 +7,7 @@ data class PrepaidVerifyPaymentDataItem(
     @field:SerializedName("mobile_no")      val mobileNo: String?,
     @field:SerializedName("operator")       val operator: String?,
     @field:SerializedName("circle")         val circle: String?,
+    @field:SerializedName("bill_amount")    val billAmount: String?,
     @field:SerializedName("amount")         val amount: String?,
     @field:SerializedName("txn_id")         val txnId: String?,
     @field:SerializedName("status")         val status: String?,

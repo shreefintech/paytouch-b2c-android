@@ -13,11 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.adapter.ReferralHistoryAdp
 import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityWalletTransactionsBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
+import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.WalletTransactionsViewModel
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletHistoryItem
 import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -25,14 +28,28 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 class WalletTransactionsActivity : BaseActivity() {
 
     private lateinit var binding: ActivityWalletTransactionsBinding
-    private val viewModel: WalletTransactionsViewModel by viewModels()
+    private val walletTxVm: WalletTransactionsViewModel by viewModels()
+    private val loadWalletVm: LoadWalletViewModel by viewModels()
 
     private val transactionList = ArrayList<WalletTransactionItem>()
     private lateinit var transactionAdp: WalletTransactionAdp
 
+    private val referralList = ArrayList<BonusWalletHistoryItem>()
+    private lateinit var referralAdp: ReferralHistoryAdp
+
+    private val tab by lazy { intent.getStringExtra(EXTRA_TAB) ?: TAB_WALLET }
+
     companion object {
-        fun start(context: Context) {
-            context.startActivity(Intent(context, WalletTransactionsActivity::class.java))
+        const val TAB_WALLET   = "wallet"
+        const val TAB_REFERRAL = "referral"
+        private const val EXTRA_TAB = "extra_tab"
+
+        fun start(context: Context, tab: String = TAB_WALLET) {
+            context.startActivity(
+                Intent(context, WalletTransactionsActivity::class.java).apply {
+                    putExtra(EXTRA_TAB, tab)
+                }
+            )
         }
     }
 
@@ -58,31 +75,37 @@ class WalletTransactionsActivity : BaseActivity() {
             solidStroke  = true,
         )
 
+        binding.tvTitle.text = getString(
+            if (tab == TAB_REFERRAL) R.string.titleReferralHistory else R.string.titleTransactionReport
+        )
         binding.onClickListener = onClickListener()
-        setupRecyclerView()
+        setupAdapters()
         retryCallback = { loadPage(1) }
         loadPage(1)
     }
 
     // ── Setup ─────────────────────────────────────────────────────────────────
 
-    private fun setupRecyclerView() {
+    private fun setupAdapters() {
         transactionAdp = WalletTransactionAdp(mActivity, transactionList)
         transactionAdp.onClickItem = { transactionId ->
             if (!Utility.stopClick()) TransactionHistoryDetailActivity.start(mActivity, transactionId)
         }
+        referralAdp = ReferralHistoryAdp(mActivity, referralList)
+
         binding.rvTransactions.apply {
             layoutManager = LinearLayoutManager(mActivity)
-            adapter = transactionAdp
+            adapter = if (tab == TAB_REFERRAL) referralAdp else transactionAdp
         }
+
         binding.rvTransactions.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy <= 0) return
+                if (tab != TAB_WALLET || dy <= 0) return
                 val lm          = recyclerView.layoutManager as LinearLayoutManager
                 val lastVisible = lm.findLastVisibleItemPosition()
                 val totalItems  = lm.itemCount
-                if (lastVisible >= totalItems - 3 && viewModel.canLoadMore()) {
-                    loadPage(viewModel.nextPage())
+                if (lastVisible >= totalItems - 3 && walletTxVm.canLoadMore()) {
+                    loadPage(walletTxVm.nextPage())
                 }
             }
         })
@@ -91,16 +114,18 @@ class WalletTransactionsActivity : BaseActivity() {
     // ── Data Loading ──────────────────────────────────────────────────────────
 
     private fun loadPage(page: Int) {
+        if (tab == TAB_REFERRAL) {
+            loadReferrals()
+            return
+        }
         if (!Utility.isInternetAvailable(mActivity)) {
             if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
             return
         }
         if (page == 1) hideNoInternet()
-        viewModel.loadHistory(
+        walletTxVm.loadHistory(
             page      = page,
-            onLoading = {
-                if (page == 1) showShimmer(true) else showFooterLoader(true)
-            },
+            onLoading = { if (page == 1) showShimmer(true) else showFooterLoader(true) },
             onSuccess = { list ->
                 if (page == 1) {
                     showShimmer(false)
@@ -127,6 +152,25 @@ class WalletTransactionsActivity : BaseActivity() {
         )
     }
 
+    private fun loadReferrals() {
+        if (!Utility.isInternetAvailable(mActivity)) { showNoInternet(); return }
+        hideNoInternet()
+        showShimmer(true)
+        loadWalletVm.fetchBonusWallet(
+            onSuccess = { data ->
+                showShimmer(false)
+                referralAdp.updateList((data.history ?: emptyList()).filter { it.isReferral })
+                updateEmptyState()
+            },
+            onError = { msg ->
+                showShimmer(false)
+                referralAdp.updateList(emptyList())
+                updateEmptyState()
+                if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
     // ── UI Helpers ────────────────────────────────────────────────────────────
 
     private fun showShimmer(show: Boolean) {
@@ -147,8 +191,9 @@ class WalletTransactionsActivity : BaseActivity() {
     }
 
     private fun updateEmptyState() {
-        binding.tvEmpty.visibility = if (transactionList.isEmpty()) View.VISIBLE else View.GONE
-        if (transactionList.isEmpty()) binding.rvTransactions.visibility = View.GONE
+        val empty = if (tab == TAB_REFERRAL) referralList.isEmpty() else transactionList.isEmpty()
+        binding.tvEmpty.visibility = if (empty) View.VISIBLE else View.GONE
+        if (empty) binding.rvTransactions.visibility = View.GONE
     }
 
     // ── Navigation ────────────────────────────────────────────────────────────

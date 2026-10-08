@@ -1044,9 +1044,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_large"
-                        android:foreground="?selectableItemBackground"
                         android:gravity="center_vertical"
-                        android:onClickListener="@{onClickListener}"
                         android:orientation="horizontal"
                         android:paddingTop="@dimen/margin_small"
                         android:paddingBottom="@dimen/margin_small">
@@ -1061,24 +1059,109 @@
                             android:textColor="@color/primary"
                             android:textSize="@dimen/text_size_14" />
 
-                        <androidx.appcompat.widget.AppCompatTextView
+                        <LinearLayout
+                            android:id="@+id/llViewAll"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/proza_libre_medium"
-                            android:includeFontPadding="false"
-                            android:text="@string/labelViewAll"
-                            android:textColor="@color/primary"
-                            android:textSize="@dimen/text_size_12" />
+                            android:gravity="center_vertical"
+                            android:foreground="?selectableItemBackground"
+                            android:onClickListener="@{onClickListener}"
+                            android:orientation="horizontal">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:layout_marginStart="4dp"
-                            android:src="@drawable/ic_right_arrow"
-                            android:tint="@color/primary" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:includeFontPadding="false"
+                                android:text="@string/labelViewAll"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_size_12" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginStart="4dp"
+                                android:src="@drawable/ic_right_arrow"
+                                android:tint="@color/primary" />
+                        </LinearLayout>
                     </LinearLayout>
 
-                    <!-- Recent transactions list -->
+                    <!-- Wallet / Referral History tab row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:cardBackgroundColor="@android:color/transparent"
+                            app:cardCornerRadius="@dimen/card_corner_radius"
+                            app:cardElevation="0dp"
+                            app:strokeColor="?attr/colorPrimary"
+                            app:strokeWidth="1dp">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:padding="3dp">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cvTabWallet"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:onClickListener="@{onClickListener}"
+                                    app:cardCornerRadius="@dimen/card_corner_radius"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvTabWallet"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="?selectableItemBackground"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:paddingStart="14dp"
+                                        android:paddingTop="6dp"
+                                        android:paddingEnd="14dp"
+                                        android:paddingBottom="6dp"
+                                        android:text="@string/tabWallet"
+                                        android:textSize="@dimen/text_size_13" />
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cvTabReferralHistory"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="2dp"
+                                    android:onClickListener="@{onClickListener}"
+                                    app:cardCornerRadius="@dimen/card_corner_radius"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvTabReferralHistory"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="?selectableItemBackground"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:paddingStart="14dp"
+                                        android:paddingTop="6dp"
+                                        android:paddingEnd="14dp"
+                                        android:paddingBottom="6dp"
+                                        android:text="@string/titleReferralHistory"
+                                        android:textSize="@dimen/text_size_13" />
+                                </com.google.android.material.card.MaterialCardView>
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <!-- Recent items list (wallet or referral based on tab) -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvTransactions"
                         android:layout_width="match_parent"

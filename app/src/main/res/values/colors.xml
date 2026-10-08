@@ -164,6 +164,17 @@
     <color name="lu_pip_off_text">#D9FFFFFF</color>
     <color name="lu_perm_tile">#EEE9FF</color>
     <color name="lu_seg_track">#F1E4EA</color>
+    <color name="lu_text_soft">#D1FFFFFF</color>
+    <color name="lu_text_dim">#CCFFFFFF</color>
+    <color name="lu_glow_end">#00FFFFFF</color>
+    <color name="lu_check_dot">#22B573</color>
+    <!--  level-up celebration: screen backgrounds  -->
+    <color name="lu_screen_start">#4A1550</color>
+    <color name="lu_screen_center">#2A0B30</color>
+    <color name="lu_screen_end">#1C0721</color>
+    <color name="lu_screen_platinum_start">#2F1B6B</color>
+    <color name="lu_screen_platinum_center">#170B36</color>
+    <color name="lu_screen_platinum_end">#0E0624</color>
 
     <!--  cash pill on hero card  -->
     <color name="rank_pill_bg">#1FFFFFFF</color>

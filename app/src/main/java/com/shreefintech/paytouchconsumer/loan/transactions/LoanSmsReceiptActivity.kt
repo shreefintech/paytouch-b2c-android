@@ -171,7 +171,7 @@ class LoanSmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: LoanLatestPaymentDataItem) {
-        val amount     = Utility.formatAmount(item.totalPayable)
+        val amount     = Utility.formatAmount(item.billAmount ?: item.totalPayable)
         val consumerNo = item.connectionNumber ?: "--"
         val txnId      = item.transactionId ?: "--"
         val date       = Utility.formatDate(item.createdAt)

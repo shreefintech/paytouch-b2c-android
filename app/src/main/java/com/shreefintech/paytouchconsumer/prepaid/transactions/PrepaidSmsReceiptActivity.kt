@@ -168,7 +168,7 @@ class PrepaidSmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: PrepaidVerifyPaymentDataItem) {
-        val amount = Utility.formatAmount(item.totalPayable)
+        val amount = Utility.formatAmount(item.billAmount ?: item.totalPayable)
         val mobileNo = item.mobileNo ?: item.subscriberNo ?: "--"
         val txnId = item.transactionId ?: item.txnId ?: "--"
         val date = Utility.formatDate(item.createdAt)

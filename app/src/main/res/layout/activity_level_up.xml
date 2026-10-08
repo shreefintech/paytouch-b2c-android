@@ -148,7 +148,7 @@
                 android:paddingVertical="6dp"
                 android:text="@string/labelLevelUpPill"
                 android:textSize="12sp"
-                tools:textColor="#F6C29A" />
+                tools:textColor="@color/lu_bronze_light" />
 
             <!-- shield (pop + float) -->
             <FrameLayout
@@ -193,7 +193,7 @@
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:letterSpacing="-0.017"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/white"
                     android:textSize="25sp"
                     tools:alpha="1"
                     tools:text="You are Bronze II!" />
@@ -209,7 +209,7 @@
                     android:includeFontPadding="false"
                     android:maxLines="3"
                     android:textAlignment="center"
-                    android:textColor="#D1FFFFFF"
+                    android:textColor="@color/lu_text_soft"
                     android:textSize="11sp"
                     tools:alpha="1"
                     tools:text="You crossed ₹1,000 in lifetime payments." />
@@ -234,7 +234,7 @@
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:text="III"
-                    android:textColor="#D9FFFFFF"
+                    android:textColor="@color/lu_pip_off_text"
                     android:textSize="15sp" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -247,7 +247,7 @@
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:text="II"
-                    android:textColor="#D9FFFFFF"
+                    android:textColor="@color/lu_pip_off_text"
                     android:textSize="15sp" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -260,7 +260,7 @@
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:text="I"
-                    android:textColor="#D9FFFFFF"
+                    android:textColor="@color/lu_pip_off_text"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -314,7 +314,7 @@
                         android:fontFamily="@font/proza_libre_semi_bold"
                         android:includeFontPadding="false"
                         android:text="@string/labelLevelUpMedalBronze"
-                        android:textColor="#CCFFFFFF"
+                        android:textColor="@color/lu_text_dim"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -359,7 +359,7 @@
                         android:fontFamily="@font/proza_libre_semi_bold"
                         android:includeFontPadding="false"
                         android:text="@string/labelLevelUpMedalSilver"
-                        android:textColor="#CCFFFFFF"
+                        android:textColor="@color/lu_text_dim"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -404,7 +404,7 @@
                         android:fontFamily="@font/proza_libre_semi_bold"
                         android:includeFontPadding="false"
                         android:text="@string/labelLevelUpMedalGold"
-                        android:textColor="#CCFFFFFF"
+                        android:textColor="@color/lu_text_dim"
                         android:textSize="11sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -486,7 +486,7 @@
                         android:fontFamily="@font/proza_libre_semi_bold"
                         android:includeFontPadding="false"
                         android:text="@string/btnLevelUpReplay"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/white"
                         android:textSize="14sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -526,7 +526,7 @@
                         android:includeFontPadding="false"
                         android:letterSpacing="0.1"
                         android:text="@string/labelLevelUpNewCashback"
-                        android:textColor="#D52662"
+                        android:textColor="@color/primary"
                         android:textSize="12sp" />
 
                     <!-- cashback block -->
@@ -564,7 +564,7 @@
                                     android:gravity="center"
                                     android:includeFontPadding="false"
                                     android:text="%"
-                                    android:textColor="#7A3A16"
+                                    android:textColor="@color/lu_bronze_dark"
                                     android:textSize="22sp" />
                             </com.google.android.material.card.MaterialCardView>
 
@@ -588,7 +588,7 @@
                                         android:fontFamily="@font/proza_libre_extra_bold"
                                         android:includeFontPadding="false"
                                         android:letterSpacing="-0.02"
-                                        android:textColor="#D52662"
+                                        android:textColor="@color/primary"
                                         android:textSize="22sp"
                                         tools:text="0.10%" />
 
@@ -600,7 +600,7 @@
                                         android:fontFamily="@font/proza_libre_bold"
                                         android:includeFontPadding="false"
                                         android:text="@string/labelLevelUpCashbackWord"
-                                        android:textColor="#2B0B33"
+                                        android:textColor="@color/rw_ink"
                                         android:textSize="14sp" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
@@ -611,7 +611,7 @@
                                         android:layout_marginBottom="2dp"
                                         android:fontFamily="@font/proza_libre_regular"
                                         android:includeFontPadding="false"
-                                        android:textColor="#6E5763"
+                                        android:textColor="@color/rw_muted"
                                         android:textSize="11sp"
                                         tools:text="0.05%" />
                                 </LinearLayout>
@@ -624,7 +624,7 @@
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
                                     android:lineSpacingMultiplier="1.35"
-                                    android:textColor="#6E5763"
+                                    android:textColor="@color/rw_muted"
                                     android:textSize="11sp"
                                     tools:text="@string/msgLevelUpCashNoteFestive" />
                             </LinearLayout>
@@ -652,7 +652,7 @@
                                 android:layout_weight="1"
                                 android:fontFamily="@font/proza_libre_semi_bold"
                                 android:includeFontPadding="false"
-                                android:textColor="#6E5763"
+                                android:textColor="@color/rw_muted"
                                 android:textSize="13sp"
                                 tools:text="Bronze progress" />
 
@@ -662,7 +662,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/proza_libre_semi_bold"
                                 android:includeFontPadding="false"
-                                android:textColor="#2B0B33"
+                                android:textColor="@color/rw_ink"
                                 android:textSize="13sp"
                                 tools:text="2 of 3" />
                         </LinearLayout>
@@ -761,7 +761,7 @@
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
                                     android:lineSpacingMultiplier="1.35"
-                                    android:textColor="#2B0B33"
+                                    android:textColor="@color/rw_ink"
                                     android:textSize="13sp"
                                     tools:text="Next: Bronze I · ₹4,000 in lifetime payments" />
                             </LinearLayout>
@@ -808,7 +808,7 @@
                                 android:fontFamily="@font/proza_libre_bold"
                                 android:includeFontPadding="false"
                                 android:text="@string/titleLevelUpPermanent"
-                                android:textColor="#2B0B33"
+                                android:textColor="@color/rw_ink"
                                 android:textSize="15sp" />
 
                             <androidx.appcompat.widget.AppCompatTextView
@@ -818,7 +818,7 @@
                                 android:fontFamily="@font/proza_libre_regular"
                                 android:includeFontPadding="false"
                                 android:text="@string/msgLevelUpPermanentBody"
-                                android:textColor="#6E5763"
+                                android:textColor="@color/rw_muted"
                                 android:textSize="13sp" />
                         </LinearLayout>
                     </LinearLayout>
@@ -845,7 +845,7 @@
                     android:fontFamily="@font/proza_libre_bold"
                     android:includeFontPadding="false"
                     android:text="@string/btnLevelUpContinue"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/white"
                     android:textSize="17sp" />
 
                 <androidx.appcompat.widget.AppCompatImageView
