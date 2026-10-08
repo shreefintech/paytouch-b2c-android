@@ -110,7 +110,7 @@
     <color name="earningSuccessBar">#22B573</color>
     <color name="earningWarnBg">#FFF3D1</color>
     <color name="earningWarnBorder">#F3D48A</color>
-    <color name="earningCardInteratstBg">#FADE9B</color>
+    <color name="earningCardInterestBg">#FADE9B</color>
     <color name="earningWarnTitle">#5A3A00</color>
     <color name="earningDisabledBg">#F1E1E7</color>
     <color name="earningDisabledText">#B79CA8</color>

@@ -77,41 +77,50 @@
         </LinearLayout>
 
         <!-- Locked balance row -->
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/llLockedBalanceRow"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:background="@drawable/bg_info_row_pink"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="10dp"
+            app:cardBackgroundColor="@color/primary_light"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
             app:layout_constraintEnd_toEndOf="@id/dummyView"
             app:layout_constraintStart_toStartOf="@id/dummyView"
             app:layout_constraintTop_toBottomOf="@id/llWithdrawTitleRow">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/proza_libre_semi_bold"
-                android:includeFontPadding="false"
-                android:text="@string/labelLockedBalance"
-                android:textColor="@color/primary"
-                android:textSize="13sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvWithdrawLockedBalance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/proza_libre_bold"
-                android:includeFontPadding="false"
-                android:textColor="@color/primary"
-                android:textSize="13sp"
-                tools:text="₹4,000.00" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelLockedBalance"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp" />
 
-        </LinearLayout>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvWithdrawLockedBalance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp"
+                    tools:text="₹4,000.00" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Amount label -->
         <androidx.appcompat.widget.AppCompatTextView
@@ -196,85 +205,95 @@
             app:layout_constraintTop_toBottomOf="@id/cardWithdrawAmount" />
 
         <!-- Warn box (gold warning + lost interest) -->
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/llWarnBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:background="@drawable/bg_warn_box"
-            android:orientation="vertical"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="12dp"
             android:visibility="gone"
+            app:cardBackgroundColor="@color/earningWarnBg"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/earningWarnBorder"
+            app:strokeWidth="1dp"
             app:layout_constraintEnd_toEndOf="@id/dummyView"
             app:layout_constraintStart_toStartOf="@id/dummyView"
             app:layout_constraintTop_toBottomOf="@id/tvWithdrawError"
             tools:visibility="visible">
 
-            <!-- Gold warning row -->
             <LinearLayout
-                android:id="@+id/llGoldWarning"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="top"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="12dp">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginTop="1dp"
-                    android:src="@drawable/ic_warning"
-                    android:tint="@color/earningWarnTitle" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tvGoldWarning"
-                    android:layout_width="0dp"
+                <!-- Gold warning row -->
+                <LinearLayout
+                    android:id="@+id/llGoldWarning"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/proza_libre_medium"
-                    android:includeFontPadding="false"
-                    android:lineSpacingMultiplier="1.35"
-                    android:textColor="@color/earningWarnTitle"
-                    android:textSize="12.5sp"
-                    tools:text="This can lower your Gold level. After this you'll have ₹3,000 locked." />
+                    android:gravity="top"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="1dp"
+                        android:src="@drawable/ic_warning"
+                        android:tint="@color/earningWarnTitle" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvGoldWarning"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:includeFontPadding="false"
+                        android:lineSpacingMultiplier="1.35"
+                        android:textColor="@color/earningWarnTitle"
+                        android:textSize="12.5sp"
+                        tools:text="This can lower your Gold level. After this you'll have ₹3,000 locked." />
+
+                </LinearLayout>
+
+                <!-- Lost interest row -->
+                <LinearLayout
+                    android:id="@+id/llInterestRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="top"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="1dp"
+                        android:src="@drawable/ic_info"
+                        android:tint="@color/earningWarnTitle" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvLostInterest"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:includeFontPadding="false"
+                        android:lineSpacingMultiplier="1.35"
+                        android:textColor="@color/earningWarnTitle"
+                        android:textSize="12.5sp"
+                        tools:text="Interest not yet moved (₹12.05) will be lost." />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Lost interest row -->
-            <LinearLayout
-                android:id="@+id/llInterestRow"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="top"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginTop="1dp"
-                    android:src="@drawable/ic_info"
-                    android:tint="@color/earningWarnTitle" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tvLostInterest"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/proza_libre_medium"
-                    android:includeFontPadding="false"
-                    android:lineSpacingMultiplier="1.35"
-                    android:textColor="@color/earningWarnTitle"
-                    android:textSize="12.5sp"
-                    tools:text="Interest not yet moved (₹12.05) will be lost." />
-
-            </LinearLayout>
-
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Info row: arrives in 3 days -->
         <LinearLayout

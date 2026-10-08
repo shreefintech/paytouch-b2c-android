@@ -15,22 +15,19 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityEarningWalletBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetEarningLockBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetEarningOptInBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetEarningWithdrawBinding
+import com.shreefintech.paytouchconsumer.earningwallet.viewmodel.EarningWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
 
 class EarningWalletActivity : BaseActivity() {
 
@@ -56,6 +53,8 @@ class EarningWalletActivity : BaseActivity() {
     private var lockedBalance = 0.0
     private var walletBalance = 0.0
     private var interestAccrued = 0.0
+    private var resultCode = 0
+    private var isDataLoaded = false
 
     companion object {
         fun start(context: Context) {
@@ -173,7 +172,7 @@ class EarningWalletActivity : BaseActivity() {
         )
         viewModel.fetchWalletData(
             onSuccess = { populateWalletBalance(it) },
-            onError = {}
+            onError = { ToastUtil.showDelete(mActivity, it) }
         )
         viewModel.fetchLevel(
             onSuccess = { isGoldStage = it.stage?.equals("gold", ignoreCase = true) == true },
@@ -189,7 +188,7 @@ class EarningWalletActivity : BaseActivity() {
         )
         viewModel.fetchWalletData(
             onSuccess = { populateWalletBalance(it) },
-            onError = {}
+            onError = { ToastUtil.showDelete(mActivity, it) }
         )
     }
 
@@ -198,6 +197,7 @@ class EarningWalletActivity : BaseActivity() {
     // region Populate UI
 
     private fun populateEarningWallet(item: EarningWalletItem) {
+        isDataLoaded = true
         isOptedIn = item.optedIn == true
         lockedBalance = item.principal ?: 0.0
         interestAccrued = item.interestAccrued ?: 0.0
@@ -212,7 +212,7 @@ class EarningWalletActivity : BaseActivity() {
             binding.cardInterestPill.gone()
         }
 
-        val agingMs = if (lockedBalance > 0.0) parseIsoDateMs(item.agingStartedAt) else null
+        val agingMs = if (lockedBalance > 0.0) Utility.parseIsoMillis(item.agingStartedAt) else null
         if (agingMs != null) {
             binding.cardStatus.visible()
             updateStatusCard(item.agingStartedAt)
@@ -234,14 +234,11 @@ class EarningWalletActivity : BaseActivity() {
     }
 
     private fun updateStatusCard(agingStartedAt: String?) {
-        val agingMs = parseIsoDateMs(agingStartedAt) ?: return
-        val activeDateMs = agingMs + 30L * 24 * 60 * 60 * 1000
+        val agingMs = Utility.parseIsoMillis(agingStartedAt) ?: return
+        val activeDateMs = agingMs + Constant.EARNING_LOCK_DAYS.toLong() * 24 * 60 * 60 * 1000
 
-        val istFormat = SimpleDateFormat("d MMM yyyy", Locale.getDefault()).apply {
-            timeZone = TimeZone.getTimeZone("Asia/Kolkata")
-        }
-        val agingDateStr = istFormat.format(Date(agingMs))
-        val activeDateStr = istFormat.format(Date(activeDateMs))
+        val agingDateStr = Utility.formatDate(agingStartedAt, "d MMM yyyy")
+        val activeDateStr = Utility.formatMillis(activeDateMs, "d MMM yyyy")
 
         val now = System.currentTimeMillis()
         val isActive = now >= activeDateMs
@@ -252,7 +249,7 @@ class EarningWalletActivity : BaseActivity() {
             )
             binding.tvStatusBadge.setTextColor(ContextCompat.getColor(mActivity, R.color.earningSuccessText))
             binding.tvStatusBadge.text = getString(R.string.labelStatusActive)
-            binding.progressStatus.progress = 30
+            binding.progressStatus.progress = Constant.EARNING_LOCK_DAYS
             binding.progressStatus.progressTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.earningSuccessBar))
             binding.progressStatus.progressBackgroundTintList =
@@ -260,16 +257,17 @@ class EarningWalletActivity : BaseActivity() {
             binding.tvStatusDate.text = getString(R.string.labelEarningsSince, activeDateStr)
         } else {
             binding.cardStatusBadge.setCardBackgroundColor(
-                ContextCompat.getColor(mActivity, R.color.tierGoldBg)
+                ContextCompat.getColor(mActivity, R.color.earningWarnBg)
             )
-            binding.tvStatusBadge.setTextColor(ContextCompat.getColor(mActivity, R.color.tierGoldText))
+            binding.tvStatusBadge.setTextColor(ContextCompat.getColor(mActivity, R.color.earningWarnTitle))
             binding.tvStatusBadge.text = getString(R.string.labelStatusLocked)
-            val daysElapsed = ((now - agingMs) / (1000L * 60 * 60 * 24)).toInt().coerceIn(0, 29)
+            val daysElapsed = ((now - agingMs) / (1000L * 60 * 60 * 24)).toInt()
+                .coerceIn(0, Constant.EARNING_LOCK_DAYS - 1)
             binding.progressStatus.progress = daysElapsed
             binding.progressStatus.progressTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.tierGoldText))
+                ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.earningWarnTitle))
             binding.progressStatus.progressBackgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.tierGoldBg))
+                ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.earningWarnBg))
             binding.tvStatusDate.text = getString(R.string.labelLockedSince, agingDateStr, activeDateStr)
         }
     }
@@ -320,17 +318,14 @@ class EarningWalletActivity : BaseActivity() {
     }
 
     private fun openLockSheet() {
-        lockSheet.etLockAmount.setText("1000")
-        lockSheet.etLockAmount.setSelection(4)
+        val defaultAmountStr = Constant.EARNING_DEFAULT_LOCK_AMOUNT.toString()
+        lockSheet.etLockAmount.setText(defaultAmountStr)
+        lockSheet.etLockAmount.setSelection(defaultAmountStr.length)
         lockSheet.tvLockWalletBalance.text = Utility.formatAmount(walletBalance)
-        val cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Kolkata"))
-        cal.add(Calendar.DAY_OF_MONTH, 30)
-        val dateStr = SimpleDateFormat("d MMM yyyy", Locale.getDefault()).apply {
-            timeZone = TimeZone.getTimeZone("Asia/Kolkata")
-        }.format(cal.time)
-        lockSheet.tvStartsEarning.text = getString(R.string.msgStartsEarning, dateStr)
+        val activeDateMs = System.currentTimeMillis() + Constant.EARNING_LOCK_DAYS.toLong() * 24 * 60 * 60 * 1000
+        lockSheet.tvStartsEarning.text = getString(R.string.msgStartsEarning, Utility.formatMillis(activeDateMs, "d MMM yyyy"))
         lockSheet.tvLockError.gone()
-        setLockButtonEnabled(walletBalance >= 1000.0)
+        setLockButtonEnabled(walletBalance >= Constant.EARNING_DEFAULT_LOCK_AMOUNT)
         lockBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
@@ -381,6 +376,7 @@ class EarningWalletActivity : BaseActivity() {
             onLoading = { showProgressLock.set(true) },
             onSuccess = { msg ->
                 showProgressLock.set(false)
+                resultCode = 1
                 lockBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 if (msg.isNotEmpty()) ToastUtil.showSuccess(mActivity, msg)
                 refreshData()
@@ -408,8 +404,9 @@ class EarningWalletActivity : BaseActivity() {
             onLoading = { showProgressWithdraw.set(true) },
             onSuccess = { msg ->
                 showProgressWithdraw.set(false)
+                resultCode = 1
                 withdrawBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
+                if (msg.isNotEmpty()) ToastUtil.showSuccess(mActivity, msg)
                 refreshData()
             },
             onError = { msg ->
@@ -434,6 +431,7 @@ class EarningWalletActivity : BaseActivity() {
                     optInBehavior.state == BottomSheetBehavior.STATE_EXPANDED ->
                         optInBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                     else -> {
+                        setResult(resultCode)
                         isEnabled = false
                         onBackPressedDispatcher.onBackPressed()
                     }
@@ -451,6 +449,7 @@ class EarningWalletActivity : BaseActivity() {
                 }
                 binding.btnLockMoney -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (!isDataLoaded) return@OnClickListener
                     if (!isOptedIn) openOptInSheet() else openLockSheet()
                 }
                 binding.btnWithdraw -> {
@@ -479,8 +478,9 @@ class EarningWalletActivity : BaseActivity() {
                 }
                 lockSheet.chipLock1000 -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    lockSheet.etLockAmount.setText("1000")
-                    lockSheet.etLockAmount.setSelection(4)
+                    val amtStr = Constant.EARNING_DEFAULT_LOCK_AMOUNT.toString()
+                    lockSheet.etLockAmount.setText(amtStr)
+                    lockSheet.etLockAmount.setSelection(amtStr.length)
                 }
                 lockSheet.chipLockAll -> {
                     if (Utility.stopClick()) return@OnClickListener
@@ -536,20 +536,4 @@ class EarningWalletActivity : BaseActivity() {
         withdrawSheet.btnWithdrawSheet.isFocusable = enabled
     }
 
-    // region Helpers
-
-    private fun parseIsoDateMs(raw: String?): Long? {
-        if (raw.isNullOrBlank()) return null
-        val cleaned = raw.substringBefore(".").substringBefore("+")
-        val utc = TimeZone.getTimeZone("UTC")
-        for (pattern in listOf("yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd")) {
-            try {
-                val date = SimpleDateFormat(pattern, Locale.getDefault()).apply { timeZone = utc }.parse(cleaned)
-                if (date != null) return date.time
-            } catch (e: Exception) { e.printStackTrace() }
-        }
-        return null
-    }
-
-    // endregion
 }

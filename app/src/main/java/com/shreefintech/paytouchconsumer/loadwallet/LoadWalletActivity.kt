@@ -18,6 +18,7 @@ import androidx.databinding.ObservableBoolean
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -96,6 +97,10 @@ class LoadWalletActivity : BaseActivity() {
     private var isWalletEntrancePlayed = false
     private var isWalletLoading = false
     private var hasWalletData = false
+
+    private val earningWalletLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result -> if (result.resultCode == 1) loadData() }
 
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
@@ -832,7 +837,7 @@ class LoadWalletActivity : BaseActivity() {
 
                 binding.cardEarningWallet -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    EarningWalletActivity.start(mActivity)
+                    earningWalletLauncher.launch(Intent(mActivity, EarningWalletActivity::class.java))
                 }
 
                 binding.cardRewardsLevel -> {
