@@ -255,6 +255,10 @@
     <string name="categoryLoan">Loan</string>
     <string name="categoryMunicipalTax">Municipal Tax</string>
 
+    <!-- Referral History -->
+    <string name="titleReferralHistory">Referral History</string>
+    <string name="msgNoReferralHistory">No referral history yet</string>
+
     <!-- Transaction Report screen -->
     <string name="titleTransactionReport">Transaction Report</string>
     <string name="hintSearchTransaction">Search consumer no. or Transaction ID</string>

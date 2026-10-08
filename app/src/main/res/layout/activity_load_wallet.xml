@@ -1102,6 +1102,78 @@
                         android:textSize="@dimen/text_size_13"
                         android:visibility="gone" />
 
+                    <!-- Referral History section -->
+                    <LinearLayout
+                        android:id="@+id/llReferralSection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_large"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:id="@+id/llReferralHistoryHeader"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:foreground="?selectableItemBackground"
+                            android:gravity="center_vertical"
+                            android:onClickListener="@{onClickListener}"
+                            android:orientation="horizontal"
+                            android:paddingTop="@dimen/margin_small"
+                            android:paddingBottom="@dimen/margin_small">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_bold"
+                                android:includeFontPadding="false"
+                                android:text="@string/titleReferralHistory"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_size_14" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:includeFontPadding="false"
+                                android:text="@string/labelViewAll"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_size_12" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginStart="4dp"
+                                android:src="@drawable/ic_right_arrow"
+                                android:tint="@color/primary" />
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvReferralHistory"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:nestedScrollingEnabled="false"
+                            android:overScrollMode="never"
+                            android:visibility="gone"
+                            tools:itemCount="2"
+                            tools:listitem="@layout/item_wallet_transaction" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvNoReferralHistory"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:fontFamily="@font/proza_libre_medium"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
+                            android:text="@string/msgNoReferralHistory"
+                            android:textColor="@color/sub_text_color"
+                            android:textSize="@dimen/text_size_13"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <!-- Coming Soon (for Referral Wallet / My Wallet / Earn tabs) -->

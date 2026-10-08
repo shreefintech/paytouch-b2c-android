@@ -99,6 +99,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletAmo
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.ReferralWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawRequest
@@ -244,6 +245,11 @@ interface ApiService {
     fun getReferralWallet(
         @Header("Authorization") authorization: String
     ): Call<General<ReferralWalletItem?>>
+
+    @GET("${AUTH}bonus-wallet")
+    fun getBonusWallet(
+        @Header("Authorization") authorization: String
+    ): Call<General<BonusWalletItem?>>
 
     @GET("${AUTH}earning-wallet")
     fun getEarningWallet(

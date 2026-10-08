@@ -122,10 +122,10 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
         binding.cardRoad.isVisible = true
         binding.llPlatinum.isVisible = false
 
-        binding.tvRoadTitle.text = getString(R.string.rank_road_to, next.label.orEmpty())
-        val nextCash = RankFormat.cashbackFor(next.level)
-        binding.tvNextCashChip.isVisible = nextCash != null
-        nextCash?.let { binding.tvNextCashChip.text = getString(R.string.rank_percent, RankFormat.percent(it)) }
+        binding.tvRoadTitle.text = d.label.orEmpty()
+        val curCash = d.cashbackPercent ?: RankFormat.cashbackFor(d.level)
+        binding.tvNextCashChip.isVisible = curCash != null
+        curCash?.let { binding.tvNextCashChip.text = getString(R.string.rank_percent, RankFormat.percent(it)) }
 
         if (next.metric == "gold_1_days") {
             bindCountdown(next, d.platinumDays)

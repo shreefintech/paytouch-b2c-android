@@ -32,6 +32,7 @@ import com.shreefintech.paytouchconsumer.databinding.DialogConfirmWithdrawBindin
 import com.shreefintech.paytouchconsumer.databinding.DialogWithdrawSuccessBinding
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.adapter.ReferralHistoryAdp
 import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoadWalletBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetMakePaymentBinding
@@ -45,6 +46,7 @@ import com.shreefintech.paytouchconsumer.earningwallet.EarningWalletActivity
 import com.shreefintech.paytouchconsumer.rewards.RewardsExplainerActivity
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletHistoryItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
@@ -63,6 +65,9 @@ class LoadWalletActivity : BaseActivity() {
     private var currentTab = TAB_TOTAL_BALANCE
     private val transactionList = ArrayList<WalletTransactionItem>()
     private lateinit var transactionAdp: WalletTransactionAdp
+
+    private val referralList = ArrayList<BonusWalletHistoryItem>()
+    private lateinit var referralAdp: ReferralHistoryAdp
 
     private lateinit var sheetBinding: SheetMakePaymentBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<View>
@@ -170,6 +175,7 @@ class LoadWalletActivity : BaseActivity() {
         binding.showProgressEarning = showProgressEarning
         binding.showProgressRewards = showProgressRewards
         setupRecyclerView()
+        setupReferralRecyclerView()
         setupPaymentSheet()
         setupWithdrawSheet()
         selectTab(TAB_TOTAL_BALANCE)
@@ -507,23 +513,47 @@ class LoadWalletActivity : BaseActivity() {
         hideNoInternet()
         fetchWalletData()
         fetchRecentHistory()
-        fetchReferralWallet()
+        fetchBonusWallet()
         fetchEarningWallet()
         fetchRewardsLevel()
     }
 
-    private fun fetchReferralWallet() {
+    private fun fetchBonusWallet() {
         showProgressBonus.set(true)
-        viewModel.fetchReferralWallet(
+        viewModel.fetchBonusWallet(
             onSuccess = { data ->
                 showProgressBonus.set(false)
-                binding.tvBonusBalance.text = Utility.formatAmount(data.referralWallet)
+                binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet)
+                val referralRows = (data.history ?: emptyList()).filter { it.isReferral }.take(2)
+                updateReferralSection(referralRows)
             },
-            onError = {
+            onError = { msg ->
                 showProgressBonus.set(false)
                 binding.tvBonusBalance.text = "--"
+                ToastUtil.showDelete(mActivity, msg)
+                updateReferralSection(emptyList())
             }
         )
+    }
+
+    private fun setupReferralRecyclerView() {
+        referralAdp = ReferralHistoryAdp(mActivity, referralList)
+        binding.rvReferralHistory.apply {
+            layoutManager = LinearLayoutManager(mActivity)
+            adapter = referralAdp
+        }
+    }
+
+    private fun updateReferralSection(rows: List<BonusWalletHistoryItem>) {
+        binding.llReferralSection.visibility = View.VISIBLE
+        referralAdp.updateList(rows)
+        if (rows.isEmpty()) {
+            binding.rvReferralHistory.visibility = View.GONE
+            binding.tvNoReferralHistory.visibility = View.VISIBLE
+        } else {
+            binding.rvReferralHistory.visibility = View.VISIBLE
+            binding.tvNoReferralHistory.visibility = View.GONE
+        }
     }
 
     private fun fetchRewardsLevel() {
@@ -859,6 +889,11 @@ class LoadWalletActivity : BaseActivity() {
                 binding.llTransactionReport -> {
                     if (Utility.stopClick()) return@OnClickListener
                     WalletTransactionsActivity.start(mActivity)
+                }
+
+                binding.llReferralHistoryHeader -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    ReferralHistoryActivity.start(mActivity)
                 }
 
                 sheetBinding.ivClose -> {

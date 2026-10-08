@@ -339,6 +339,10 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".loadwallet.ReferralHistoryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".loadwallet.HdfcWebViewActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"
