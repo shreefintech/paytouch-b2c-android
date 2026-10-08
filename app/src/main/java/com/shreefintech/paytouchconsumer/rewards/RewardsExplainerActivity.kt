@@ -112,16 +112,6 @@ class RewardsExplainerActivity : BaseActivity() {
         markYouBadge(data.label)
     }
 
-    private fun progressValueText(value: Double, metric: String): String =
-        if (metric == "referrals" || metric.endsWith("days")) value.toLong().toString()
-        else Utility.formatAmount(value.toString(), trimZeros = true)
-
-    private fun progressValueWithUnitText(value: Double, metric: String): String = when {
-        metric == "referrals" -> "${value.toLong()} ${getString(R.string.labelReferrals).lowercase()}"
-        metric.endsWith("days") -> "${value.toLong()} ${getString(R.string.labelDays)}"
-        else -> Utility.formatAmount(value.toString(), trimZeros = true)
-    }
-
     private fun animateLevelProgress(progress: Float) {
         binding.viewProgressFill.pivotX = 0f
         binding.viewProgressFill.animate()

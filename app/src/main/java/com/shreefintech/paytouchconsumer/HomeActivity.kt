@@ -257,7 +257,7 @@ class HomeActivity : BaseActivity() {
                 binding.llFastag -> {
                     if (Utility.stopClick()) return@OnClickListener
                     showWarning(mActivity, getString(R.string.coming_soon))
-//                    startActivity(Intent(mActivity, FastagActivity::class.java))
+                    // TODO(B2C-212): re-enable FastagActivity once feature is restored
                 }
 
                 binding.llLoan -> {

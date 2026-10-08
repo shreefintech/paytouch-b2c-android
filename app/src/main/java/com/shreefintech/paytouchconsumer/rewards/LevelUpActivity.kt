@@ -143,6 +143,11 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun fetchAndShow() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            finish()
+            return
+        }
         viewModel.fetchLevel(
             onSuccess = { show(it) },
             onError = { msg -> ToastUtil.showDelete(mActivity, msg); finish() }
@@ -285,7 +290,7 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
     private fun previousLevelCashback(d: RewardsLevelItem): Double? {
         val h = d.history.orEmpty()
         if (h.size < 2) return null
-        return 0.0/*RankFormat.cashbackFor(h[h.size - 2].level)*/
+        return RankFormat.cashbackFor(h[h.size - 2].level)
     }
 
     private fun subtitleFor(level: String?): Int = when (level?.lowercase(Locale.ROOT)) {
