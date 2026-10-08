@@ -2,6 +2,7 @@ package com.shreefintech.paytouchconsumer.fcm
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -36,6 +37,20 @@ object NotificationHelper {
     private var pendingToken: String? = null
 
     private val notificationIdCounter = AtomicInteger(System.currentTimeMillis().toInt())
+
+    /** Requests POST_NOTIFICATIONS permission on API 33+. No-op on older OS or if already granted. */
+    fun requestPermission(activity: Activity) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        if (ActivityCompat.checkSelfPermission(
+                activity, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) return
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+            0
+        )
+    }
 
     /** Creates the push channel. Must run before any notification is posted — call from MyApp. */
     fun createChannel(context: Context) {

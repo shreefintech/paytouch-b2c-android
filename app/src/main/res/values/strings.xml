@@ -798,6 +798,7 @@
 
     <!-- Level cards — sub-level names, triggers, cashback values -->
     <string name="labelLifetimePayments">Lifetime Payments</string>
+    <string name="labelReferrals">Referrals</string>
     <string name="labelPaymentsReferrals">Payments + Referrals</string>
     <string name="labelReferralsLocking">Referrals + Locking</string>
     <string name="labelHoldGoldI90">Hold Gold I for 90 days</string>
