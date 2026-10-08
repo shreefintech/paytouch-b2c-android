@@ -233,7 +233,7 @@ Common deprecated APIs and their replacements:
 
 ## API Level Compatibility Rule
 
-**All code must work on every device from API 24 (Android 7.0) to API 37 (Android 15).** minSdk = 24, targetSdk = 37.
+**All code must work on every device from API 24 (Android 7.0) to API 37 (Android 17).** minSdk = 24, targetSdk = 37.
 
 Rules:
 - Before using any API, check its `@RequiresApi` or `@SuppressLint` annotation and the Android docs. If it requires API > 24, guard it:
