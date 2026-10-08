@@ -219,9 +219,12 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
 
     fun fetchRewardsLevel(
         onSuccess: (RewardsLevelItem) -> Unit,
-        onError: () -> Unit
+        onError: (String) -> Unit
     ) {
-        if (!Utility.isInternetAvailable(getApplication())) { onError(); return }
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
         ApiClient.apiService.getRewardsLevel(bearerToken())
             .enqueue(object : Callback<General<RewardsLevelItem?>> {
                 override fun onResponse(
@@ -229,11 +232,19 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     response: Response<General<RewardsLevelItem?>>
                 ) {
                     val data = response.body()?.data
-                    if (response.isSuccessful && data != null) onSuccess(data) else onError()
+                    if (response.isSuccessful && data != null) {
+                        onSuccess(data)
+                    } else {
+                        onError(
+                            ApiHelper.parseErrorMessage(
+                                getApplication(), response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
                 }
 
                 override fun onFailure(call: Call<General<RewardsLevelItem?>>, t: Throwable) {
-                    onError()
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }

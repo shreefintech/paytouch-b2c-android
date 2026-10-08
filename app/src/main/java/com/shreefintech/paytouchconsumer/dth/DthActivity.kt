@@ -55,6 +55,7 @@ class DthActivity : BaseActivity() {
 
     private var selectedPlan: DthPlanItem? = null
     private var isPlanSelected = false
+    private var paymentMade = false
 
     private val showProgressBrowse = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -220,6 +221,7 @@ class DthActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { body ->
                 showProgressPay.set(false)
+                paymentMade = true
                 BillPaymentStatusActivity.start(
                     mActivity,
                     BillPaymentStatusItem(
@@ -229,7 +231,6 @@ class DthActivity : BaseActivity() {
                         category = BillPaymentStatusActivity.CATEGORY_DTH
                     )
                 )
-                finish()
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -350,6 +351,7 @@ class DthActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -386,6 +388,7 @@ class DthActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
+                    if (paymentMade) return@OnClickListener
                     onProceedToPay()
                 }
                 binding.llReset -> {

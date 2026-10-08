@@ -41,6 +41,7 @@ android {
     }
     packaging {
         jniLibs {
+            // ponytail: webpdecoder requires uncompressed .so for direct dlopen; remove when zjupure/webpdecoder drops this requirement
             useLegacyPackaging = true
         }
     }

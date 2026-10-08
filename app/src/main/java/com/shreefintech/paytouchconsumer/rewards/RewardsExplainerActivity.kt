@@ -2,7 +2,6 @@ package com.shreefintech.paytouchconsumer.rewards
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -17,8 +16,8 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityRewardsExplainerBinding
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
@@ -48,31 +47,39 @@ class RewardsExplainerActivity : BaseActivity() {
             )
             insets
         }
-        binding.onClickListener = onClickListener()
+
+        val listener = onClickListener()
+        binding.onClickListener = listener
 
         Glide.with(this).load(R.drawable.img_hero_background_with_levels).into(binding.ivHeroBg)
         setupHeroHeadline()
-        setupFaq()
+        setupFaq(listener)
         onBack()
+        retryCallback = { loadLevel() }
         loadLevel()
     }
 
     private fun loadLevel() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.fetchLevel(
             onSuccess = { data -> populateHero(data) },
-            onError   = { /* non-critical — defaults already visible */ }
+            onError   = { msg -> ToastUtil.showDelete(mActivity, msg) }
         )
     }
 
     private fun setupHeroHeadline() {
-        val full = getString(R.string.titleRewardsHero)
-        val highlight = "0.50% back"
-        val start = full.indexOf(highlight)
+        val full      = getString(R.string.titleRewardsHero)
+        val highlight = getString(R.string.labelRewardsHeroHighlight)
+        val start     = full.indexOf(highlight)
 
         binding.tvHeroHeadline.text = if (start >= 0) {
             SpannableString(full).apply {
                 setSpan(
-                    ForegroundColorSpan("#FCCFA1".toColorInt()),
+                    ForegroundColorSpan(ContextCompat.getColor(mActivity, R.color.secondary)),
                     start, start + highlight.length,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
@@ -167,23 +174,24 @@ class RewardsExplainerActivity : BaseActivity() {
 
     // ── FAQ accordion ───────────────────────────────────────────────────────
 
-    private fun setupFaq() {
-        val rows      = listOf(binding.rowFaq1, binding.rowFaq2, binding.rowFaq3, binding.rowFaq4)
-        val questions = listOf(binding.tvFaq1Question, binding.tvFaq2Question, binding.tvFaq3Question, binding.tvFaq4Question)
+    private fun setupFaq(listener: View.OnClickListener) {
+        binding.rowFaq1.setOnClickListener(listener)
+        binding.rowFaq2.setOnClickListener(listener)
+        binding.rowFaq3.setOnClickListener(listener)
+        binding.rowFaq4.setOnClickListener(listener)
+    }
+
+    private fun toggleFaq(index: Int) {
         val answers   = listOf(binding.tvFaq1Answer,   binding.tvFaq2Answer,   binding.tvFaq3Answer,   binding.tvFaq4Answer)
         val arrows    = listOf(binding.ivFaq1Arrow,    binding.ivFaq2Arrow,    binding.ivFaq3Arrow,    binding.ivFaq4Arrow)
-
+        val questions = listOf(binding.tvFaq1Question, binding.tvFaq2Question, binding.tvFaq3Question, binding.tvFaq4Question)
         val primaryColor = ContextCompat.getColor(mActivity, R.color.primary)
         val defaultColor = ContextCompat.getColor(mActivity, R.color.black)
 
-        rows.forEachIndexed { i, row ->
-            row.setOnClickListener {
-                val open = answers[i].visibility == View.VISIBLE
-                answers[i].visibility = if (open) View.GONE else View.VISIBLE
-                arrows[i].rotation    = if (open) 0f else 180f
-                questions[i].setTextColor(if (open) defaultColor else primaryColor)
-            }
-        }
+        val open = answers[index].visibility == View.VISIBLE
+        answers[index].visibility = if (open) View.GONE else View.VISIBLE
+        arrows[index].rotation    = if (open) 0f else 180f
+        questions[index].setTextColor(if (open) defaultColor else primaryColor)
     }
 
     // ── Navigation ──────────────────────────────────────────────────────────
@@ -208,6 +216,14 @@ class RewardsExplainerActivity : BaseActivity() {
                 binding.tabSilver   -> { if (Utility.stopClick()) return@OnClickListener; selectTierTab(RewardsTier.SILVER) }
                 binding.tabGold     -> { if (Utility.stopClick()) return@OnClickListener; selectTierTab(RewardsTier.GOLD) }
                 binding.tabPlatinum -> { if (Utility.stopClick()) return@OnClickListener; selectTierTab(RewardsTier.PLATINUM) }
+                binding.rowFaq1     -> { if (Utility.stopClick()) return@OnClickListener; toggleFaq(0) }
+                binding.rowFaq2     -> { if (Utility.stopClick()) return@OnClickListener; toggleFaq(1) }
+                binding.rowFaq3     -> { if (Utility.stopClick()) return@OnClickListener; toggleFaq(2) }
+                binding.rowFaq4     -> { if (Utility.stopClick()) return@OnClickListener; toggleFaq(3) }
+                binding.tvMyRank    -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, MyRankActivity::class.java))
+                }
                 binding.cardYourLevel    -> {
                     if (Utility.stopClick()) return@OnClickListener
                     startActivity(Intent(mActivity, MyRankActivity::class.java))

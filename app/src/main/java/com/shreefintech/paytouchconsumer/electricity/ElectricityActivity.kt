@@ -54,6 +54,7 @@ class ElectricityActivity : BaseActivity() {
     private var selectedOperatorName: String? = null
     private var fetchedBillItem: ElectricityBillItem? = null
     private var isBillFetched = false
+    private var paymentMade = false
 
     private val showProgressFetch = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -246,6 +247,7 @@ class ElectricityActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { body ->
                 showProgressPay.set(false)
+                paymentMade = true
                 BillPaymentStatusActivity.start(
                     mActivity,
                     BillPaymentStatusItem(
@@ -324,6 +326,7 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
+        // Consumer number length varies by operator — no minimum enforced; backend validates.
         Utility.hideKeyboard(mActivity)
         fetchBill(connectionNumber)
     }
@@ -335,6 +338,7 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
+        // Consumer number length varies by operator — no minimum enforced; backend validates.
         if (selectedOperatorId.isNullOrEmpty()) {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
             return
@@ -375,6 +379,7 @@ class ElectricityActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -429,6 +434,7 @@ class ElectricityActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
+                    if (paymentMade) return@OnClickListener
                     onProceedToPay()
                 }
                 binding.llReset -> {

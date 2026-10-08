@@ -8,6 +8,15 @@
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgressBonus"
+            type="androidx.databinding.ObservableBoolean" />
+        <variable
+            name="showProgressEarning"
+            type="androidx.databinding.ObservableBoolean" />
+        <variable
+            name="showProgressRewards"
+            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -224,16 +233,31 @@
                                         </com.google.android.material.card.MaterialCardView>
                                     </LinearLayout>
 
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tvBonusBalance"
+                                    <FrameLayout
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="4dp"
-                                        android:fontFamily="@font/proza_libre_semi_bold"
-                                        android:includeFontPadding="false"
-                                        tools:text="₹0.00"
-                                        android:textColor="@color/primary"
-                                        android:textSize="@dimen/text_size_19" />
+                                        android:minHeight="28dp">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvBonusBalance"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
+                                            android:includeFontPadding="false"
+                                            tools:text="₹0.00"
+                                            android:textColor="@color/primary"
+                                            android:textSize="@dimen/text_size_19"
+                                            android:visibility="@{showProgressBonus ? View.GONE : View.VISIBLE}" />
+
+                                        <ProgressBar
+                                            style="?android:attr/progressBarStyleSmall"
+                                            android:layout_width="22dp"
+                                            android:layout_height="22dp"
+                                            android:layout_gravity="center_vertical"
+                                            android:indeterminateTint="@color/primary"
+                                            android:visibility="@{showProgressBonus ? View.VISIBLE : View.GONE}" />
+                                    </FrameLayout>
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="wrap_content"
@@ -321,16 +345,31 @@
                                         </com.google.android.material.card.MaterialCardView>
                                     </LinearLayout>
 
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tvEarningBalance"
+                                    <FrameLayout
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="4dp"
-                                        android:fontFamily="@font/proza_libre_semi_bold"
-                                        android:includeFontPadding="false"
-                                        tools:text="₹0.00"
-                                        android:textColor="@color/primary"
-                                        android:textSize="@dimen/text_size_19" />
+                                        android:minHeight="28dp">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvEarningBalance"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
+                                            android:includeFontPadding="false"
+                                            tools:text="₹0.00"
+                                            android:textColor="@color/primary"
+                                            android:textSize="@dimen/text_size_19"
+                                            android:visibility="@{showProgressEarning ? View.GONE : View.VISIBLE}" />
+
+                                        <ProgressBar
+                                            style="?android:attr/progressBarStyleSmall"
+                                            android:layout_width="22dp"
+                                            android:layout_height="22dp"
+                                            android:layout_gravity="center_vertical"
+                                            android:indeterminateTint="@color/primary"
+                                            android:visibility="@{showProgressEarning ? View.VISIBLE : View.GONE}" />
+                                    </FrameLayout>
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:layout_width="wrap_content"
@@ -379,12 +418,27 @@
                                 android:layout_height="35dp"
                                 android:src="@drawable/ic_shield_bronze" />
 
-                            <LinearLayout
+                            <FrameLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="10dp"
                                 android:layout_weight="1"
-                                android:orientation="vertical">
+                                android:minHeight="50dp">
+
+                                <ProgressBar
+                                    style="?android:attr/progressBarStyleSmall"
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:indeterminateTint="@color/primary"
+                                    android:visibility="@{showProgressRewards ? View.VISIBLE : View.GONE}" />
+
+                                <LinearLayout
+                                    android:id="@+id/llRewardsContent"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:visibility="@{showProgressRewards ? View.GONE : View.VISIBLE}">
 
                                 <!-- Tier name + cashback% -->
                                 <LinearLayout
@@ -416,19 +470,21 @@
                                 </LinearLayout>
 
                                 <!-- Progress bar -->
-                                <FrameLayout
+                                <com.google.android.material.card.MaterialCardView
                                     android:layout_width="match_parent"
                                     android:layout_height="5dp"
                                     android:layout_marginTop="10dp"
-                                    android:background="@drawable/bg_progress_track">
+                                    app:cardBackgroundColor="@color/progress_track"
+                                    app:cardCornerRadius="3dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
 
                                     <View
                                         android:id="@+id/viewProgressFill"
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
-                                        android:background="@drawable/bg_progress_fill"
-                                        android:scaleX="0" />
-                                </FrameLayout>
+                                        android:background="@color/primary" />
+                                </com.google.android.material.card.MaterialCardView>
 
                                 <!-- Promo / next level text -->
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -441,7 +497,9 @@
                                     tools:text="Festive season: flat ₹5 cashback on bills ₹50+"
                                     android:textColor="@color/sub_text_color"
                                     android:textSize="@dimen/text_size_10" />
-                            </LinearLayout>
+
+                                </LinearLayout>
+                            </FrameLayout>
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:layout_width="18dp"

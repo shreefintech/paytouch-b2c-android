@@ -54,6 +54,7 @@ class MunicipalTaxActivity : BaseActivity() {
     private var selectedOperatorName: String? = null
     private var fetchedBillItem: MunicipalTaxFetchBillDataItem? = null
     private var isBillFetched = false
+    private var paymentMade = false
 
     private val operatorSelectionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -247,7 +248,7 @@ class MunicipalTaxActivity : BaseActivity() {
             onLoading    = { showProgressPay.set(true) },
             onSuccess    = { body ->
                 showProgressPay.set(false)
-                onReset()
+                paymentMade = true
                 BillPaymentStatusActivity.start(
                     mActivity,
                     BillPaymentStatusItem(
@@ -373,6 +374,7 @@ class MunicipalTaxActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -431,6 +433,7 @@ class MunicipalTaxActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
+                    if (paymentMade) return@OnClickListener
                     onProceedToPay()
                 }
                 binding.llReset -> {

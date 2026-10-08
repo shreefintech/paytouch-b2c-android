@@ -4,6 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#D52662</color>
     <color name="primary_light">#FFEEF4</color>
+    <color name="progress_track">#F7D6E2</color>
     <color name="secondary">#FCCFA1</color>
     <color name="hint_color">#4A4A4A</color>
     <color name="sub_text_color">#80000000</color>
@@ -98,16 +99,7 @@
 
     <color name="home_card_bg">#72FFFFFF</color>
 
-    <!-- Rewards tier colors -->
-    <color name="tierBronzeBg">#FBEBDD</color>
-    <color name="tierBronzeText">#7A3A16</color>
-    <color name="tierBronzeMid">#C2733A</color>
-    <color name="tierSilverBg">#ECEFF4</color>
-    <color name="tierSilverText">#4D5868</color>
-    <color name="tierGoldBg">#FFF3D1</color>
-    <color name="tierGoldText">#8A5800</color>
-    <color name="tierPlatinumBg">#EEE9FF</color>
-    <color name="tierPlatinumText">#4A2DA6</color>
+    <color name="progressTrack">#F7D6E2</color>
     <color name="other_wallet_color">#CCFFFFFF</color>
     <color name="wallet_bg_circle">#59D52662</color>
 

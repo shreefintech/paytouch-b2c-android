@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
@@ -18,6 +17,7 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import androidx.core.view.ViewCompat
@@ -26,22 +26,16 @@ import androidx.core.view.isVisible
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityMyRankBinding
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
-import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelNextItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.Locale
 
 class MyRankActivity : BaseActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityMyRankBinding
+    private val viewModel: RewardsViewModel by viewModels()
     private val loopAnimators = mutableListOf<Animator>()
     private var levelData: RewardsLevelItem? = null
 
@@ -89,35 +83,22 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
         binding.shimmerLayout.startShimmer()
         binding.llContent.visibility = View.INVISIBLE
 
-        ApiClient.apiService.getRewardsLevel(SharedPreferenceHelper.bearerToken(mActivity))
-            .enqueue(object : Callback<General<RewardsLevelItem?>> {
-                override fun onResponse(
-                    call: Call<General<RewardsLevelItem?>>,
-                    response: Response<General<RewardsLevelItem?>>
-                ) {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayout.visibility = View.GONE
-                    val data = if (response.isSuccessful) response.body()?.data else null
-                    if (data != null) {
-                        levelData = data
-                        bind(data)
-                        binding.llContent.visibility = View.VISIBLE
-                        startLoops()
-                        playEntrance()
-                    } else {
-                        ToastUtil.showDelete(
-                            mActivity,
-                            ApiHelper.parseErrorMessage(mActivity, response.code(), response.errorBody()?.string())
-                        )
-                    }
-                }
-
-                override fun onFailure(call: Call<General<RewardsLevelItem?>>, t: Throwable) {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayout.visibility = View.GONE
-                    ToastUtil.showDelete(mActivity, t.localizedMessage ?: getString(R.string.rank_error))
-                }
-            })
+        viewModel.fetchLevel(
+            onSuccess = { data ->
+                binding.shimmerLayout.stopShimmer()
+                binding.shimmerLayout.visibility = View.GONE
+                levelData = data
+                bind(data)
+                binding.llContent.visibility = View.VISIBLE
+                startLoops()
+                playEntrance()
+            },
+            onError = { msg ->
+                binding.shimmerLayout.stopShimmer()
+                binding.shimmerLayout.visibility = View.GONE
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
     }
 
     // ───────────────────────── BIND ─────────────────────────
@@ -157,7 +138,7 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
         val value = "${RankFormat.percent(percent)}%"
         val full = value + getString(R.string.rank_cash_suffix)
         return SpannableString(full).apply {
-            setSpan(ForegroundColorSpan(Color.parseColor("#FCCFA1")), 0, value.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(ForegroundColorSpan(ContextCompat.getColor(mActivity, R.color.secondary)), 0, value.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(AbsoluteSizeSpan(16, true), 0, value.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(StyleSpan(Typeface.BOLD), 0, value.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
