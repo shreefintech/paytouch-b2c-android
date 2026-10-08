@@ -91,21 +91,11 @@ class RewardsExplainerActivity : BaseActivity() {
 
         val next = data.next
         if (next == null) {
-            binding.tvProgressNext.text = getString(R.string.msgHighestLevelPermanent)
             animateLevelProgress(1f)
         } else {
             val current = next.current ?: 0.0
             val target  = next.target  ?: 0.0
             val metric  = next.metric?.lowercase() ?: ""
-
-            val amountPart = getString(
-                R.string.labelProgressAmountFormat,
-                progressValueText(current, metric),
-                progressValueWithUnitText(target, metric)
-            )
-            binding.tvProgressNext.text = next.label?.let {
-                getString(R.string.labelProgressToNextFormat, amountPart, it)
-            } ?: amountPart
 
             val progress = if (target > 0) (current / target).toFloat().coerceIn(0f, 1f) else 1f
             animateLevelProgress(progress)

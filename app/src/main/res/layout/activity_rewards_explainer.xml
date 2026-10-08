@@ -342,7 +342,7 @@
                                         android:includeFontPadding="false"
                                         android:textColor="#6E5763"
                                         android:textSize="12sp"
-                                        tools:text="₹2,300 of ₹4,000 to Bronze I" />
+                                        android:text="@string/explain_screen_next" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:id="@+id/tvMyRank"

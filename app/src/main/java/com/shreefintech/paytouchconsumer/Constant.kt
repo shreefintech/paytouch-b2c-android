@@ -67,6 +67,9 @@ object Constant {
     const val APP_LOCK_GRACE_MS = 60 * 1000L                // normal app switch
     const val APP_LOCK_EXTERNAL_GRACE_MS = 5 * 60 * 1000L   // camera, file picker, UPI app, payment gateway, share, browser
 
+    // Rewards level-up — last level seen by the user; cleared on logout via clearSharedPreference()
+    const val KEY_LAST_SEEN_LEVEL = "LAST_SEEN_LEVEL"
+
     // Auth flow type extras
     const val EXTRA_FLOW_TYPE = "FLOW_TYPE"
     const val EXTRA_MOBILE = "EXTRA_MOBILE"

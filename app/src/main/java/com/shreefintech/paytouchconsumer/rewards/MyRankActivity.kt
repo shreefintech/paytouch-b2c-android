@@ -249,6 +249,6 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
 
     private fun openCelebration() {
         val d = levelData ?: return
-        // TODO: point this at your level-up Activity
+        LevelUpActivity.start(this, d)
     }
 }

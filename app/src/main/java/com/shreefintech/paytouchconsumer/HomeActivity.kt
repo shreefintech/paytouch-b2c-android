@@ -36,10 +36,12 @@ import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
+import com.shreefintech.paytouchconsumer.rewards.LevelUpActivity
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
+import com.shreefintech.paytouchconsumer.utill.ToastUtil.showWarning
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
@@ -97,6 +99,13 @@ class HomeActivity : BaseActivity() {
         // Skip on config change / process restore — once per Home launch is enough
         if (savedInstanceState == null) {
             locationHelper.start()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkLevelUp { levelData ->
+            LevelUpActivity.start(mActivity, levelData)
         }
     }
 
@@ -216,7 +225,8 @@ class HomeActivity : BaseActivity() {
 
                 binding.llFastag -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, FastagActivity::class.java))
+                    showWarning(mActivity, getString(R.string.coming_soon))
+//                    startActivity(Intent(mActivity, FastagActivity::class.java))
                 }
 
                 binding.llLoan -> {
@@ -243,7 +253,7 @@ class HomeActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressLogout.get()) return@OnClickListener
                     if (!Utility.isInternetAvailable(mActivity)) {
-                        ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet), inWindow = false)
+                        showWarning(mActivity, getString(R.string.msgNoInternet), inWindow = false)
                         return@OnClickListener
                     }
                     viewModel.logout(
@@ -258,7 +268,7 @@ class HomeActivity : BaseActivity() {
                         },
                         onError = { msg ->
                             showProgressLogout.set(false)
-                            ToastUtil.showWarning(mActivity, msg, inWindow = false)
+                            showWarning(mActivity, msg, inWindow = false)
                         }
                     )
                 }

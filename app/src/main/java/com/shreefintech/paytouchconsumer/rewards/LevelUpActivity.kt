@@ -29,11 +29,15 @@ import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityLevelUpBinding
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import java.util.Locale
@@ -62,11 +66,13 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
     private lateinit var binding: ActivityLevelUpBinding
     private val viewModel: RewardsViewModel by viewModels()
     private val running = mutableListOf<Animator>()
+    private var levelUpPlayer: MediaPlayer? = null
     private var data: RewardsLevelItem? = null
     private var prevCashback: Double? = null
     private var palette = Palette.BRONZE
     private var rankIndex = 0
     private var isPlatinum = false
+    private var statusBarInset = 0
 
     private val dp get() = resources.displayMetrics.density
 
@@ -82,6 +88,8 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
             runCatching { Gson().fromJson(it, RewardsLevelItem::class.java) }.getOrNull()
         }
         if (fromIntent != null) show(fromIntent) else fetchAndShow()
+
+        playSound()
     }
 
     override fun onPause() {
@@ -91,14 +99,15 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        if (data != null && running.isEmpty() && animationsEnabled()) startLoops()
+        if (data == null) return
+        if (running.isEmpty() && animationsEnabled()) startLoops()
     }
 
     override fun onClick(v: View) {
         if (Utility.stopClick()) return
         when (v.id) {
             R.id.btnClose -> finish()
-            R.id.btnReplay -> { stopAll(); resetForEntrance(); playAll() }
+            R.id.btnReplay -> { stopAll(); resetForEntrance(); playAll(); playSound() }
             R.id.btnContinue -> finish()
         }
     }
@@ -106,14 +115,30 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
     private fun applyInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.flRoot) { _, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            statusBarInset = bars.top
             binding.flStage.setPadding(0, bars.top, 0, 0)
             binding.llTopBar.setPadding(
                 (16 * dp).toInt(), bars.top + (14 * dp).toInt(), (16 * dp).toInt(), 0
             )
             binding.llSheet.setPadding(
-                (22 * dp).toInt(), (22 * dp).toInt(), (22 * dp).toInt(), bars.bottom + (24 * dp).toInt()
+                (22 * dp).toInt(), (14 * dp).toInt(), (22 * dp).toInt(), bars.bottom + (14 * dp).toInt()
             )
             insets
+        }
+    }
+
+    private fun capSheetHeight() {
+        binding.llSheet.post {
+            val pipsBottom = statusBarInset + (412 * dp).toInt() + (44 * dp).toInt()
+            val screenH = resources.displayMetrics.heightPixels
+            val maxSheetH = (screenH - pipsBottom - (4 * dp).toInt()).coerceAtLeast((200 * dp).toInt())
+            if (binding.llSheet.measuredHeight > maxSheetH) {
+                val continuePlusMargin = binding.btnContinue.measuredHeight + (12 * dp).toInt()
+                val svMaxH = (maxSheetH - binding.llSheet.paddingTop - binding.llSheet.paddingBottom - continuePlusMargin)
+                    .coerceAtLeast((80 * dp).toInt())
+                binding.svSheet.layoutParams = binding.svSheet.layoutParams.apply { height = svMaxH }
+                binding.svSheet.requestLayout()
+            }
         }
     }
 
@@ -127,6 +152,7 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
     private fun show(d: RewardsLevelItem) {
         data = d
         bind(d)
+        capSheetHeight()
         resetForEntrance()
         playAll()
     }
@@ -163,8 +189,7 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
             setStroke((1 * dp).toInt(), withAlpha(palette.glow, 0.6f))
         }
 
-        binding.ivShield.setImageResource(tier.shield)
-        binding.tvBadgeLabel.text = if (isPlatinum) "PLATINUM" else label.uppercase(Locale.ROOT)
+        Glide.with(this).load(tier.shield).into(binding.ivShield)
 
         binding.tvTitle.text = getString(R.string.lu_you_are, label)
         if (isPlatinum) {
@@ -307,6 +332,35 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
         medals().forEach { it.scaleX = 1f; it.scaleY = 1f }
     }
 
+    private fun playSound() {
+        stopSound()
+        try {
+            val afd = resources.openRawResourceFd(R.raw.lavel_up_2) ?: return
+
+            val mp = MediaPlayer()
+            mp.setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build()
+            )
+            mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+            afd.close()
+            mp.setOnPreparedListener { it.start() }
+            mp.setOnCompletionListener { it.release(); levelUpPlayer = null }
+            mp.setOnErrorListener { m, _, _ -> m.release(); levelUpPlayer = null; true }
+            mp.prepareAsync()
+            levelUpPlayer = mp
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun stopSound() {
+        levelUpPlayer?.release()
+        levelUpPlayer = null
+    }
+
     private fun playAll() {
         if (!animationsEnabled()) { showEndState(); return }
         playEntrance()
@@ -375,6 +429,7 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
             interpolator = AccelerateDecelerateInterpolator(); start()
         }
         listOf(binding.viewRing1 to 1_000L, binding.viewRing2 to 2_200L).forEach { (ring, delay) ->
+            ring.setLayerType(View.LAYER_TYPE_HARDWARE, null)
             running += ObjectAnimator.ofPropertyValuesHolder(
                 ring,
                 PropertyValuesHolder.ofFloat(View.SCALE_X, 0.55f, 1.9f),
@@ -382,7 +437,8 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
                 PropertyValuesHolder.ofFloat(View.ALPHA, 0.9f, 0f)
             ).apply {
                 duration = 2_400L; startDelay = delay
-                repeatCount = ValueAnimator.INFINITE; interpolator = DecelerateInterpolator(); start()
+                repeatCount = ValueAnimator.INFINITE; repeatMode = ValueAnimator.RESTART
+                interpolator = DecelerateInterpolator(); start()
             }
         }
         sparkles().forEachIndexed { i, s ->
@@ -397,17 +453,22 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
                 repeatCount = ValueAnimator.INFINITE; start()
             }
         }
-        binding.shineShield.start(1_400L)
     }
 
     private fun stopAll() {
         running.forEach { it.cancel() }
         running.clear()
-        binding.shineShield.stop()
+        stopSound()
         binding.confetti.stop()
         binding.ivRays.setLayerType(View.LAYER_TYPE_NONE, null)
         binding.ivRays.rotation = 0f
         binding.flBadge.translationY = 0f
+        listOf(binding.viewRing1, binding.viewRing2).forEach { ring ->
+            ring.setLayerType(View.LAYER_TYPE_NONE, null)
+            ring.alpha = 0f
+            ring.scaleX = 1f
+            ring.scaleY = 1f
+        }
         showEndState()
     }
 

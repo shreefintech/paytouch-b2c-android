@@ -23,6 +23,26 @@ enum class RankTier(
             "platinum" -> PLATINUM
             else -> BRONZE
         }
+
+        /** Ordered lowest → highest. Used to detect a level-up between sessions. */
+        val allLevels = listOf(
+            "bronze_3", "bronze_2", "bronze_1",
+            "silver_3", "silver_2", "silver_1",
+            "gold_3",   "gold_2",   "gold_1",
+            "platinum"
+        )
+
+        /**
+         * Returns true when [newLevel] is strictly higher than [savedLevel].
+         * - Empty / null [savedLevel] = fresh install → always show.
+         * - Unknown [newLevel] (not in [allLevels]) → never show (safe default).
+         */
+        fun shouldShowLevelUp(newLevel: String?, savedLevel: String?): Boolean {
+            val newIdx = allLevels.indexOf(newLevel?.lowercase(Locale.ROOT) ?: "")
+            if (newIdx < 0) return false
+            val savedIdx = allLevels.indexOf(savedLevel?.lowercase(Locale.ROOT) ?: "")
+            return newIdx > savedIdx  // savedIdx = -1 on fresh install → always true for any valid level
+        }
     }
 }
 

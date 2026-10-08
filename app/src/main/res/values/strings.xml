@@ -930,5 +930,7 @@
     <string name="lu_sub_gold_2">₹1,000 locked in your Earning Wallet for 30+ days.</string>
     <string name="lu_sub_gold_1">₹4,000 locked for 30+ days. Platinum is in sight.</string>
     <string name="lu_sub_platinum">90 days in a row at Gold I. This level is yours forever.</string>
+    <string name="explain_screen_next">Festive season: flat ₹5 cashback on bills ₹50+</string>
+    <string name="coming_soon">Coming Soon</string>
 
 </resources>
