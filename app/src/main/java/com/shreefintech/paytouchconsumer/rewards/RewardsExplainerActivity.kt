@@ -60,7 +60,10 @@ class RewardsExplainerActivity : BaseActivity() {
     }
 
     private fun loadLevel() {
-        if (!Utility.isInternetAvailable(mActivity)) { showNoInternet(); return }
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
         hideNoInternet()
         viewModel.fetchLevel(
             onSuccess = { data -> populateHero(data) },
@@ -201,7 +204,11 @@ class RewardsExplainerActivity : BaseActivity() {
                 binding.rowFaq4     -> { if (Utility.stopClick()) return@OnClickListener; toggleFaq(3) }
                 binding.tvMyRank    -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-205): navigate to MyRankActivity when implemented
+                    startActivity(Intent(mActivity, MyRankActivity::class.java))
+                }
+                binding.cardYourLevel    -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    startActivity(Intent(mActivity, MyRankActivity::class.java))
                 }
             }
         }

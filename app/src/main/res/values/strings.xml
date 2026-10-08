@@ -848,5 +848,26 @@
 
 
     <string name="titleRewardsHero">Level up and earn\nup to 0.50% back</string>
+
     <string name="labelRewardsHeroHighlight">0.50% back</string>
+    <string name="labelCashbackSuffix"> cashback on every bill</string>
+    <string name="titleRoadToLevel">Road to %1$s</string>
+    <!--  progress line per next.metric  -->
+    <string name="msgRankProgressTxn">%1$s of %2$s lifetime payments</string>
+    <string name="msgRankProgressReferrals">%1$s of %2$s referrals</string>
+    <string name="msgRankProgressLocked">%1$s of %2$s locked 30+ days</string>
+    <!--  rule line per next.metric  -->
+    <string name="msgRankRuleTxn">Every successful payment counts toward your next level.</string>
+    <string name="msgRankRuleReferrals">A friend counts once they complete KYC after you reached Silver.</string>
+    <string name="msgRankRuleLocked">Money kept 30+ days in your Earning Wallet counts. You never drop below Gold III.</string>
+    <!--  Gold I countdown  -->
+    <string name="labelDaysOf">of %1$d days</string>
+    <string name="msgDaysToGo">%1$d days to go</string>
+    <string name="msgRankCountdownRule">Stay at Gold I every day. If your locked balance drops below ₹4,000, the count restarts.</string>
+    <!--  Platinum  -->
+    <string name="titleRankPlatinum">Highest level · permanent</string>
+    <string name="msgRankPlatinumBody">You will never drop from Platinum.</string>
+    <string name="btnReplayCelebration">Replay celebration</string>
+    <string name="errRankLoad">Could not load your level. Please try again.</string>
+
 </resources>

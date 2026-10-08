@@ -131,4 +131,13 @@
     <color name="rw_gold_icon">#8A5800</color>
     <!--  card shadow tint, used on API 28+ = rgba(213,38,98,0.2)  -->
     <color name="rw_card_shadow">#33D52662</color>
+
+    <!--  tier glow / rays tint  -->
+    <color name="rank_tint_bronze">#F6AA6E</color>
+    <color name="rank_tint_silver">#C8D2E1</color>
+    <color name="rank_tint_gold">#FFD65C</color>
+    <color name="rank_tint_platinum">#BEAFFF</color>
+    <!--  cash pill on hero card  -->
+    <color name="rank_pill_bg">#1FFFFFFF</color>
+    <color name="rank_pill_stroke">#2EFFFFFF</color>
 </resources>

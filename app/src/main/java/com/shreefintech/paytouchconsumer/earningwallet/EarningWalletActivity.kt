@@ -71,6 +71,7 @@ class EarningWalletActivity : BaseActivity() {
         setupInsets()
         bindClickListeners()
         onBack()
+        retryCallback = { loadData() }
         loadData()
     }
 
@@ -165,6 +166,11 @@ class EarningWalletActivity : BaseActivity() {
     // region Data Loading
 
     private fun loadData() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.fetchEarningWallet(
             onLoading = {},
             onSuccess = { populateEarningWallet(it) },
