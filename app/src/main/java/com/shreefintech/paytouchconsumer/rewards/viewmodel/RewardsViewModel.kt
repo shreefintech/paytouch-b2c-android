@@ -1,4 +1,4 @@
-package com.shreefintech.paytouchconsumer.rewards
+package com.shreefintech.paytouchconsumer.rewards.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

@@ -771,14 +771,14 @@
     <!-- Rewards Explainer screen -->
     <string name="titlePayTouchRewards">PayTouch Rewards</string>
     <string name="labelFestiveSeason">Festive Season</string>
-    <string name="titleRewardsHeroLine1">Earn more cashback</string>
-    <string name="titleRewardsHeroHighlight">every single bill.</string>
     <string name="subtitleRewardsHero">Level up by paying bills, referring friends, and locking money. Your cashback grows with you.</string>
     <string name="labelBronzeAllCaps">BRONZE</string>
     <string name="labelSilverAllCaps">SILVER</string>
     <string name="labelGoldAllCaps">GOLD</string>
     <string name="labelPlatinumAllCaps">PLATINUM</string>
+    <string name="labelYourLevel">Your Level</string>
     <string name="labelCashback">Cashback</string>
+    <string name="fmtPercent">%1$.2f%%</string>
     <string name="labelMyRank">My Rank </string>
     <string name="titleCashbackGrows">Cashback grows every level</string>
     <string name="subtitleCashbackGrows">From 0.05% at Bronze III up to 0.50% at Platinum — your cashback rate increases as you level up.</string>
