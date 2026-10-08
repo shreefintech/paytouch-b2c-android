@@ -102,6 +102,7 @@ class EditBankDetailsActivity : BaseActivity() {
         val listener = onClickListener()
         binding.onClickListener  = listener
         binding.showProgressSave = showProgressSave
+        binding.flUpload1.setOnClickListener(listener)
         binding.flBankProof.setOnClickListener(listener)
         binding.ivEditProof.setOnClickListener(listener)
         binding.ivDeleteProof.setOnClickListener(listener)
@@ -345,10 +346,6 @@ class EditBankDetailsActivity : BaseActivity() {
 
     private fun onSubmit() {
         if (!validate()) return
-        if (!Utility.isInternetAvailable(mActivity)) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
-            return
-        }
         val item = bankItem ?: return
 
         // Snapshot all form values on the main thread before going to IO
@@ -407,8 +404,10 @@ class EditBankDetailsActivity : BaseActivity() {
                     if (showProgressSave.get()) return@OnClickListener
                     onSubmit()
                 }
-                binding.llUploadProof, binding.ivEditProof -> {
+                binding.flUpload1, binding.flBankProof, binding.ivEditProof -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // flBankProof catches border taps — only open picker when in upload state
+                    if (view == binding.flBankProof && !binding.llUploadProof.isVisible) return@OnClickListener
                     filePickerUtil.showSourceChooser(File(filesDir, Constant.KYC_BANK_DOCS_DIR))
                 }
                 binding.ivDeleteProof -> {

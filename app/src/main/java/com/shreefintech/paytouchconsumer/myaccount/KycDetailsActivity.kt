@@ -242,7 +242,7 @@ class KycDetailsActivity : BaseActivity() {
                 val bankId = account.id ?: return@OnClickListener
                 val passItem = EditBankPassItem(
                     bankId            = bankId,
-                    isPrimary         = account.isPrimary ?: (bankId == 0),
+                    isPrimary         = account.isPrimary ?: false,
                     accountHolderName = account.accountHolderName,
                     accountNumber     = account.accountNumber,
                     bankName          = account.bankName,
