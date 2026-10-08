@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.myaccount.viewmodel.EditBankDetailsViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityEditBankDetailsBinding
@@ -48,7 +49,7 @@ class EditBankDetailsActivity : BaseActivity() {
 
         private val IFSC_REGEX = Regex("^[A-Z]{4}0[A-Z0-9]{6}$")
 
-        fun start(context: Context, item: EditBankPassItem): Intent =
+        fun createIntent(context: Context, item: EditBankPassItem): Intent =
             Intent(context, EditBankDetailsActivity::class.java).apply {
                 putExtra(EXTRA_BANK, Gson().toJson(item))
             }
@@ -63,6 +64,7 @@ class EditBankDetailsActivity : BaseActivity() {
 
     private lateinit var filePickerUtil: FilePickerUtil
     private var proofUri: Uri? = null
+    private var proofExtension: String = "jpg"
     private var initialProofUrl: String? = null
     private var thumbnailJob: Job? = null
 
@@ -102,11 +104,6 @@ class EditBankDetailsActivity : BaseActivity() {
         val listener = onClickListener()
         binding.onClickListener  = listener
         binding.showProgressSave = showProgressSave
-        binding.flUpload1.setOnClickListener(listener)
-        binding.flBankProof.setOnClickListener(listener)
-        binding.ivEditProof.setOnClickListener(listener)
-        binding.ivDeleteProof.setOnClickListener(listener)
-        binding.ivEyePassword.setOnClickListener(listener)
 
         setupInputFilters()
         setupFilePicker()
@@ -174,6 +171,7 @@ class EditBankDetailsActivity : BaseActivity() {
 
     private fun applyProof(uri: Uri, extension: String) {
         proofUri = uri
+        proofExtension = extension
         showProofPreview(loadUri = uri, localIsPdf = extension.equals("pdf", ignoreCase = true))
     }
 
@@ -234,7 +232,7 @@ class EditBankDetailsActivity : BaseActivity() {
 
     private fun renderLocalPdf(uri: Uri): Bitmap? {
         return try {
-            val tempFile = File(filesDir, "edit_bank_proof_preview.pdf")
+            val tempFile = File(cacheDir, "edit_bank_proof_preview.pdf")
             tempFile.delete()
             contentResolver.openInputStream(uri)?.use { input ->
                 tempFile.outputStream().use { output -> input.copyTo(output) }
@@ -255,6 +253,7 @@ class EditBankDetailsActivity : BaseActivity() {
             } finally {
                 renderer.close()
                 fd.close()
+                tempFile.delete()
             }
         } catch (e: Exception) {
             Utility.logError(e)
@@ -375,6 +374,7 @@ class EditBankDetailsActivity : BaseActivity() {
                     branchName          = branchNameSnap,
                     password            = passwordSnap,
                     proofBytes          = proofBytes,
+                    proofExtension      = proofExtension,
                     onSuccess           = { msg ->
                         isSaving = false
                         showProgressSave.set(false)

@@ -13,11 +13,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import android.Manifest
-import android.content.ActivityNotFoundException
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat

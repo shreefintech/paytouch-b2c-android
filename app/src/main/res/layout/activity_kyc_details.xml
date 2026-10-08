@@ -455,17 +455,25 @@
                                     android:textSize="@dimen/text_size_13" />
                             </LinearLayout>
 
-                            <androidx.appcompat.widget.AppCompatImageView
+                            <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/ivEditBank"
                                 android:layout_width="28dp"
                                 android:layout_height="28dp"
                                 android:layout_marginStart="@dimen/margin_small"
-                                android:foreground="?selectableItemBackgroundBorderless"
-                                android:padding="4dp"
-                                android:background="@drawable/bg_close"
-                                android:src="@drawable/ic_toast_edit"
-                                android:tint="@color/primary"
-                                android:visibility="visible" />
+                                android:onClickListener="@{onClickListener}"
+                                android:visibility="gone"
+                                app:cardBackgroundColor="@color/primary_light"
+                                app:cardCornerRadius="14dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="4dp"
+                                    android:src="@drawable/ic_toast_edit"
+                                    android:tint="@color/primary" />
+                            </com.google.android.material.card.MaterialCardView>
                         </LinearLayout>
 
                         <!-- Bank Name (with icon) | IFSC code (no icon) — two columns -->
