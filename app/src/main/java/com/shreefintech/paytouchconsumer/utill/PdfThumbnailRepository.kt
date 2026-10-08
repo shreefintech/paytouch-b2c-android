@@ -27,7 +27,7 @@ object PdfThumbnailRepository {
         override fun removeEldestEntry(eldest: Map.Entry<String, Bitmap>) = size > MAX_CACHE
     }
 
-    fun loadThumbnail(url: String, cacheDir: File, onResult: (Bitmap?) -> Unit): Job =
+    fun loadThumbnail(url: String, cacheDir: File, authHeader: String? = null, onResult: (Bitmap?) -> Unit): Job =
         scope.launch {
             val cached = synchronized(cache) { cache[url] }
             if (cached != null) {
@@ -35,7 +35,7 @@ object PdfThumbnailRepository {
                 return@launch
             }
             val bitmap = try {
-                renderFirstPage(downloadToCache(url, cacheDir))
+                renderFirstPage(downloadToCache(url, cacheDir, authHeader))
             } catch (e: Exception) {
                 null
             }
@@ -43,12 +43,16 @@ object PdfThumbnailRepository {
             withContext(Dispatchers.Main) { onResult(bitmap) }
         }
 
-    internal fun downloadToCache(url: String, cacheDir: File): File {
+    internal fun downloadToCache(url: String, cacheDir: File, authHeader: String? = null): File {
         val file = File(cacheDir, "kyc_pdf_${url.hashCode()}.pdf")
-        if (file.exists() && file.length() > 0L) return file
+        // Validate cached file starts with PDF magic bytes — a previous failed download
+        // (e.g. a 401 HTML response) could leave a non-empty but invalid file.
+        if (file.exists() && file.length() > 0L && isValidPdf(file)) return file
+        file.delete()
         val conn = URL(url).openConnection() as HttpURLConnection
         conn.connectTimeout = 15_000
         conn.readTimeout = 60_000
+        if (authHeader != null) conn.setRequestProperty("Authorization", authHeader)
         try {
             conn.connect()
             conn.inputStream.use { input -> FileOutputStream(file).use { input.copyTo(it) } }
@@ -57,6 +61,15 @@ object PdfThumbnailRepository {
         }
         return file
     }
+
+    private fun isValidPdf(file: File): Boolean = try {
+        file.inputStream().use { stream ->
+            val magic = ByteArray(4)
+            stream.read(magic) == 4 &&
+                magic[0] == '%'.code.toByte() && magic[1] == 'P'.code.toByte() &&
+                magic[2] == 'D'.code.toByte() && magic[3] == 'F'.code.toByte()
+        }
+    } catch (e: Exception) { false }
 
     private fun renderFirstPage(file: File): Bitmap? {
         val fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)

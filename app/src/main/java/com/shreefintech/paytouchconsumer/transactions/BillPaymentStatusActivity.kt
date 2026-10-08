@@ -150,7 +150,7 @@ class BillPaymentStatusActivity : BaseActivity() {
                 amountLabel = getString(R.string.labelAmountPaid),
                 statusColorRes = R.color.colorStatusSuccess,
                 gifRes = R.drawable.gif_success,
-                soundRes = R.raw.success_sound
+                soundRes = R.raw.bbps_success
             )
             STATUS_FAILED -> StatusDisplay(
                 label = getString(R.string.msgPaymentFailed),
@@ -158,7 +158,7 @@ class BillPaymentStatusActivity : BaseActivity() {
                 amountLabel = getString(R.string.labelAmountFailed),
                 statusColorRes = R.color.colorStatusFailed,
                 gifRes = R.drawable.gif_rejected,
-                soundRes = R.raw.failed_sound
+                soundRes = R.raw.bbps_failure
             )
             else -> StatusDisplay(
                 label = getString(R.string.msgPaymentPending),

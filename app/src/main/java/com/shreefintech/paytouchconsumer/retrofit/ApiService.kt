@@ -43,6 +43,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReport
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.EditBankUpdateDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycAgreeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
@@ -661,6 +662,13 @@ interface ApiService {
     fun getKycMyAccount(
         @Header("Authorization") authorization: String
     ): Call<KycMyAccountItem>
+
+    @Multipart
+    @POST("${AUTH}dashboard-kyc/bank-account")
+    fun editBankAccount(
+        @Header("Authorization") authorization: String,
+        @Part parts: List<MultipartBody.Part>
+    ): Call<General<EditBankUpdateDataItem>>
 
     // ── HDFC Payment Gateway ──────────────────────────────────────────────────
 
