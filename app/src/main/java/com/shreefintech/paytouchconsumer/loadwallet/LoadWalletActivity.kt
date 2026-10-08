@@ -42,6 +42,7 @@ import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.earningwallet.EarningWalletActivity
+import com.shreefintech.paytouchconsumer.rewards.RewardsExplainerActivity
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
@@ -842,7 +843,7 @@ class LoadWalletActivity : BaseActivity() {
 
                 binding.cardRewardsLevel -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(B2C-199): navigate to RewardsRankingActivity when implemented
+                    RewardsExplainerActivity.start(mActivity)
                 }
 
                 binding.llMakePayment -> {

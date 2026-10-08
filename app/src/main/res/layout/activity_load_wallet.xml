@@ -474,9 +474,10 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="5dp"
                                     android:layout_marginTop="10dp"
-                                    app:cardBackgroundColor="@color/progressTrack"
+                                    app:cardBackgroundColor="@color/progress_track"
                                     app:cardCornerRadius="3dp"
-                                    app:cardElevation="0dp">
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
 
                                     <View
                                         android:id="@+id/viewProgressFill"
