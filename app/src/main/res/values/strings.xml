@@ -510,6 +510,9 @@
     <string name="msgTopTier">You\'ve reached the top tier!</string>
     <string name="labelCashbackPct">%1$.2f%% cashback</string>
     <string name="labelMoreToNextLevel">%1$s more to next level</string>
+    <string name="msgHighestLevelPermanent">Highest level · permanent</string>
+    <string name="labelProgressAmountFormat">%1$s of %2$s</string>
+    <string name="labelProgressToNextFormat">%1$s to %2$s</string>
     <string name="msgWalletInfo">Bills use Bonus Wallet first (up to 50%), the rest from Wallet Balance. Only Wallet Balance can be withdrawn.</string>
 
     <!-- HDFC Payment flow -->
@@ -765,7 +768,6 @@
     <string name="errAgreeToTerms">Please agree to the terms and conditions</string>
 
     <!-- Rewards Explainer screen -->
-    <string name="titlePayTouchRewards">PayTouch Rewards</string>
     <string name="labelFestiveSeason">Festive Season</string>
     <string name="subtitleRewardsHero">Level up by paying bills, referring friends, and locking money. Your cashback grows with you.</string>
     <string name="labelBronzeAllCaps">BRONZE</string>
@@ -783,44 +785,53 @@
     <string name="subtitleAllLevels">Tap a tier to see what it takes to reach each level.</string>
 
     <!-- How it works steps -->
-    <string name="stepPayBillsTitle">Pay your bills</string>
-    <string name="stepPayBillsDesc">Every payment counts toward your lifetime total. The more you pay, the faster you climb through Bronze and Silver.</string>
+    <string name="stepPayBillsTitle">Pay bills</string>
+    <string name="stepPayBillsDesc">Reach ₹10,000 in lifetime payments to leave Bronze</string>
     <string name="stepReferFriendsTitle">Refer friends</string>
-    <string name="stepReferFriendsDesc">Each successful referral adds to your score. Referrals are combined with payments to unlock Silver and Gold levels.</string>
+    <string name="stepReferFriendsDesc">Friends who complete KYC move you through Silver.</string>
     <string name="stepLockMoneyTitle">Lock money</string>
-    <string name="stepLockMoneyDesc">Lock funds in your Earning Wallet to earn 11% p.a. and accelerate your Gold progress.</string>
-    <string name="stepHoldGoldTitle">Hold Gold I for 90 days</string>
-    <string name="stepHoldGoldDesc">Maintain Gold I status for 90 consecutive days to unlock Platinum — the highest tier with maximum cashback.</string>
+    <string name="stepLockMoneyDesc">Keep money 30+ days in your Earning Wallet for Gold.</string>
+    <string name="stepHoldGoldTitle">Hold Gold I for 3 months</string>
+    <string name="stepHoldGoldDesc">Then Platinum is yours forever.</string>
 
     <!-- Level cards — sub-level names, triggers, cashback values -->
     <string name="labelLifetimePayments">Lifetime Payments</string>
+    <string name="labelReferrals">Referrals</string>
+    <plurals name="fmtReferralsCount">
+        <item quantity="one">%d referral</item>
+        <item quantity="other">%d referrals</item>
+    </plurals>
+    <plurals name="fmtDaysCount">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
     <string name="labelPaymentsReferrals">Payments + Referrals</string>
     <string name="labelReferralsLocking">Referrals + Locking</string>
     <string name="labelHoldGoldI90">Hold Gold I for 90 days</string>
     <string name="labelYou">YOU</string>
 
     <string name="levelBronzeIII">Bronze III</string>
-    <string name="levelBronzeIIITrigger">New user · no payments yet</string>
+    <string name="levelBronzeIIITrigger">₹0 – ₹1,000 lifetime payments</string>
     <string name="levelBronzeII">Bronze II</string>
-    <string name="levelBronzeIITrigger">₹500+ lifetime payments</string>
+    <string name="levelBronzeIITrigger">₹1,000 – ₹4,000 lifetime payments</string>
     <string name="levelBronzeI">Bronze I</string>
-    <string name="levelBronzeITrigger">₹2,000+ lifetime payments</string>
+    <string name="levelBronzeITrigger">₹4,000 – ₹10,000 lifetime payments</string>
     <string name="levelBronzeHint">Bronze levels use your total bill payments since joining PayTouch.</string>
 
     <string name="levelSilverIII">Silver III</string>
-    <string name="levelSilverIIITrigger">₹10,000+ payments or 5 referrals</string>
+    <string name="levelSilverIIITrigger">0 – 5 referrals</string>
     <string name="levelSilverII">Silver II</string>
-    <string name="levelSilverIITrigger">₹25,000+ payments or 15 referrals</string>
+    <string name="levelSilverIITrigger">5 – 20 referrals</string>
     <string name="levelSilverI">Silver I</string>
-    <string name="levelSilverITrigger">₹50,000+ payments or 30 referrals</string>
+    <string name="levelSilverITrigger">20 – 30 referrals</string>
     <string name="levelSilverHint">Silver uses a combined score of payments and active referrals.</string>
 
     <string name="levelGoldIII">Gold III</string>
-    <string name="levelGoldIIITrigger">50 referrals or ₹10,000 locked</string>
+    <string name="levelGoldIIITrigger">Up to ₹1,000 locked 30+ days</string>
     <string name="levelGoldII">Gold II</string>
-    <string name="levelGoldIITrigger">100 referrals or ₹25,000 locked</string>
+    <string name="levelGoldIITrigger">₹1,000 – ₹4,000 locked 30+ days</string>
     <string name="levelGoldI">Gold I</string>
-    <string name="levelGoldITrigger">200 referrals or ₹50,000 locked</string>
+    <string name="levelGoldITrigger">₹4,000 – ₹10,000 locked 30+ days</string>
     <string name="levelGoldHint">Gold rewards you for growing the PayTouch community and locking funds.</string>
 
     <string name="levelPlatinumTrigger">Hold Gold I for 90 consecutive days</string>
@@ -840,27 +851,27 @@
 
     <!-- Your Wallets section -->
     <string name="titleYourWallets">Your Wallets</string>
-    <string name="descBonusWallet">Receives all cashback earned</string>
+    <string name="descBonusWallet">Cashback, referral and lucky-draw money</string>
     <string name="descBonusWalletPays">Pays up to 50% of any bill</string>
-    <string name="descBonusWalletSpend">Spend only, cannot withdraw</string>
-    <string name="descEarningWalletRate">Earns 11% p.a. on locked funds</string>
-    <string name="descEarningWalletUnlocks">Unlocks after 30-day lock period</string>
-    <string name="descEarningWalletWithdraw">Withdraw anytime to main wallet</string>
+    <string name="descBonusWalletSpend">Spend only</string>
+    <string name="descEarningWalletRate">11% p.a. after 30 days locked</string>
+    <string name="descEarningWalletUnlocks">Unlocks Gold II and I</string>
+    <string name="descEarningWalletWithdraw">Withdraw in 3 days</string>
 
     <!-- Good to Know FAQ -->
     <string name="titleGoodToKnow">Good to Know</string>
-    <string name="faqQ1">How is my cashback calculated?</string>
-    <string name="faqA1">Cashback is calculated as a percentage of each bill payment. For example, at Bronze II (0.10%) a ₹500 bill earns ₹0.50 cashback. It is credited to your Bonus Wallet immediately after the payment is confirmed.</string>
-    <string name="faqQ2">Can my level go down?</string>
-    <string name="faqA2">Bronze and Silver levels can go down if your score drops below a tier threshold. Gold levels are reviewed monthly. Platinum is permanent once earned and never downgrades.</string>
-    <string name="faqQ3">What counts as a referral?</string>
-    <string name="faqA3">A referral is counted when someone you invited makes their first successful bill payment. Inviting someone who never pays a bill does not count toward your score.</string>
-    <string name="faqQ4">How does the Earning Wallet interest work?</string>
-    <string name="faqA4">Money you lock in the Earning Wallet earns 11% per annum, calculated daily and credited monthly. Funds are locked for a minimum of 30 days; you can withdraw after that at any time.</string>
+    <string name="faqQ1">Can I drop to a lower level?</string>
+    <string name="faqA1">You never go back a stage. Inside Gold, Gold II and I follow your locked Earning Wallet balance, but you never drop below Gold III. Platinum is permanent.</string>
+    <string name="faqQ2">How is my cashback calculated?</string>
+    <string name="faqA2">"Cashback = bill amount × your level %. During the festive season everyone gets a flat ₹5 on bills of ₹50 or more instead.</string>
+    <string name="faqQ3">Which referrals count?</string>
+    <string name="faqA3">A friend counts toward Silver and Gold III when they complete KYC after you reach Silver.</string>
+    <string name="faqQ4">Where does my cashback go?</string>
+    <string name="faqA4">Into your Bonus Wallet. It pays up to 50% of any bill automatically and cannot be withdrawn.</string>
 
 
 
-    <string name="titleRewardsHero">Level up and earn\nup to 0.50% back</string>
+    <string name="titleRewardsHero">Level up and earn up to 0.50% back</string>
 
     <string name="labelRewardsHeroHighlight">0.50% back</string>
     <string name="labelCashbackSuffix"> cashback on every bill</string>

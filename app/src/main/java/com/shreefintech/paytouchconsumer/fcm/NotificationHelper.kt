@@ -19,7 +19,6 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.SplashActivity
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
-import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRemoveRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper.bearerToken
@@ -94,7 +93,6 @@ object NotificationHelper {
      */
     fun syncToken(context: Context, token: String? = null) {
         val appContext = context.applicationContext
-        if (!SharedPreferenceHelper.isLoggedIn(appContext)) return
         if (token != null) {
             registerToken(appContext, token)
             return
@@ -104,78 +102,41 @@ object NotificationHelper {
             .addOnFailureListener { it.printStackTrace() }
     }
 
-    /**
-     * Fire-and-forget token removal for session timeout. Captures the FCM token and bearer
-     * before the caller clears prefs, so the request goes out even after SharedPreferences
-     * are wiped on the next line.
-     */
-    fun removeTokenDetached(context: Context) {
-        val appContext = context.applicationContext
-        val fcmToken = SharedPreferenceHelper.getSharedPreferenceString(
-            appContext, Constant.KEY_FCM_TOKEN, ""
-        ) ?: ""
-        if (fcmToken.isEmpty() || !Utility.isInternetAvailable(appContext)) return
-        val bearer = bearerToken(appContext)
-        ApiClient.apiService.removeDeviceToken(bearer, DeviceTokenRemoveRequest(fcmToken))
-            .enqueue(object : Callback<MessageItem> {
-                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {}
-                override fun onFailure(call: Call<MessageItem>, t: Throwable) { t.printStackTrace() }
-            })
-    }
-
-    /**
-     * Unregisters this device's token so a logged-out device stops receiving the user's pushes.
-     * Must run before the logout API (it needs a valid bearer token). [onDone] is always invoked,
-     * on success, failure, or skip — logout must never be blocked by this call.
-     */
-    fun removeToken(context: Context, onDone: () -> Unit) {
-        val appContext = context.applicationContext
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            appContext, Constant.KEY_FCM_TOKEN, ""
-        ) ?: ""
-        if (token.isEmpty() || !Utility.isInternetAvailable(appContext)) {
-            onDone()
-            return
-        }
-        ApiClient.apiService.removeDeviceToken(SharedPreferenceHelper.bearerToken(appContext), DeviceTokenRemoveRequest(token))
-            .enqueue(object : Callback<MessageItem> {
-                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
-                    if (!response.isSuccessful) {
-                        IllegalStateException("removeDeviceToken failed: HTTP ${response.code()}").printStackTrace()
-                    }
-                    onDone()
-                }
-
-                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
-                    t.printStackTrace()
-                    onDone()
-                }
-            })
-    }
-
     // Synchronized: onNewToken runs on an FCM worker thread while Login/Home sync on main
     @Synchronized
     private fun registerToken(context: Context, token: String) {
         if (token.isEmpty() || token == pendingToken) return
         if (!Utility.isInternetAvailable(context)) return
+        val isLoggedIn = SharedPreferenceHelper.isLoggedIn(context)
         val registered = SharedPreferenceHelper.getSharedPreferenceString(
             context, Constant.KEY_FCM_TOKEN, ""
         )
-        if (token == registered) return
+        val registeredAuthed = SharedPreferenceHelper.getSharedPreferenceBoolean(
+            context, Constant.KEY_FCM_TOKEN_AUTHED, false
+        )
+        // Skip only if the token is already registered for the current login state.
+        // A token registered while logged out must be re-sent after login so the
+        // server can link this device to the user's account.
+        if (token == registered && (registeredAuthed || !isLoggedIn)) return
 
         pendingToken = token
+        val bearer = if (isLoggedIn) bearerToken(context) else null
         val body = DeviceTokenRequest(
             fcmToken = token,
             platform = Constant.FCM_PLATFORM_ANDROID,
-            deviceId = deviceId(context)
+            deviceId = deviceId(context),
+            language = Constant.FCM_LANGUAGE_DEFAULT
         )
-        ApiClient.apiService.registerDeviceToken(SharedPreferenceHelper.bearerToken(context), body)
+        ApiClient.apiService.registerDeviceToken(bearer, body)
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     pendingToken = null
                     if (response.isSuccessful && response.body()?.success == true) {
                         SharedPreferenceHelper.setSharedPreferenceString(
                             context, Constant.KEY_FCM_TOKEN, token
+                        )
+                        SharedPreferenceHelper.setSharedPreferenceBoolean(
+                            context, Constant.KEY_FCM_TOKEN_AUTHED, isLoggedIn
                         )
                     } else {
                         // Background call — no toast, but keep the failure visible for debugging

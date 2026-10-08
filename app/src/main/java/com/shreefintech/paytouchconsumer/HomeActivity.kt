@@ -31,7 +31,6 @@ import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
-import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.fastag.FastagActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -112,7 +111,6 @@ class HomeActivity : BaseActivity() {
 
         // Skip on config change / process restore — once per Home launch is enough
         if (savedInstanceState == null) {
-            NotificationHelper.syncToken(mActivity)
             locationHelper.start()
         }
     }
