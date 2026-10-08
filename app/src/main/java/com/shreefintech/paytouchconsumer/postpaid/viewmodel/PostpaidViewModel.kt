@@ -95,6 +95,7 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
             PostpaidProcessPaymentRequest(
                 mobileNumber = mobileNumber,
                 operatorId = operatorId,
+                circleId = Constant.POSTPAID_CIRCLE_ID,
                 amount = amount,
                 platformFee = fee,
                 totalPayable = total
@@ -148,11 +149,11 @@ class PostpaidViewModel(application: Application) : BaseBillViewModel(applicatio
             ) {
                 val body = response.body()
                 if (response.isSuccessful && body?.success == true) {
-                    val bill = body.data
+                    val bill = body.data?.data?.firstOrNull()
                     if (bill != null) onSuccess(bill)
                     else onError(getString(R.string.errGeneric))
                 } else {
-                    val msg = body?.message
+                    val msg = body?.message?.text
                         ?: ApiHelper.parseErrorMessage(
                             getApplication(), response.code(), response.errorBody()?.string()
                         )

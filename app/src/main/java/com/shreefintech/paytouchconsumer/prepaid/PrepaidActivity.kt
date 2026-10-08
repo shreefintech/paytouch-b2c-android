@@ -62,6 +62,7 @@ class PrepaidActivity : BaseActivity() {
 
     private var selectedPlan: PrepaidPlanItem? = null
     private var isPlanSelected = false
+    private var paymentMade = false
 
     private val showProgressBrowse = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -122,7 +123,7 @@ class PrepaidActivity : BaseActivity() {
         setupInputFilters()
         setupAmountWatcher()
         setupTermsText()
-        retryCallback = { loadOperators() }
+        retryCallback = { loadOperators(); loadStates() }
         loadOperators()
         loadStates()
         tabHelper = TabAnimationHelper(mActivity, binding.llTabPayBill, binding.llTabReport, binding.llTabStatus, binding.llTabSmsReceipt)
@@ -152,9 +153,9 @@ class PrepaidActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
+                binding.tvPlatformFee.text = Utility.formatAmount(fee.toString())
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
+                binding.tvTotalPayable.text = Utility.formatAmount(total.toString())
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
@@ -242,6 +243,7 @@ class PrepaidActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { body ->
                 showProgressPay.set(false)
+                paymentMade = true
                 BillPaymentStatusActivity.start(
                     mActivity,
                     BillPaymentStatusItem(
@@ -413,6 +415,7 @@ class PrepaidActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -475,6 +478,7 @@ class PrepaidActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
+                    if (paymentMade) return@OnClickListener
                     onProceedToPay()
                 }
                 binding.llReset -> {

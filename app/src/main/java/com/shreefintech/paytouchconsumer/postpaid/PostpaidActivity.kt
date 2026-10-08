@@ -55,6 +55,7 @@ class PostpaidActivity : BaseActivity() {
 
     private val showProgressFetch = ObservableBoolean(false)
     private var fetchedBillItem: PostpaidFetchBillDataItem? = null
+    private var paymentMade = false
     private var isBillFetched = false
 
     private val operatorSelectionLauncher = registerForActivityResult(
@@ -215,6 +216,7 @@ class PostpaidActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { body ->
                 showProgressPay.set(false)
+                paymentMade = true
                 BillPaymentStatusActivity.start(
                     mActivity,
                     BillPaymentStatusItem(
@@ -263,7 +265,7 @@ class PostpaidActivity : BaseActivity() {
 
     private fun showBillDetails() {
         val bill = fetchedBillItem ?: return
-        binding.tvBillCustomerName.text = bill.customerName ?: "-"
+        binding.tvBillCustomerName.text = bill.userName ?: "-"
         binding.tvBillDueDate.text = Utility.formatDate(bill.dueDate, "dd/MM/yyyy")
         binding.tvBillDate.text = Utility.formatDate(bill.billDate, "dd/MM/yyyy")
         binding.tvBillAmount.text = Utility.formatAmount(bill.billAmount)
@@ -365,6 +367,7 @@ class PostpaidActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -423,6 +426,7 @@ class PostpaidActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
+                    if (paymentMade) return@OnClickListener
                     onProceedToPay()
                 }
                 binding.llReset -> {
