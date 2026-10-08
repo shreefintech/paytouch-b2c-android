@@ -88,7 +88,7 @@ class ResetPasswordActivity : BaseActivity() {
                 binding.etNewPassword.requestFocus()
                 getString(R.string.msgNewPasswordShort)
             }
-            !isPasswordStrong(newPassword) -> {
+            !Utility.isPasswordStrong(newPassword) -> {
                 binding.etNewPassword.requestFocus()
                 getString(R.string.msgPasswordWeak)
             }
@@ -104,13 +104,6 @@ class ResetPasswordActivity : BaseActivity() {
         }
         if (msg != null) { ToastUtil.showDelete(mActivity, msg); return false }
         return true
-    }
-
-    private fun isPasswordStrong(password: String): Boolean {
-        val hasUppercase = password.any { it.isUpperCase() }
-        val hasDigit     = password.any { it.isDigit() }
-        val hasSpecial   = password.any { !it.isLetterOrDigit() }
-        return hasUppercase && hasDigit && hasSpecial
     }
 
     private fun onChangePassword() {

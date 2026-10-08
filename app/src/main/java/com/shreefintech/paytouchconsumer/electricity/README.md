@@ -142,10 +142,10 @@ The receipt card (`cvReceiptCard`) is captured via the shared `ReceiptHelper` (i
 
 ## Intent Data Passing
 
-`SmsReceiptActivity` is started with only `context` and `fromPayment`:
+`SmsReceiptActivity` is started from `BillPaymentStatusActivity` with `context`, `transactionId`, and `fromPayment = true`:
 
 ```kotlin
-SmsReceiptActivity.start(context, fromPayment = true)
+SmsReceiptActivity.start(mActivity, transactionId, fromPayment = true)
 ```
 
 `TransactionReportActivity` / `ElectricityTransactionStatusActivity` navigate to the **shared** `TransactionDetailActivity` using the generic `TransactionItem`, serialized to JSON:

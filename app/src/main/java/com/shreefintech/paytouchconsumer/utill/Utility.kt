@@ -60,13 +60,22 @@ object Utility {
         val output = SimpleDateFormat(format, Locale.getDefault()).apply { timeZone = ist }
         for (pattern in inputFormats) {
             try {
-                val date = SimpleDateFormat(pattern, Locale.getDefault()).apply { timeZone = utc }.parse(cleaned)
+                val parser = SimpleDateFormat(pattern, Locale.getDefault()).apply {
+                    isLenient = false
+                    timeZone = if (pattern.contains("'T'")) utc else ist
+                }
+                val date = parser.parse(cleaned)
                 if (date != null) return output.format(date)
             } catch (_: Exception) {
             }
         }
         return createdAt
     }
+
+    fun isPasswordStrong(password: String): Boolean =
+        password.any { it.isUpperCase() } &&
+        password.any { it.isDigit() } &&
+        password.any { !it.isLetterOrDigit() }
 
     fun isInternetAvailable(context: Context): Boolean {
         val connectivityManager =

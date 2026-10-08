@@ -75,10 +75,11 @@ class FastagSmsReceiptActivity : BaseActivity() {
             )
         }
 
-        fun start(context: Context, transactionId: String) {
+        fun start(context: Context, transactionId: String, fromPayment: Boolean = false) {
             context.startActivity(
                 Intent(context, FastagSmsReceiptActivity::class.java).apply {
                     putExtra(EXTRA_TRANSACTION_ID, transactionId)
+                    putExtra(EXTRA_FROM_PAYMENT, fromPayment)
                 }
             )
         }
@@ -218,7 +219,7 @@ class FastagSmsReceiptActivity : BaseActivity() {
         binding.tvCcf.text             = Utility.formatAmount(item.platformFee)
         binding.tvReceiptStatus.text   = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
-        InAppReviewHelper.onPaymentReceiptShown(this, item.transactionId, status)
+        if (isFromPayment) InAppReviewHelper.onPaymentReceiptShown(this, item.transactionId, status)
 
         val smsBodyText = getString(R.string.msgFastagSmsBody, amount, identifier)
         val spannable   = SpannableString(smsBodyText)
