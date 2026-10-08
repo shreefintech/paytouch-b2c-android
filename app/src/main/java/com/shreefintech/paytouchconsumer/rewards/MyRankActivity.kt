@@ -26,13 +26,14 @@ import androidx.core.view.isVisible
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityMyRankBinding
+import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelNextItem
+import com.shreefintech.paytouchconsumer.rewards.viewmodel.RewardsViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import java.util.Locale
 
-class MyRankActivity : BaseActivity(), View.OnClickListener {
+class MyRankActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMyRankBinding
     private val viewModel: RewardsViewModel by viewModels()
@@ -48,7 +49,7 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        binding.onClickListener = this
+        binding.onClickListener = onClickListener()
         retryCallback = { loadLevel() }
         loadLevel()
     }
@@ -63,11 +64,10 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
         super.onPause()
     }
 
-    override fun onClick(v: View) {
-        if (Utility.stopClick()) return
-        when (v.id) {
-            R.id.ivBack   -> onBackPressedDispatcher.onBackPressed()
-            R.id.btnReplay -> openCelebration()
+    private fun onClickListener() = View.OnClickListener {
+        when (it) {
+            binding.lytToolbar.ivBack -> { if (Utility.stopClick()) return@OnClickListener; onBackPressedDispatcher.onBackPressed() }
+            binding.btnReplay         -> { if (Utility.stopClick()) return@OnClickListener; openCelebration() }
         }
     }
 
@@ -96,7 +96,8 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
             onError = { msg ->
                 binding.shimmerLayout.stopShimmer()
                 binding.shimmerLayout.visibility = View.GONE
-                ToastUtil.showDelete(mActivity, msg)
+                ToastUtil.showDelete(mActivity, msg.ifEmpty { getString(R.string.errRankLoad) })
+                finish()
             }
         )
     }
@@ -104,10 +105,10 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
     // ───────────────────────── BIND ─────────────────────────
 
     private fun bind(d: RewardsLevelItem) {
-        val tier = RankTier.from(d.stage)
-        val tint = ContextCompat.getColor(this, tier.tint)
+        val tier = RewardsTier.from(d.stage)
+        val tint = ContextCompat.getColor(this, tier.rankTintRes)
 
-        Glide.with(this).load(tier.shield).into(binding.ivShield)
+        Glide.with(this).load(tier.rankShieldRes).into(binding.ivShield)
         binding.ivRays.imageTintList = ColorStateList.valueOf(tint)
         binding.viewGlow.backgroundTintList = ColorStateList.valueOf(tint)
         binding.tvRankName.text = d.label.orEmpty()
@@ -122,10 +123,10 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
         binding.cardRoad.isVisible = true
         binding.llPlatinum.isVisible = false
 
-        binding.tvRoadTitle.text = getString(R.string.rank_road_to, next.label.orEmpty())
-        val nextCash = RankFormat.cashbackFor(next.level)
-        binding.tvNextCashChip.isVisible = nextCash != null
-        nextCash?.let { binding.tvNextCashChip.text = getString(R.string.rank_percent, RankFormat.percent(it)) }
+        binding.tvRoadTitle.text = getString(R.string.titleRoadToLevel, next.label.orEmpty())
+        val nextCash = RankCashbackTable.cashbackFor(next.level)
+        binding.cardNextCash.isVisible = nextCash != null
+        nextCash?.let { binding.tvNextCashChip.text = getString(R.string.fmtPercent, it) }
 
         if (next.metric == "gold_1_days") {
             bindCountdown(next, d.platinumDays)
@@ -135,8 +136,8 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun cashPillText(percent: Double): CharSequence {
-        val value = "${RankFormat.percent(percent)}%"
-        val full = value + getString(R.string.rank_cash_suffix)
+        val value = getString(R.string.fmtPercent, percent)
+        val full = value + getString(R.string.labelCashbackSuffix)
         return SpannableString(full).apply {
             setSpan(ForegroundColorSpan(ContextCompat.getColor(mActivity, R.color.secondary)), 0, value.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(AbsoluteSizeSpan(16, true), 0, value.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -151,19 +152,19 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
         val cur = next.current ?: 0.0
         val tgt = next.target ?: 0.0
         binding.tvProgress.text = when (next.metric) {
-            "txn_amount"    -> getString(R.string.rank_progress_txn, RankFormat.rupees(cur), RankFormat.rupees(tgt))
-            "locked_amount" -> getString(R.string.rank_progress_locked, RankFormat.rupees(cur), RankFormat.rupees(tgt))
-            else            -> getString(R.string.rank_progress_referrals, RankFormat.count(cur), RankFormat.count(tgt))
+            "txn_amount"    -> getString(R.string.msgRankProgressTxn, Utility.formatAmount(cur.toString()), Utility.formatAmount(tgt.toString()))
+            "locked_amount" -> getString(R.string.msgRankProgressLocked, Utility.formatAmount(cur.toString()), Utility.formatAmount(tgt.toString()))
+            else            -> getString(R.string.msgRankProgressReferrals, cur.toLong().toString(), tgt.toLong().toString())
         }
         binding.tvRule.text = getString(
             when (next.metric) {
-                "txn_amount"    -> R.string.rank_rule_txn
-                "locked_amount" -> R.string.rank_rule_locked
-                else            -> R.string.rank_rule_referrals
+                "txn_amount"    -> R.string.msgRankRuleTxn
+                "locked_amount" -> R.string.msgRankRuleLocked
+                else            -> R.string.msgRankRuleReferrals
             }
         )
         val ratio = if (tgt > 0) (cur / tgt).toFloat().coerceIn(0f, 1f) else 0f
-        binding.tvProgressPct.text = getString(R.string.rank_percent, (ratio * 100).toInt().toString())
+        binding.tvProgressPct.text = getString(R.string.fmtPercent, (ratio * 100).toDouble())
         binding.viewBarFill.tag = ratio
     }
 
@@ -176,8 +177,12 @@ class MyRankActivity : BaseActivity(), View.OnClickListener {
         val remaining = (target - current).coerceAtLeast(0)
 
         binding.tvRingValue.text = current.toString()
-        binding.tvRingTotal.text = getString(R.string.rank_days_of, target)
-        binding.tvDaysToGo.text  = getString(R.string.rank_days_to_go, remaining)
+        binding.tvRingTotal.text = getString(R.string.labelDaysOf, target)
+        binding.tvDaysToGo.text  = getString(R.string.msgDaysToGo, remaining)
+        binding.ringDays.setProgress(
+            if (target > 0) current.toFloat() / target else 0f,
+            animate = animationsEnabled()
+        )
     }
 
     // ───────────────────────── MOTION ─────────────────────────
