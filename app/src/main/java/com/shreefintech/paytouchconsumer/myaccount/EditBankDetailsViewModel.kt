@@ -28,6 +28,7 @@ class EditBankDetailsViewModel(application: Application) : AndroidViewModel(appl
         branchName: String,
         password: String,
         proofBytes: ByteArray?,
+        proofMimeType: String?,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
@@ -45,10 +46,12 @@ class EditBankDetailsViewModel(application: Application) : AndroidViewModel(appl
         parts += MultipartBody.Part.createFormData("bank_name", bankName)
         parts += MultipartBody.Part.createFormData("branch_name", branchName)
         proofBytes?.let {
+            val ext = if (proofMimeType == "application/pdf") "pdf" else "jpg"
+            val mediaType = (proofMimeType ?: "image/jpeg").toMediaTypeOrNull()
             parts += MultipartBody.Part.createFormData(
                 "bank_proof",
-                "bank_proof.jpg",
-                it.toRequestBody("image/*".toMediaTypeOrNull())
+                "bank_proof.$ext",
+                it.toRequestBody(mediaType)
             )
         }
 

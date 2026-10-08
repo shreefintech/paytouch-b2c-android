@@ -361,6 +361,7 @@ class EditBankDetailsActivity : BaseActivity() {
         showProgressSave.set(true)
 
         lifecycleScope.launch(Dispatchers.IO) {
+            val proofMimeType = capturedUri?.let { contentResolver.getType(it) }
             val proofBytes = capturedUri?.let { uri ->
                 try { contentResolver.openInputStream(uri)?.use { it.readBytes() } } catch (e: Exception) { Utility.logError(e); null }
             }
@@ -375,6 +376,7 @@ class EditBankDetailsActivity : BaseActivity() {
                     branchName          = branchNameSnap,
                     password            = passwordSnap,
                     proofBytes          = proofBytes,
+                    proofMimeType       = proofMimeType,
                     onSuccess           = { msg ->
                         isSaving = false
                         showProgressSave.set(false)
