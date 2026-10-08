@@ -2,7 +2,6 @@ package com.shreefintech.paytouchconsumer.fcm
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -37,20 +36,6 @@ object NotificationHelper {
     private var pendingToken: String? = null
 
     private val notificationIdCounter = AtomicInteger(System.currentTimeMillis().toInt())
-
-    /** Requests POST_NOTIFICATIONS permission on API 33+. No-op on older OS or if already granted. */
-    fun requestPermission(activity: Activity) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
-        if (ActivityCompat.checkSelfPermission(
-                activity, Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-        ) return
-        ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-            0
-        )
-    }
 
     /** Creates the push channel. Must run before any notification is posted — call from MyApp. */
     fun createChannel(context: Context) {
@@ -122,18 +107,25 @@ object NotificationHelper {
     private fun registerToken(context: Context, token: String) {
         if (token.isEmpty() || token == pendingToken) return
         if (!Utility.isInternetAvailable(context)) return
+        val isLoggedIn = SharedPreferenceHelper.isLoggedIn(context)
         val registered = SharedPreferenceHelper.getSharedPreferenceString(
             context, Constant.KEY_FCM_TOKEN, ""
         )
-        if (token == registered) return
+        val registeredAuthed = SharedPreferenceHelper.getSharedPreferenceBoolean(
+            context, Constant.KEY_FCM_TOKEN_AUTHED, false
+        )
+        // Skip only if the token is already registered for the current login state.
+        // A token registered while logged out must be re-sent after login so the
+        // server can link this device to the user's account.
+        if (token == registered && (registeredAuthed || !isLoggedIn)) return
 
         pendingToken = token
-        val bearer = if (SharedPreferenceHelper.isLoggedIn(context)) bearerToken(context) else null
+        val bearer = if (isLoggedIn) bearerToken(context) else null
         val body = DeviceTokenRequest(
             fcmToken = token,
             platform = Constant.FCM_PLATFORM_ANDROID,
             deviceId = deviceId(context),
-            language = "en"
+            language = Constant.FCM_LANGUAGE_DEFAULT
         )
         ApiClient.apiService.registerDeviceToken(bearer, body)
             .enqueue(object : Callback<MessageItem> {
@@ -142,6 +134,9 @@ object NotificationHelper {
                     if (response.isSuccessful && response.body()?.success == true) {
                         SharedPreferenceHelper.setSharedPreferenceString(
                             context, Constant.KEY_FCM_TOKEN, token
+                        )
+                        SharedPreferenceHelper.setSharedPreferenceBoolean(
+                            context, Constant.KEY_FCM_TOKEN_AUTHED, isLoggedIn
                         )
                     } else {
                         // Background call — no toast, but keep the failure visible for debugging

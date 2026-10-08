@@ -26,7 +26,11 @@ object Constant {
 
     // Push notifications — last FCM token accepted by the backend
     const val KEY_FCM_TOKEN = "FCM_TOKEN"
+    // True when KEY_FCM_TOKEN was registered with a bearer token (logged-in user).
+    // Cleared on logout so the next login re-registers as authenticated.
+    const val KEY_FCM_TOKEN_AUTHED = "fcm_token_authed"
     const val FCM_PLATFORM_ANDROID = "android"
+    const val FCM_LANGUAGE_DEFAULT = "en"
 
     // Location — true once the system location permission popup has been shown at least once.
     // Distinguishes "never asked" from "permanently denied" (both report no rationale).

@@ -513,7 +513,6 @@
     <string name="msgHighestLevelPermanent">Highest level · permanent</string>
     <string name="labelProgressAmountFormat">%1$s of %2$s</string>
     <string name="labelProgressToNextFormat">%1$s to %2$s</string>
-    <string name="labelDays">days</string>
     <string name="msgWalletInfo">Bills use Bonus Wallet first (up to 50%), the rest from Wallet Balance. Only Wallet Balance can be withdrawn.</string>
 
     <!-- HDFC Payment flow -->
@@ -769,7 +768,6 @@
     <string name="errAgreeToTerms">Please agree to the terms and conditions</string>
 
     <!-- Rewards Explainer screen -->
-    <string name="titlePayTouchRewards">PayTouch Rewards</string>
     <string name="labelFestiveSeason">Festive Season</string>
     <string name="subtitleRewardsHero">Level up by paying bills, referring friends, and locking money. Your cashback grows with you.</string>
     <string name="labelBronzeAllCaps">BRONZE</string>
@@ -799,6 +797,14 @@
     <!-- Level cards — sub-level names, triggers, cashback values -->
     <string name="labelLifetimePayments">Lifetime Payments</string>
     <string name="labelReferrals">Referrals</string>
+    <plurals name="fmtReferralsCount">
+        <item quantity="one">%d referral</item>
+        <item quantity="other">%d referrals</item>
+    </plurals>
+    <plurals name="fmtDaysCount">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
     <string name="labelPaymentsReferrals">Payments + Referrals</string>
     <string name="labelReferralsLocking">Referrals + Locking</string>
     <string name="labelHoldGoldI90">Hold Gold I for 90 days</string>
