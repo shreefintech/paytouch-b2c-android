@@ -48,7 +48,8 @@ class BannerSliderHelper(
     }
 
     private fun scrollToNext() {
-        viewPager.setCurrentItem((viewPager.currentItem + 1) % banners.size, true)
+        val next = (viewPager.currentItem + 1) % banners.size
+        viewPager.setCurrentItem(next, next != 0)
     }
 
     companion object {
