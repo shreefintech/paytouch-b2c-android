@@ -24,6 +24,8 @@ Before presenting any code, perform a complete self-review and confirm all of th
 - All unused imports, variables, and dead code removed
 - Implementation integrates correctly with existing codebase patterns
 - All existing project rules (Architecture Rules, Naming Conventions, Network Call Pattern, RecyclerView Update Rules, Code Generation Rule) are satisfied
+- No deprecated APIs used (see **Deprecated API Rule** below)
+- All code works on every supported API level — minSdk 24 through targetSdk 37 (see **API Level Compatibility Rule** below)
 
 Only present the solution after this check passes.
 
@@ -47,7 +49,7 @@ Write production-ready Kotlin/MVVM Android code — readable, performant, scalab
 | Auth | Bearer token stored in SharedPreferences |
 | Push | Firebase Cloud Messaging 25.0 (planned) |
 | Analytics | Firebase Analytics + Crashlytics |
-| Min/Target SDK | 24 / 36 |
+| Min/Target SDK | 24 / 37 |
 
 ---
 
@@ -202,6 +204,53 @@ binding.flSubmit.attach(binding.clRoot as ViewGroup)
 ```
 
 Call `.attach()` on each `LiquidGlassButton` individually — never `LiquidGlassEffect.attach()`.
+
+---
+
+## Deprecated API Rule
+
+**Never use deprecated Android APIs.** Always use the modern replacement.
+
+Common deprecated APIs and their replacements:
+
+| Deprecated | Replacement | Since |
+|---|---|---|
+| `Handler()` no-arg constructor | `Handler(Looper.getMainLooper())` | API 30 |
+| `AsyncTask` | `CoroutineScope` + `Dispatchers.IO` | API 30 |
+| `startActivityForResult` / `onActivityResult` | `ActivityResultLauncher` + `ActivityResultContracts` | API 29 |
+| `requestPermissions` / `onRequestPermissionsResult` | `ActivityResultLauncher` + `RequestPermission` contract | API 29 |
+| `NetworkInfo` / `getActiveNetworkInfo()` | `NetworkCapabilities` + `getNetworkCapabilities()` | API 29 |
+| `getColor(int)` on `Context` | `ContextCompat.getColor(context, int)` | API 23 |
+| `getDrawable(int)` on `Context` | `ContextCompat.getDrawable(context, int)` | API 21 |
+| `PackageInfo.versionCode` | `PackageInfo.longVersionCode` | API 28 |
+| `View.SYSTEM_UI_FLAG_*` | `WindowInsetsController` | API 30 |
+
+**Rule:** If a replacement requires a minimum API higher than our minSdk (24), guard it with `if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.X)` and provide a compatible fallback — never suppress the warning without a fallback.
+
+**Exception:** `@Suppress("OVERRIDE_DEPRECATION")` is allowed only where the override is intentional and documented with a comment explaining why.
+
+---
+
+## API Level Compatibility Rule
+
+**All code must work on every device from API 24 (Android 7.0) to API 37 (Android 17).** minSdk = 24, targetSdk = 37.
+
+Rules:
+- Before using any API, check its `@RequiresApi` or `@SuppressLint` annotation and the Android docs. If it requires API > 24, guard it:
+
+```kotlin
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    // API 31+ path
+} else {
+    // fallback for API 24–30
+}
+```
+
+- **Never call an API > minSdk 24 without a version guard and fallback.** Lint will catch most cases, but always verify manually for any API added after API 24.
+- Prefer `ContextCompat`, `ActivityCompat`, `ViewCompat`, and other `*Compat` helpers — they handle version branching internally.
+- Use `WindowInsetsControllerCompat` (not `WindowInsetsController`) and `EdgeToEdgeCompat` for edge-to-edge / status bar work.
+- XML attributes introduced after API 24 must be wrapped in `res/layout-v{N}/` alternates or replaced with a compat equivalent.
+- Test mental model: *"Would this crash on a Pixel running Android 7?"* If yes, add the guard.
 
 ---
 

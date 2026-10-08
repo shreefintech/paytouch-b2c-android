@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.loadwallet
 
-import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
+import android.graphics.Rect
 import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -87,6 +88,10 @@ class LoadWalletActivity : BaseActivity() {
     private var withdrawRequestId: String? = null
     private val withdrawSoundPlayer = StatusSoundPlayer()
 
+    private val showProgressBonus   = ObservableBoolean(false)
+    private val showProgressEarning = ObservableBoolean(false)
+    private val showProgressRewards = ObservableBoolean(false)
+
     private var isWalletEntrancePlayed = false
     private var isWalletLoading = false
     private var hasWalletData = false
@@ -154,6 +159,9 @@ class LoadWalletActivity : BaseActivity() {
         )
 
         binding.onClickListener = onClickListener()
+        binding.showProgressBonus   = showProgressBonus
+        binding.showProgressEarning = showProgressEarning
+        binding.showProgressRewards = showProgressRewards
         setupRecyclerView()
         setupPaymentSheet()
         setupWithdrawSheet()
@@ -498,27 +506,48 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun fetchReferralWallet() {
+        showProgressBonus.set(true)
         viewModel.fetchReferralWallet(
             onSuccess = { data ->
+                showProgressBonus.set(false)
                 binding.tvBonusBalance.text = Utility.formatAmount(data.referralWallet)
             },
-            onError = { /* non-critical; bonus card shows ₹0.00 by default */ }
+            onError = {
+                showProgressBonus.set(false)
+                binding.tvBonusBalance.text = "--"
+            }
         )
     }
 
     private fun fetchRewardsLevel() {
+        showProgressRewards.set(true)
         viewModel.fetchRewardsLevel(
-            onSuccess = { data -> populateLevel(data) },
-            onError = { /* non-critical; level card shows defaults */ }
+            onSuccess = { data ->
+                showProgressRewards.set(false)
+                populateLevel(data)
+            },
+            onError = {
+                showProgressRewards.set(false)
+                val tier = RewardsTier.BRONZE
+                binding.tvTierName.text = getString(tier.labelRes)
+                binding.ivTierBadge.setImageResource(tier.badgeRes)
+                binding.tvCashbackPct.text = "--"
+                binding.tvNextLevel.text = "--"
+            }
         )
     }
 
     private fun fetchEarningWallet() {
+        showProgressEarning.set(true)
         viewModel.fetchEarningWallet(
             onSuccess = { data ->
+                showProgressEarning.set(false)
                 binding.tvEarningBalance.text = Utility.formatAmount(data.principal)
             },
-            onError = { /* non-critical; earning card shows ₹0.00 by default */ }
+            onError = {
+                showProgressEarning.set(false)
+                binding.tvEarningBalance.text = "--"
+            }
         )
     }
 
@@ -542,12 +571,22 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun animateLevelProgress(progress: Float) {
-        binding.viewProgressFill.pivotX = 0f
-        ObjectAnimator.ofFloat(binding.viewProgressFill, "scaleX", 0f, progress).apply {
-            duration = 1200
-            startDelay = 600
-            interpolator = DecelerateInterpolator()
-        }.start()
+        // Start hidden; post waits for layout so width is known before animating
+        binding.viewProgressFill.clipBounds = Rect(0, 0, 0, 0)
+        binding.viewProgressFill.post {
+            val totalWidth = binding.viewProgressFill.width
+            if (totalWidth == 0) return@post
+            ValueAnimator.ofFloat(0f, progress).apply {
+                duration = 1200
+                startDelay = 600
+                interpolator = DecelerateInterpolator()
+                addUpdateListener { anim ->
+                    val w = (totalWidth * (anim.animatedValue as Float)).toInt().coerceAtLeast(0)
+                    binding.viewProgressFill.clipBounds = Rect(0, 0, w, binding.viewProgressFill.height)
+                }
+                start()
+            }
+        }
     }
 
     private fun validateAndShowConfirmDialog() {
@@ -793,12 +832,12 @@ class LoadWalletActivity : BaseActivity() {
 
                 binding.cardEarningWallet -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-XXX): navigate to EarningWalletActivity when implemented
+                    // TODO(B2C-199): navigate to EarningWalletActivity when implemented
                 }
 
                 binding.cardRewardsLevel -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-XXX): navigate to RewardsRankingActivity when implemented
+                    // TODO(B2C-199): navigate to RewardsRankingActivity when implemented
                 }
 
                 binding.llMakePayment -> {
