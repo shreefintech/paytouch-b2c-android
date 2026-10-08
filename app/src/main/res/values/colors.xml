@@ -4,6 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#D52662</color>
     <color name="primary_light">#FFEEF4</color>
+    <color name="progress_track">#F7D6E2</color>
     <color name="secondary">#FCCFA1</color>
     <color name="hint_color">#4A4A4A</color>
     <color name="sub_text_color">#80000000</color>

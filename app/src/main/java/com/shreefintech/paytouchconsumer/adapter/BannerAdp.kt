@@ -15,7 +15,7 @@ class BannerAdp(
     private val banners: List<Int>
 ) : RecyclerView.Adapter<BannerAdp.ViewHolder>() {
 
-    inner class ViewHolder(val binding: ItemBannerBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ItemBannerBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(ItemBannerBinding.inflate(LayoutInflater.from(context), parent, false))
@@ -25,4 +25,9 @@ class BannerAdp(
     }
 
     override fun getItemCount() = banners.size
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        Glide.with(context).clear(holder.binding.ivBanner)
+        super.onViewRecycled(holder)
+    }
 }

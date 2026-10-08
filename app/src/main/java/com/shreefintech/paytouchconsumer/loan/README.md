@@ -178,11 +178,11 @@ binding.tvConsumerNoLabel.text = getString(R.string.labelConsumerNo)
 
 ## Intent Data Passing
 
-`LoanSmsReceiptActivity` is started with only `context` and `fromPayment`:
+`LoanSmsReceiptActivity` is started from `BillPaymentStatusActivity` with `context`, `transactionId`, and `fromPayment = true`:
 
 ```kotlin
-LoanSmsReceiptActivity.start(context, fromPayment = true)   // after payment
-LoanSmsReceiptActivity.start(context)                       // from recent transactions tab
+LoanSmsReceiptActivity.start(mActivity, transactionId, fromPayment = true)   // after payment
+LoanSmsReceiptActivity.start(context)                                         // from recent transactions tab
 ```
 
 `LoanTransactionReportActivity` / `LoanTransactionStatusActivity` navigate to the shared `TransactionDetailActivity`:

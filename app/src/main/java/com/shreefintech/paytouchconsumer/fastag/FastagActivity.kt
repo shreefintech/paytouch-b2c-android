@@ -53,6 +53,7 @@ class FastagActivity : BaseActivity() {
     private var selectedOperatorName: String? = null
     private var selectedCircleId: String? = null
     private val showProgressPay = ObservableBoolean(false)
+    private var paymentMade = false
 
     private val operatorSelectionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -202,6 +203,7 @@ class FastagActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { body ->
                 showProgressPay.set(false)
+                paymentMade = true
                 BillPaymentStatusActivity.start(
                     mActivity,
                     BillPaymentStatusItem(
@@ -289,6 +291,7 @@ class FastagActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
