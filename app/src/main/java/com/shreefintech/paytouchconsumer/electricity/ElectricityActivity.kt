@@ -54,6 +54,7 @@ class ElectricityActivity : BaseActivity() {
     private var selectedOperatorName: String? = null
     private var fetchedBillItem: ElectricityBillItem? = null
     private var isBillFetched = false
+    private var paymentMade = false
 
     private val showProgressFetch = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -246,6 +247,7 @@ class ElectricityActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { body ->
                 showProgressPay.set(false)
+                paymentMade = true
                 BillPaymentStatusActivity.start(
                     mActivity,
                     BillPaymentStatusItem(
@@ -375,6 +377,7 @@ class ElectricityActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }

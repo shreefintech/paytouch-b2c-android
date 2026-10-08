@@ -62,6 +62,7 @@ class PrepaidActivity : BaseActivity() {
 
     private var selectedPlan: PrepaidPlanItem? = null
     private var isPlanSelected = false
+    private var paymentMade = false
 
     private val showProgressBrowse = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -242,6 +243,7 @@ class PrepaidActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { body ->
                 showProgressPay.set(false)
+                paymentMade = true
                 BillPaymentStatusActivity.start(
                     mActivity,
                     BillPaymentStatusItem(
@@ -413,6 +415,7 @@ class PrepaidActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
