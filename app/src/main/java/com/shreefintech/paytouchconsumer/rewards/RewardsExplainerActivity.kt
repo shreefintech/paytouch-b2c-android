@@ -126,10 +126,13 @@ class RewardsExplainerActivity : BaseActivity() {
         if (metric == "referrals" || metric.endsWith("days")) value.toLong().toString()
         else Utility.formatAmount(value.toString(), trimZeros = true)
 
-    private fun progressValueWithUnitText(value: Double, metric: String): String = when {
-        metric == "referrals" -> "${value.toLong()} ${getString(R.string.labelReferrals).lowercase()}"
-        metric.endsWith("days") -> "${value.toLong()} ${getString(R.string.labelDays)}"
-        else -> Utility.formatAmount(value.toString(), trimZeros = true)
+    private fun progressValueWithUnitText(value: Double, metric: String): String {
+        val n = value.toLong().toInt()
+        return when {
+            metric == "referrals" -> resources.getQuantityString(R.plurals.fmtReferralsCount, n, n)
+            metric.endsWith("days") -> resources.getQuantityString(R.plurals.fmtDaysCount, n, n)
+            else -> Utility.formatAmount(value.toString(), trimZeros = true)
+        }
     }
 
     private fun animateLevelProgress(progress: Float) {

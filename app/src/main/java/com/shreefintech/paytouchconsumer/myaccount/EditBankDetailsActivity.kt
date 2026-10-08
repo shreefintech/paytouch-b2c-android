@@ -360,7 +360,6 @@ class EditBankDetailsActivity : BaseActivity() {
         showProgressSave.set(true)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val proofMimeType = capturedUri?.let { contentResolver.getType(it) }
             val proofBytes = capturedUri?.let { uri ->
                 try { contentResolver.openInputStream(uri)?.use { it.readBytes() } } catch (e: Exception) { Utility.logError(e); null }
             }

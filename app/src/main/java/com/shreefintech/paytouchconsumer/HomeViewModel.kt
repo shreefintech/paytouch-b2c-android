@@ -62,6 +62,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         SharedPreferenceHelper.setSharedPreferenceString(
                             getApplication(), Constant.KEY_FCM_TOKEN, ""
                         )
+                        SharedPreferenceHelper.setSharedPreferenceBoolean(
+                            getApplication(), Constant.KEY_FCM_TOKEN_AUTHED, false
+                        )
                         onComplete()
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
