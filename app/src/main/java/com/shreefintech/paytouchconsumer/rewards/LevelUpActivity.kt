@@ -26,6 +26,8 @@ import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.activity.viewModels
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -34,6 +36,7 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityLevelUpBinding
+import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import android.media.AudioAttributes
 import android.media.MediaPlayer
@@ -43,7 +46,7 @@ import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import java.util.Locale
 
-class LevelUpActivity : BaseActivity(), View.OnClickListener {
+class LevelUpActivity : BaseActivity() {
 
     companion object {
         private const val EXTRA_LEVEL_JSON = "extra_level_json"
@@ -57,12 +60,20 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    private enum class Palette(val light: Int, val mid: Int, val dark: Int, val glow: Int) {
-        BRONZE(0xFFF6C29A.toInt(), 0xFFC2733A.toInt(), 0xFF7A3A16.toInt(), 0xFFF6AA6E.toInt()),
-        SILVER(0xFFF1F4F8.toInt(), 0xFFA3AEBD.toInt(), 0xFF4D5868.toInt(), 0xFFD7E0EC.toInt()),
-        GOLD(0xFFFFE28F.toInt(), 0xFFE2A51A.toInt(), 0xFF8A5800.toInt(), 0xFFFFD65C.toInt()),
-        PLATINUM(0xFFDDF6FF.toInt(), 0xFFA08CFF.toInt(), 0xFF4A2DA6.toInt(), 0xFFBEAFFF.toInt())
+    private enum class Palette(
+        @ColorRes val lightRes: Int,
+        @ColorRes val midRes: Int,
+        @ColorRes val darkRes: Int,
+        @ColorRes val glowRes: Int
+    ) {
+        BRONZE(R.color.lu_bronze_light, R.color.lu_bronze_mid, R.color.lu_bronze_dark, R.color.lu_bronze_glow),
+        SILVER(R.color.lu_silver_light, R.color.lu_silver_mid, R.color.lu_silver_dark, R.color.lu_silver_glow),
+        GOLD(R.color.lu_gold_light, R.color.lu_gold_mid, R.color.lu_gold_dark, R.color.lu_gold_glow),
+        PLATINUM(R.color.lu_platinum_light, R.color.lu_platinum_mid, R.color.lu_platinum_dark, R.color.lu_platinum_glow)
     }
+
+    /** [Palette] resolved to color ints for the current tier. */
+    private class Colors(val light: Int, val mid: Int, val dark: Int, val glow: Int)
 
     private lateinit var binding: ActivityLevelUpBinding
     private val viewModel: RewardsViewModel by viewModels()
@@ -70,7 +81,7 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
     private var levelUpPlayer: MediaPlayer? = null
     private var data: RewardsLevelItem? = null
     private var prevCashback: Double? = null
-    private var palette = Palette.BRONZE
+    private lateinit var palette: Colors
     private var rankIndex = 0
     private var isPlatinum = false
     private var statusBarInset = 0
@@ -81,7 +92,8 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivityLevelUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.onClickListener = this
+        binding.onClickListener = onClickListener()
+        palette = resolve(Palette.BRONZE)
         applyInsets()
 
         prevCashback = intent.getDoubleExtra(EXTRA_PREV_CASHBACK, -1.0).takeIf { it >= 0 }
@@ -104,12 +116,23 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
         if (running.isEmpty() && animationsEnabled()) startLoops()
     }
 
-    override fun onClick(v: View) {
-        if (Utility.stopClick()) return
-        when (v.id) {
-            R.id.btnClose -> finish()
-            R.id.btnReplay -> { stopAll(); resetForEntrance(); playAll(); playSound() }
-            R.id.btnContinue -> finish()
+    private fun onClickListener(): View.OnClickListener {
+        return View.OnClickListener {
+            when (it) {
+                binding.btnClose -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    finish()
+                }
+                binding.btnReplay -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (data == null) return@OnClickListener
+                    stopAll(); resetForEntrance(); playAll(); playSound()
+                }
+                binding.btnContinue -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    finish()
+                }
+            }
         }
     }
 
@@ -164,14 +187,16 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun bind(d: RewardsLevelItem) {
-        val tier = RankTier.from(d.stage)
-        isPlatinum = tier == RankTier.PLATINUM
-        palette = when (tier) {
-            RankTier.BRONZE -> Palette.BRONZE
-            RankTier.SILVER -> Palette.SILVER
-            RankTier.GOLD -> Palette.GOLD
-            RankTier.PLATINUM -> Palette.PLATINUM
-        }
+        val tier = RewardsTier.from(d.stage)
+        isPlatinum = tier == RewardsTier.PLATINUM
+        palette = resolve(
+            when (tier) {
+                RewardsTier.BRONZE -> Palette.BRONZE
+                RewardsTier.SILVER -> Palette.SILVER
+                RewardsTier.GOLD -> Palette.GOLD
+                RewardsTier.PLATINUM -> Palette.PLATINUM
+            }
+        )
         rankIndex = when (d.level?.substringAfterLast('_')) {
             "3" -> 0; "2" -> 1; "1" -> 2; else -> 2
         }
@@ -187,7 +212,7 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
         binding.viewRing2.backgroundTintList = ColorStateList.valueOf(palette.glow)
         sparkles().forEach { it.imageTintList = ColorStateList.valueOf(palette.light) }
 
-        binding.tvLevelPill.setText(if (isPlatinum) R.string.lu_highest_level else R.string.lu_level_up)
+        binding.tvLevelPill.setText(if (isPlatinum) R.string.labelLevelUpHighest else R.string.labelLevelUpPill)
         binding.tvLevelPill.setTextColor(palette.light)
         binding.tvLevelPill.background = GradientDrawable().apply {
             cornerRadius = 14 * dp
@@ -195,15 +220,19 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
             setStroke((1 * dp).toInt(), withAlpha(palette.glow, 0.6f))
         }
 
-        Glide.with(this).load(tier.shield).into(binding.ivShield)
+        Glide.with(this).load(tier.rankShieldRes).into(binding.ivShield)
 
-        binding.tvTitle.text = getString(R.string.lu_you_are, label)
+        binding.tvTitle.text = getString(R.string.titleLevelUpYouAre, label)
         if (isPlatinum) {
             binding.tvTitle.post {
                 val w = binding.tvTitle.paint.measureText(binding.tvTitle.text.toString())
                 binding.tvTitle.paint.shader = LinearGradient(
                     0f, 0f, w, 0f,
-                    intArrayOf(0xFF9AE6FF.toInt(), 0xFFE3C8FF.toInt(), 0xFFFFB3D9.toInt()),
+                    intArrayOf(
+                        color(R.color.lu_platinum_title_start),
+                        color(R.color.lu_platinum_title_mid),
+                        color(R.color.lu_platinum_title_end)
+                    ),
                     null, Shader.TileMode.CLAMP
                 )
                 binding.tvTitle.invalidate()
@@ -218,20 +247,20 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
         if (!isPlatinum) bindPips()
 
         binding.tvSheetLabel.setText(
-            if (isPlatinum) R.string.lu_your_permanent_cashback else R.string.lu_your_new_cashback
+            if (isPlatinum) R.string.labelLevelUpPermanentCashback else R.string.labelLevelUpNewCashback
         )
-        binding.tvCash.text = "${RankFormat.percent(d.cashbackPercent ?: 0.0)}%"
+        binding.tvCash.text = getString(R.string.fmtPercent, d.cashbackPercent ?: 0.0)
         val old = prevCashback ?: previousLevelCashback(d)
         binding.tvCashOld.isVisible = old != null
         old?.let {
-            binding.tvCashOld.text = "${RankFormat.percent(it)}%"
+            binding.tvCashOld.text = getString(R.string.fmtPercent, it)
             binding.tvCashOld.paintFlags = binding.tvCashOld.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
         }
         binding.tvCashNote.setText(
             when {
-                isPlatinum -> R.string.lu_cash_note_platinum
-                d.cashbackActive == true -> R.string.lu_cash_note_active
-                else -> R.string.lu_cash_note_festive
+                isPlatinum -> R.string.msgLevelUpCashNotePlatinum
+                d.cashbackActive == true -> R.string.msgLevelUpCashNoteActive
+                else -> R.string.msgLevelUpCashNoteFestive
             }
         )
 
@@ -250,15 +279,15 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
                 tv.typeface = Typeface.create(tv.typeface, Typeface.BOLD)
             } else {
                 tv.setBackgroundResource(R.drawable.bg_lu_pip_off)
-                tv.setTextColor(0xD9FFFFFF.toInt())
+                tv.setTextColor(color(R.color.lu_pip_off_text))
             }
         }
     }
 
     private fun bindProgress(d: RewardsLevelItem) {
         val tierName = d.stage.orEmpty().replaceFirstChar { it.titlecase(Locale.ROOT) }
-        binding.tvTierProgress.text = getString(R.string.lu_tier_progress, tierName)
-        binding.tvTierCount.text = getString(R.string.lu_of_three, rankIndex + 1)
+        binding.tvTierProgress.text = getString(R.string.labelLevelUpTierProgress, tierName)
+        binding.tvTierCount.text = getString(R.string.labelLevelUpOfThree, rankIndex + 1)
 
         segments().forEachIndexed { i, seg ->
             seg.background = GradientDrawable(
@@ -270,14 +299,15 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
         val next = d.next
         binding.llNext.isVisible = next != null
         if (next != null) {
-            val head = getString(R.string.lu_next, next.label.orEmpty())
+            val head = getString(R.string.labelLevelUpNext, next.label.orEmpty())
+            val target = next.target ?: 0.0
             val req = when (next.metric) {
-                "txn_amount" -> getString(R.string.lu_req_txn, RankFormat.rupees(next.target ?: 0.0))
-                "referrals" -> getString(R.string.lu_req_referrals, RankFormat.count(next.target ?: 0.0))
-                "locked_amount" -> getString(R.string.lu_req_locked, RankFormat.rupees(next.target ?: 0.0))
+                "txn_amount" -> getString(R.string.msgLevelUpReqTxn, rupees(target))
+                "referrals" -> getString(R.string.msgLevelUpReqReferrals, target.toLong().toString())
+                "locked_amount" -> getString(R.string.msgLevelUpReqLocked, rupees(target))
                 "gold_1_days" -> getString(
-                    R.string.lu_req_gold_days,
-                    RankFormat.count(if ((next.target ?: 0.0) > 0) next.target!! else 90.0)
+                    R.string.msgLevelUpReqGoldDays,
+                    (target.takeIf { it > 0 } ?: 90.0).toLong().toString()
                 )
                 else -> ""
             }
@@ -291,20 +321,20 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
     private fun previousLevelCashback(d: RewardsLevelItem): Double? {
         val h = d.history.orEmpty()
         if (h.size < 2) return null
-        return RankFormat.cashbackFor(h[h.size - 2]?.level)
+        return RankCashbackTable.cashbackFor(h[h.size - 2]?.level)
     }
 
     private fun subtitleFor(level: String?): Int = when (level?.lowercase(Locale.ROOT)) {
-        "bronze_3" -> R.string.lu_sub_bronze_3
-        "bronze_2" -> R.string.lu_sub_bronze_2
-        "bronze_1" -> R.string.lu_sub_bronze_1
-        "silver_3" -> R.string.lu_sub_silver_3
-        "silver_2" -> R.string.lu_sub_silver_2
-        "silver_1" -> R.string.lu_sub_silver_1
-        "gold_3" -> R.string.lu_sub_gold_3
-        "gold_2" -> R.string.lu_sub_gold_2
-        "gold_1" -> R.string.lu_sub_gold_1
-        else -> R.string.lu_sub_platinum
+        "bronze_3" -> R.string.msgLevelUpSubBronze3
+        "bronze_2" -> R.string.msgLevelUpSubBronze2
+        "bronze_1" -> R.string.msgLevelUpSubBronze1
+        "silver_3" -> R.string.msgLevelUpSubSilver3
+        "silver_2" -> R.string.msgLevelUpSubSilver2
+        "silver_1" -> R.string.msgLevelUpSubSilver1
+        "gold_3" -> R.string.msgLevelUpSubGold3
+        "gold_2" -> R.string.msgLevelUpSubGold2
+        "gold_1" -> R.string.msgLevelUpSubGold1
+        else -> R.string.msgLevelUpSubPlatinum
     }
 
     // ─── MOTION ───
@@ -341,7 +371,7 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
     private fun playSound() {
         stopSound()
         try {
-            val afd = resources.openRawResourceFd(R.raw.lavel_up_2) ?: return
+            val afd = resources.openRawResourceFd(R.raw.level_up) ?: return
 
             val mp = MediaPlayer()
             mp.setAudioAttributes(
@@ -358,7 +388,7 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
             mp.prepareAsync()
             levelUpPlayer = mp
         } catch (e: Exception) {
-            e.printStackTrace()
+            Utility.logError(e)
         }
     }
 
@@ -372,7 +402,7 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
         playEntrance()
         startLoops()
         binding.confetti.burst(
-            intArrayOf(palette.light, palette.mid, 0xFFD52662.toInt(), 0xFFFCCFA1.toInt(), Color.WHITE)
+            intArrayOf(palette.light, palette.mid, color(R.color.primary), color(R.color.secondary), Color.WHITE)
         )
     }
 
@@ -486,6 +516,12 @@ class LevelUpActivity : BaseActivity(), View.OnClickListener {
     private fun segments() = listOf(binding.viewSeg0, binding.viewSeg1, binding.viewSeg2)
 
     private fun medals() = listOf(binding.llMedalBronze, binding.llMedalSilver, binding.llMedalGold)
+
+    private fun color(@ColorRes res: Int): Int = ContextCompat.getColor(mActivity, res)
+
+    private fun resolve(p: Palette) = Colors(color(p.lightRes), color(p.midRes), color(p.darkRes), color(p.glowRes))
+
+    private fun rupees(value: Double): String = Utility.formatAmount(value.toString(), trimZeros = true)
 
     private fun withAlpha(color: Int, a: Float): Int =
         Color.argb((a * 255).toInt(), Color.red(color), Color.green(color), Color.blue(color))

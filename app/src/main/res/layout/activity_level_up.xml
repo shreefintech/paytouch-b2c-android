@@ -146,7 +146,7 @@
                 android:letterSpacing="0.25"
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="6dp"
-                android:text="@string/lu_level_up"
+                android:text="@string/labelLevelUpPill"
                 android:textSize="12sp"
                 tools:textColor="#F6C29A" />
 
@@ -313,7 +313,7 @@
                         android:layout_marginTop="2dp"
                         android:fontFamily="@font/proza_libre_semi_bold"
                         android:includeFontPadding="false"
-                        android:text="@string/lu_medal_bronze"
+                        android:text="@string/labelLevelUpMedalBronze"
                         android:textColor="#CCFFFFFF"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -358,7 +358,7 @@
                         android:layout_marginTop="2dp"
                         android:fontFamily="@font/proza_libre_semi_bold"
                         android:includeFontPadding="false"
-                        android:text="@string/lu_medal_silver"
+                        android:text="@string/labelLevelUpMedalSilver"
                         android:textColor="#CCFFFFFF"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -403,7 +403,7 @@
                         android:layout_marginTop="2dp"
                         android:fontFamily="@font/proza_libre_semi_bold"
                         android:includeFontPadding="false"
-                        android:text="@string/lu_medal_gold"
+                        android:text="@string/labelLevelUpMedalGold"
                         android:textColor="#CCFFFFFF"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -428,47 +428,68 @@
             android:paddingHorizontal="16dp"
             android:paddingTop="5dp">
 
-            <androidx.appcompat.widget.AppCompatImageButton
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnClose"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:background="@drawable/bg_lu_top_btn"
-                android:contentDescription="@string/lu_close"
+                android:clickable="true"
+                android:contentDescription="@string/btnLevelUpClose"
+                android:focusable="true"
                 android:onClick="@{onClickListener}"
-                android:src="@drawable/ic_lu_close" />
+                app:cardBackgroundColor="@color/rank_pill_bg"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_lu_close" />
+            </com.google.android.material.card.MaterialCardView>
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnReplay"
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
-                android:background="@drawable/bg_lu_top_btn"
-                android:foreground="?selectableItemBackground"
-                android:gravity="center_vertical"
                 android:onClick="@{onClickListener}"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp">
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/rank_pill_bg"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_lu_replay" />
-
-                <androidx.appcompat.widget.AppCompatTextView
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:fontFamily="@font/proza_libre_semi_bold"
-                    android:includeFontPadding="false"
-                    android:text="@string/lu_replay"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_lu_replay" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:fontFamily="@font/proza_libre_semi_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/btnLevelUpReplay"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
         <!-- ═══ BOTTOM SHEET ═══ -->
@@ -504,95 +525,111 @@
                         android:fontFamily="@font/proza_libre_extra_bold"
                         android:includeFontPadding="false"
                         android:letterSpacing="0.1"
-                        android:text="@string/lu_your_new_cashback"
+                        android:text="@string/labelLevelUpNewCashback"
                         android:textColor="#D52662"
                         android:textSize="12sp" />
 
                     <!-- cashback block -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:id="@+id/llCashBlock"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:alpha="0"
-                        android:background="@drawable/bg_lu_cash_block"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="14dp"
-                        android:paddingVertical="8dp">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="52dp"
-                            android:layout_height="52dp"
-                            android:background="@drawable/bg_lu_cash_tile"
-                            android:fontFamily="@font/proza_libre_extra_bold"
-                            android:gravity="center"
-                            android:includeFontPadding="false"
-                            android:text="%"
-                            android:textColor="#7A3A16"
-                            android:textSize="22sp" />
+                        app:cardBackgroundColor="@color/primary_light"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="14dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="8dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="52dp"
+                                android:layout_height="52dp"
+                                app:cardBackgroundColor="@color/secondary"
+                                app:cardCornerRadius="16dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:fontFamily="@font/proza_libre_extra_bold"
+                                    android:gravity="center"
+                                    android:includeFontPadding="false"
+                                    android:text="%"
+                                    android:textColor="#7A3A16"
+                                    android:textSize="22sp" />
+                            </com.google.android.material.card.MaterialCardView>
 
                             <LinearLayout
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:gravity="bottom"
-                                android:orientation="horizontal">
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvCash"
+                                <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:fontFamily="@font/proza_libre_extra_bold"
-                                    android:includeFontPadding="false"
-                                    android:letterSpacing="-0.02"
-                                    android:textColor="#D52662"
-                                    android:textSize="22sp"
-                                    tools:text="0.10%" />
+                                    android:gravity="bottom"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvCash"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_extra_bold"
+                                        android:includeFontPadding="false"
+                                        android:letterSpacing="-0.02"
+                                        android:textColor="#D52662"
+                                        android:textSize="22sp"
+                                        tools:text="0.10%" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:layout_marginBottom="2dp"
+                                        android:fontFamily="@font/proza_libre_bold"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/labelLevelUpCashbackWord"
+                                        android:textColor="#2B0B33"
+                                        android:textSize="14sp" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvCashOld"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:layout_marginBottom="2dp"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:textColor="#6E5763"
+                                        android:textSize="11sp"
+                                        tools:text="0.05%" />
+                                </LinearLayout>
 
                                 <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
+                                    android:id="@+id/tvCashNote"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="8dp"
-                                    android:layout_marginBottom="2dp"
-                                    android:fontFamily="@font/proza_libre_bold"
-                                    android:includeFontPadding="false"
-                                    android:text="@string/lu_cashback_word"
-                                    android:textColor="#2B0B33"
-                                    android:textSize="14sp" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/tvCashOld"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="8dp"
-                                    android:layout_marginBottom="2dp"
+                                    android:layout_marginTop="4dp"
                                     android:fontFamily="@font/proza_libre_regular"
                                     android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.35"
                                     android:textColor="#6E5763"
                                     android:textSize="11sp"
-                                    tools:text="0.05%" />
+                                    tools:text="@string/msgLevelUpCashNoteFestive" />
                             </LinearLayout>
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/tvCashNote"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/proza_libre_regular"
-                                android:includeFontPadding="false"
-                                android:lineSpacingMultiplier="1.35"
-                                android:textColor="#6E5763"
-                                android:textSize="11sp"
-                                tools:text="@string/lu_cash_note_festive" />
                         </LinearLayout>
-                    </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- tier progress + next (Bronze / Silver / Gold) -->
                     <LinearLayout
@@ -636,11 +673,14 @@
                             android:layout_marginTop="8dp"
                             android:orientation="horizontal">
 
-                            <FrameLayout
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:background="@drawable/bg_lu_seg_track">
+                                app:cardBackgroundColor="@color/lu_seg_track"
+                                app:cardCornerRadius="4dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
 
                                 <View
                                     android:id="@+id/viewSeg0"
@@ -648,14 +688,17 @@
                                     android:layout_height="match_parent"
                                     android:scaleX="0"
                                     android:transformPivotX="0dp" />
-                            </FrameLayout>
+                            </com.google.android.material.card.MaterialCardView>
 
-                            <FrameLayout
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="6dp"
                                 android:layout_weight="1"
-                                android:background="@drawable/bg_lu_seg_track">
+                                app:cardBackgroundColor="@color/lu_seg_track"
+                                app:cardCornerRadius="4dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
 
                                 <View
                                     android:id="@+id/viewSeg1"
@@ -663,14 +706,17 @@
                                     android:layout_height="match_parent"
                                     android:scaleX="0"
                                     android:transformPivotX="0dp" />
-                            </FrameLayout>
+                            </com.google.android.material.card.MaterialCardView>
 
-                            <FrameLayout
+                            <com.google.android.material.card.MaterialCardView
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="6dp"
                                 android:layout_weight="1"
-                                android:background="@drawable/bg_lu_seg_track">
+                                app:cardBackgroundColor="@color/lu_seg_track"
+                                app:cardCornerRadius="4dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
 
                                 <View
                                     android:id="@+id/viewSeg2"
@@ -678,39 +724,48 @@
                                     android:layout_height="match_parent"
                                     android:scaleX="0"
                                     android:transformPivotX="0dp" />
-                            </FrameLayout>
+                            </com.google.android.material.card.MaterialCardView>
                         </LinearLayout>
 
-                        <LinearLayout
+                        <com.google.android.material.card.MaterialCardView
                             android:id="@+id/llNext"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:background="@drawable/bg_lu_next_row"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="10dp">
+                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/rw_line"
+                            app:strokeWidth="1.5dp">
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:importantForAccessibility="no"
-                                android:src="@drawable/ic_lu_arrow" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/tvNext"
-                                android:layout_width="0dp"
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:layout_weight="1"
-                                android:fontFamily="@font/proza_libre_regular"
-                                android:includeFontPadding="false"
-                                android:lineSpacingMultiplier="1.35"
-                                android:textColor="#2B0B33"
-                                android:textSize="13sp"
-                                tools:text="Next: Bronze I · ₹4,000 in lifetime payments" />
-                        </LinearLayout>
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="10dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:importantForAccessibility="no"
+                                    android:src="@drawable/ic_lu_arrow" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvNext"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingMultiplier="1.35"
+                                    android:textColor="#2B0B33"
+                                    android:textSize="13sp"
+                                    tools:text="Next: Bronze I · ₹4,000 in lifetime payments" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
 
                     <!-- Platinum only: permanent row -->
@@ -724,10 +779,13 @@
                         android:orientation="horizontal"
                         android:visibility="gone">
 
-                        <FrameLayout
+                        <com.google.android.material.card.MaterialCardView
                             android:layout_width="44dp"
                             android:layout_height="44dp"
-                            android:background="@drawable/bg_lu_perm_tile">
+                            app:cardBackgroundColor="@color/lu_perm_tile"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:layout_width="22dp"
@@ -735,7 +793,7 @@
                                 android:layout_gravity="center"
                                 android:importantForAccessibility="no"
                                 android:src="@drawable/ic_lu_infinity" />
-                        </FrameLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -749,7 +807,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/proza_libre_bold"
                                 android:includeFontPadding="false"
-                                android:text="@string/lu_perm_title"
+                                android:text="@string/titleLevelUpPermanent"
                                 android:textColor="#2B0B33"
                                 android:textSize="15sp" />
 
@@ -759,7 +817,7 @@
                                 android:layout_marginTop="2dp"
                                 android:fontFamily="@font/proza_libre_regular"
                                 android:includeFontPadding="false"
-                                android:text="@string/lu_perm_body"
+                                android:text="@string/msgLevelUpPermanentBody"
                                 android:textColor="#6E5763"
                                 android:textSize="13sp" />
                         </LinearLayout>
@@ -786,7 +844,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/proza_libre_bold"
                     android:includeFontPadding="false"
-                    android:text="@string/lu_continue"
+                    android:text="@string/btnLevelUpContinue"
                     android:textColor="#FFFFFF"
                     android:textSize="17sp" />
 
