@@ -41,6 +41,7 @@ android {
     }
     packaging {
         jniLibs {
+            // ponytail: webpdecoder requires uncompressed .so for direct dlopen; remove when zjupure/webpdecoder drops this requirement
             useLegacyPackaging = true
         }
     }
@@ -94,7 +95,7 @@ dependencies {
     implementation("com.google.mlkit:face-detection:16.1.7")
 
     // App lock — phone's own screen lock (fingerprint / face / PIN / pattern)
-    implementation("androidx.biometric:biometric:1.1.0")
+    implementation("androidx.biometric:biometric:1.4.0")
 
     // In-app review — Google Play rating sheet after a successful bill payment
     implementation("com.google.android.play:review:2.0.2")
