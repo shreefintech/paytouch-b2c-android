@@ -763,7 +763,6 @@
     <string name="msgGoldWarning">This can lower your Gold level. After this you\'ll have %1$s locked.</string>
     <string name="msgLostInterest">Interest not yet moved (%1$s) will be lost.</string>
     <string name="msgWithdrawInfo">Arrives in your Wallet Balance in 3 days. One withdrawal at a time.</string>
-    <string name="msgWithdrawNote">Withdrawn amount will be credited to your main wallet. Pending interest for the current cycle will be forfeited.</string>
     <string name="errMoreThanLocked">More than your locked balance</string>
     <string name="errExceedsLockedBalance">Amount exceeds your locked balance</string>
     <string name="errMinAmount">Please enter a valid amount</string>
