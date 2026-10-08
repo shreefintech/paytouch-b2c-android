@@ -201,6 +201,9 @@ class BillPaymentStatusActivity : BaseActivity() {
         autoFinishHandler.postDelayed({ binding.ivCopyId.setImageResource(R.drawable.ic_copy) }, 1500L)
     }
 
+    // Best-effort: the /transaction-history/detail endpoint serves both wallet and bill payment
+    // records by transaction ID. onError is silent — optimistic status from the payment response
+    // is already shown; this only upgrades it if the backend confirms a different status.
     private fun fetchConfirmedStatus() {
         if (transactionId == "--") return
         detailViewModel.loadDetail(

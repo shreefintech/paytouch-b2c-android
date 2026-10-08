@@ -123,7 +123,7 @@ class PrepaidActivity : BaseActivity() {
         setupInputFilters()
         setupAmountWatcher()
         setupTermsText()
-        retryCallback = { loadOperators() }
+        retryCallback = { loadOperators(); loadStates() }
         loadOperators()
         loadStates()
         tabHelper = TabAnimationHelper(mActivity, binding.llTabPayBill, binding.llTabReport, binding.llTabStatus, binding.llTabSmsReceipt)
@@ -153,9 +153,9 @@ class PrepaidActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
+                binding.tvPlatformFee.text = Utility.formatAmount(fee.toString())
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
+                binding.tvTotalPayable.text = Utility.formatAmount(total.toString())
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
