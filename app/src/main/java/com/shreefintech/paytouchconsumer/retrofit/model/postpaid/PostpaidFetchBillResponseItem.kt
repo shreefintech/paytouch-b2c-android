@@ -7,7 +7,7 @@ data class PostpaidFetchBillResponseItem(
     val success: Boolean? = null,
 
     @field:SerializedName("data")
-    val data: PostpaidFetchBillDataWrapper? = null,
+    val data: PostpaidFetchBillDataWrapperItem? = null,
 
     @field:SerializedName("bill_id")
     val billId: String? = null,
@@ -16,7 +16,7 @@ data class PostpaidFetchBillResponseItem(
     val message: PostpaidFetchBillMessageItem? = null
 )
 
-data class PostpaidFetchBillDataWrapper(
+data class PostpaidFetchBillDataWrapperItem(
     @field:SerializedName("success")
     val success: Boolean? = null,
 
@@ -40,10 +40,10 @@ data class PostpaidFetchBillDataItem(
     val billAmount: String? = null,
 
     @field:SerializedName("billnetamount")
-    val billnetamount: String? = null,
+    val billNetAmount: String? = null,
 
     @field:SerializedName("billdate")
-    val billdate: String? = null,
+    val billDate: String? = null,
 
     @field:SerializedName("dueDate")
     val dueDate: String? = null,
