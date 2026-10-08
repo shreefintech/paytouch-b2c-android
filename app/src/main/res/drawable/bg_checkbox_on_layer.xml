@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/bg_checkbox_on" />
+    <item
+        android:gravity="center"
+        android:width="14dp"
+        android:height="14dp"
+        android:drawable="@drawable/ic_check_white" />
+</layer-list>

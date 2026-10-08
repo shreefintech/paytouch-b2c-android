@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgressWithdraw"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bottom_sheet_bg"
+        android:clickable="true"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="0dp"
+        app:behavior_skipCollapsed="true"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <!-- Horizontal margin anchor -->
+        <View
+            android:id="@+id/dummyView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Title row -->
+        <LinearLayout
+            android:id="@+id/llWithdrawTitleRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_bold"
+                android:includeFontPadding="false"
+                android:text="@string/titleWithdrawToWallet"
+                android:textColor="@color/earningInk"
+                android:textSize="20sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/ivCloseWithdraw"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:onClickListener="@{onClickListener}"
+                app:cardBackgroundColor="@color/earningCloseBg"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_cross"
+                    android:tint="@color/primary" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- Locked balance row -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/llLockedBalanceRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/primary_light"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/llWithdrawTitleRow">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelLockedBalance"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvWithdrawLockedBalance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp"
+                    tools:text="₹4,000.00" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Amount label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvWithdrawAmountLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelAmount"
+            android:textColor="@color/earningMuted"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/llLockedBalanceRow" />
+
+        <!-- Amount input field -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardWithdrawAmount"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="6dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/primary"
+            app:strokeWidth="1.5dp"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/tvWithdrawAmountLabel">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:includeFontPadding="false"
+                    android:text="₹"
+                    android:textColor="@color/primary"
+                    android:textSize="26sp" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etWithdrawAmount"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:hint="@string/hintAmount"
+                    android:imeOptions="actionDone"
+                    android:inputType="numberDecimal"
+                    android:singleLine="true"
+                    android:textColor="@color/earningInk"
+                    android:textColorHint="@color/earningMuted"
+                    android:textSize="26sp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Inline error: more than locked -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvWithdrawError"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/errMoreThanLocked"
+            android:textColor="@color/earningError"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/cardWithdrawAmount" />
+
+        <!-- Warn box (gold warning + lost interest) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/llWarnBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/earningWarnBg"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/earningWarnBorder"
+            app:strokeWidth="1dp"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/tvWithdrawError"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="12dp">
+
+                <!-- Gold warning row -->
+                <LinearLayout
+                    android:id="@+id/llGoldWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="1dp"
+                        android:src="@drawable/ic_warning"
+                        android:tint="@color/earningWarnTitle" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvGoldWarning"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:includeFontPadding="false"
+                        android:lineSpacingMultiplier="1.35"
+                        android:textColor="@color/earningWarnTitle"
+                        android:textSize="12.5sp"
+                        tools:text="This can lower your Gold level. After this you'll have ₹3,000 locked." />
+
+                </LinearLayout>
+
+                <!-- Lost interest row -->
+                <LinearLayout
+                    android:id="@+id/llInterestRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="top"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="1dp"
+                        android:src="@drawable/ic_info"
+                        android:tint="@color/earningWarnTitle" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvLostInterest"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:includeFontPadding="false"
+                        android:lineSpacingMultiplier="1.35"
+                        android:textColor="@color/earningWarnTitle"
+                        android:textSize="12.5sp"
+                        tools:text="Interest not yet moved (₹12.05) will be lost." />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Info row: arrives in 3 days -->
+        <LinearLayout
+            android:id="@+id/llWithdrawInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="top"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/llWarnBox">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="1dp"
+                android:src="@drawable/ic_clock"
+                android:tint="@color/primary" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/proza_libre_regular"
+                android:includeFontPadding="false"
+                android:lineSpacingMultiplier="1.45"
+                android:text="@string/msgWithdrawInfo"
+                android:textColor="@color/earningMuted"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Withdraw button -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnWithdrawSheet"
+            android:layout_width="0dp"
+            android:layout_height="51dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="28dp"
+            android:onClickListener="@{onClickListener}"
+            app:cardBackgroundColor="@color/earningDisabledBg"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/llWithdrawInfo"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="17dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivBtnWithdrawIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_wallet"
+                    android:tint="@color/earningDisabledText"
+                    android:visibility="@{showProgressWithdraw ? View.GONE : View.VISIBLE}" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvBtnWithdrawLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="@string/btnWithdraw"
+                    android:textColor="@color/earningDisabledText"
+                    android:textSize="17sp"
+                    android:visibility="@{showProgressWithdraw ? View.GONE : View.VISIBLE}" />
+
+                <ProgressBar
+                    android:id="@+id/pbWithdraw"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:indeterminateTint="@color/white"
+                    android:visibility="@{showProgressWithdraw ? View.VISIBLE : View.GONE}" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
