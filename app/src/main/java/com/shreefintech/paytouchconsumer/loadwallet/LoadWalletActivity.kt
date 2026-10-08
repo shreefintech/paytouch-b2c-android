@@ -512,7 +512,10 @@ class LoadWalletActivity : BaseActivity() {
                 showProgressBonus.set(false)
                 binding.tvBonusBalance.text = Utility.formatAmount(data.referralWallet)
             },
-            onError = { showProgressBonus.set(false) }
+            onError = {
+                showProgressBonus.set(false)
+                binding.tvBonusBalance.text = "--"
+            }
         )
     }
 
@@ -523,7 +526,14 @@ class LoadWalletActivity : BaseActivity() {
                 showProgressRewards.set(false)
                 populateLevel(data)
             },
-            onError = { showProgressRewards.set(false) }
+            onError = {
+                showProgressRewards.set(false)
+                val tier = RewardsTier.BRONZE
+                binding.tvTierName.text = getString(tier.labelRes)
+                binding.ivTierBadge.setImageResource(tier.badgeRes)
+                binding.tvCashbackPct.text = "--"
+                binding.tvNextLevel.text = "--"
+            }
         )
     }
 
@@ -534,7 +544,10 @@ class LoadWalletActivity : BaseActivity() {
                 showProgressEarning.set(false)
                 binding.tvEarningBalance.text = Utility.formatAmount(data.principal)
             },
-            onError = { showProgressEarning.set(false) }
+            onError = {
+                showProgressEarning.set(false)
+                binding.tvEarningBalance.text = "--"
+            }
         )
     }
 
@@ -819,12 +832,12 @@ class LoadWalletActivity : BaseActivity() {
 
                 binding.cardEarningWallet -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-XXX): navigate to EarningWalletActivity when implemented
+                    // TODO(B2C-199): navigate to EarningWalletActivity when implemented
                 }
 
                 binding.cardRewardsLevel -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-XXX): navigate to RewardsRankingActivity when implemented
+                    // TODO(B2C-199): navigate to RewardsRankingActivity when implemented
                 }
 
                 binding.llMakePayment -> {
