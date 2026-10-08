@@ -3,7 +3,6 @@ package com.shreefintech.paytouchconsumer.myaccount
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -67,7 +66,6 @@ class KycDetailsActivity : BaseActivity() {
 
         val listener = onClickListener()
         binding.onClickListener = listener
-        binding.ivEditBank.setOnClickListener(listener)
         setupDocumentSlider()
         onBack()
         retryCallback = { loadKycDetails() }
@@ -152,7 +150,7 @@ class KycDetailsActivity : BaseActivity() {
         binding.tvBranchName.text = account.branchName ?: "--"
 
         // Show edit button when the server allows edits and the account has an id
-        val canEdit = bank.canEdit != false && account.id != null
+        val canEdit = bank.canEdit == true && account.id != null
         binding.ivEditBank.isVisible = canEdit
     }
 
@@ -252,7 +250,7 @@ class KycDetailsActivity : BaseActivity() {
                 )
 
 
-                editBankLauncher.launch(EditBankDetailsActivity.start(this, passItem))
+                editBankLauncher.launch(EditBankDetailsActivity.createIntent(this, passItem))
             }
         }
     }

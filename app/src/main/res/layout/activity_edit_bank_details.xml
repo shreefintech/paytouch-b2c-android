@@ -300,7 +300,8 @@
                         android:layout_marginTop="@dimen/margin_small"
                         android:background="@drawable/bg_upload_area"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:onClickListener="@{onClickListener}">
 
                         <!-- Upload state -->
                         <LinearLayout
@@ -315,6 +316,7 @@
                                 android:id="@+id/flUpload1"
                                 android:layout_width="@dimen/btn_height"
                                 android:layout_height="@dimen/btn_height"
+                                android:onClickListener="@{onClickListener}"
                                 app:glassCornerRadius="@dimen/submit_btn_radius"
                                 app:normalTint="@android:color/transparent"
                                 app:pressedTint="@color/upload_btn_color">
@@ -398,6 +400,7 @@
                                     android:layout_width="@dimen/upload_edit_size"
                                     android:layout_height="@dimen/upload_edit_size"
                                     android:background="?selectableItemBackgroundBorderless"
+                                    android:onClickListener="@{onClickListener}"
                                     android:padding="2dp"
                                     android:src="@drawable/ic_edit_placeholder"
                                     android:tint="@color/form_wizard_success" />
@@ -415,6 +418,7 @@
                                     android:layout_width="@dimen/upload_edit_size"
                                     android:layout_height="@dimen/upload_edit_size"
                                     android:background="?selectableItemBackgroundBorderless"
+                                    android:onClickListener="@{onClickListener}"
                                     android:padding="2dp"
                                     android:src="@drawable/ic_cross"
                                     android:tint="@color/form_wizard_reject" />
@@ -472,9 +476,10 @@
                             android:layout_height="22dp"
                             android:layout_gravity="center_vertical|end"
                             android:layout_marginEnd="@dimen/margin_small"
-                            app:tint="@color/black"
                             android:background="?selectableItemBackgroundBorderless"
-                            android:src="@drawable/ic_eye_off" />
+                            android:onClickListener="@{onClickListener}"
+                            android:src="@drawable/ic_eye_off"
+                            app:tint="@color/black" />
                     </FrameLayout>
 
                     <!-- Password note -->
