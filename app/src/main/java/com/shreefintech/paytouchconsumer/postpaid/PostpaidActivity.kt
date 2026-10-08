@@ -55,6 +55,7 @@ class PostpaidActivity : BaseActivity() {
 
     private val showProgressFetch = ObservableBoolean(false)
     private var fetchedBillItem: PostpaidFetchBillDataItem? = null
+    private var paymentMade = false
     private var isBillFetched = false
 
     private val operatorSelectionLauncher = registerForActivityResult(
@@ -215,6 +216,7 @@ class PostpaidActivity : BaseActivity() {
             onLoading = { showProgressPay.set(true) },
             onSuccess = { body ->
                 showProgressPay.set(false)
+                paymentMade = true
                 BillPaymentStatusActivity.start(
                     mActivity,
                     BillPaymentStatusItem(
@@ -365,6 +367,7 @@ class PostpaidActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }

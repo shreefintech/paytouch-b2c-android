@@ -40,15 +40,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-            <!-- ── Banner slider ── -->
-            <include
-                android:id="@+id/incBannerSlider"
-                layout="@layout/lyt_banner_slider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_medium"
-                android:layout_marginHorizontal="@dimen/page_margin_horizontal"
-                android:layout_marginBottom="@dimen/margin_small" />
+                <include
+                    android:id="@+id/incBannerSlider"
+                    layout="@layout/lyt_banner_slider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_marginHorizontal="@dimen/page_margin_horizontal"
+                    android:layout_marginBottom="@dimen/margin_small" />
 
             <!-- White categories card -->
             <FrameLayout

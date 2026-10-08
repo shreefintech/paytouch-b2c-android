@@ -72,6 +72,7 @@ class EarningWalletActivity : BaseActivity() {
         setupInsets()
         bindClickListeners()
         onBack()
+        retryCallback = { loadData() }
         loadData()
     }
 
@@ -166,6 +167,11 @@ class EarningWalletActivity : BaseActivity() {
     // region Data Loading
 
     private fun loadData() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
         viewModel.fetchEarningWallet(
             onLoading = {},
             onSuccess = { populateEarningWallet(it) },
@@ -255,6 +261,8 @@ class EarningWalletActivity : BaseActivity() {
             binding.progressStatus.progress = 30
             binding.progressStatus.progressTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.earningSuccessBar))
+            binding.progressStatus.progressBackgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.earningSuccessBg))
             binding.tvStatusDate.text = getString(R.string.labelEarningsSince, activeDateStr)
         } else {
             binding.cardStatusBadge.setCardBackgroundColor(
@@ -266,6 +274,8 @@ class EarningWalletActivity : BaseActivity() {
             binding.progressStatus.progress = daysElapsed
             binding.progressStatus.progressTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.tierGoldText))
+            binding.progressStatus.progressBackgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.tierGoldBg))
             binding.tvStatusDate.text = getString(R.string.labelLockedSince, agingDateStr, activeDateStr)
         }
     }
@@ -350,7 +360,7 @@ class EarningWalletActivity : BaseActivity() {
             onSuccess = { msg ->
                 showProgressOptIn.set(false)
                 optInBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
+                if (msg.isNotEmpty()) ToastUtil.showSuccess(mActivity, msg)
                 isOptedIn = true
                 refreshData()
             },
@@ -405,7 +415,7 @@ class EarningWalletActivity : BaseActivity() {
             onSuccess = { msg ->
                 showProgressWithdraw.set(false)
                 withdrawBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
+                if (msg.isNotEmpty()) ToastUtil.showSuccess(mActivity, msg)
                 refreshData()
             },
             onError = { msg ->
@@ -542,7 +552,7 @@ class EarningWalletActivity : BaseActivity() {
             try {
                 val date = SimpleDateFormat(pattern, Locale.getDefault()).apply { timeZone = utc }.parse(cleaned)
                 if (date != null) return date.time
-            } catch (_: Exception) {}
+            } catch (e: Exception) { e.printStackTrace() }
         }
         return null
     }

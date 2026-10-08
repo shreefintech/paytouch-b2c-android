@@ -73,6 +73,7 @@ class LoginActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.showProgress = showProgress
 
+        // TODO(B2C-194): seasonal Navratri — revert after festival
         Glide.with(this).load(R.drawable.img_garba_couple).into(binding.ivWalletIllustration)
 
         onBack()
@@ -80,6 +81,7 @@ class LoginActivity : BaseActivity() {
         setupMpinBoxes()
         updateToggleUi(LoginMode.PASSWORD)
 
+        // TODO(B2C-194): seasonal Navratri — revert after festival
         BannerSliderHelper(this, binding.incBannerSlider.vpBanner).attachToLifecycle(this)
     }
 

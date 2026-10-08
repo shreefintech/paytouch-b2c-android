@@ -171,10 +171,10 @@ The receipt card is captured via the shared `ReceiptHelper` for download and sha
 
 ## Intent Data Passing
 
-`PrepaidSmsReceiptActivity` is started with only `context` and `fromPayment`:
+`PrepaidSmsReceiptActivity` is started from `BillPaymentStatusActivity` with `context`, `transactionId`, and `fromPayment = true`:
 
 ```kotlin
-PrepaidSmsReceiptActivity.start(context, fromPayment = true)
+PrepaidSmsReceiptActivity.start(mActivity, transactionId, fromPayment = true)
 ```
 
 `PrepaidTransactionReportActivity` / `PrepaidTransactionStatusActivity` navigate to the **shared** `TransactionDetailActivity`:

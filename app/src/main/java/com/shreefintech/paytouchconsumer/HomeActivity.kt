@@ -9,13 +9,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
+import android.Manifest
+import android.content.ActivityNotFoundException
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -54,9 +62,18 @@ class HomeActivity : BaseActivity() {
     private val showProgressLogout = ObservableBoolean(false)
 
     // Field-initialised: activity-result launchers must be registered before onStart()
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* granted or denied — either way nothing to do; FCM delivers as long as permission holds */ }
+
     private val locationHelper = LocationPermissionHelper(this) { location ->
         location?.let { viewModel.sendLocation(it) }
+        // Asked after the location flow ends so the two system permission popups never overlap
+        requestNotificationPermission()
     }
+
+    // True when the location flow ended while Home was not in front — asked again in onResume()
+    private var isNotificationPermissionPending = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +104,7 @@ class HomeActivity : BaseActivity() {
 
         loadCategoryIcons()
 
+        // TODO(B2C-194): seasonal Navratri — revert after festival
         BannerSliderHelper(this, binding.incBannerSlider.vpBanner).attachToLifecycle(this)
 
         val listener = onClickListener()
@@ -97,6 +115,26 @@ class HomeActivity : BaseActivity() {
         // Skip on config change / process restore — once per Home launch is enough
         if (savedInstanceState == null) {
             locationHelper.start()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isNotificationPermissionPending) requestNotificationPermission()
+    }
+
+    // Never pop the system dialog over another screen (e.g. a category opened mid location fix)
+    private fun requestNotificationPermission() {
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            isNotificationPermissionPending = true
+            return
+        }
+        isNotificationPermissionPending = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(mActivity, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 

@@ -2,7 +2,6 @@ package com.shreefintech.paytouchconsumer.fcm
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -31,8 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger
 
 object NotificationHelper {
 
-    const val NOTIFICATION_PERMISSION_CODE = 1001
-
     // Token currently being registered — prevents duplicate calls when login and
     // HomeActivity both trigger a sync before the first call has completed.
     @Volatile
@@ -50,20 +47,6 @@ object NotificationHelper {
         )
         context.getSystemService(NotificationManager::class.java)
             ?.createNotificationChannel(channel)
-    }
-
-    /** Asks for POST_NOTIFICATIONS on Android 13+. No-op on older versions or when already granted. */
-    fun requestPermission(activity: Activity) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
-        if (ActivityCompat.checkSelfPermission(
-                activity, Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-        ) return
-        ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-            NOTIFICATION_PERMISSION_CODE
-        )
     }
 
     fun showNotification(context: Context, title: String, message: String) {

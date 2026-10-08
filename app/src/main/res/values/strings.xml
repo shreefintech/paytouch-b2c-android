@@ -14,8 +14,8 @@
     <string name="forgot_password">Forgot Password?</string>
     <string name="labelForgotMpin">Forgot MPIN?</string>
     <string name="sign_in">Sign In</string>
-    <string name="no_account">New to paytouch?</string>
-    <string name="create_account">SignUp</string>
+    <string name="no_account">New to PayTouch?</string>
+    <string name="create_account">Sign Up</string>
 
     <string name="msgLoginSuccess">Login successful</string>
 
@@ -503,12 +503,6 @@
     <string name="labelEarningWallet">Earning Wallet</string>
     <string name="labelBonusWalletDesc">Spend only · up to 50% of a bill</string>
     <string name="labelEarningWalletDesc">11% p.a. after 30 days locked</string>
-    <string name="msgFestiveCashback">Festive season: flat ₹5 cashback on bills ₹50+</string>
-    <string name="labelLocked">Locked</string>
-    <string name="labelYourLevel">Your Level</string>
-    <string name="labelViewMyRank">View My Rank</string>
-    <string name="labelReferrals">Referrals</string>
-    <string name="msgEarningWalletHint">From rewards &amp; referrals</string>
     <string name="labelBronze">Bronze</string>
     <string name="labelSilver">Silver</string>
     <string name="labelGold">Gold</string>
@@ -873,6 +867,7 @@
 
     <string name="titleRewardsHero">Level up and earn up to 0.50% back</string>
 
+    <string name="labelRewardsHeroHighlight">0.50% back</string>
     <string name="rank_cash_suffix"> cashback on every bill</string>
     <string name="rank_road_to">Road to %1$s</string>
     <string name="rank_percent">%1$s%%</string>
