@@ -267,7 +267,7 @@ class PostpaidActivity : BaseActivity() {
         val bill = fetchedBillItem ?: return
         binding.tvBillCustomerName.text = bill.userName ?: "-"
         binding.tvBillDueDate.text = Utility.formatDate(bill.dueDate, "dd/MM/yyyy")
-        binding.tvBillDate.text = Utility.formatDate(bill.billdate, "dd/MM/yyyy")
+        binding.tvBillDate.text = Utility.formatDate(bill.billDate, "dd/MM/yyyy")
         binding.tvBillAmount.text = Utility.formatAmount(bill.billAmount)
         binding.tvBillMobileNo.text = binding.etMobileNumber.text?.toString()?.trim() ?: "-"
         binding.tvBillOperator.text = selectedOperatorName ?: "-"
@@ -426,6 +426,7 @@ class PostpaidActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
+                    if (paymentMade) return@OnClickListener
                     onProceedToPay()
                 }
                 binding.llReset -> {
