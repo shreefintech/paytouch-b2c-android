@@ -218,15 +218,17 @@ class BillPaymentStatusActivity : BaseActivity() {
         if (isNavigating) return
         isNavigating = true
         autoFinishHandler.removeCallbacksAndMessages(null)
+        // Fall back to latest-payment (fromPayment) when no transaction ID was returned by the backend.
+        val txnId = transactionId.takeIf { it != "--" }
         when (category) {
-            CATEGORY_ELECTRICITY   -> SmsReceiptActivity.start(mActivity, transactionId)
-            CATEGORY_DTH           -> DthSmsReceiptActivity.start(mActivity, transactionId)
-            CATEGORY_GAS           -> GasSmsReceiptActivity.start(mActivity, transactionId)
-            CATEGORY_LOAN          -> LoanSmsReceiptActivity.start(mActivity, transactionId)
-            CATEGORY_MUNICIPAL_TAX -> MunicipalTaxSmsReceiptActivity.start(mActivity, transactionId)
-            CATEGORY_PREPAID       -> PrepaidSmsReceiptActivity.start(mActivity, transactionId)
-            CATEGORY_FASTAG        -> FastagSmsReceiptActivity.start(mActivity, transactionId)
-            CATEGORY_POSTPAID      -> PostpaidSmsReceiptActivity.start(mActivity, transactionId)
+            CATEGORY_ELECTRICITY   -> if (txnId != null) SmsReceiptActivity.start(mActivity, txnId) else SmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_DTH           -> if (txnId != null) DthSmsReceiptActivity.start(mActivity, txnId) else DthSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_GAS           -> if (txnId != null) GasSmsReceiptActivity.start(mActivity, txnId) else GasSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_LOAN          -> if (txnId != null) LoanSmsReceiptActivity.start(mActivity, txnId) else LoanSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_MUNICIPAL_TAX -> if (txnId != null) MunicipalTaxSmsReceiptActivity.start(mActivity, txnId) else MunicipalTaxSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_PREPAID       -> if (txnId != null) PrepaidSmsReceiptActivity.start(mActivity, txnId) else PrepaidSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_FASTAG        -> if (txnId != null) FastagSmsReceiptActivity.start(mActivity, txnId) else FastagSmsReceiptActivity.start(mActivity, fromPayment = true)
+            CATEGORY_POSTPAID      -> if (txnId != null) PostpaidSmsReceiptActivity.start(mActivity, txnId) else PostpaidSmsReceiptActivity.start(mActivity, fromPayment = true)
             else -> Utility.logError(IllegalStateException("BillPaymentStatusActivity: unknown category $category"))
         }
         finish()

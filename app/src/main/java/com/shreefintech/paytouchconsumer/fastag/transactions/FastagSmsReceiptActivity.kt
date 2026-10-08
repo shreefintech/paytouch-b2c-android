@@ -218,6 +218,7 @@ class FastagSmsReceiptActivity : BaseActivity() {
         binding.tvCcf.text             = Utility.formatAmount(item.platformFee)
         binding.tvReceiptStatus.text   = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
+        InAppReviewHelper.onPaymentReceiptShown(this, item.transactionId, status)
 
         val smsBodyText = getString(R.string.msgFastagSmsBody, amount, identifier)
         val spannable   = SpannableString(smsBodyText)

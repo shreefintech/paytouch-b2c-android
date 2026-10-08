@@ -326,6 +326,7 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
+        // Consumer number length varies by operator — no minimum enforced; backend validates.
         Utility.hideKeyboard(mActivity)
         fetchBill(connectionNumber)
     }
@@ -337,6 +338,7 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
+        // Consumer number length varies by operator — no minimum enforced; backend validates.
         if (selectedOperatorId.isNullOrEmpty()) {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
             return
