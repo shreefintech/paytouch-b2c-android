@@ -173,7 +173,7 @@ class SmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: ElectricityVerifyPaymentDataItem) {
-        val amount = Utility.formatAmount(item.totalPayable)
+        val amount = Utility.formatAmount(item.billAmount ?: item.amount)
         val consumerNo = item.subscriberNo ?: "--"
         val txnId = item.transactionId ?: "--"
         val date = Utility.formatDate(item.createdAt)

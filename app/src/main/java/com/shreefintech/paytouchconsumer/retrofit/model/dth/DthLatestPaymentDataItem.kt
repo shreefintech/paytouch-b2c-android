@@ -7,6 +7,7 @@ data class DthLatestPaymentDataItem(
     @field:SerializedName("mobile_no")      val mobileNo: String?,
     @field:SerializedName("subscriber_no")  val subscriberNo: String?,
     @field:SerializedName("operator")       val operator: String?,
+    @field:SerializedName("bill_amount")    val billAmount: String?,
     @field:SerializedName("amount")         val amount: String?,
     @field:SerializedName("platform_fee")   val platformFee: String?,
     @field:SerializedName("total_payable")  val totalPayable: String?,

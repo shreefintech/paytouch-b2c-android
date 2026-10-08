@@ -11,7 +11,11 @@ data class RewardsLevelItem(
     @field:SerializedName("next")             val next: RewardsLevelNextItem?,
     @field:SerializedName("platinum_days")    val platinumDays: Int?,
     @field:SerializedName("reached_at")       val reachedAt: String?,
-    @field:SerializedName("history")          val history: List<Any?>?
+    @field:SerializedName("history")          val history: List<RewardsHistoryItem?>?
+)
+
+data class RewardsHistoryItem(
+    @field:SerializedName("level") val level: String?
 )
 
 data class RewardsLevelNextItem(

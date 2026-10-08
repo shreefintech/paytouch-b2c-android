@@ -63,11 +63,14 @@ class LoadWalletActivity : BaseActivity() {
     private val viewModel: LoadWalletViewModel by viewModels()
 
     private var currentTab = TAB_TOTAL_BALANCE
+
     private val transactionList = ArrayList<WalletTransactionItem>()
     private lateinit var transactionAdp: WalletTransactionAdp
-
     private val referralList = ArrayList<BonusWalletHistoryItem>()
     private lateinit var referralAdp: ReferralHistoryAdp
+
+    private enum class RecentTab { WALLET, REFERRAL }
+    private var currentRecentTab = RecentTab.WALLET
 
     private lateinit var sheetBinding: SheetMakePaymentBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<View>
@@ -135,16 +138,10 @@ class LoadWalletActivity : BaseActivity() {
             )
             if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
             binding.incPaymentSheet.root.setPadding(
-                0,
-                0,
-                0,
-                maxOf(imeInsets.bottom, systemBars.bottom)
+                0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom)
             )
             binding.incWithdrawSheet.root.setPadding(
-                0,
-                0,
-                0,
-                maxOf(imeInsets.bottom, systemBars.bottom)
+                0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom)
             )
             insets
         }
@@ -175,10 +172,10 @@ class LoadWalletActivity : BaseActivity() {
         binding.showProgressEarning = showProgressEarning
         binding.showProgressRewards = showProgressRewards
         setupRecyclerView()
-        setupReferralRecyclerView()
         setupPaymentSheet()
         setupWithdrawSheet()
         selectTab(TAB_TOTAL_BALANCE)
+        selectRecentTab(RecentTab.WALLET)
         onBack()
         retryCallback = { loadData() }
         loadData()
@@ -236,6 +233,19 @@ class LoadWalletActivity : BaseActivity() {
         }
     }
 
+    // ── Setup ─────────────────────────────────────────────────────────────────
+
+    private fun setupRecyclerView() {
+        transactionAdp = WalletTransactionAdp(mActivity, transactionList)
+        transactionAdp.onClickItem = { transactionId ->
+            if (!Utility.stopClick()) TransactionHistoryDetailActivity.start(mActivity, transactionId)
+        }
+        referralAdp = ReferralHistoryAdp(mActivity, referralList)
+        binding.rvTransactions.layoutManager = LinearLayoutManager(mActivity)
+        binding.tvNoTransactions.visibility = View.GONE
+        binding.rvTransactions.visibility = View.GONE
+    }
+
     private fun setupPaymentSheet() {
         sheetBinding = binding.incPaymentSheet
         sheetBinding.onClickListener = onClickListener()
@@ -281,6 +291,127 @@ class LoadWalletActivity : BaseActivity() {
         selectPaymentMode(MODE_IMPS)
     }
 
+    // ── Recent Tab ────────────────────────────────────────────────────────────
+
+    private fun selectRecentTab(tab: RecentTab) {
+        currentRecentTab = tab
+        updateRecentTabVisuals()
+        binding.rvTransactions.adapter = if (tab == RecentTab.WALLET) transactionAdp else referralAdp
+        updateEmptyState()
+    }
+
+    private fun updateRecentTabVisuals() {
+        val primary = ContextCompat.getColor(mActivity, R.color.primary)
+        val white = ContextCompat.getColor(mActivity, R.color.white)
+        val transparent = ContextCompat.getColor(mActivity, android.R.color.transparent)
+        if (currentRecentTab == RecentTab.WALLET) {
+            binding.cvTabWallet.setCardBackgroundColor(primary)
+            binding.tvTabWallet.setTextColor(white)
+            binding.cvTabReferralHistory.setCardBackgroundColor(transparent)
+            binding.tvTabReferralHistory.setTextColor(primary)
+        } else {
+            binding.cvTabWallet.setCardBackgroundColor(transparent)
+            binding.tvTabWallet.setTextColor(primary)
+            binding.cvTabReferralHistory.setCardBackgroundColor(primary)
+            binding.tvTabReferralHistory.setTextColor(white)
+        }
+    }
+
+    // ── Data Loading ──────────────────────────────────────────────────────────
+
+    private fun loadData() {
+        if (!Utility.isInternetAvailable(mActivity)) {
+            showNoInternet()
+            return
+        }
+        hideNoInternet()
+        fetchWalletData()
+        fetchRecentHistory()
+        fetchBonusWallet()
+        fetchEarningWallet()
+        fetchRewardsLevel()
+    }
+
+    private fun fetchWalletData() {
+        viewModel.fetchUserWalletData(
+            onLoading = { showLoading() },
+            onSuccess = { data ->
+                hideLoading()
+                populateWalletData(data)
+            },
+            onError = { msg ->
+                hideLoading()
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
+    private fun fetchRecentHistory() {
+        viewModel.fetchRecentHistory(
+            onSuccess = { list ->
+                transactionAdp.updateList(list)
+                if (currentRecentTab == RecentTab.WALLET) updateEmptyState()
+            },
+            onError = { msg ->
+                ToastUtil.showDelete(mActivity, msg)
+                if (currentRecentTab == RecentTab.WALLET) updateEmptyState()
+            }
+        )
+    }
+
+    private fun fetchBonusWallet() {
+        showProgressBonus.set(true)
+        viewModel.fetchBonusWallet(
+            onSuccess = { data ->
+                showProgressBonus.set(false)
+                binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet)
+                val referralRows = (data.history ?: emptyList()).filter { it.isReferral }.take(2)
+                referralAdp.updateList(referralRows)
+                if (currentRecentTab == RecentTab.REFERRAL) updateEmptyState()
+            },
+            onError = { msg ->
+                showProgressBonus.set(false)
+                binding.tvBonusBalance.text = "--"
+                ToastUtil.showDelete(mActivity, msg)
+                referralAdp.updateList(emptyList())
+                if (currentRecentTab == RecentTab.REFERRAL) updateEmptyState()
+            }
+        )
+    }
+
+    private fun fetchEarningWallet() {
+        showProgressEarning.set(true)
+        viewModel.fetchEarningWallet(
+            onSuccess = { data ->
+                showProgressEarning.set(false)
+                binding.tvEarningBalance.text = Utility.formatAmount(data.principal)
+            },
+            onError = {
+                showProgressEarning.set(false)
+                binding.tvEarningBalance.text = "--"
+            }
+        )
+    }
+
+    private fun fetchRewardsLevel() {
+        showProgressRewards.set(true)
+        viewModel.fetchRewardsLevel(
+            onSuccess = { data ->
+                showProgressRewards.set(false)
+                populateLevel(data)
+            },
+            onError = {
+                showProgressRewards.set(false)
+                binding.tvTierName.text = "--"
+                binding.ivTierBadge.setImageDrawable(null)
+                binding.tvCashbackPct.text = "--"
+                binding.tvNextLevel.text = "--"
+            }
+        )
+    }
+
+    // ── Withdraw ──────────────────────────────────────────────────────────────
+
     private fun showWithdrawSheet() {
         withdrawSheetBinding.etAmount.setText("")
         withdrawSheetBinding.etNarration.setText("")
@@ -298,9 +429,9 @@ class LoadWalletActivity : BaseActivity() {
 
     private fun selectPaymentMode(mode: String) {
         selectedPaymentMode = mode
-        val selected = ContextCompat.getDrawable(mActivity, R.drawable.bg_toggle_selected)
+        val selected   = ContextCompat.getDrawable(mActivity, R.drawable.bg_toggle_selected)
         val unselected = ContextCompat.getDrawable(mActivity, R.drawable.bg_toggle_unselected)
-        val white = ContextCompat.getColor(mActivity, R.color.white)
+        val white   = ContextCompat.getColor(mActivity, R.color.white)
         val primary = ContextCompat.getColor(mActivity, R.color.primary)
 
         withdrawSheetBinding.tvTabImps.background = if (mode == MODE_IMPS) selected else unselected
@@ -317,24 +448,12 @@ class LoadWalletActivity : BaseActivity() {
             return
         }
         val amountStr = withdrawSheetBinding.etAmount.text?.toString()?.trim() ?: ""
-        if (amountStr.isEmpty()) {
-            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
-            return
-        }
+        if (amountStr.isEmpty()) { ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount)); return }
         val amount = amountStr.toDoubleOrNull()
-        if (amount == null) {
-            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
-            return
-        }
-        if (amount < 100) {
-            ToastUtil.showDelete(mActivity, getString(R.string.errMinWithdrawAmount))
-            return
-        }
+        if (amount == null) { ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount)); return }
+        if (amount < 100) { ToastUtil.showDelete(mActivity, getString(R.string.errMinWithdrawAmount)); return }
         val balance = currentWalletBalance?.toDoubleOrNull() ?: 0.0
-        if (amount > balance) {
-            ToastUtil.showDelete(mActivity, getString(R.string.errInsufficientBalance))
-            return
-        }
+        if (amount > balance) { ToastUtil.showDelete(mActivity, getString(R.string.errInsufficientBalance)); return }
         val narration = withdrawSheetBinding.etNarration.text?.toString()?.trim() ?: ""
         hideWithdrawSheet()
         showWithdrawConfirmDialog(amount, selectedPaymentMode, narration)
@@ -369,7 +488,6 @@ class LoadWalletActivity : BaseActivity() {
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvPaymentMode.text = mode
         dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
-
         dialog.show()
     }
 
@@ -479,7 +597,6 @@ class LoadWalletActivity : BaseActivity() {
                 chipBgRes = R.drawable.bg_status_success,
                 chipTextColorRes = R.color.toast_text_success
             )
-
             Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> WithdrawStatusDisplay(
                 titleRes = R.string.titleWithdrawalFailed,
                 subtitleRes = R.string.msgWithdrawalFailed,
@@ -487,7 +604,6 @@ class LoadWalletActivity : BaseActivity() {
                 chipBgRes = R.drawable.bg_status_failed,
                 chipTextColorRes = R.color.toast_text_delete
             )
-
             else -> WithdrawStatusDisplay(
                 titleRes = R.string.titleWithdrawalRequestSent,
                 subtitleRes = R.string.msgWithdrawalReachBank,
@@ -505,143 +621,32 @@ class LoadWalletActivity : BaseActivity() {
         ToastUtil.showSuccess(mActivity, getString(R.string.msgRequestIdCopied))
     }
 
-    private fun loadData() {
-        if (!Utility.isInternetAvailable(mActivity)) {
-            showNoInternet()
-            return
-        }
-        hideNoInternet()
-        fetchWalletData()
-        fetchRecentHistory()
-        fetchBonusWallet()
-        fetchEarningWallet()
-        fetchRewardsLevel()
+    // ── Payment ───────────────────────────────────────────────────────────────
+
+    private fun showPaymentSheet() {
+        sheetBinding.etAmount.setText("")
+        sheetBinding.etDescription.setText("")
+        binding.viewBg.visible()
+        sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    private fun fetchBonusWallet() {
-        showProgressBonus.set(true)
-        viewModel.fetchBonusWallet(
-            onSuccess = { data ->
-                showProgressBonus.set(false)
-                binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet)
-                val referralRows = (data.history ?: emptyList()).filter { it.isReferral }.take(2)
-                updateReferralSection(referralRows)
-            },
-            onError = { msg ->
-                showProgressBonus.set(false)
-                binding.tvBonusBalance.text = "--"
-                ToastUtil.showDelete(mActivity, msg)
-                updateReferralSection(emptyList())
-            }
-        )
+    private fun hidePaymentSheet() {
+        Utility.hideKeyboard(mActivity)
+        sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
-    private fun setupReferralRecyclerView() {
-        referralAdp = ReferralHistoryAdp(mActivity, referralList)
-        binding.rvReferralHistory.apply {
-            layoutManager = LinearLayoutManager(mActivity)
-            adapter = referralAdp
-        }
-    }
-
-    private fun updateReferralSection(rows: List<BonusWalletHistoryItem>) {
-        binding.llReferralSection.visibility = View.VISIBLE
-        referralAdp.updateList(rows)
-        if (rows.isEmpty()) {
-            binding.rvReferralHistory.visibility = View.GONE
-            binding.tvNoReferralHistory.visibility = View.VISIBLE
-        } else {
-            binding.rvReferralHistory.visibility = View.VISIBLE
-            binding.tvNoReferralHistory.visibility = View.GONE
-        }
-    }
-
-    private fun fetchRewardsLevel() {
-        showProgressRewards.set(true)
-        viewModel.fetchRewardsLevel(
-            onSuccess = { data ->
-                showProgressRewards.set(false)
-                populateLevel(data)
-            },
-            onError = {
-                showProgressRewards.set(false)
-                binding.tvTierName.text = "--"
-                binding.ivTierBadge.setImageDrawable(null)
-                binding.tvCashbackPct.text = "--"
-                binding.tvNextLevel.text = "--"
-            }
-        )
-    }
-
-    private fun fetchEarningWallet() {
-        showProgressEarning.set(true)
-        viewModel.fetchEarningWallet(
-            onSuccess = { data ->
-                showProgressEarning.set(false)
-                binding.tvEarningBalance.text = Utility.formatAmount(data.principal)
-            },
-            onError = {
-                showProgressEarning.set(false)
-                binding.tvEarningBalance.text = "--"
-            }
-        )
-    }
-
-    private fun populateLevel(data: RewardsLevelItem) {
-        val tier = RewardsTier.from(data.stage)
-        binding.tvTierName.text = data.label ?: getString(tier.labelRes)
-        binding.tvCashbackPct.text = getString(R.string.labelCashbackPct, data.cashbackPercent ?: 0.0)
-        binding.ivTierBadge.setImageResource(tier.badgeRes)
-
-        val next = data.next
-        val remaining = next?.remaining ?: 0.0
-        binding.tvNextLevel.text = when {
-            remaining > 0 -> getString(R.string.labelMoreToNextLevel, Utility.formatAmount(remaining.toString()))
-            else -> getString(R.string.msgTopTier)
-        }
-
-        val current = next?.current ?: 0.0
-        val target = next?.target ?: 0.0
-        val progress = if (target > 0) (current / target).toFloat().coerceIn(0f, 1f) else 1f
-        animateLevelProgress(progress)
-    }
-
-    private fun animateLevelProgress(progress: Float) {
-        // Start hidden; post waits for layout so width is known before animating
-        binding.viewProgressFill.clipBounds = Rect(0, 0, 0, 0)
-        binding.viewProgressFill.post {
-            val totalWidth = binding.viewProgressFill.width
-            if (totalWidth == 0) return@post
-            ValueAnimator.ofFloat(0f, progress).apply {
-                duration = 1200
-                startDelay = 600
-                interpolator = DecelerateInterpolator()
-                addUpdateListener { anim ->
-                    val w = (totalWidth * (anim.animatedValue as Float)).toInt().coerceAtLeast(0)
-                    binding.viewProgressFill.clipBounds = Rect(0, 0, w, binding.viewProgressFill.height)
-                }
-                start()
-            }
-        }
-    }
+    private fun isPaymentSheetVisible() = sheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
 
     private fun validateAndShowConfirmDialog() {
         if (!Utility.isInternetAvailable(mActivity)) {
             ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
             return
         }
-
         val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
         val description = sheetBinding.etDescription.text?.toString()?.trim() ?: ""
-        if (amountStr.isEmpty()) {
-            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
-            return
-        }
+        if (amountStr.isEmpty()) { ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount)); return }
         val amount = amountStr.toDoubleOrNull()
-        if (amount == null || amount <= 0) {
-            ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
-            return
-        }
+        if (amount == null || amount <= 0) { ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount)); return }
         hidePaymentSheet()
         showConfirmDialog(amount, description)
     }
@@ -673,7 +678,6 @@ class LoadWalletActivity : BaseActivity() {
 
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
-
         dialog.show()
     }
 
@@ -719,49 +723,8 @@ class LoadWalletActivity : BaseActivity() {
         )
     }
 
-    private fun showPaymentSheet() {
-        sheetBinding.etAmount.setText("")
-        sheetBinding.etDescription.setText("")
-        binding.viewBg.visible()
-        sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-    }
+    // ── Wallet Display ────────────────────────────────────────────────────────
 
-    private fun hidePaymentSheet() {
-        Utility.hideKeyboard(mActivity)
-        sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-    }
-
-    private fun isPaymentSheetVisible() = sheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
-
-    private fun fetchWalletData() {
-        viewModel.fetchUserWalletData(
-            onLoading = { showLoading() },
-            onSuccess = { data ->
-                hideLoading()
-                populateWalletData(data)
-            },
-            onError = { msg ->
-                hideLoading()
-                ToastUtil.showDelete(mActivity, msg)
-            }
-        )
-    }
-
-    private fun fetchRecentHistory() {
-        viewModel.fetchRecentHistory(
-            onSuccess = { list ->
-                transactionAdp.updateList(list)
-                updateEmptyState()
-            },
-            onError = { msg ->
-                ToastUtil.showDelete(mActivity, msg)
-                updateEmptyState()
-            }
-        )
-    }
-
-    // Shimmer and balance content belong to the Total Balance tab only — selectTab() re-applies
-    // this state when the user switches tabs mid-load.
     private fun showLoading() {
         isWalletLoading = true
         binding.llTotalBalanceContent.visibility = View.GONE
@@ -778,7 +741,6 @@ class LoadWalletActivity : BaseActivity() {
             if (currentTab == TAB_TOTAL_BALANCE) View.VISIBLE else View.GONE
     }
 
-    // Deferred until the Total Balance tab is visible so the entrance never plays on a hidden view.
     private fun playWalletEntranceIfNeeded() {
         if (isWalletEntrancePlayed || !hasWalletData || currentTab != TAB_TOTAL_BALANCE) return
         isWalletEntrancePlayed = true
@@ -806,24 +768,47 @@ class LoadWalletActivity : BaseActivity() {
         }
     }
 
-    private fun setupRecyclerView() {
-        transactionAdp = WalletTransactionAdp(mActivity, transactionList)
-        transactionAdp.onClickItem = { transactionId ->
-            if (!Utility.stopClick()) TransactionHistoryDetailActivity.start(mActivity, transactionId)
+    private fun populateLevel(data: RewardsLevelItem) {
+        val tier = RewardsTier.from(data.stage)
+        binding.tvTierName.text = data.label ?: getString(tier.labelRes)
+        binding.tvCashbackPct.text = getString(R.string.labelCashbackPct, data.cashbackPercent ?: 0.0)
+        binding.ivTierBadge.setImageResource(tier.badgeRes)
+
+        val next = data.next
+        val remaining = next?.remaining ?: 0.0
+        binding.tvNextLevel.text = when {
+            remaining > 0 -> getString(R.string.labelMoreToNextLevel, Utility.formatAmount(remaining.toString()))
+            else -> getString(R.string.msgTopTier)
         }
-        binding.rvTransactions.apply {
-            layoutManager = LinearLayoutManager(mActivity)
-            adapter = transactionAdp
+
+        val current = next?.current ?: 0.0
+        val target  = next?.target ?: 0.0
+        val progress = if (target > 0) (current / target).toFloat().coerceIn(0f, 1f) else 1f
+        animateLevelProgress(progress)
+    }
+
+    private fun animateLevelProgress(progress: Float) {
+        binding.viewProgressFill.clipBounds = Rect(0, 0, 0, 0)
+        binding.viewProgressFill.post {
+            val totalWidth = binding.viewProgressFill.width
+            if (totalWidth == 0) return@post
+            ValueAnimator.ofFloat(0f, progress).apply {
+                duration = 1200
+                startDelay = 600
+                interpolator = DecelerateInterpolator()
+                addUpdateListener { anim ->
+                    val w = (totalWidth * (anim.animatedValue as Float)).toInt().coerceAtLeast(0)
+                    binding.viewProgressFill.clipBounds = Rect(0, 0, w, binding.viewProgressFill.height)
+                }
+                start()
+            }
         }
-        // Keep both views hidden until fetchRecentHistory() resolves — avoids flashing "No transactions" while loading
-        binding.tvNoTransactions.visibility = View.GONE
-        binding.rvTransactions.visibility = View.GONE
     }
 
     private fun updateEmptyState() {
-        val isEmpty = transactionList.isEmpty()
+        val isEmpty = if (currentRecentTab == RecentTab.WALLET) transactionList.isEmpty() else referralList.isEmpty()
         binding.tvNoTransactions.visibility = if (isEmpty) View.VISIBLE else View.GONE
-        binding.rvTransactions.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        binding.rvTransactions.visibility   = if (isEmpty) View.GONE else View.VISIBLE
     }
 
     private fun selectTab(tab: Int) {
@@ -842,11 +827,13 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvComingSoon.visibility = if (isTotalBalance) View.GONE else View.VISIBLE
     }
 
+    // ── Back ──────────────────────────────────────────────────────────────────
+
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 when {
-                    isPaymentSheetVisible() -> hidePaymentSheet()
+                    isPaymentSheetVisible()  -> hidePaymentSheet()
                     isWithdrawSheetVisible() -> hideWithdrawSheet()
                     else -> {
                         isEnabled = false
@@ -856,6 +843,8 @@ class LoadWalletActivity : BaseActivity() {
             }
         })
     }
+
+    // ── Click Handling ────────────────────────────────────────────────────────
 
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->
@@ -886,14 +875,23 @@ class LoadWalletActivity : BaseActivity() {
                     showWithdrawSheet()
                 }
 
-                binding.llTransactionReport -> {
+                binding.llViewAll -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    WalletTransactionsActivity.start(mActivity)
+                    val tab = if (currentRecentTab == RecentTab.WALLET)
+                        WalletTransactionsActivity.TAB_WALLET
+                    else
+                        WalletTransactionsActivity.TAB_REFERRAL
+                    WalletTransactionsActivity.start(mActivity, tab)
                 }
 
-                binding.llReferralHistoryHeader -> {
+                binding.cvTabWallet -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    ReferralHistoryActivity.start(mActivity)
+                    if (currentRecentTab != RecentTab.WALLET) selectRecentTab(RecentTab.WALLET)
+                }
+
+                binding.cvTabReferralHistory -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (currentRecentTab != RecentTab.REFERRAL) selectRecentTab(RecentTab.REFERRAL)
                 }
 
                 sheetBinding.ivClose -> {

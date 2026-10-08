@@ -168,7 +168,7 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: MunicipalTaxLatestPaymentDataItem) {
-        val amount    = Utility.formatAmount(item.totalPayable ?: item.billAmount)
+        val amount    = Utility.formatAmount(item.billAmount ?: item.totalPayable)
         val consumerNo = item.houseNumber ?: item.subscriberNo ?: "--"
         val txnId     = item.transactionId ?: "--"
         val date      = Utility.formatDate(item.createdAt)

@@ -8,6 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRemoveRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
@@ -87,6 +88,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val fcmToken = SharedPreferenceHelper.getSharedPreferenceString(
             getApplication(), Constant.KEY_FCM_TOKEN, ""
         )?.ifEmpty { null }
+        if (!fcmToken.isNullOrEmpty()) {
+            ApiClient.apiService.removeDeviceToken(bearerToken(), DeviceTokenRemoveRequest(fcmToken))
+                .enqueue(object : Callback<MessageItem> {
+                    override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {}
+                    override fun onFailure(call: Call<MessageItem>, t: Throwable) { t.printStackTrace() }
+                })
+        }
         ApiClient.apiService.logout(bearerToken(), LogoutRequest(fcmToken))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {

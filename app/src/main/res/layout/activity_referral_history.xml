@@ -26,89 +26,177 @@
             app:layout_constraintTop_toTopOf="parent"
             app:onClickListener="@{onClickListener}" />
 
-        <LinearLayout
-            android:id="@+id/llTitle"
+        <!-- Title -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/page_margin_horizontal"
             android:layout_marginTop="@dimen/margin_medium"
             android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:fontFamily="@font/proza_libre_bold"
+            android:includeFontPadding="false"
+            android:text="@string/titleReferralHistory"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_20"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar" />
+
+        <!-- Tab segment — same pattern as MyAccountActivity -->
+        <LinearLayout
+            android:id="@+id/llTabRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+            app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="0dp"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/proza_libre_bold"
-                android:includeFontPadding="false"
-                android:text="@string/titleReferralHistory"
-                android:textColor="@color/primary"
-                android:textSize="@dimen/text_size_20" />
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorPrimary"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="3dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cvTabTransactions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClickListener="@{onClickListener}"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvTabTransactions"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?selectableItemBackground"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:paddingStart="14dp"
+                            android:paddingTop="6dp"
+                            android:paddingEnd="14dp"
+                            android:paddingBottom="6dp"
+                            android:text="@string/tabTransactions"
+                            android:textSize="@dimen/text_size_13" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cvTabReferrals"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="2dp"
+                        android:onClickListener="@{onClickListener}"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvTabReferrals"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?selectableItemBackground"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:includeFontPadding="false"
+                            android:paddingStart="14dp"
+                            android:paddingTop="6dp"
+                            android:paddingEnd="14dp"
+                            android:paddingBottom="6dp"
+                            android:text="@string/tabReferrals"
+                            android:textSize="@dimen/text_size_13" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefresh"
+        <!-- Glass card — transaction report style -->
+        <FrameLayout
+            android:id="@+id/flCard"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginStart="@dimen/page_margin_horizontal"
             android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginEnd="@dimen/page_margin_horizontal"
+            android:layout_marginBottom="@dimen/page_margin_vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/llTitle">
+            app:layout_constraintTop_toBottomOf="@id/llTabRow">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvHistory"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingHorizontal="@dimen/margin_small_medium"
+                android:paddingVertical="@dimen/margin_large"
+                android:scrollbars="none"
+                android:visibility="gone"
+                tools:itemCount="4"
+                tools:listitem="@layout/item_wallet_transaction"
+                tools:visibility="visible" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvHistory"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:clipToPadding="false"
-                    android:overScrollMode="never"
-                    android:paddingHorizontal="@dimen/page_margin_horizontal"
-                    android:paddingVertical="@dimen/margin_medium"
-                    android:scrollbars="none"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:itemCount="4"
-                    tools:listitem="@layout/item_wallet_transaction"
-                    tools:visibility="visible" />
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="@dimen/margin_small_medium"
+                android:paddingVertical="@dimen/margin_large"
+                android:visibility="gone">
 
-                <ProgressBar
-                    android:id="@+id/pbLoading"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:indeterminateTint="@color/primary"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tvEmpty"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/proza_libre_medium"
-                    android:gravity="center"
-                    android:includeFontPadding="false"
-                    android:text="@string/msgNoReferralHistory"
-                    android:textColor="@color/sub_text_color"
-                    android:textSize="@dimen/text_size_14"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                    <include layout="@layout/lyt_shimmer_transaction_item" />
+                </LinearLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <ProgressBar
+                android:id="@+id/pbLoading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/proza_libre_medium"
+                android:includeFontPadding="false"
+                android:gravity="center"
+                android:textColor="@color/sub_text_color"
+                android:textSize="@dimen/text_size_14"
+                android:visibility="gone"
+                tools:text="No transactions found"
+                tools:visibility="gone" />
+
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

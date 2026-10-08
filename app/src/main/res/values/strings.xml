@@ -258,6 +258,9 @@
     <!-- Referral History -->
     <string name="titleReferralHistory">Referral History</string>
     <string name="msgNoReferralHistory">No referral history yet</string>
+    <string name="tabTransactions">Transactions</string>
+    <string name="tabReferrals">Referrals</string>
+    <string name="tabWallet">Wallet</string>
 
     <!-- Transaction Report screen -->
     <string name="titleTransactionReport">Transaction Report</string>

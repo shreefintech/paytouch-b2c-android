@@ -28,6 +28,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityMyRankBinding
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelNextItem
+import com.shreefintech.paytouchconsumer.rewards.viewmodel.RewardsViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import java.util.Locale
