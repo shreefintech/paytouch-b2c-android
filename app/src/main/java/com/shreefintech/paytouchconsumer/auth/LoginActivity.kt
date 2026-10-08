@@ -24,7 +24,6 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.LoginViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoginBinding
 import com.shreefintech.paytouchconsumer.enums.LoginMode
-import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
@@ -47,8 +46,6 @@ class LoginActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        NotificationHelper.requestPermission(mActivity)
-
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
