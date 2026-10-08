@@ -4,6 +4,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.shreefintech.paytouchconsumer.R
+import java.util.Locale
 
 enum class RewardsTier(
     @StringRes val labelRes: Int,
@@ -22,6 +23,25 @@ enum class RewardsTier(
             "gold"     -> GOLD
             "platinum" -> PLATINUM
             else       -> BRONZE
+        }
+
+        /** Ordered lowest → highest. Used to detect a level-up between sessions. */
+        private val allLevels = listOf(
+            "bronze_3", "bronze_2", "bronze_1",
+            "silver_3", "silver_2", "silver_1",
+            "gold_3",   "gold_2",   "gold_1",
+            "platinum"
+        )
+
+        /**
+         * Returns true when [newLevel] is strictly higher than [savedLevel].
+         * Unknown [newLevel] (not in [allLevels]) → never show (safe default).
+         */
+        fun shouldShowLevelUp(newLevel: String?, savedLevel: String?): Boolean {
+            val newIdx = allLevels.indexOf(newLevel?.lowercase(Locale.ROOT).orEmpty())
+            if (newIdx < 0) return false
+            val savedIdx = allLevels.indexOf(savedLevel?.lowercase(Locale.ROOT).orEmpty())
+            return newIdx > savedIdx
         }
     }
 }

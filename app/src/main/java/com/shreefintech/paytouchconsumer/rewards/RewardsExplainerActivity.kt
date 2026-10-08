@@ -98,11 +98,21 @@ class RewardsExplainerActivity : BaseActivity() {
 
         val next = data.next
         if (next == null) {
+            binding.tvProgressNext.text = getString(R.string.msgHighestLevelPermanent)
             animateLevelProgress(1f)
         } else {
             val current = next.current ?: 0.0
             val target  = next.target  ?: 0.0
             val metric  = next.metric?.lowercase() ?: ""
+
+            val amountPart = getString(
+                R.string.labelProgressAmountFormat,
+                progressValueText(current, metric),
+                progressValueWithUnitText(target, metric)
+            )
+            binding.tvProgressNext.text = next.label?.let {
+                getString(R.string.labelProgressToNextFormat, amountPart, it)
+            } ?: amountPart
 
             val progress = if (target > 0) (current / target).toFloat().coerceIn(0f, 1f) else 1f
             animateLevelProgress(progress)
@@ -110,6 +120,19 @@ class RewardsExplainerActivity : BaseActivity() {
 
         selectTierTab(tier)
         markYouBadge(data.label)
+    }
+
+    private fun progressValueText(value: Double, metric: String): String =
+        if (metric == "referrals" || metric.endsWith("days")) value.toLong().toString()
+        else Utility.formatAmount(value.toString(), trimZeros = true)
+
+    private fun progressValueWithUnitText(value: Double, metric: String): String {
+        val n = value.toLong().toInt()
+        return when {
+            metric == "referrals" -> resources.getQuantityString(R.plurals.fmtReferralsCount, n, n)
+            metric.endsWith("days") -> resources.getQuantityString(R.plurals.fmtDaysCount, n, n)
+            else -> Utility.formatAmount(value.toString(), trimZeros = true)
+        }
     }
 
     private fun animateLevelProgress(progress: Float) {

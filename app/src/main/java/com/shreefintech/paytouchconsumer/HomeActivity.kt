@@ -46,7 +46,6 @@ import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
-import com.shreefintech.paytouchconsumer.utill.ToastUtil.showWarning
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
@@ -120,7 +119,10 @@ class HomeActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.checkLevelUp { levelData ->
-            LevelUpActivity.start(mActivity, levelData)
+            // Skip if the user already left Home (e.g. opened a module) before the response arrived.
+            if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                LevelUpActivity.start(mActivity, levelData)
+            }
         }
         if (isNotificationPermissionPending) requestNotificationPermission()
     }
@@ -256,8 +258,7 @@ class HomeActivity : BaseActivity() {
 
                 binding.llFastag -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    showWarning(mActivity, getString(R.string.coming_soon))
-                    // TODO(B2C-212): re-enable FastagActivity once feature is restored
+                    startActivity(Intent(mActivity, FastagActivity::class.java))
                 }
 
                 binding.llLoan -> {
@@ -284,7 +285,7 @@ class HomeActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressLogout.get()) return@OnClickListener
                     if (!Utility.isInternetAvailable(mActivity)) {
-                        showWarning(mActivity, getString(R.string.msgNoInternet), inWindow = false)
+                        ToastUtil.showWarning(mActivity, getString(R.string.msgNoInternet), inWindow = false)
                         return@OnClickListener
                     }
                     viewModel.logout(
@@ -299,7 +300,7 @@ class HomeActivity : BaseActivity() {
                         },
                         onError = { msg ->
                             showProgressLogout.set(false)
-                            showWarning(mActivity, msg, inWindow = false)
+                            ToastUtil.showWarning(mActivity, msg, inWindow = false)
                         }
                     )
                 }

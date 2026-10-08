@@ -132,20 +132,38 @@
     <!--  card shadow tint, used on API 28+ = rgba(213,38,98,0.2)  -->
     <color name="rw_card_shadow">#33D52662</color>
 
-    <color name="rank_primary">#D52662</color>
-    <color name="rank_ink">#2B0B33</color>
-    <color name="rank_muted">#6E5763</color>
-    <color name="rank_card_shadow">#33D52662</color>
     <!--  tier glow / rays tint  -->
     <color name="rank_tint_bronze">#F6AA6E</color>
     <color name="rank_tint_silver">#C8D2E1</color>
     <color name="rank_tint_gold">#FFD65C</color>
     <color name="rank_tint_platinum">#BEAFFF</color>
 
-
-    <color name="rank_primary_light">#FFEEF4</color>
-    <color name="rank_peach">#FCCFA1</color>
-    <color name="rank_white_70">#B3FFFFFF</color>
+    <!--  level-up celebration: tier palette (light / mid / dark / glow)  -->
+    <color name="lu_bronze_light">#F6C29A</color>
+    <color name="lu_bronze_mid">#C2733A</color>
+    <color name="lu_bronze_dark">#7A3A16</color>
+    <color name="lu_bronze_glow">#F6AA6E</color>
+    <color name="lu_silver_light">#F1F4F8</color>
+    <color name="lu_silver_mid">#A3AEBD</color>
+    <color name="lu_silver_dark">#4D5868</color>
+    <color name="lu_silver_glow">#D7E0EC</color>
+    <color name="lu_gold_light">#FFE28F</color>
+    <color name="lu_gold_mid">#E2A51A</color>
+    <color name="lu_gold_dark">#8A5800</color>
+    <color name="lu_gold_glow">#FFD65C</color>
+    <color name="lu_platinum_light">#DDF6FF</color>
+    <color name="lu_platinum_mid">#A08CFF</color>
+    <color name="lu_platinum_dark">#4A2DA6</color>
+    <color name="lu_platinum_glow">#BEAFFF</color>
+    <!--  level-up celebration: platinum title gradient  -->
+    <color name="lu_platinum_title_start">#9AE6FF</color>
+    <color name="lu_platinum_title_mid">#E3C8FF</color>
+    <color name="lu_platinum_title_end">#FFB3D9</color>
+    <!--  level-up celebration: surfaces  -->
+    <color name="lu_pip_off_stroke">#59FFFFFF</color>
+    <color name="lu_pip_off_text">#D9FFFFFF</color>
+    <color name="lu_perm_tile">#EEE9FF</color>
+    <color name="lu_seg_track">#F1E4EA</color>
 
     <!--  cash pill on hero card  -->
     <color name="rank_pill_bg">#1FFFFFFF</color>

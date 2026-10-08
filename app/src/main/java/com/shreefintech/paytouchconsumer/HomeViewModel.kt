@@ -4,6 +4,7 @@ import android.app.Application
 import android.location.Location
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
+import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -12,7 +13,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceToken
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
-import com.shreefintech.paytouchconsumer.rewards.RankTier
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -55,7 +55,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Silently checks /api/level on every Dashboard appear.
-     * Saves the level first so each level shows exactly once.
+     * Saves the level first so each level shows exactly once; the first level seen
+     * after install or login is only recorded, never celebrated.
      * No toast on failure — matches iOS "the level check is silent" spec.
      */
     fun checkLevelUp(onLevelUp: (RewardsLevelItem) -> Unit) {
@@ -75,7 +76,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     SharedPreferenceHelper.setSharedPreferenceString(
                         getApplication(), Constant.KEY_LAST_SEEN_LEVEL, newLevel
                     )
-                    if (RankTier.shouldShowLevelUp(newLevel, saved)) onLevelUp(data)
+                    // First sighting (fresh install / re-login): record the level without celebrating.
+                    if (saved.isEmpty()) return
+                    if (RewardsTier.shouldShowLevelUp(newLevel, saved)) onLevelUp(data)
                 }
 
                 override fun onFailure(call: Call<General<RewardsLevelItem?>>, t: Throwable) {
