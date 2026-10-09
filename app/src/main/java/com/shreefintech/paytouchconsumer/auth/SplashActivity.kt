@@ -56,6 +56,8 @@ class SplashActivity : BaseActivity() {
         setContentView(binding.root)
 
         Glide.with(this).load(R.drawable.paytouch_splash).into(binding.ivSplash)
+        binding.tvAppVersion.text = getString(R.string.labelAppVersion,
+            packageManager.getPackageInfo(packageName, 0).versionName ?: "")
 
         retryCallback = { startFlow() }
 
