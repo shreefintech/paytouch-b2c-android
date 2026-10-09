@@ -331,8 +331,8 @@ object Utility {
     }
 
 
-    var tapFlag = true
-    var LAST_CLICK_TIME: Long = 0
+    @Volatile var tapFlag = true
+    @Volatile var LAST_CLICK_TIME: Long = 0
 
     fun stopClick(): Boolean {
         if (SystemClock.elapsedRealtime() - LAST_CLICK_TIME < 800 && !tapFlag) {
