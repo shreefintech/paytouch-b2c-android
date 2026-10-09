@@ -480,6 +480,14 @@
     <string name="labelAmountZero">₹0.00</string>
     <string name="labelReferralCode">Referral Code</string>
     <string name="labelReferralLink">Referral Link</string>
+    <string name="titleContactUs">Contact Us</string>
+    <string name="msgContactUsSubtitle">We\'re here to help. Reach us anytime.</string>
+    <string name="labelCallUs">Call Us</string>
+    <string name="labelEmailUs">Email Us</string>
+    <string name="supportPhone1">7567525558</string>
+    <string name="supportPhone2">7567525559</string>
+    <string name="supportPhone3">7567525557</string>
+    <string name="supportEmail">info@paytouch.in</string>
     <string name="btnRefresh">Refresh</string>
     <string name="latterI">i</string>
     <string name="idColon">ID:</string>

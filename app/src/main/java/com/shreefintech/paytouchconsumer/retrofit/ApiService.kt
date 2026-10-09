@@ -183,7 +183,8 @@ interface ApiService {
         @Field("email") email: String,
         @Field("password") password: String,
         @Field("password_confirmation") passwordConfirmation: String,
-        @Field("referral_code") referralCode: String
+        @Field("referral_code") referralCode: String,
+        @Field("platform") platform: String
     ): Call<RegisterItem>
 
     // ── Forgot Password OTP flow ──────────────────────────────────────────────

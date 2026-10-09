@@ -61,6 +61,7 @@ class MyAccountActivity : BaseActivity() {
         }
 
         binding.onClickListener = onClickListener()
+        binding.lytToolbar.ivHelp.visibility = View.VISIBLE
         selectTab(TAB_ACCOUNT_INFO, animate = false)
         onBack()
 
@@ -245,6 +246,10 @@ class MyAccountActivity : BaseActivity() {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
+                }
+                binding.lytToolbar.ivHelp -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    ContactUsActivity.start(mActivity)
                 }
                 binding.cvTabAccountInfo -> {
                     if (Utility.stopClick()) return@OnClickListener

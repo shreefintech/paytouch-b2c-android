@@ -1050,6 +1050,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/margin_extra_large"
                             android:gravity="center_vertical"
+                            android:visibility="gone"
                             android:orientation="horizontal">
 
                             <com.google.android.material.card.MaterialCardView

@@ -38,9 +38,7 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityLevelUpBinding
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
-import android.media.AudioAttributes
-import android.media.MediaPlayer
-
+import com.shreefintech.paytouchconsumer.utill.StatusSoundPlayer
 import com.shreefintech.paytouchconsumer.rewards.viewmodel.RewardsViewModel
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -78,7 +76,7 @@ class LevelUpActivity : BaseActivity() {
     private lateinit var binding: ActivityLevelUpBinding
     private val viewModel: RewardsViewModel by viewModels()
     private val running = mutableListOf<Animator>()
-    private var levelUpPlayer: MediaPlayer? = null
+    private val soundPlayer = StatusSoundPlayer()
     private var data: RewardsLevelItem? = null
     private var prevCashback: Double? = null
     private lateinit var palette: Colors
@@ -368,34 +366,9 @@ class LevelUpActivity : BaseActivity() {
         medals().forEach { it.scaleX = 1f; it.scaleY = 1f }
     }
 
-    private fun playSound() {
-        stopSound()
-        try {
-            val afd = resources.openRawResourceFd(R.raw.level_up) ?: return
+    private fun playSound() = soundPlayer.play(this, R.raw.level_up)
 
-            val mp = MediaPlayer()
-            mp.setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build()
-            )
-            mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-            afd.close()
-            mp.setOnPreparedListener { it.start() }
-            mp.setOnCompletionListener { it.release(); levelUpPlayer = null }
-            mp.setOnErrorListener { m, _, _ -> m.release(); levelUpPlayer = null; true }
-            mp.prepareAsync()
-            levelUpPlayer = mp
-        } catch (e: Exception) {
-            Utility.logError(e)
-        }
-    }
-
-    private fun stopSound() {
-        levelUpPlayer?.release()
-        levelUpPlayer = null
-    }
+    private fun stopSound() = soundPlayer.release()
 
     private fun playAll() {
         if (!animationsEnabled()) { showEndState(); return }

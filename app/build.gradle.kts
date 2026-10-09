@@ -103,6 +103,9 @@ dependencies {
     // App lock — phone's own screen lock (fingerprint / face / PIN / pattern)
     implementation("androidx.biometric:biometric:1.1.0")
 
+    // In-app update — force users to update before proceeding past splash
+    implementation("com.google.android.play:app-update:2.1.0")
+
     // In-app review — Google Play rating sheet after a successful bill payment
     implementation("com.google.android.play:review:2.0.2")
 }

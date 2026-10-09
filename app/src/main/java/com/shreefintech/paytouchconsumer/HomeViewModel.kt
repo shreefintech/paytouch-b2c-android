@@ -5,7 +5,6 @@ import android.location.Location
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
-import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -28,7 +27,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         onLoading()
-        NotificationHelper.removeToken(getApplication()) { callLogout(onComplete, onError) }
+        callLogout(onComplete, onError)
     }
 
     /** Fire-and-forget — used for payment risk checks; failures are not shown to the user. */
