@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
@@ -116,19 +117,34 @@ class OtpVerificationActivity : BaseActivity() {
             binding.etOtp1, binding.etOtp2, binding.etOtp3,
             binding.etOtp4, binding.etOtp5, binding.etOtp6
         )
-        boxes.forEachIndexed { index, editText ->
-            editText.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
+        var isDistributing = false
 
+        fun distributeOtp(digits: String) {
+            isDistributing = true
+            boxes.forEachIndexed { i, et ->
+                et.setText(if (i < digits.length) digits[i].toString() else "")
+            }
+            boxes[minOf(digits.length - 1, boxes.lastIndex)].requestFocus()
+            isDistributing = false
+        }
+
+        boxes.forEachIndexed { index, editText ->
+            editText.filters = arrayOf(
+                InputFilter { source, _, _, _, _, _ ->
+                    val digits = source.filter { it.isDigit() }.toString()
+                    when {
+                        digits.length > 1 -> { editText.post { distributeOtp(digits) }; "" }
+                        digits.isEmpty() && source.isNotEmpty() -> ""
+                        else -> null
+                    }
+                },
+                InputFilter.LengthFilter(1)
+            )
+            editText.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
-                    if (s?.length == 1 && index < boxes.lastIndex) {
+                    if (!isDistributing && s?.length == 1 && index < boxes.lastIndex) {
                         boxes[index + 1].requestFocus()
                     }
                 }
@@ -144,9 +160,7 @@ class OtpVerificationActivity : BaseActivity() {
                         prev.text?.clear()
                     }
                     true
-                } else {
-                    false
-                }
+                } else false
             }
         }
     }

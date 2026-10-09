@@ -408,7 +408,7 @@
                                     android:background="@drawable/bg_form_field"
                                     android:fontFamily="@font/proza_libre_medium"
                                     android:hint="@string/hintVehicleNumber"
-                                    android:inputType="textCapCharacters"
+                                    android:inputType="textCapCharacters|textNoSuggestions"
                                     android:padding="@dimen/margin_small_medium"
                                     android:textColor="@color/black"
                                     android:textColorHint="?attr/colorTextHint"
