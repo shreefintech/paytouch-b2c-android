@@ -141,7 +141,7 @@ object NotificationHelper {
                         )
                     } else {
                         // Background call — no toast, but keep the failure visible for debugging
-                        IllegalStateException("registerDeviceToken failed: HTTP ${response.code()}").printStackTrace()
+                        Utility.logError(IllegalStateException("registerDeviceToken failed: HTTP ${response.code()}"))
                     }
                 }
 
@@ -171,7 +171,7 @@ object NotificationHelper {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     if (!response.isSuccessful) {
                         // Background call — no toast, but keep the failure visible for debugging
-                        IllegalStateException("removeDeviceToken failed: HTTP ${response.code()}").printStackTrace()
+                        Utility.logError(IllegalStateException("removeDeviceToken failed: HTTP ${response.code()}"))
                     }
                     onDone()
                 }
