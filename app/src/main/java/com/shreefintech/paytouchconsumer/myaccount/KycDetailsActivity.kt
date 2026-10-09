@@ -99,6 +99,7 @@ class KycDetailsActivity : BaseActivity() {
                 binding.nsvContent.isVisible = false
             },
             onReady = { data ->
+                if (isFinishing || isDestroyed) return@fetchMyAccount
                 binding.pbLoading.isVisible = false
                 binding.nsvContent.isVisible = true
                 populateData(data)

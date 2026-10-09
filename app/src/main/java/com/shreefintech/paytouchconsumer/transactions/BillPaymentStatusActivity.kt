@@ -217,6 +217,7 @@ class BillPaymentStatusActivity : BaseActivity() {
             transactionId = transactionId,
             onLoading = {},
             onSuccess = { item ->
+                if (isFinishing || isDestroyed) return@loadDetail
                 val confirmedStatus = item.status ?: return@loadDetail
                 if (confirmedStatus.uppercase() != statusStr.uppercase()) {
                     isSoundPlayed = false

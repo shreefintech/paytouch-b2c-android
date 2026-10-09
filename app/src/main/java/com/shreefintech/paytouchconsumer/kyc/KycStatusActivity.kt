@@ -72,6 +72,7 @@ class KycStatusActivity : BaseActivity() {
         viewModel.fetchStatus(
             onLoading = {},
             onReady = { item ->
+                if (isFinishing || isDestroyed) return@fetchStatus
                 binding.swipeRefresh.isRefreshing = false
                 renderStatus(item)
             },

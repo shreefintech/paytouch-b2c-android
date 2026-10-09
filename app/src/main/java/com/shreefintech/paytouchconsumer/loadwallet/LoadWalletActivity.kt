@@ -721,6 +721,7 @@ class LoadWalletActivity : BaseActivity() {
         viewModel.fetchUserWalletData(
             onLoading = { showLoading() },
             onSuccess = { data ->
+                if (isFinishing || isDestroyed) return@fetchUserWalletData
                 hideLoading()
                 populateWalletData(data)
             },
