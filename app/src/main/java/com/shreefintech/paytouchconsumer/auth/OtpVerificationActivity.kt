@@ -124,7 +124,10 @@ class OtpVerificationActivity : BaseActivity() {
             boxes.forEachIndexed { i, et ->
                 et.setText(if (i < digits.length) digits[i].toString() else "")
             }
-            boxes[minOf(digits.length - 1, boxes.lastIndex)].requestFocus()
+            // setText() leaves the cursor at 0 — move it past the digit so the first Backspace deletes it
+            val focusBox = boxes[minOf(digits.length - 1, boxes.lastIndex)]
+            focusBox.requestFocus()
+            focusBox.setSelection(focusBox.text?.length ?: 0)
             isDistributing = false
         }
 

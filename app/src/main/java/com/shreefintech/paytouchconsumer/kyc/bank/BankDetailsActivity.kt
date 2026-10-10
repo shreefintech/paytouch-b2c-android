@@ -179,8 +179,10 @@ class BankDetailsActivity : BaseActivity() {
 
         val openPicker = View.OnClickListener {
             if (Utility.stopClick()) return@OnClickListener
-            activeCardIndex = bankCardBindings.indexOf(card)
-            filePickerUtil.showSourceChooser(File(filesDir, Constant.KYC_BANK_DOCS_DIR))
+            // Assign only once the chooser opens — switching card during an in-flight pick would misplace its file
+            if (filePickerUtil.showSourceChooser(File(filesDir, Constant.KYC_BANK_DOCS_DIR))) {
+                activeCardIndex = bankCardBindings.indexOf(card)
+            }
         }
         card.flUpload1.setOnClickListener(openPicker)
         card.ivEditProof1.setOnClickListener(openPicker)

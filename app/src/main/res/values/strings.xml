@@ -151,6 +151,8 @@
     <string name="msgCameraPermissionBlockedDoc">Camera access is blocked. Open Settings → Permissions → Camera and allow it to take a photo</string>
     <string name="msgNoCameraApp">No camera app found on this device</string>
     <string name="msgNoFilePickerApp">No app found to pick files</string>
+    <string name="msgNoBrowserApp">No app found to open this link</string>
+    <string name="msgFileStillProcessing">Please wait, your previous file is still being processed</string>
     <string name="msgReselectDocument">Please select the document again</string>
 
     <!-- Create Virtual Account screen -->

@@ -92,6 +92,8 @@ class FilePickerUtil(activity: AppCompatActivity) {
     private val context: Context = activity
     private val lifecycleOwner: LifecycleOwner = activity
     private var sourceDialog: Dialog? = null
+    // Main-thread only — true from a picked/captured file until its validation or compression reports back
+    private var isProcessing = false
 
     init {
         // Dismiss the source chooser with its Activity so a recreation never leaks its window.
@@ -156,10 +158,12 @@ class FilePickerUtil(activity: AppCompatActivity) {
             }
             val uri = fileProviderUri(file)
             // lifecycleScope: if the Activity is destroyed mid-compression the callback is skipped.
+            isProcessing = true
             lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 Utility.compressImageFile(file, cameraMaxBytes)
                 val sizeBytes = file.length()
                 withContext(Dispatchers.Main) {
+                    isProcessing = false
                     if (sizeBytes > MAX_FILE_SIZE_BYTES) {
                         onError?.invoke(FilePickerError.FileTooLarge)
                     } else {
@@ -235,7 +239,15 @@ class FilePickerUtil(activity: AppCompatActivity) {
         }
     }
 
-    fun showSourceChooser(storageDir: File) {
+    /**
+     * Returns false (and warns) while a previous file is still being validated / compressed — a second pick
+     * would race the first and the caller's "active slot" could receive the wrong file.
+     */
+    fun showSourceChooser(storageDir: File): Boolean {
+        if (isProcessing) {
+            ToastUtil.showWarning(hostActivity, context.getString(R.string.msgFileStillProcessing))
+            return false
+        }
         val dialogBinding = DialogSelectDocumentBinding.inflate(LayoutInflater.from(context))
         sourceDialog?.dismiss()
         val dialog = Dialog(context)
@@ -270,6 +282,7 @@ class FilePickerUtil(activity: AppCompatActivity) {
         dialogBinding.cardCamera.setOnClickListener(onClickListener)
         dialogBinding.cardFiles.setOnClickListener(onClickListener)
         dialog.show()
+        return true
     }
 
     // ─── Validate file ────────────────────────────────────────────────────────
@@ -277,12 +290,14 @@ class FilePickerUtil(activity: AppCompatActivity) {
     private fun validate(uri: Uri) {
         // Cloud providers (Drive / OneDrive) download the file on openFileDescriptor — keep lookups off Main.
         // lifecycleScope: if the Activity is destroyed mid-lookup the callback is skipped.
+        isProcessing = true
         lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val fileName = getFileName(uri)
             val extension = fileName?.substringAfterLast(".", "")?.lowercase()
             // Size only for an allowed extension, so a rejected file is never downloaded
             val fileSizeBytes = if (extension in ALLOWED_EXTENSIONS) getFileSize(uri) else null
             withContext(Dispatchers.Main) {
+                isProcessing = false
                 when {
                     fileName == null || extension == null      -> onError?.invoke(FilePickerError.UnableToReadFile)
                     extension !in ALLOWED_EXTENSIONS           -> onError?.invoke(FilePickerError.InvalidExtension)

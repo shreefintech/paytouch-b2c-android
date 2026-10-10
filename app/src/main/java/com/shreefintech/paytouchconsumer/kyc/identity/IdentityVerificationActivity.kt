@@ -204,8 +204,10 @@ class IdentityVerificationActivity : BaseActivity() {
     }
 
     fun pickDocument(onPicked: (Uri) -> Unit) {
-        onDocumentPicked = onPicked
-        filePickerUtil.showSourceChooser(File(filesDir, Constant.KYC_IDENTITY_DOCS_DIR))
+        // Assign only once the chooser opens — overwriting during an in-flight pick would hand its file to this slot
+        if (filePickerUtil.showSourceChooser(File(filesDir, Constant.KYC_IDENTITY_DOCS_DIR))) {
+            onDocumentPicked = onPicked
+        }
     }
 
     fun captureSelfie(onCaptured: (Uri) -> Unit) {

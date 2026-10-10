@@ -172,7 +172,7 @@ object Utility {
             activity.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
         } catch (e: ActivityNotFoundException) {
             e.printStackTrace()
-            ToastUtil.showDelete(activity, activity.getString(R.string.errGeneric))
+            ToastUtil.showDelete(activity, activity.getString(R.string.msgNoBrowserApp))
         }
     }
 
