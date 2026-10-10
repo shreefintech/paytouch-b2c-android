@@ -1,7 +1,6 @@
 package com.shreefintech.paytouchconsumer.loadwallet
 
 import android.animation.ValueAnimator
-import android.graphics.Rect
 import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -591,21 +590,12 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun animateLevelProgress(progress: Float) {
-        // Start hidden; post waits for layout so width is known before animating
-        binding.viewProgressFill.clipBounds = Rect(0, 0, 0, 0)
-        binding.viewProgressFill.post {
-            val totalWidth = binding.viewProgressFill.width
-            if (totalWidth == 0) return@post
-            ValueAnimator.ofFloat(0f, progress).apply {
-                duration = 1200
-                startDelay = 600
-                interpolator = DecelerateInterpolator()
-                addUpdateListener { anim ->
-                    val w = (totalWidth * (anim.animatedValue as Float)).toInt().coerceAtLeast(0)
-                    binding.viewProgressFill.clipBounds = Rect(0, 0, w, binding.viewProgressFill.height)
-                }
-                start()
-            }
+        ValueAnimator.ofInt(0, (progress * 100).toInt()).apply {
+            duration = 1200
+            startDelay = 600
+            interpolator = DecelerateInterpolator()
+            addUpdateListener { anim -> binding.viewProgressFill.progress = anim.animatedValue as Int }
+            start()
         }
     }
 
@@ -721,6 +711,7 @@ class LoadWalletActivity : BaseActivity() {
         viewModel.fetchUserWalletData(
             onLoading = { showLoading() },
             onSuccess = { data ->
+                if (isFinishing || isDestroyed) return@fetchUserWalletData
                 hideLoading()
                 populateWalletData(data)
             },

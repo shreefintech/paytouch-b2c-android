@@ -122,9 +122,9 @@ class EarningWalletActivity : BaseActivity() {
             val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, maxOf(imeInsets.bottom, systemBars.bottom))
             if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
-            optInSheet.root.setPadding(0, 0, 0, systemBars.bottom)
-            lockSheet.root.setPadding(0, 0, 0, systemBars.bottom)
-            withdrawSheet.root.setPadding(0, 0, 0, systemBars.bottom)
+            optInSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
+            lockSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
+            withdrawSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
             insets
         }
     }
@@ -324,14 +324,12 @@ class EarningWalletActivity : BaseActivity() {
     }
 
     private fun openLockSheet() {
-        val defaultAmountStr = Constant.EARNING_DEFAULT_LOCK_AMOUNT.toString()
-        lockSheet.etLockAmount.setText(defaultAmountStr)
-        lockSheet.etLockAmount.setSelection(defaultAmountStr.length)
+        lockSheet.etLockAmount.text?.clear()
         lockSheet.tvLockWalletBalance.text = Utility.formatAmount(walletBalance)
         val activeDateMs = System.currentTimeMillis() + Constant.EARNING_LOCK_DAYS.toLong() * 24 * 60 * 60 * 1000
         lockSheet.tvStartsEarning.text = getString(R.string.msgStartsEarning, Utility.formatMillis(activeDateMs, "d MMM yyyy"))
         lockSheet.tvLockError.gone()
-        setLockButtonEnabled(walletBalance >= Constant.EARNING_DEFAULT_LOCK_AMOUNT)
+        setLockButtonEnabled(false)
         lockBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 

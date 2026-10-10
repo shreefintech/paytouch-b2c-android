@@ -393,6 +393,8 @@
     <string name="apiErr504">Gateway Timeout</string>
     <string name="apiErr508">Server detected an infinite loop</string>
     <string name="errGeneric">Something went wrong. Please try again.</string>
+    <string name="errNoDialerApp">No app found to make calls</string>
+    <string name="errNoEmailApp">No email app found</string>
     <string name="apiErr422">Unprocessable Content</string>
     <string name="btnFetchBill">Fetch Bill</string>
     <string name="btnSearch">Search</string>
@@ -480,6 +482,10 @@
     <string name="labelAmountZero">₹0.00</string>
     <string name="labelReferralCode">Referral Code</string>
     <string name="labelReferralLink">Referral Link</string>
+    <string name="titleContactUs">Contact Us</string>
+    <string name="msgContactUsSubtitle">We\'re here to help. Reach us anytime.</string>
+    <string name="labelCallUs">Call Us</string>
+    <string name="labelEmailUs">Email Us</string>
     <string name="btnRefresh">Refresh</string>
     <string name="latterI">i</string>
     <string name="idColon">ID:</string>
@@ -937,5 +943,6 @@
     <string name="msgLevelUpSubGold1">₹4,000 locked for 30+ days. Platinum is in sight.</string>
     <string name="msgLevelUpSubPlatinum">90 days in a row at Gold I. This level is yours forever.</string>
     <string name="coming_soon">Coming Soon</string>
+    <string name="labelAppVersion">Version %1$s</string>
 
 </resources>

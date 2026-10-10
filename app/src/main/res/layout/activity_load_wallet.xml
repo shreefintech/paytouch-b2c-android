@@ -470,21 +470,15 @@
                                 </LinearLayout>
 
                                 <!-- Progress bar -->
-                                <com.google.android.material.card.MaterialCardView
+                                <ProgressBar
+                                    android:id="@+id/viewProgressFill"
+                                    style="?android:attr/progressBarStyleHorizontal"
                                     android:layout_width="match_parent"
                                     android:layout_height="5dp"
                                     android:layout_marginTop="10dp"
-                                    app:cardBackgroundColor="@color/progress_track"
-                                    app:cardCornerRadius="3dp"
-                                    app:cardElevation="0dp"
-                                    app:strokeWidth="0dp">
-
-                                    <View
-                                        android:id="@+id/viewProgressFill"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:background="@color/primary" />
-                                </com.google.android.material.card.MaterialCardView>
+                                    android:max="100"
+                                    android:progress="0"
+                                    android:progressDrawable="@drawable/progress_rounded_track" />
 
                                 <!-- Promo / next level text -->
                                 <androidx.appcompat.widget.AppCompatTextView

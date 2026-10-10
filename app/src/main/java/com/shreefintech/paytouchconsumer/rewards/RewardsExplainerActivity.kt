@@ -1,8 +1,10 @@
 package com.shreefintech.paytouchconsumer.rewards
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.animation.DecelerateInterpolator
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -136,12 +138,13 @@ class RewardsExplainerActivity : BaseActivity() {
     }
 
     private fun animateLevelProgress(progress: Float) {
-        binding.viewProgressFill.pivotX = 0f
-        binding.viewProgressFill.animate()
-            .scaleX(progress)
-            .setDuration(1000)
-            .setStartDelay(500)
-            .start()
+        ValueAnimator.ofInt(0, (progress * 100).toInt()).apply {
+            duration = 1000
+            startDelay = 500
+            interpolator = DecelerateInterpolator()
+            addUpdateListener { anim -> binding.viewProgressFill.progress = anim.animatedValue as Int }
+            start()
+        }
     }
 
     // ── All Levels tabs ─────────────────────────────────────────────────────

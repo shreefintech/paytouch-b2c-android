@@ -32,7 +32,7 @@ class CreateAccountViewModel : ViewModel() {
             return
         }
         onLoading()
-        ApiClient.apiService.register(name, mobile, email, password, passwordConfirmation, referralCode)
+        ApiClient.apiService.register(name, mobile, email, password, passwordConfirmation, referralCode, Constant.FCM_PLATFORM_ANDROID)
             .enqueue(object : Callback<RegisterItem> {
                 override fun onResponse(call: Call<RegisterItem>, response: Response<RegisterItem>) {
                     if (response.isSuccessful) {

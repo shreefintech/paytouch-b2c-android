@@ -19,6 +19,7 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.KycDocumentAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycDetailsBinding
+import com.shreefintech.paytouchconsumer.databinding.ItemKycBankAccountBinding
 import com.shreefintech.paytouchconsumer.kyc.bank.model.EditBankPassItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycBankAccountDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDocumentDetailItem
@@ -34,8 +35,6 @@ class KycDetailsActivity : BaseActivity() {
 
     private val documents = mutableListOf<KycDocumentDetailItem>()
     private lateinit var documentAdp: KycDocumentAdp
-
-    private var currentBankAccount: KycBankAccountDetailItem? = null
 
     private val editBankLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -99,6 +98,7 @@ class KycDetailsActivity : BaseActivity() {
                 binding.nsvContent.isVisible = false
             },
             onReady = { data ->
+                if (isFinishing || isDestroyed) return@fetchMyAccount
                 binding.pbLoading.isVisible = false
                 binding.nsvContent.isVisible = true
                 populateData(data)
@@ -142,16 +142,43 @@ class KycDetailsActivity : BaseActivity() {
         val bank = data.bank ?: return
         binding.tvBankStatus.text = statusLabel(bank.status)
         binding.tvBankStatus.setTextColor(statusColor(bank.status))
-        val account = bank.accounts?.firstOrNull() ?: return
-        currentBankAccount = account
-        binding.tvAccountNumber.text = account.accountNumber ?: "--"
-        binding.tvBankName.text = account.bankName ?: "--"
-        binding.tvIfsc.text = account.ifsc ?: "--"
-        binding.tvBranchName.text = account.branchName ?: "--"
 
-        // Show edit button when the server allows edits and the account has an id
-        val canEdit = bank.canEdit == true && account.id != null
-        binding.ivEditBank.isVisible = canEdit
+        val accounts = bank.accounts ?: return
+        val canEdit = bank.canEdit == true
+        binding.llBankAccounts.removeAllViews()
+        accounts.forEachIndexed { index, account ->
+            val item = ItemKycBankAccountBinding.inflate(layoutInflater, binding.llBankAccounts, false)
+            item.tvAccountNumber.text = account.accountNumber ?: "--"
+            item.tvBankName.text = account.bankName ?: "--"
+            item.tvIfsc.text = account.ifsc ?: "--"
+            item.tvBranchName.text = account.branchName ?: "--"
+            if (canEdit && account.id != null) {
+                item.ivEditBank.visibility = View.VISIBLE
+                item.ivEditBank.setOnClickListener {
+                    if (Utility.stopClick()) return@setOnClickListener
+                    onEditBank(account, index)
+                }
+            }
+            binding.llBankAccounts.addView(item.root)
+        }
+    }
+
+    private fun onEditBank(account: KycBankAccountDetailItem, index: Int) {
+        val bankId = account.id ?: return
+        // Account's own URL first; index match is a fallback (list orders are not guaranteed to align)
+        val bankProofUrl = account.bankProofUrl
+            ?: documents.filter { it.documentType == "bank_proof" }.getOrNull(index)?.fileUrl
+        val passItem = EditBankPassItem(
+            bankId            = bankId,
+            isPrimary         = account.isPrimary ?: false,
+            accountHolderName = account.accountHolderName,
+            accountNumber     = account.accountNumber,
+            bankName          = account.bankName,
+            ifsc              = account.ifsc,
+            branchName        = account.branchName,
+            bankProofUrl      = bankProofUrl
+        )
+        editBankLauncher.launch(EditBankDetailsActivity.createIntent(this, passItem))
     }
 
     private fun populateDocuments(data: KycMyAccountItem) {
@@ -233,24 +260,6 @@ class KycDetailsActivity : BaseActivity() {
                     return@OnClickListener
                 }
                 DocPreviewActivity.start(this, url, doc.label ?: "")
-            }
-            binding.ivEditBank -> {
-                if (Utility.stopClick()) return@OnClickListener
-                val account = currentBankAccount ?: return@OnClickListener
-                val bankId = account.id ?: return@OnClickListener
-                val passItem = EditBankPassItem(
-                    bankId            = bankId,
-                    isPrimary         = account.isPrimary ?: false,
-                    accountHolderName = account.accountHolderName,
-                    accountNumber     = account.accountNumber,
-                    bankName          = account.bankName,
-                    ifsc              = account.ifsc,
-                    branchName        = account.branchName,
-                    bankProofUrl      = documents.firstOrNull { it.documentType == "bank_proof" }?.fileUrl ?: account.bankProofUrl
-                )
-
-
-                editBankLauncher.launch(EditBankDetailsActivity.createIntent(this, passItem))
             }
         }
     }

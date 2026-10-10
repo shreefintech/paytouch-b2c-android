@@ -42,8 +42,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     call: Call<General<WalletDataItem>>,
                     response: Response<General<WalletDataItem>>
                 ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        onSuccess(response.body()!!.data!!)
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        onSuccess(data)
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(
@@ -80,8 +81,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 response: Response<General<HdfcOrderItem>>
             ) {
                 val body = response.body()
-                if (response.isSuccessful && body?.data != null) {
-                    onSuccess(body.data!!)
+                val data = body?.data
+                if (response.isSuccessful && data != null) {
+                    onSuccess(data)
                 } else {
                     onError(
                         body?.message ?: ApiHelper.parseErrorMessage(
@@ -133,8 +135,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     call: Call<General<WalletHistoryPageItem>>,
                     response: Response<General<WalletHistoryPageItem>>
                 ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        val rawList = response.body()!!.data!!.data ?: emptyList()
+                    val page = response.body()?.data
+                    if (response.isSuccessful && page != null) {
+                        val rawList = page.data ?: emptyList()
                         val list = ArrayList<WalletTransactionItem>()
                         rawList.forEach { list.add(WalletTransactionItem.from(it)) }
                         onSuccess(list)
@@ -275,8 +278,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 response: Response<General<WithdrawDataItem>>
             ) {
                 val body = response.body()
-                if (response.isSuccessful && body?.data != null) {
-                    onSuccess(body.data!!)
+                val data = body?.data
+                if (response.isSuccessful && data != null) {
+                    onSuccess(data)
                 } else {
                     onError(
                         body?.message ?: ApiHelper.parseErrorMessage(

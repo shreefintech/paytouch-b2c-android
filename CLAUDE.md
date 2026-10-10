@@ -31,6 +31,32 @@ Only present the solution after this check passes.
 
 ---
 
+## Feature & Dependency Removal Rule (Mandatory — No Exceptions)
+
+**Never remove a feature, dependency, module, screen, API endpoint, or any existing functionality without explicit user approval — even in auto mode, even mid-implementation.**
+
+This applies to:
+- Gradle dependencies (removing a library from `build.gradle.kts`)
+- API endpoints (removing from `ApiService` or `ApiAdminService`)
+- Screens, Activities, Fragments, or ViewModels
+- UI elements (buttons, fields, sections of a layout)
+- Business logic, validations, or flows
+- Utility methods, helpers, or shared components
+- Any code path that is currently reachable by the user
+
+**What to do instead:**
+1. Stop mid-implementation if you realize a removal would help or is tempting.
+2. Ask the user: describe what you want to remove and why, then wait for explicit approval.
+3. Only proceed after the user says yes.
+
+This rule applies even when:
+- The code appears unused or dead
+- The removal seems like a simplification or cleanup
+- Auto mode / autonomous mode is active
+- The removal is a side-effect of another task, not the main task
+
+---
+
 ## Code Generation Rule
 
 Write production-ready Kotlin/MVVM Android code — readable, performant, scalable, testable. Reuse existing components, follow SOLID principles, consider lifecycle and threading in every implementation. Never sacrifice code quality for brevity.
@@ -72,7 +98,7 @@ com.shreefintech.paytouchconsumer/
 ├── myaccount/      # My Account — two-tab profile viewer (Account Info + Refer & Earn)
 ├── transactions/   # Shared TransactionDetailActivity + TransactionItem model (never duplicated per module)
 ├── adapter/        # Shared adapters: TransactionAdp, RecentTransactionAdp, PrepaidPlanAdp, DthPlanAdp
-├── fcm/            # Push notifications — MyFirebaseMessagingService + NotificationHelper (channel, token register/remove)
+├── fcm/            # Push notifications — MyFirebaseMessagingService + NotificationHelper (channel, token register)
 │                   # Notification icon = img_paytouch (intentional, works — don't flag)
 ├── location/       # LocationPermissionHelper — disclosure dialog → permission → one foreground fix for payment risk checks
 ├── enums/          # Project-wide enums (LoginMode, etc.)

@@ -14,8 +14,8 @@ android {
         applicationId = "com.shreefintech.paytouchconsumer"
         minSdk = 24
         targetSdk = 37
-        versionCode = 7
-        versionName = "1.6"
+        versionCode = 8
+        versionName = "1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,6 +44,12 @@ android {
             // ponytail: webpdecoder requires uncompressed .so for direct dlopen; remove when zjupure/webpdecoder drops this requirement
             useLegacyPackaging = true
         }
+    }
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -96,6 +102,9 @@ dependencies {
 
     // App lock — phone's own screen lock (fingerprint / face / PIN / pattern)
     implementation("androidx.biometric:biometric:1.1.0")
+
+    // In-app update — force users to update before proceeding past splash
+    implementation("com.google.android.play:app-update:2.1.0")
 
     // In-app review — Google Play rating sheet after a successful bill payment
     implementation("com.google.android.play:review:2.0.2")

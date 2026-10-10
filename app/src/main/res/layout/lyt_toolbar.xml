@@ -37,6 +37,20 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivHelp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_margin="@dimen/margin_medium"
+            android:elevation="15dp"
+            android:onClick="@{onClickListener}"
+            android:src="@drawable/ic_help"
+            android:background="?selectableItemBackgroundBorderless"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <FrameLayout
             android:id="@+id/flLogout"
             android:layout_width="45dp"

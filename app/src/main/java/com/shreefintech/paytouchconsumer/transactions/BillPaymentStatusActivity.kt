@@ -213,10 +213,12 @@ class BillPaymentStatusActivity : BaseActivity() {
     // is already shown; this only upgrades it if the backend confirms a different status.
     private fun fetchConfirmedStatus() {
         if (transactionId == "--") return
+        if (!Utility.isInternetAvailable(mActivity)) return
         detailViewModel.loadDetail(
             transactionId = transactionId,
             onLoading = {},
             onSuccess = { item ->
+                if (isFinishing || isDestroyed) return@loadDetail
                 val confirmedStatus = item.status ?: return@loadDetail
                 if (confirmedStatus.uppercase() != statusStr.uppercase()) {
                     isSoundPlayed = false

@@ -8,9 +8,9 @@ registered with the backend for the logged-in user.
 | File                            | Role                                                                    |
 |---------------------------------|-------------------------------------------------------------------------|
 | `MyFirebaseMessagingService.kt` | FCM service — handles token rotation and incoming messages              |
-| `NotificationHelper.kt`         | Channel, notification display, token register/remove                    |
+| `NotificationHelper.kt`         | Channel, notification display, token register                           |
 
-Related: request DTOs `retrofit/model/notification/DeviceTokenRequest.kt` and `DeviceTokenRemoveRequest.kt`,
+Related: request DTO `retrofit/model/notification/DeviceTokenRequest.kt`,
 keys `KEY_FCM_TOKEN` / `KEY_FCM_TOKEN_AUTHED` / `FCM_PLATFORM_ANDROID` / `FCM_LANGUAGE_DEFAULT` in `Constant.kt`, channel strings
 `labelNotificationChannelId` / `labelNotificationChannel`, and the service + default channel/icon
 meta-data in `AndroidManifest.xml`.
@@ -20,7 +20,6 @@ meta-data in `AndroidManifest.xml`.
 | Method   | Endpoint            | Body                                                        | Response      |
 |----------|---------------------|-------------------------------------------------------------|---------------|
 | `POST`   | `/api/device-token` | `DeviceTokenRequest` (`fcm_token`, `platform`, `device_id`, `language`) | `MessageItem` |
-| `DELETE` | `/api/device-token` | `DeviceTokenRemoveRequest` (`fcm_token`)                    | `MessageItem` |
 
 Bearer token is optional — `null` registers the device without linking to a user. After login,
 `syncToken()` is called again with a bearer token so the server links the device to the account.
@@ -37,7 +36,7 @@ Bearer token is optional — `null` registers the device without linking to a us
 | Home opened (covers already-logged-in users) | `syncToken()`                  | `HomeActivity.onCreate()`       |
 | POST_NOTIFICATIONS permission         | `ActivityResultLauncher`              | `HomeActivity` (after location flow) |
 | FCM rotates the token                 | `syncToken(token)`                    | `onNewToken()`                  |
-| Logout                                | `removeToken()` → then logout API (also sends `fcm_token`) | `HomeViewModel.logout()` |
+| Logout                                | Logout API sends `fcm_token`; backend unlinks the device | `HomeViewModel.logout()` |
 
 ### `syncToken(context, token?)`
 
@@ -47,13 +46,6 @@ links the device to the account. `registerToken()` is `@Synchronized` because `o
 on an FCM worker thread while Login/Home sync on main. Both `KEY_FCM_TOKEN` and
 `KEY_FCM_TOKEN_AUTHED` are wiped by `clearSharedPreference()` on session timeout, and explicitly
 cleared on logout, so the next login always registers as authenticated.
-
-### `removeToken(context, onDone)`
-
-`DELETE /api/device-token` carries a JSON body, so it is declared with
-`@HTTP(method = "DELETE", hasBody = true)` — plain `@DELETE` cannot send a body. Must run
-**before** the logout API, which invalidates the bearer token this call needs. `onDone` always
-runs (success, failure, offline, no saved token) so logout is never blocked.
 
 ### `device_id`
 
@@ -78,7 +70,7 @@ depend on payload fields the backend has not defined.
 
 ## Gotchas
 
-- Session timeout and HTTP 401 clear SharedPreferences without calling `removeToken()` (the bearer
+- Session timeout and HTTP 401 clear SharedPreferences without calling the logout API (the bearer
   token is already invalid). The next login re-registers the same `device_id`.
 - The small icon is `img_paytouch` (intentional, verified working) — used in `NotificationHelper` and the
   manifest meta-data.

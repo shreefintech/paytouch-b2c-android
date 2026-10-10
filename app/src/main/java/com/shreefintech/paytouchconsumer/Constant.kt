@@ -115,4 +115,10 @@ object Constant {
     const val EARNING_LOCK_DAYS = 30
     const val EARNING_DEFAULT_LOCK_AMOUNT = 1000
 
+    // Support contact details
+    const val SUPPORT_PHONE_1 = "7567525558"
+    const val SUPPORT_PHONE_2 = "7567525559"
+    const val SUPPORT_PHONE_3 = "7567525557"
+    const val SUPPORT_EMAIL = "info@paytouch.in"
+
 }

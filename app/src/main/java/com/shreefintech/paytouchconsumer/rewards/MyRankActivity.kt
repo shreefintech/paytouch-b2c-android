@@ -172,8 +172,8 @@ class MyRankActivity : BaseActivity() {
         binding.llBar.isVisible = false
         binding.llCountdown.isVisible = true
 
-        val target  = if ((next.target ?: 0.0) > 0) next.target!!.toInt() else 90
-        val current = if ((next.current ?: 0.0) > 0) next.current!!.toInt() else (platinumDays ?: 0)
+        val target  = if ((next.target ?: 0.0) > 0) next.target?.toInt() ?: 90 else 90
+        val current = if ((next.current ?: 0.0) > 0) next.current?.toInt() ?: (platinumDays ?: 0) else (platinumDays ?: 0)
         val remaining = (target - current).coerceAtLeast(0)
 
         binding.tvRingValue.text = current.toString()

@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/img_screen_bg">
+
+        <include
+            android:id="@+id/lytToolbar"
+            layout="@layout/lyt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onClickListener="@{onClickListener}" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:overScrollMode="never"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lytToolbar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/page_margin_horizontal"
+                android:paddingBottom="@dimen/margin_extra_large">
+
+                <!-- Title -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:fontFamily="@font/proza_libre_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/titleContactUs"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_22" />
+
+                <!-- Subtitle -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_extra_small"
+                    android:fontFamily="@font/proza_libre_regular"
+                    android:includeFontPadding="false"
+                    android:text="@string/msgContactUsSubtitle"
+                    android:textColor="@color/personal_info_label"
+                    android:textSize="@dimen/text_size_13" />
+
+                <!-- Call Us Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin_large">
+
+                        <!-- Call Us header -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelCallUs"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_16" />
+
+                        <View
+                            android:layout_width="@dimen/kyc_gradiant_line_width"
+                            android:layout_height="2dp"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/kyc_gradiant_line" />
+
+                        <!-- Phone 1 -->
+                        <LinearLayout
+                            android:id="@+id/llPhone1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:background="?selectableItemBackground"
+                            android:gravity="center_vertical"
+                            android:onClick="@{onClickListener}"
+                            android:orientation="horizontal"
+                            android:paddingVertical="@dimen/margin_small">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:layout_marginEnd="@dimen/margin_medium"
+                                app:cardBackgroundColor="@color/primary_light"
+                                app:cardCornerRadius="10dp"
+                                app:cardElevation="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="10dp"
+                                    android:src="@drawable/ic_phone"
+                                    android:tint="@color/primary" />
+                            </androidx.cardview.widget.CardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelPhoneNumber"
+                                    android:textColor="@color/personal_info_label"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvPhone1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    tools:text="7567525558"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_right_arrow"
+                                android:tint="@color/primary" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/sheet_divider" />
+
+                        <!-- Phone 2 -->
+                        <LinearLayout
+                            android:id="@+id/llPhone2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="?selectableItemBackground"
+                            android:gravity="center_vertical"
+                            android:onClick="@{onClickListener}"
+                            android:orientation="horizontal"
+                            android:paddingVertical="@dimen/margin_small">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:layout_marginEnd="@dimen/margin_medium"
+                                app:cardBackgroundColor="@color/primary_light"
+                                app:cardCornerRadius="10dp"
+                                app:cardElevation="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="10dp"
+                                    android:src="@drawable/ic_phone"
+                                    android:tint="@color/primary" />
+                            </androidx.cardview.widget.CardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelPhoneNumber"
+                                    android:textColor="@color/personal_info_label"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvPhone2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    tools:text="7567525559"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_right_arrow"
+                                android:tint="@color/primary" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/sheet_divider" />
+
+                        <!-- Phone 3 -->
+                        <LinearLayout
+                            android:id="@+id/llPhone3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="?selectableItemBackground"
+                            android:gravity="center_vertical"
+                            android:onClick="@{onClickListener}"
+                            android:orientation="horizontal"
+                            android:paddingVertical="@dimen/margin_small">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:layout_marginEnd="@dimen/margin_medium"
+                                app:cardBackgroundColor="@color/primary_light"
+                                app:cardCornerRadius="10dp"
+                                app:cardElevation="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="10dp"
+                                    android:src="@drawable/ic_phone"
+                                    android:tint="@color/primary" />
+                            </androidx.cardview.widget.CardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelPhoneNumber"
+                                    android:textColor="@color/personal_info_label"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvPhone3"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    tools:text="7567525557"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_right_arrow"
+                                android:tint="@color/primary" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Email Us Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin_large">
+
+                        <!-- Email Us header -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_bold"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelEmailUs"
+                            android:textColor="@color/primary"
+                            android:textSize="@dimen/text_size_16" />
+
+                        <View
+                            android:layout_width="@dimen/kyc_gradiant_line_width"
+                            android:layout_height="2dp"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/kyc_gradiant_line" />
+
+                        <!-- Email row -->
+                        <LinearLayout
+                            android:id="@+id/llEmail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:background="?selectableItemBackground"
+                            android:gravity="center_vertical"
+                            android:onClick="@{onClickListener}"
+                            android:orientation="horizontal"
+                            android:paddingVertical="@dimen/margin_small">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:layout_marginEnd="@dimen/margin_medium"
+                                app:cardBackgroundColor="@color/primary_light"
+                                app:cardCornerRadius="10dp"
+                                app:cardElevation="0dp">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="10dp"
+                                    android:src="@drawable/ic_email"
+                                    android:tint="@color/primary" />
+                            </androidx.cardview.widget.CardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelEmailAddress"
+                                    android:textColor="@color/personal_info_label"
+                                    android:textSize="@dimen/text_size_11" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvEmail"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    tools:text="info@paytouch.in"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_right_arrow"
+                                android:tint="@color/primary" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
