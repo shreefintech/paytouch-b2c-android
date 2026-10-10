@@ -38,6 +38,10 @@ object PdfThumbnailRepository {
                 renderFirstPage(downloadToCache(url, cacheDir, authHeader))
             } catch (e: Exception) {
                 null
+            } catch (e: OutOfMemoryError) {
+                // No CoroutineExceptionHandler on this scope — an uncaught Error kills the process
+                e.printStackTrace()
+                null
             }
             if (bitmap != null) synchronized(cache) { cache[url] = bitmap }
             withContext(Dispatchers.Main) { onResult(bitmap) }
@@ -79,10 +83,10 @@ object PdfThumbnailRepository {
             try {
                 // Invalid page size — no thumbnail; caller shows its placeholder.
                 if (page.width <= 0 || page.height <= 0) return null
-                val scale = 400f / page.width
+                val scale = Utility.pdfRenderScale(page.width, page.height, 400)
                 val bmp = Bitmap.createBitmap(
-                    (page.width * scale).toInt(),
-                    (page.height * scale).toInt(),
+                    (page.width * scale).toInt().coerceAtLeast(1),
+                    (page.height * scale).toInt().coerceAtLeast(1),
                     Bitmap.Config.ARGB_8888
                 )
                 Canvas(bmp).drawColor(Color.WHITE)

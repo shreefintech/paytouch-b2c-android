@@ -171,7 +171,8 @@ class LevelUpActivity : BaseActivity() {
             return
         }
         viewModel.fetchLevel(
-            onSuccess = { show(it) },
+            // Glide in bind() throws if the screen was closed before the response arrived
+            onSuccess = { if (!isFinishing && !isDestroyed) show(it) },
             onError = { msg -> ToastUtil.showDelete(mActivity, msg); finish() }
         )
     }

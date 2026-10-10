@@ -1,7 +1,9 @@
 package com.shreefintech.paytouchconsumer.utill
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -19,9 +21,11 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
 import androidx.core.widget.NestedScrollView
 import androidx.exifinterface.media.ExifInterface
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -99,12 +103,19 @@ object Utility {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        val network = connectivityManager.activeNetwork ?: return false
+        return try {
+            val network = connectivityManager.activeNetwork ?: return false
 
-        val capabilities =
-            connectivityManager.getNetworkCapabilities(network) ?: return false
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(network) ?: return false
 
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        } catch (e: SecurityException) {
+            // Android 11 platform bug — "Package android does not belong to uid".
+            // Assume online; a real outage still lands in Retrofit onFailure.
+            e.printStackTrace()
+            true
+        }
     }
 
     fun applyImeOverlapPadding(view: View, imeBottom: Int, activity: Activity) {
@@ -155,6 +166,16 @@ object Utility {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
+    /** Opens [url] in an external browser; toasts instead of crashing when no browser is installed or enabled. */
+    fun openUrl(activity: Activity, url: String) {
+        try {
+            activity.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+        } catch (e: ActivityNotFoundException) {
+            e.printStackTrace()
+            ToastUtil.showDelete(activity, activity.getString(R.string.msgNoBrowserApp))
+        }
+    }
+
     /** [trimZeros] drops trailing ".00" — plan cards only; bills and transactions always show paise. */
     fun formatAmount(raw: String?, trimZeros: Boolean = false): String {
         if (raw.isNullOrBlank()) return "-"
@@ -177,12 +198,20 @@ object Utility {
         return "${number.take(4)}*****${number.takeLast(1)}"
     }
 
+    /** Scale that fits a PDF page to [targetWidthPx], capped so tall pages never exceed [Constant.MAX_BITMAP_HEIGHT_PX]. */
+    fun pdfRenderScale(pageWidth: Int, pageHeight: Int, targetWidthPx: Int): Float =
+        minOf(targetWidthPx.toFloat() / pageWidth, Constant.MAX_BITMAP_HEIGHT_PX.toFloat() / pageHeight)
+
     fun renderPdfFirstPage(context: Context, uri: Uri, widthPx: Int = 800): Bitmap? = try {
         context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
             PdfRenderer(pfd).use { renderer ->
                 renderer.openPage(0).use { page ->
-                    val scale = widthPx.toFloat() / page.width
-                    val bmp = createBitmap(widthPx, (page.height * scale).toInt())
+                    if (page.width <= 0 || page.height <= 0) return@use null
+                    val scale = pdfRenderScale(page.width, page.height, widthPx)
+                    val bmp = createBitmap(
+                        (page.width * scale).toInt().coerceAtLeast(1),
+                        (page.height * scale).toInt().coerceAtLeast(1)
+                    )
                     bmp.eraseColor(Color.WHITE)
                     page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     bmp
@@ -191,6 +220,9 @@ object Utility {
         }
     } catch (e: Exception) {
         logError(e)
+        null
+    } catch (e: OutOfMemoryError) {
+        e.printStackTrace()
         null
     }
 

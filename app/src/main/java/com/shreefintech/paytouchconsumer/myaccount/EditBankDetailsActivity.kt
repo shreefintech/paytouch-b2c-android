@@ -244,8 +244,11 @@ class EditBankDetailsActivity : BaseActivity() {
                 val page = renderer.openPage(0)
                 page.use { page ->
                     if (page.width <= 0 || page.height <= 0) return null
-                    val scale = 800f / page.width
-                    val bmp = createBitmap(800, (page.height * scale).toInt())
+                    val scale = Utility.pdfRenderScale(page.width, page.height, 800)
+                    val bmp = createBitmap(
+                        (page.width * scale).toInt().coerceAtLeast(1),
+                        (page.height * scale).toInt().coerceAtLeast(1)
+                    )
                     bmp.eraseColor(Color.WHITE)
                     page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     bmp
@@ -257,6 +260,9 @@ class EditBankDetailsActivity : BaseActivity() {
             }
         } catch (e: Exception) {
             Utility.logError(e)
+            null
+        } catch (e: OutOfMemoryError) {
+            e.printStackTrace()
             null
         }
     }

@@ -87,6 +87,7 @@ class EarningWalletActivity : BaseActivity() {
         lockBehavior = BottomSheetBehavior.from(lockSheet.root)
         lockBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         lockBehavior.addBottomSheetCallback(sheetCallback())
+        lockSheet.tvLockInfo.text = getString(R.string.msgLockInfo, Constant.EARNING_MIN_LOCK_AMOUNT)
 
         withdrawSheet = binding.incSheetWithdraw
         withdrawBehavior = BottomSheetBehavior.from(withdrawSheet.root)
@@ -213,7 +214,7 @@ class EarningWalletActivity : BaseActivity() {
 
         if (interestAccrued > 0.0) {
             binding.cardInterestPill.visible()
-            binding.tvInterestPill.text = "+${Utility.formatAmount(interestAccrued)} ${getString(R.string.labelInterestEarned)}"
+            binding.tvInterestPill.text = getString(R.string.labelInterestEarned, Utility.formatAmount(interestAccrued))
         } else {
             binding.cardInterestPill.gone()
         }
@@ -307,6 +308,7 @@ class EarningWalletActivity : BaseActivity() {
         setWithdrawButtonEnabled(entered > 0.0 && !isOverLimit)
     }
 
+    // Below-minimum is checked on submit in onLock() — a live error would flash while typing "5" on the way to "500"
     private fun updateLockValidation(entered: Double) {
         val isOverBalance = entered > 0.0 && entered > walletBalance
         lockSheet.tvLockError.visibility = if (isOverBalance) View.VISIBLE else View.GONE
@@ -369,6 +371,10 @@ class EarningWalletActivity : BaseActivity() {
         val amount = lockSheet.etLockAmount.text?.toString()?.trim()?.toDoubleOrNull()
         if (amount == null || amount <= 0.0) {
             ToastUtil.showDelete(mActivity, getString(R.string.errMinAmount))
+            return
+        }
+        if (amount < Constant.EARNING_MIN_LOCK_AMOUNT) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errMinLockAmount, Constant.EARNING_MIN_LOCK_AMOUNT))
             return
         }
         if (amount > walletBalance) {
@@ -477,8 +483,9 @@ class EarningWalletActivity : BaseActivity() {
                 }
                 lockSheet.chipLock500 -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    lockSheet.etLockAmount.setText("500")
-                    lockSheet.etLockAmount.setSelection(3)
+                    val amtStr = Constant.EARNING_QUICK_LOCK_AMOUNT.toString()
+                    lockSheet.etLockAmount.setText(amtStr)
+                    lockSheet.etLockAmount.setSelection(amtStr.length)
                 }
                 lockSheet.chipLock1000 -> {
                     if (Utility.stopClick()) return@OnClickListener

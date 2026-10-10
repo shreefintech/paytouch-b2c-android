@@ -343,6 +343,7 @@ amount > 40000           → fee = ₹30
 ### Rules
 - Balance is fetched fresh from the API on every Home/dashboard load
 - `Load Wallet` opens `LoadWalletActivity` which routes to the HDFC payment WebView
+- Earning Wallet lock: minimum `Constant.EARNING_MIN_LOCK_AMOUNT` (₹100), maximum = main wallet balance. Below-minimum is rejected on tap of Lock (toast), not shown live while typing; over-balance shows an inline error and disables the button.
 
 ### API Endpoints
 | Method | Path | Purpose |

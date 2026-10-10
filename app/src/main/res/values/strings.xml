@@ -149,6 +149,10 @@
     <string name="labelPdfOrImage">PDF or image</string>
     <string name="msgCameraPermissionDenied">Camera permission is required to take a photo.</string>
     <string name="msgCameraPermissionBlockedDoc">Camera access is blocked. Open Settings → Permissions → Camera and allow it to take a photo</string>
+    <string name="msgNoCameraApp">No camera app found on this device</string>
+    <string name="msgNoFilePickerApp">No app found to pick files</string>
+    <string name="msgNoBrowserApp">No app found to open this link</string>
+    <string name="msgFileStillProcessing">Please wait, your previous file is still being processed</string>
     <string name="msgReselectDocument">Please select the document again</string>
 
     <!-- Create Virtual Account screen -->
@@ -678,6 +682,7 @@
     <string name="errPdfNoPages">PDF has no pages</string>
     <string name="errCannotRenderPdf">Cannot render PDF: %s</string>
     <string name="errPdfInvalidPageDimensions">invalid page dimensions</string>
+    <string name="errWebViewUnavailable">Android System WebView is unavailable. Please update or enable it from Play Store.</string>
     <string name="errFailedToLoad">Failed to load: %s</string>
     <string name="labelPageIndicator">%1$d / %2$d</string>
     <string name="msgLoading">Loading…</string>
@@ -732,7 +737,7 @@
     <!-- Earning Wallet -->
     <string name="titleEarningWallet">Earning Wallet</string>
     <string name="labelLockedBalance">Locked balance</string>
-    <string name="labelInterestEarned">interest earned</string>
+    <string name="labelInterestEarned">+%1$s interest earned</string>
     <string name="labelEarnRate">Earning 11% a year</string>
     <string name="labelStatusActive">ACTIVE</string>
     <string name="labelStatusLocked">LOCKED</string>
@@ -762,12 +767,13 @@
 
     <!-- Earning Wallet — Lock sheet -->
     <string name="titleLockMoney">Lock money</string>
-    <string name="msgLockInfo">Minimum ₹1. Bonus Wallet money and money held for a payment in progress can\'t be locked.</string>
+    <string name="msgLockInfo">Minimum ₹%1$d. Bonus Wallet money and money held for a payment in progress can\'t be locked.</string>
     <string name="msgStartsEarning">Starts earning 11%% a year on %1$s</string>
     <string name="btnLock">Lock</string>
     <string name="labelAll">All</string>
     <string name="errNotEnoughBalance">Not enough Wallet Balance</string>
     <string name="errExceedsWalletBalance">Amount exceeds your wallet balance</string>
+    <string name="errMinLockAmount">Minimum lock amount is ₹%1$d</string>
 
     <!-- Earning Wallet — Withdraw sheet -->
     <string name="titleWithdrawToWallet">Withdraw to Wallet</string>

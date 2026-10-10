@@ -58,7 +58,7 @@
             android:fontFamily="@font/proza_libre_medium"
             android:hint="@string/hintEmail"
             android:includeFontPadding="false"
-            android:inputType="textEmailAddress"
+            android:inputType="textEmailAddress|textNoSuggestions"
             android:maxLength="100"
             android:maxLines="1"
             android:paddingHorizontal="@dimen/margin_small"
