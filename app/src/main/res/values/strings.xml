@@ -393,6 +393,8 @@
     <string name="apiErr504">Gateway Timeout</string>
     <string name="apiErr508">Server detected an infinite loop</string>
     <string name="errGeneric">Something went wrong. Please try again.</string>
+    <string name="errNoDialerApp">No app found to make calls</string>
+    <string name="errNoEmailApp">No email app found</string>
     <string name="apiErr422">Unprocessable Content</string>
     <string name="btnFetchBill">Fetch Bill</string>
     <string name="btnSearch">Search</string>
@@ -484,10 +486,6 @@
     <string name="msgContactUsSubtitle">We\'re here to help. Reach us anytime.</string>
     <string name="labelCallUs">Call Us</string>
     <string name="labelEmailUs">Email Us</string>
-    <string name="supportPhone1">7567525558</string>
-    <string name="supportPhone2">7567525559</string>
-    <string name="supportPhone3">7567525557</string>
-    <string name="supportEmail">info@paytouch.in</string>
     <string name="btnRefresh">Refresh</string>
     <string name="latterI">i</string>
     <string name="idColon">ID:</string>

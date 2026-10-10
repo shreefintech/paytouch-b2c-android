@@ -165,8 +165,9 @@ class KycDetailsActivity : BaseActivity() {
 
     private fun onEditBank(account: KycBankAccountDetailItem, index: Int) {
         val bankId = account.id ?: return
-        val bankProofUrl = documents.filter { it.documentType == "bank_proof" }
-            .getOrNull(index)?.fileUrl ?: account.bankProofUrl
+        // Account's own URL first; index match is a fallback (list orders are not guaranteed to align)
+        val bankProofUrl = account.bankProofUrl
+            ?: documents.filter { it.documentType == "bank_proof" }.getOrNull(index)?.fileUrl
         val passItem = EditBankPassItem(
             bankId            = bankId,
             isPrimary         = account.isPrimary ?: false,

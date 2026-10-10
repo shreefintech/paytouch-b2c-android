@@ -1,16 +1,20 @@
 package com.shreefintech.paytouchconsumer.myaccount
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.StringRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
+import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityContactUsBinding
+import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 class ContactUsActivity : BaseActivity() {
@@ -33,6 +37,11 @@ class ContactUsActivity : BaseActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        binding.tvPhone1.text = Constant.SUPPORT_PHONE_1
+        binding.tvPhone2.text = Constant.SUPPORT_PHONE_2
+        binding.tvPhone3.text = Constant.SUPPORT_PHONE_3
+        binding.tvEmail.text  = Constant.SUPPORT_EMAIL
 
         binding.onClickListener = onClickListener()
         onBack()
@@ -74,12 +83,21 @@ class ContactUsActivity : BaseActivity() {
     }
 
     private fun dialPhone(number: String) {
-        startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$number")))
+        launchExternal(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$number")), R.string.errNoDialerApp)
     }
 
     private fun openEmail(address: String) {
-        startActivity(Intent(Intent.ACTION_SENDTO).apply {
+        launchExternal(Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:$address")
-        })
+        }, R.string.errNoEmailApp)
+    }
+
+    private fun launchExternal(intent: Intent, @StringRes errorRes: Int) {
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            e.printStackTrace()
+            ToastUtil.showWarning(mActivity, getString(errorRes))
+        }
     }
 }

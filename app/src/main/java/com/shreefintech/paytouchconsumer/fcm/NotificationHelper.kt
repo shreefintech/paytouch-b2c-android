@@ -19,7 +19,6 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.SplashActivity
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
-import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRemoveRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper.bearerToken
@@ -148,37 +147,6 @@ object NotificationHelper {
                 override fun onFailure(call: Call<MessageItem>, t: Throwable) {
                     pendingToken = null
                     t.printStackTrace()
-                }
-            })
-    }
-
-    /**
-     * Unlinks this device's FCM token from the logged-in user (DELETE /api/device-token).
-     * Must run before the logout API — logout invalidates the bearer token this call needs.
-     * [onDone] always runs (success, failure, offline, no token) so logout is never blocked.
-     */
-    fun removeToken(context: Context, onDone: () -> Unit) {
-        val appContext = context.applicationContext
-        val token = SharedPreferenceHelper.getSharedPreferenceString(
-            appContext, Constant.KEY_FCM_TOKEN, ""
-        ).orEmpty()
-        if (token.isEmpty() || !Utility.isInternetAvailable(appContext)) {
-            onDone()
-            return
-        }
-        ApiClient.apiService.removeDeviceToken(bearerToken(appContext), DeviceTokenRemoveRequest(token))
-            .enqueue(object : Callback<MessageItem> {
-                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
-                    if (!response.isSuccessful) {
-                        // Background call — no toast, but keep the failure visible for debugging
-                        Utility.logError(IllegalStateException("removeDeviceToken failed: HTTP ${response.code()}"))
-                    }
-                    onDone()
-                }
-
-                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
-                    t.printStackTrace()
-                    onDone()
                 }
             })
     }

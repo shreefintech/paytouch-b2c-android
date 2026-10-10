@@ -15,6 +15,7 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.BuildConfig
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
@@ -43,9 +44,14 @@ class SplashActivity : BaseActivity() {
 
     private val updateLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
-    ) { _ ->
-        // IMMEDIATE update finished (completed, cancelled, or failed) — proceed with startup
+    ) { result ->
         updateLaunching = false
+        if (result.resultCode == RESULT_CANCELED) {
+            // User declined a mandatory update — close; the prompt shows again on next launch
+            finishAffinity()
+            return@registerForActivityResult
+        }
+        // RESULT_OK or RESULT_IN_APP_UPDATE_FAILED — never lock users out on a Play-side error
         updateCheckDone = true
         startFlow()
     }
@@ -56,8 +62,7 @@ class SplashActivity : BaseActivity() {
         setContentView(binding.root)
 
         Glide.with(this).load(R.drawable.paytouch_splash).into(binding.ivSplash)
-        binding.tvAppVersion.text = getString(R.string.labelAppVersion,
-            packageManager.getPackageInfo(packageName, 0).versionName ?: "")
+        binding.tvAppVersion.text = getString(R.string.labelAppVersion, BuildConfig.VERSION_NAME)
 
         retryCallback = { startFlow() }
 
@@ -67,7 +72,7 @@ class SplashActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (updateCheckDone || updateLaunching) return
+        if (updateCheckDone || updateLaunching || isFinishing) return
         // Re-prompt if a previous IMMEDIATE update was started but the activity was recreated mid-flow
         appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
             if (!updateCheckDone && !updateLaunching &&
