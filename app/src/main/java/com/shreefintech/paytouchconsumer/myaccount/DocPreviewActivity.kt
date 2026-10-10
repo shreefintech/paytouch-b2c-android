@@ -174,7 +174,7 @@ class DocPreviewActivity : BaseActivity() {
                 .asBitmap()
                 .load(url)
                 .downsample(DownsampleStrategy.CENTER_INSIDE)
-                .into(object : CustomTarget<Bitmap>(maxWidth, Constant.PDF_MAX_BITMAP_HEIGHT_PX) {
+                .into(object : CustomTarget<Bitmap>(maxWidth, Constant.MAX_BITMAP_HEIGHT_PX) {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         showLoading(false)
                         scaleFactor = 1f

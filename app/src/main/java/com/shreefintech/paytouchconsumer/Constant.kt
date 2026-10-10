@@ -59,8 +59,8 @@ object Constant {
     const val KYC_BANK_DOCS_DIR = "kyc_docs/bank"
     const val KYC_IMAGE_MAX_BYTES = 800 * 1024
 
-    // PDF page bitmaps — tall pages (long statements) otherwise allocate 100 MB+ and crash on draw
-    const val PDF_MAX_BITMAP_HEIGHT_PX = 4096
+    // Max decoded bitmap height (PDF pages, preview images) — tall pages / huge images otherwise allocate 100 MB+ and crash on draw
+    const val MAX_BITMAP_HEIGHT_PX = 4096
 
     // External URLs
     const val URL_PLATFORM_TERMS = "https://www.paytouch.in/terms/platform"
@@ -116,6 +116,7 @@ object Constant {
 
     // Earning Wallet
     const val EARNING_LOCK_DAYS = 30
+    const val EARNING_QUICK_LOCK_AMOUNT = 500
     const val EARNING_DEFAULT_LOCK_AMOUNT = 1000
     const val EARNING_MIN_LOCK_AMOUNT = 100
 

@@ -1,7 +1,9 @@
 package com.shreefintech.paytouchconsumer.utill
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -19,6 +21,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
 import androidx.core.widget.NestedScrollView
 import androidx.exifinterface.media.ExifInterface
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -163,6 +166,16 @@ object Utility {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
+    /** Opens [url] in an external browser; toasts instead of crashing when no browser is installed or enabled. */
+    fun openUrl(activity: Activity, url: String) {
+        try {
+            activity.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+        } catch (e: ActivityNotFoundException) {
+            e.printStackTrace()
+            ToastUtil.showDelete(activity, activity.getString(R.string.errGeneric))
+        }
+    }
+
     /** [trimZeros] drops trailing ".00" — plan cards only; bills and transactions always show paise. */
     fun formatAmount(raw: String?, trimZeros: Boolean = false): String {
         if (raw.isNullOrBlank()) return "-"
@@ -185,9 +198,9 @@ object Utility {
         return "${number.take(4)}*****${number.takeLast(1)}"
     }
 
-    /** Scale that fits a PDF page to [targetWidthPx], capped so tall pages never exceed [Constant.PDF_MAX_BITMAP_HEIGHT_PX]. */
+    /** Scale that fits a PDF page to [targetWidthPx], capped so tall pages never exceed [Constant.MAX_BITMAP_HEIGHT_PX]. */
     fun pdfRenderScale(pageWidth: Int, pageHeight: Int, targetWidthPx: Int): Float =
-        minOf(targetWidthPx.toFloat() / pageWidth, Constant.PDF_MAX_BITMAP_HEIGHT_PX.toFloat() / pageHeight)
+        minOf(targetWidthPx.toFloat() / pageWidth, Constant.MAX_BITMAP_HEIGHT_PX.toFloat() / pageHeight)
 
     fun renderPdfFirstPage(context: Context, uri: Uri, widthPx: Int = 800): Bitmap? = try {
         context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->

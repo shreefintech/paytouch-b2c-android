@@ -130,12 +130,13 @@ class OtpVerificationActivity : BaseActivity() {
 
         boxes.forEachIndexed { index, editText ->
             editText.filters = arrayOf(
-                InputFilter { source, _, _, _, _, _ ->
-                    val digits = source.filter { it.isDigit() }.toString()
+                InputFilter { source, start, end, _, _, _ ->
+                    val sub = source.subSequence(start, end)
+                    val digits = sub.filter { it.isDigit() }.toString()
                     when {
                         digits.length > 1 -> { editText.post { distributeOtp(digits) }; "" }
-                        digits.isEmpty() && source.isNotEmpty() -> ""
-                        else -> null
+                        digits.length == sub.length -> null
+                        else -> digits
                     }
                 },
                 InputFilter.LengthFilter(1)

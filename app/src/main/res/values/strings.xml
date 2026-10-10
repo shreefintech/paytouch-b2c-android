@@ -735,7 +735,7 @@
     <!-- Earning Wallet -->
     <string name="titleEarningWallet">Earning Wallet</string>
     <string name="labelLockedBalance">Locked balance</string>
-    <string name="labelInterestEarned">interest earned</string>
+    <string name="labelInterestEarned">+%1$s interest earned</string>
     <string name="labelEarnRate">Earning 11% a year</string>
     <string name="labelStatusActive">ACTIVE</string>
     <string name="labelStatusLocked">LOCKED</string>
@@ -765,7 +765,7 @@
 
     <!-- Earning Wallet — Lock sheet -->
     <string name="titleLockMoney">Lock money</string>
-    <string name="msgLockInfo">Minimum ₹100. Bonus Wallet money and money held for a payment in progress can\'t be locked.</string>
+    <string name="msgLockInfo">Minimum ₹%1$d. Bonus Wallet money and money held for a payment in progress can\'t be locked.</string>
     <string name="msgStartsEarning">Starts earning 11%% a year on %1$s</string>
     <string name="btnLock">Lock</string>
     <string name="labelAll">All</string>

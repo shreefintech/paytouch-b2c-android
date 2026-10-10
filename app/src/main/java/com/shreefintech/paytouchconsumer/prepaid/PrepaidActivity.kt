@@ -1,6 +1,5 @@
 package com.shreefintech.paytouchconsumer.prepaid
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -42,7 +41,6 @@ import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
-import androidx.core.net.toUri
 import android.widget.LinearLayout
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
 
@@ -179,12 +177,7 @@ class PrepaidActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    try {
-                        startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
-                    } catch (e: ActivityNotFoundException) {
-                        e.printStackTrace()
-                        ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
-                    }
+                    Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)

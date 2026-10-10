@@ -1,6 +1,5 @@
 package com.shreefintech.paytouchconsumer.earningwallet
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -88,6 +87,7 @@ class EarningWalletActivity : BaseActivity() {
         lockBehavior = BottomSheetBehavior.from(lockSheet.root)
         lockBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         lockBehavior.addBottomSheetCallback(sheetCallback())
+        lockSheet.tvLockInfo.text = getString(R.string.msgLockInfo, Constant.EARNING_MIN_LOCK_AMOUNT)
 
         withdrawSheet = binding.incSheetWithdraw
         withdrawBehavior = BottomSheetBehavior.from(withdrawSheet.root)
@@ -203,7 +203,6 @@ class EarningWalletActivity : BaseActivity() {
 
     // region Populate UI
 
-    @SuppressLint("SetTextI18n")
     private fun populateEarningWallet(item: EarningWalletItem) {
         isDataLoaded = true
         isOptedIn = item.optedIn == true
@@ -215,7 +214,7 @@ class EarningWalletActivity : BaseActivity() {
 
         if (interestAccrued > 0.0) {
             binding.cardInterestPill.visible()
-            binding.tvInterestPill.text = "+${Utility.formatAmount(interestAccrued)} ${getString(R.string.labelInterestEarned)}"
+            binding.tvInterestPill.text = getString(R.string.labelInterestEarned, Utility.formatAmount(interestAccrued))
         } else {
             binding.cardInterestPill.gone()
         }
@@ -309,15 +308,11 @@ class EarningWalletActivity : BaseActivity() {
         setWithdrawButtonEnabled(entered > 0.0 && !isOverLimit)
     }
 
+    // Below-minimum is checked on submit in onLock() — a live error would flash while typing "5" on the way to "500"
     private fun updateLockValidation(entered: Double) {
-        val isUnderMin = entered > 0.0 && entered < Constant.EARNING_MIN_LOCK_AMOUNT
         val isOverBalance = entered > 0.0 && entered > walletBalance
-        when {
-            isOverBalance -> lockSheet.tvLockError.text = getString(R.string.errNotEnoughBalance)
-            isUnderMin -> lockSheet.tvLockError.text = getString(R.string.errMinLockAmount, Constant.EARNING_MIN_LOCK_AMOUNT)
-        }
-        lockSheet.tvLockError.visibility = if (isOverBalance || isUnderMin) View.VISIBLE else View.GONE
-        setLockButtonEnabled(entered >= Constant.EARNING_MIN_LOCK_AMOUNT && !isOverBalance)
+        lockSheet.tvLockError.visibility = if (isOverBalance) View.VISIBLE else View.GONE
+        setLockButtonEnabled(entered > 0.0 && !isOverBalance)
     }
 
     // endregion
@@ -455,7 +450,6 @@ class EarningWalletActivity : BaseActivity() {
         })
     }
 
-    @SuppressLint("SetTextI18n")
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->
             when (view) {
@@ -489,8 +483,9 @@ class EarningWalletActivity : BaseActivity() {
                 }
                 lockSheet.chipLock500 -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    lockSheet.etLockAmount.setText("500")
-                    lockSheet.etLockAmount.setSelection(3)
+                    val amtStr = Constant.EARNING_QUICK_LOCK_AMOUNT.toString()
+                    lockSheet.etLockAmount.setText(amtStr)
+                    lockSheet.etLockAmount.setSelection(amtStr.length)
                 }
                 lockSheet.chipLock1000 -> {
                     if (Utility.stopClick()) return@OnClickListener

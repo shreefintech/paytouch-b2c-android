@@ -1,6 +1,5 @@
 package com.shreefintech.paytouchconsumer.postpaid
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -40,7 +39,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperato
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
-import androidx.core.net.toUri
 import android.widget.LinearLayout
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
 
@@ -168,12 +166,7 @@ class PostpaidActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    try {
-                        startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
-                    } catch (e: ActivityNotFoundException) {
-                        e.printStackTrace()
-                        ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
-                    }
+                    Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)

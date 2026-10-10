@@ -141,6 +141,7 @@
                     android:background="@null"
                     android:fontFamily="@font/proza_libre_regular"
                     android:hint="@string/hintPaymentDescription"
+                    android:inputType="textNoSuggestions"
                     android:paddingHorizontal="@dimen/margin_large"
                     android:singleLine="true"
                     android:imeOptions="actionDone"
