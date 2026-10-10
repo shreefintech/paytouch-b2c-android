@@ -58,7 +58,15 @@ class HdfcWebViewActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityHdfcWebViewBinding.inflate(layoutInflater)
+        binding = try {
+            ActivityHdfcWebViewBinding.inflate(layoutInflater)
+        } catch (e: Exception) {
+            // System WebView missing / disabled / mid-update — WebView constructor throws during inflate
+            e.printStackTrace()
+            ToastUtil.showDelete(mActivity, getString(R.string.errWebViewUnavailable), inWindow = false)
+            finish()
+            return
+        }
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -87,8 +95,10 @@ class HdfcWebViewActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        binding.webView.stopLoading()
-        binding.webView.destroy()
+        if (::binding.isInitialized) {
+            binding.webView.stopLoading()
+            binding.webView.destroy()
+        }
         super.onDestroy()
     }
 

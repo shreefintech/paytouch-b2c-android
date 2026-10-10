@@ -52,7 +52,11 @@ class LoanRecentTransactionViewModel(application: Application) : AndroidViewMode
                     call: Call<General<LoanOperatorsDataItem>>,
                     response: Response<General<LoanOperatorsDataItem>>
                 ) {
-                    response.body()?.data?.operators?.let { operatorMap.putAll(it) }
+                    // Gson can put null values into a non-null-typed Map — skip them so operatorMap[id]!! stays safe
+                    response.body()?.data?.operators?.forEach { (id, name) ->
+                        @Suppress("SENSELESS_COMPARISON")
+                        if (name != null) operatorMap[id] = name
+                    }
                     fetchTransactions(onSuccess, onError)
                 }
 

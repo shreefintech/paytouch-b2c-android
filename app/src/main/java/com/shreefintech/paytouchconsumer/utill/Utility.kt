@@ -22,6 +22,7 @@ import androidx.core.graphics.createBitmap
 import androidx.core.widget.NestedScrollView
 import androidx.exifinterface.media.ExifInterface
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -99,12 +100,19 @@ object Utility {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        val network = connectivityManager.activeNetwork ?: return false
+        return try {
+            val network = connectivityManager.activeNetwork ?: return false
 
-        val capabilities =
-            connectivityManager.getNetworkCapabilities(network) ?: return false
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(network) ?: return false
 
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        } catch (e: SecurityException) {
+            // Android 11 platform bug — "Package android does not belong to uid".
+            // Assume online; a real outage still lands in Retrofit onFailure.
+            e.printStackTrace()
+            true
+        }
     }
 
     fun applyImeOverlapPadding(view: View, imeBottom: Int, activity: Activity) {
@@ -177,12 +185,20 @@ object Utility {
         return "${number.take(4)}*****${number.takeLast(1)}"
     }
 
+    /** Scale that fits a PDF page to [targetWidthPx], capped so tall pages never exceed [Constant.PDF_MAX_BITMAP_HEIGHT_PX]. */
+    fun pdfRenderScale(pageWidth: Int, pageHeight: Int, targetWidthPx: Int): Float =
+        minOf(targetWidthPx.toFloat() / pageWidth, Constant.PDF_MAX_BITMAP_HEIGHT_PX.toFloat() / pageHeight)
+
     fun renderPdfFirstPage(context: Context, uri: Uri, widthPx: Int = 800): Bitmap? = try {
         context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
             PdfRenderer(pfd).use { renderer ->
                 renderer.openPage(0).use { page ->
-                    val scale = widthPx.toFloat() / page.width
-                    val bmp = createBitmap(widthPx, (page.height * scale).toInt())
+                    if (page.width <= 0 || page.height <= 0) return@use null
+                    val scale = pdfRenderScale(page.width, page.height, widthPx)
+                    val bmp = createBitmap(
+                        (page.width * scale).toInt().coerceAtLeast(1),
+                        (page.height * scale).toInt().coerceAtLeast(1)
+                    )
                     bmp.eraseColor(Color.WHITE)
                     page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     bmp
@@ -191,6 +207,9 @@ object Utility {
         }
     } catch (e: Exception) {
         logError(e)
+        null
+    } catch (e: OutOfMemoryError) {
+        e.printStackTrace()
         null
     }
 

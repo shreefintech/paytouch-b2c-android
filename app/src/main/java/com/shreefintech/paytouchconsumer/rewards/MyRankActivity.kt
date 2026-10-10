@@ -85,13 +85,16 @@ class MyRankActivity : BaseActivity() {
 
         viewModel.fetchLevel(
             onSuccess = { data ->
-                binding.shimmerLayout.stopShimmer()
-                binding.shimmerLayout.visibility = View.GONE
-                levelData = data
-                bind(data)
-                binding.llContent.visibility = View.VISIBLE
-                startLoops()
-                playEntrance()
+                // Back during the shimmer destroys the screen — Glide in bind() throws on a destroyed Activity
+                if (!isFinishing && !isDestroyed) {
+                    binding.shimmerLayout.stopShimmer()
+                    binding.shimmerLayout.visibility = View.GONE
+                    levelData = data
+                    bind(data)
+                    binding.llContent.visibility = View.VISIBLE
+                    startLoops()
+                    playEntrance()
+                }
             },
             onError = { msg ->
                 binding.shimmerLayout.stopShimmer()

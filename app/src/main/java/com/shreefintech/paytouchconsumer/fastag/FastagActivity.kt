@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.fastag
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -152,7 +153,12 @@ class FastagActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    } catch (e: ActivityNotFoundException) {
+                        e.printStackTrace()
+                        ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                    }
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)

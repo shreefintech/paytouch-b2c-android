@@ -63,6 +63,8 @@ class FilePickerUtil(activity: AppCompatActivity) {
         object UnableToReadFile : FilePickerError()
         object CameraPermissionDenied : FilePickerError()
         object CameraPermissionBlocked : FilePickerError()
+        object CameraUnavailable : FilePickerError()
+        object FilePickerUnavailable : FilePickerError()
     }
 
     // ─── Config ───────────────────────────────────────────────────────────────
@@ -185,7 +187,13 @@ class FilePickerUtil(activity: AppCompatActivity) {
     // ─── Open picker ──────────────────────────────────────────────────────────
 
     fun openPicker() {
-        fileLauncher.launch("*/*")
+        try {
+            fileLauncher.launch("*/*")
+        } catch (e: ActivityNotFoundException) {
+            // Kiosk / MDM builds can disable the system document picker
+            e.printStackTrace()
+            onError?.invoke(FilePickerError.FilePickerUnavailable)
+        }
     }
 
     fun openCamera(storageDir: File) {
@@ -203,7 +211,15 @@ class FilePickerUtil(activity: AppCompatActivity) {
         storageDir.mkdirs()
         val file = File(storageDir, "doc_${System.currentTimeMillis()}.jpg")
         cameraOutputFile = file
-        cameraLauncher.launch(fileProviderUri(file))
+        try {
+            cameraLauncher.launch(fileProviderUri(file))
+        } catch (e: ActivityNotFoundException) {
+            // Camera is optional in the manifest — camera-less or MDM-restricted devices have no capture app
+            e.printStackTrace()
+            cameraOutputFile = null
+            file.delete()
+            onError?.invoke(FilePickerError.CameraUnavailable)
+        }
     }
 
     private fun fileProviderUri(file: File): Uri =
@@ -259,27 +275,23 @@ class FilePickerUtil(activity: AppCompatActivity) {
     // ─── Validate file ────────────────────────────────────────────────────────
 
     private fun validate(uri: Uri) {
-        val fileName = getFileName(uri) ?: run {
-            onError?.invoke(FilePickerError.UnableToReadFile)
-            return
+        // Cloud providers (Drive / OneDrive) download the file on openFileDescriptor — keep lookups off Main.
+        // lifecycleScope: if the Activity is destroyed mid-lookup the callback is skipped.
+        lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val fileName = getFileName(uri)
+            val extension = fileName?.substringAfterLast(".", "")?.lowercase()
+            // Size only for an allowed extension, so a rejected file is never downloaded
+            val fileSizeBytes = if (extension in ALLOWED_EXTENSIONS) getFileSize(uri) else null
+            withContext(Dispatchers.Main) {
+                when {
+                    fileName == null || extension == null      -> onError?.invoke(FilePickerError.UnableToReadFile)
+                    extension !in ALLOWED_EXTENSIONS           -> onError?.invoke(FilePickerError.InvalidExtension)
+                    fileSizeBytes == null                      -> onError?.invoke(FilePickerError.UnableToReadFile)
+                    fileSizeBytes > MAX_FILE_SIZE_BYTES        -> onError?.invoke(FilePickerError.FileTooLarge)
+                    else -> onSuccess?.invoke(FileResult(uri, fileName, extension, fileSizeBytes / (1024.0 * 1024.0)))
+                }
+            }
         }
-
-        val extension = fileName.substringAfterLast(".", "").lowercase()
-        if (extension !in ALLOWED_EXTENSIONS) {
-            onError?.invoke(FilePickerError.InvalidExtension)
-            return
-        }
-
-        val fileSizeBytes = getFileSize(uri) ?: run {
-            onError?.invoke(FilePickerError.UnableToReadFile)
-            return
-        }
-        if (fileSizeBytes > MAX_FILE_SIZE_BYTES) {
-            onError?.invoke(FilePickerError.FileTooLarge)
-            return
-        }
-
-        onSuccess?.invoke(FileResult(uri, fileName, extension, fileSizeBytes / (1024.0 * 1024.0)))
     }
 
     // ─── Get file name ────────────────────────────────────────────────────────
@@ -287,11 +299,16 @@ class FilePickerUtil(activity: AppCompatActivity) {
     private fun getFileName(uri: Uri): String? {
         var name: String? = null
         if (uri.scheme == "content") {
-            context.contentResolver.query(uri, null, null, null, null)?.use {
-                if (it.moveToFirst()) {
-                    val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    if (index != -1) name = it.getString(index)
+            try {
+                context.contentResolver.query(uri, null, null, null, null)?.use {
+                    if (it.moveToFirst()) {
+                        val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                        if (index != -1) name = it.getString(index)
+                    }
                 }
+            } catch (e: Exception) {
+                // Third-party document providers can refuse the query (Security / IllegalArgument / Unsupported)
+                e.printStackTrace()
             }
         }
         return name ?: uri.path?.substringAfterLast("/")
@@ -302,11 +319,16 @@ class FilePickerUtil(activity: AppCompatActivity) {
     private fun getFileSize(uri: Uri): Long? {
         var size = 0L
         if (uri.scheme == "content") {
-            context.contentResolver.query(uri, null, null, null, null)?.use {
-                if (it.moveToFirst()) {
-                    val index = it.getColumnIndex(OpenableColumns.SIZE)
-                    if (index != -1) size = it.getLong(index)
+            try {
+                context.contentResolver.query(uri, null, null, null, null)?.use {
+                    if (it.moveToFirst()) {
+                        val index = it.getColumnIndex(OpenableColumns.SIZE)
+                        if (index != -1) size = it.getLong(index)
+                    }
                 }
+            } catch (e: Exception) {
+                // Falls through to the openFileDescriptor fallback below
+                e.printStackTrace()
             }
         }
         if (size == 0L) {
@@ -327,5 +349,7 @@ class FilePickerUtil(activity: AppCompatActivity) {
         is FilePickerError.UnableToReadFile        -> context.getString(R.string.msgUnableToReadFileTryAgain)
         is FilePickerError.CameraPermissionDenied  -> context.getString(R.string.msgCameraPermissionDenied)
         is FilePickerError.CameraPermissionBlocked -> context.getString(R.string.msgCameraPermissionBlockedDoc)
+        is FilePickerError.CameraUnavailable       -> context.getString(R.string.msgNoCameraApp)
+        is FilePickerError.FilePickerUnavailable   -> context.getString(R.string.msgNoFilePickerApp)
     }
 }

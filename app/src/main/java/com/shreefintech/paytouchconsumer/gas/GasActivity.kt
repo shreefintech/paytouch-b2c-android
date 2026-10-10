@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.gas
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -177,7 +178,12 @@ class GasActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_PLATFORM_TERMS)))
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_PLATFORM_TERMS)))
+                    } catch (e: ActivityNotFoundException) {
+                        e.printStackTrace()
+                        ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                    }
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)

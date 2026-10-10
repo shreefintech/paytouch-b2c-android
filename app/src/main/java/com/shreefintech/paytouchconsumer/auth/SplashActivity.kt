@@ -75,6 +75,7 @@ class SplashActivity : BaseActivity() {
         if (updateCheckDone || updateLaunching || isFinishing) return
         // Re-prompt if a previous IMMEDIATE update was started but the activity was recreated mid-flow
         appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+            if (!isScreenAlive()) return@addOnSuccessListener
             if (!updateCheckDone && !updateLaunching &&
                 info.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
                 launchImmediateUpdate(info)
@@ -87,9 +88,13 @@ class SplashActivity : BaseActivity() {
         handler.removeCallbacks(timerRunnable)
     }
 
+    // Play Task listeners are not lifecycle-aware — they can fire after Back/recreation destroyed this screen
+    private fun isScreenAlive() = !isFinishing && !isDestroyed
+
     private fun checkForUpdate() {
         appUpdateManager.appUpdateInfo
             .addOnSuccessListener { info ->
+                if (!isScreenAlive()) return@addOnSuccessListener
                 if (info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
                     info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
                     launchImmediateUpdate(info)
@@ -100,6 +105,7 @@ class SplashActivity : BaseActivity() {
                 }
             }
             .addOnFailureListener {
+                if (!isScreenAlive()) return@addOnFailureListener
                 if (!updateLaunching) {
                     updateCheckDone = true
                     startFlow()

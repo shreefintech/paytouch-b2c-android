@@ -23,6 +23,7 @@ import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.shreefintech.paytouchconsumer.BaseActivity
@@ -65,7 +66,15 @@ class DocPreviewActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityDocPreviewBinding.inflate(layoutInflater)
+        binding = try {
+            ActivityDocPreviewBinding.inflate(layoutInflater)
+        } catch (e: Exception) {
+            // System WebView missing / disabled / mid-update — WebView constructor throws during inflate
+            e.printStackTrace()
+            ToastUtil.showDelete(mActivity, getString(R.string.errWebViewUnavailable), inWindow = false)
+            finish()
+            return
+        }
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
@@ -157,11 +166,15 @@ class DocPreviewActivity : BaseActivity() {
             // because showLoading(true) hides layoutContent (GONE → zero dimensions on imagePreview).
             // Glide decodes by content, not URL extension — extension-less URLs work too.
             // Falls back to WebView if the URL is not an image Glide can decode.
+            // Bounded target + CENTER_INSIDE: a no-arg CustomTarget decodes at original size, and a
+            // 25 MP+ server image throws "Canvas: trying to draw too large bitmap". 2× width keeps zoom headroom.
             showLoading(true)
+            val maxWidth = resources.displayMetrics.widthPixels * 2
             Glide.with(this)
                 .asBitmap()
                 .load(url)
-                .into(object : CustomTarget<Bitmap>() {
+                .downsample(DownsampleStrategy.CENTER_INSIDE)
+                .into(object : CustomTarget<Bitmap>(maxWidth, Constant.PDF_MAX_BITMAP_HEIGHT_PX) {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         showLoading(false)
                         scaleFactor = 1f
@@ -222,10 +235,10 @@ class DocPreviewActivity : BaseActivity() {
                     showError(getString(R.string.errCannotRenderPdf, getString(R.string.errPdfInvalidPageDimensions)))
                     return
                 }
-                val scale = screenWidth.toFloat() / page.width
+                val scale = Utility.pdfRenderScale(page.width, page.height, screenWidth)
                 val bitmap = Bitmap.createBitmap(
-                    (page.width * scale).toInt(),
-                    (page.height * scale).toInt(),
+                    (page.width * scale).toInt().coerceAtLeast(1),
+                    (page.height * scale).toInt().coerceAtLeast(1),
                     Bitmap.Config.ARGB_8888
                 )
                 Canvas(bitmap).drawColor(Color.WHITE)
@@ -242,6 +255,9 @@ class DocPreviewActivity : BaseActivity() {
                 page.close()
             }
         } catch (e: Exception) {
+            showError(getString(R.string.errCannotRenderPdf, e.message))
+        } catch (e: OutOfMemoryError) {
+            e.printStackTrace()
             showError(getString(R.string.errCannotRenderPdf, e.message))
         }
     }
@@ -316,7 +332,7 @@ class DocPreviewActivity : BaseActivity() {
     override fun onDestroy() {
         pdfRenderer?.close()
         fileDescriptor?.close()
-        binding.webViewPreview.destroy()
+        if (::binding.isInitialized) binding.webViewPreview.destroy()
         super.onDestroy()
     }
 }
