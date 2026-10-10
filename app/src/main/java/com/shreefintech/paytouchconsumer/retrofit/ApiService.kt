@@ -91,7 +91,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoIt
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
 import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRemoveRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletActionDataItem
@@ -109,7 +108,6 @@ import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
-import retrofit2.http.HTTP
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -142,13 +140,6 @@ interface ApiService {
     fun registerDeviceToken(
         @Header("Authorization") authorization: String?,
         @Body body: DeviceTokenRequest
-    ): Call<MessageItem>
-
-    // @DELETE cannot carry a body — the backend expects fcm_token in the JSON body
-    @HTTP(method = "DELETE", path = "${AUTH}device-token", hasBody = true)
-    fun removeDeviceToken(
-        @Header("Authorization") authorization: String,
-        @Body body: DeviceTokenRemoveRequest
     ): Call<MessageItem>
 
     // ── Location ──────────────────────────────────────────────────────────────

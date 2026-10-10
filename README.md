@@ -162,7 +162,7 @@ com.shreefintech.paytouchconsumer/
 |   |   +-- myaccount/              AccountInfoItem, ReferralInfoItem
 |   |   +-- hdfc/                   HdfcCreateOrderRequest, HdfcOrderItem, etc.
 |   |   +-- wallet/                 WalletHistoryItem, WalletHistoryPageItem
-|   |   +-- notification/           DeviceTokenRequest, DeviceTokenRemoveRequest
+|   |   +-- notification/           DeviceTokenRequest
 |   |   +-- location/               UserLocationRequest
 |   |   \-- auth/                   LoginItem, RegisterItem, MessageItem
 |   +-- ApiClient.kt                Main Retrofit singleton (paytouch.in)
@@ -314,7 +314,6 @@ Separate singleton. Used for VPS user registration (fire-and-forget after login 
 | Method | Endpoint | Body | Caller |
 |---|---|---|---|
 | `POST` | `/api/device-token` | `DeviceTokenRequest` (`fcm_token`, `platform`, `device_id`) | `NotificationHelper.syncToken()` |
-| `DELETE` | `/api/device-token` | `DeviceTokenRemoveRequest` (`fcm_token`) — `@HTTP(hasBody = true)` | `NotificationHelper.removeToken()` before logout |
 | `POST` | `/api/location` | `UserLocationRequest` (`latitude`, `longitude`, `accuracy`) | `HomeViewModel.sendLocation()` (fire-and-forget) |
 
 ### Endpoint Pattern

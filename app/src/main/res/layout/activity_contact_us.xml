@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
@@ -138,11 +139,12 @@
                                     android:textSize="@dimen/text_size_11" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvPhone1"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/proza_libre_semi_bold"
                                     android:includeFontPadding="false"
-                                    android:text="@string/supportPhone1"
+                                    tools:text="7567525558"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_14" />
                             </LinearLayout>
@@ -202,11 +204,12 @@
                                     android:textSize="@dimen/text_size_11" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvPhone2"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/proza_libre_semi_bold"
                                     android:includeFontPadding="false"
-                                    android:text="@string/supportPhone2"
+                                    tools:text="7567525559"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_14" />
                             </LinearLayout>
@@ -266,11 +269,12 @@
                                     android:textSize="@dimen/text_size_11" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvPhone3"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/proza_libre_semi_bold"
                                     android:includeFontPadding="false"
-                                    android:text="@string/supportPhone3"
+                                    tools:text="7567525557"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_14" />
                             </LinearLayout>
@@ -361,11 +365,12 @@
                                     android:textSize="@dimen/text_size_11" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvEmail"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/proza_libre_semi_bold"
                                     android:includeFontPadding="false"
-                                    android:text="@string/supportEmail"
+                                    tools:text="info@paytouch.in"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_14" />
                             </LinearLayout>
