@@ -762,12 +762,13 @@
 
     <!-- Earning Wallet — Lock sheet -->
     <string name="titleLockMoney">Lock money</string>
-    <string name="msgLockInfo">Minimum ₹1. Bonus Wallet money and money held for a payment in progress can\'t be locked.</string>
+    <string name="msgLockInfo">Minimum ₹100. Bonus Wallet money and money held for a payment in progress can\'t be locked.</string>
     <string name="msgStartsEarning">Starts earning 11%% a year on %1$s</string>
     <string name="btnLock">Lock</string>
     <string name="labelAll">All</string>
     <string name="errNotEnoughBalance">Not enough Wallet Balance</string>
     <string name="errExceedsWalletBalance">Amount exceeds your wallet balance</string>
+    <string name="errMinLockAmount">Minimum lock amount is ₹%1$d</string>
 
     <!-- Earning Wallet — Withdraw sheet -->
     <string name="titleWithdrawToWallet">Withdraw to Wallet</string>

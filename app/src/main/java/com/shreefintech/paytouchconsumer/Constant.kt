@@ -114,6 +114,7 @@ object Constant {
     // Earning Wallet
     const val EARNING_LOCK_DAYS = 30
     const val EARNING_DEFAULT_LOCK_AMOUNT = 1000
+    const val EARNING_MIN_LOCK_AMOUNT = 100
 
     // Support contact details
     const val SUPPORT_PHONE_1 = "7567525558"

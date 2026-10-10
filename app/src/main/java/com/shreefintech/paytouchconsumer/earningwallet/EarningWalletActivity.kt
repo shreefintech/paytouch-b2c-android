@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.earningwallet
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -202,6 +203,7 @@ class EarningWalletActivity : BaseActivity() {
 
     // region Populate UI
 
+    @SuppressLint("SetTextI18n")
     private fun populateEarningWallet(item: EarningWalletItem) {
         isDataLoaded = true
         isOptedIn = item.optedIn == true
@@ -308,9 +310,14 @@ class EarningWalletActivity : BaseActivity() {
     }
 
     private fun updateLockValidation(entered: Double) {
+        val isUnderMin = entered > 0.0 && entered < Constant.EARNING_MIN_LOCK_AMOUNT
         val isOverBalance = entered > 0.0 && entered > walletBalance
-        lockSheet.tvLockError.visibility = if (isOverBalance) View.VISIBLE else View.GONE
-        setLockButtonEnabled(entered > 0.0 && !isOverBalance)
+        when {
+            isOverBalance -> lockSheet.tvLockError.text = getString(R.string.errNotEnoughBalance)
+            isUnderMin -> lockSheet.tvLockError.text = getString(R.string.errMinLockAmount, Constant.EARNING_MIN_LOCK_AMOUNT)
+        }
+        lockSheet.tvLockError.visibility = if (isOverBalance || isUnderMin) View.VISIBLE else View.GONE
+        setLockButtonEnabled(entered >= Constant.EARNING_MIN_LOCK_AMOUNT && !isOverBalance)
     }
 
     // endregion
@@ -369,6 +376,10 @@ class EarningWalletActivity : BaseActivity() {
         val amount = lockSheet.etLockAmount.text?.toString()?.trim()?.toDoubleOrNull()
         if (amount == null || amount <= 0.0) {
             ToastUtil.showDelete(mActivity, getString(R.string.errMinAmount))
+            return
+        }
+        if (amount < Constant.EARNING_MIN_LOCK_AMOUNT) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errMinLockAmount, Constant.EARNING_MIN_LOCK_AMOUNT))
             return
         }
         if (amount > walletBalance) {
@@ -444,6 +455,7 @@ class EarningWalletActivity : BaseActivity() {
         })
     }
 
+    @SuppressLint("SetTextI18n")
     private fun onClickListener(): View.OnClickListener {
         return View.OnClickListener { view ->
             when (view) {
