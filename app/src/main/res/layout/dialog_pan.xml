@@ -15,7 +15,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ic_confirm_dialog_bg"
         android:paddingHorizontal="24dp"
         android:paddingTop="20dp"
         android:paddingBottom="24dp">
@@ -60,7 +59,7 @@
             android:id="@+id/tvSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="6dp"
             android:fontFamily="@font/proza_libre_medium"
             android:text="@string/msgPanCardSubtitle"
             android:textColor="@color/sub_text_color"
@@ -142,21 +141,6 @@
                     android:visibility="@{showProgress ? View.VISIBLE : View.GONE}" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
-        <!-- Skip link -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvSkipPan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:fontFamily="@font/proza_libre_medium"
-            android:onClickListener="@{onClickListener}"
-            android:text="@string/btnSkipPan"
-            android:textColor="@color/primary"
-            android:textSize="@dimen/text_size_14"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardSubmit" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

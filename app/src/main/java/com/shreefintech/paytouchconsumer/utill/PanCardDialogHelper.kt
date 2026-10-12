@@ -58,10 +58,6 @@ object PanCardDialogHelper {
         b.onClickListener = android.view.View.OnClickListener { view ->
             when (view) {
                 b.cardClose -> dialog.dismiss()
-                b.tvSkipPan -> {
-                    dismissReason = DismissReason.SKIP
-                    dialog.dismiss()
-                }
                 b.cardSubmit -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgress.get()) return@OnClickListener

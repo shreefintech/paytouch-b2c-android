@@ -280,8 +280,8 @@ class HomeActivity : BaseActivity() {
                         BankDetailsDialogHelper.show(
                             activity = mActivity,
                             authorization = SharedPreferenceHelper.bearerToken(mActivity),
-                            onBankAdded = {},
-                            onComplete = { MyAccountActivity.start(mActivity) }
+                            onBankAdded = { MyAccountActivity.start(mActivity) },
+                            onComplete = {  }
                         )
                     } else {
                         MyAccountActivity.start(mActivity)
@@ -295,8 +295,8 @@ class HomeActivity : BaseActivity() {
                         BankDetailsDialogHelper.show(
                             activity = mActivity,
                             authorization = SharedPreferenceHelper.bearerToken(mActivity),
-                            onBankAdded = {},
-                            onComplete = { LoadWalletActivity.start(mActivity) }
+                            onBankAdded = { LoadWalletActivity.start(mActivity) },
+                            onComplete = {  }
                         )
                     } else {
                         LoadWalletActivity.start(mActivity)

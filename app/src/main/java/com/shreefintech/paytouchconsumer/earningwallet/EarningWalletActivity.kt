@@ -470,7 +470,7 @@ class EarningWalletActivity : BaseActivity() {
                                 activity = mActivity,
                                 authorization = SharedPreferenceHelper.bearerToken(mActivity),
                                 onSuccess = { openLockSheet() },
-                                onSkip = { openLockSheet() }
+                                onSkip = {  }
                             )
                         } else {
                             openLockSheet()

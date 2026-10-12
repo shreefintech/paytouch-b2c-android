@@ -437,7 +437,7 @@ class ElectricityActivity : BaseActivity() {
                     if (showProgressPay.get()) return@OnClickListener
                     if (paymentMade) return@OnClickListener
                     if (!SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_BANK_DETAILS_ADDED, false)) {
-                        BankDetailsDialogHelper.show(mActivity, SharedPreferenceHelper.bearerToken(mActivity)) { onProceedToPay() }
+                        BankDetailsDialogHelper.show(mActivity, SharedPreferenceHelper.bearerToken(mActivity), onBankAdded = { onProceedToPay() })
                         return@OnClickListener
                     }
                     onProceedToPay()

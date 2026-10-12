@@ -15,7 +15,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ic_confirm_dialog_bg"
         android:paddingHorizontal="24dp"
         android:paddingTop="20dp"
         android:paddingBottom="24dp">
