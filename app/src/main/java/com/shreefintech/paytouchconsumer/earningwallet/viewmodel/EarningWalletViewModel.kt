@@ -11,6 +11,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletAct
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletAmountRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
+import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Item
+import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -118,6 +120,29 @@ class EarningWalletViewModel(application: Application) : AndroidViewModel(applic
                     }
                 }
                 override fun onFailure(call: Call<General<EarningWalletActionDataItem>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+    }
+
+    fun postPan(
+        panNumber: String,
+        onLoading: () -> Unit,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
+        onLoading()
+        ApiClient.apiService.addPan(bearerToken(), PanV2Request(panNumber))
+            .enqueue(object : Callback<PanV2Item> {
+                override fun onResponse(call: Call<PanV2Item>, response: Response<PanV2Item>) {
+                    if (response.isSuccessful && response.body()?.success == true) {
+                        onSuccess()
+                    } else {
+                        onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+                    }
+                }
+                override fun onFailure(call: Call<PanV2Item>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })

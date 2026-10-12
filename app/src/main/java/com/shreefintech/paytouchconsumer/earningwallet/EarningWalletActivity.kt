@@ -24,6 +24,8 @@ import com.shreefintech.paytouchconsumer.databinding.SheetEarningWithdrawBinding
 import com.shreefintech.paytouchconsumer.earningwallet.viewmodel.EarningWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
+import com.shreefintech.paytouchconsumer.utill.PanCardDialogHelper
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -460,7 +462,20 @@ class EarningWalletActivity : BaseActivity() {
                 binding.btnLockMoney -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (!isDataLoaded) return@OnClickListener
-                    if (!isOptedIn) openOptInSheet() else openLockSheet()
+                    if (!isOptedIn) {
+                        openOptInSheet()
+                    } else {
+                        if (!SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_PAN_ADDED, false)) {
+                            PanCardDialogHelper.show(
+                                activity = mActivity,
+                                authorization = SharedPreferenceHelper.bearerToken(mActivity),
+                                onSuccess = { openLockSheet() },
+                                onSkip = { openLockSheet() }
+                            )
+                        } else {
+                            openLockSheet()
+                        }
+                    }
                 }
                 binding.btnWithdraw -> {
                     if (Utility.stopClick()) return@OnClickListener

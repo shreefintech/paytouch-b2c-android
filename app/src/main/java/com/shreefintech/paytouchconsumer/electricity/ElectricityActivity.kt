@@ -38,6 +38,8 @@ import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -434,6 +436,10 @@ class ElectricityActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
                     if (paymentMade) return@OnClickListener
+                    if (!SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_BANK_DETAILS_ADDED, false)) {
+                        BankDetailsDialogHelper.show(mActivity, SharedPreferenceHelper.bearerToken(mActivity)) { onProceedToPay() }
+                        return@OnClickListener
+                    }
                     onProceedToPay()
                 }
                 binding.llReset -> {

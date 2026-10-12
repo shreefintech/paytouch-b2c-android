@@ -183,6 +183,7 @@ class LoadWalletActivity : BaseActivity() {
         onBack()
         retryCallback = { loadData() }
         loadData()
+
     }
 
     override fun onResume() {

@@ -951,4 +951,21 @@
     <string name="coming_soon">Coming Soon</string>
     <string name="labelAppVersion">Version %1$s</string>
 
+    <!-- B2C V2 Onboarding — Bank Details Dialog -->
+    <string name="titleAddBankDetails">Add Bank Details</string>
+    <string name="msgBankDetailsRequired">Please add your bank details to continue</string>
+    <string name="msgBankDetailsSaved">Bank details saved successfully</string>
+
+    <!-- B2C V2 Onboarding — PAN Sheet -->
+    <string name="titleAddPanCard">Add PAN Card</string>
+    <string name="msgPanCardSubtitle">Optional — add your PAN to enable interest on your Earning Wallet.</string>
+    <string name="btnSkipPan">Skip for now</string>
+    <string name="msgPanSaved">PAN added successfully</string>
+
+    <!-- B2C V2 Registration — Aadhaar document upload -->
+    <string name="labelAadhaarPhoto">Upload Aadhaar Document</string>
+    <string name="hintAadhaarPhoto">JPG, PNG or PDF · max 5 MB</string>
+    <string name="msgAadhaarPhotoRequired">Please upload your Aadhaar document</string>
+    <string name="msgAadhaarPhotoInvalid">File must be JPG, PNG or PDF · max 5 MB</string>
+
 </resources>

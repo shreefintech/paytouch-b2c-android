@@ -26,6 +26,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmLogoutBinding
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
@@ -44,6 +45,7 @@ import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
 import com.shreefintech.paytouchconsumer.rewards.LevelUpActivity
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -273,12 +275,32 @@ class HomeActivity : BaseActivity() {
 
                 binding.llMyAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    MyAccountActivity.start(mActivity)
+                    val bankAdded = SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_BANK_DETAILS_ADDED, false)
+                    if (!bankAdded) {
+                        BankDetailsDialogHelper.show(
+                            activity = mActivity,
+                            authorization = SharedPreferenceHelper.bearerToken(mActivity),
+                            onBankAdded = {},
+                            onComplete = { MyAccountActivity.start(mActivity) }
+                        )
+                    } else {
+                        MyAccountActivity.start(mActivity)
+                    }
                 }
 
                 binding.cvLoadWallet -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    LoadWalletActivity.start(mActivity)
+                    val bankAdded = SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_BANK_DETAILS_ADDED, false)
+                    if (!bankAdded) {
+                        BankDetailsDialogHelper.show(
+                            activity = mActivity,
+                            authorization = SharedPreferenceHelper.bearerToken(mActivity),
+                            onBankAdded = {},
+                            onComplete = { LoadWalletActivity.start(mActivity) }
+                        )
+                    } else {
+                        LoadWalletActivity.start(mActivity)
+                    }
                 }
 
                 logoutDialogBinding?.btnLogout -> {
