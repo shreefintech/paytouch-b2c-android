@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
+        android:background="@drawable/bg_transaction_item"
         android:paddingTop="20dp"
         android:paddingBottom="24dp">
 
@@ -59,7 +60,7 @@
             android:id="@+id/tvSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="10dp"
             android:fontFamily="@font/proza_libre_medium"
             android:text="@string/msgPanCardSubtitle"
             android:textColor="@color/sub_text_color"

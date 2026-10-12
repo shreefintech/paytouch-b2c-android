@@ -8,5 +8,5 @@ data class PanV2Item(
 )
 
 data class PanV2Request(
-    @field:SerializedName("pan_number") val panNumber: String
+    @field:SerializedName("pan") val panNumber: String
 )
