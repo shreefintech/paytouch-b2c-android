@@ -38,7 +38,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlanItem
 import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -480,11 +479,7 @@ class PrepaidActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
                     if (paymentMade) return@OnClickListener
-                    if (!SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_BANK_DETAILS_ADDED, false)) {
-                        BankDetailsDialogHelper.show(mActivity, SharedPreferenceHelper.bearerToken(mActivity), onBankAdded = { onProceedToPay() })
-                        return@OnClickListener
-                    }
-                    onProceedToPay()
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { onProceedToPay() }
                 }
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener

@@ -275,6 +275,7 @@
                                 android:id="@+id/flUploadAadhaarBtn"
                                 android:layout_width="@dimen/btn_height"
                                 android:layout_height="@dimen/btn_height"
+                                android:onClickListener="@{onClickListener}"
                                 app:glassCornerRadius="@dimen/submit_btn_radius"
                                 app:normalTint="@android:color/transparent"
                                 app:pressedTint="@color/upload_btn_color">
@@ -343,6 +344,7 @@
                                 android:id="@+id/flEditAadhaar"
                                 android:layout_width="@dimen/upload_edit_size"
                                 android:layout_height="@dimen/upload_edit_size"
+                                android:onClickListener="@{onClickListener}"
                                 android:layout_marginTop="@dimen/margin_tiny"
                                 android:layout_marginHorizontal="@dimen/margin_medium">
 
@@ -368,6 +370,7 @@
                                     android:id="@+id/ivDeleteAadhaar"
                                     android:layout_width="@dimen/upload_edit_size"
                                     android:layout_height="@dimen/upload_edit_size"
+                                    android:onClickListener="@{onClickListener}"
                                     android:background="?selectableItemBackgroundBorderless"
                                     android:padding="2dp"
                                     android:src="@drawable/ic_cross"

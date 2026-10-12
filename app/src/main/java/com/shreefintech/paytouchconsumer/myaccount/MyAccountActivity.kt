@@ -19,7 +19,6 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityMyAccountBinding
 import com.shreefintech.paytouchconsumer.myaccount.viewmodel.MyAccountViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -68,7 +67,6 @@ class MyAccountActivity : BaseActivity() {
 
         retryCallback = { loadData() }
         loadData()
-
     }
 
     // ── API Calls ─────────────────────────────────────────────

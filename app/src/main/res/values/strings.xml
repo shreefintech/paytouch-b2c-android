@@ -959,7 +959,6 @@
     <!-- B2C V2 Onboarding — PAN Sheet -->
     <string name="titleAddPanCard">Add PAN Card</string>
     <string name="msgPanCardSubtitle">You can lock your money without PAN. To earn interest on your locked amount, please add your PAN details.</string>
-    <string name="btnSkipPan">Skip for now</string>
     <string name="msgPanSaved">PAN added successfully</string>
 
     <!-- B2C V2 Registration — Aadhaar document upload -->

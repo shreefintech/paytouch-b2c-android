@@ -17,13 +17,22 @@ import retrofit2.Response
 
 object BankDetailsDialogHelper {
 
-    fun show(activity: Activity, authorization: String, onBankAdded: () -> Unit, onComplete: (() -> Unit)? = null) {
-        val dialogBinding = DialogBankDetailsBinding.inflate(activity.layoutInflater)
+    /** Runs [action] when bank details exist; otherwise asks for them first and runs [action] once saved. */
+    fun runIfBankAdded(activity: Activity, action: () -> Unit) {
+        if (SharedPreferenceHelper.getSharedPreferenceBoolean(activity, Constant.KEY_BANK_DETAILS_ADDED, false)) {
+            action()
+        } else {
+            show(activity, SharedPreferenceHelper.bearerToken(activity), onBankAdded = action)
+        }
+    }
+
+    private fun show(activity: Activity, authorization: String, onBankAdded: () -> Unit) {
+        val binding = DialogBankDetailsBinding.inflate(activity.layoutInflater)
         val showProgress = ObservableBoolean(false)
-        dialogBinding.showProgress = showProgress
+        binding.showProgress = showProgress
 
         val dialog = Dialog(activity)
-        dialog.setContentView(dialogBinding.root)
+        dialog.setContentView(binding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
         dialog.window?.setLayout(
@@ -31,15 +40,14 @@ object BankDetailsDialogHelper {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.setCancelable(true)
-        dialog.setOnDismissListener { onComplete?.invoke() }
 
-        dialogBinding.onClickListener = android.view.View.OnClickListener { view ->
+        binding.onClickListener = android.view.View.OnClickListener { view ->
             when (view) {
-                dialogBinding.cardClose -> dialog.dismiss()
-                dialogBinding.cardSubmit -> {
+                binding.cardClose -> dialog.dismiss()
+                binding.cardSubmit -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgress.get()) return@OnClickListener
-                    onSubmit(activity, authorization, dialogBinding, showProgress, dialog, onBankAdded)
+                    onSubmit(activity, authorization, binding, showProgress, dialog, onBankAdded)
                 }
             }
         }
@@ -50,14 +58,14 @@ object BankDetailsDialogHelper {
     private fun onSubmit(
         activity: Activity,
         authorization: String,
-        b: DialogBankDetailsBinding,
+        binding: DialogBankDetailsBinding,
         showProgress: ObservableBoolean,
         dialog: Dialog,
         onBankAdded: () -> Unit
     ) {
-        val accountNumber = b.etAccountNumber.text?.toString()?.trim() ?: ""
-        val ifsc = b.etIfsc.text?.toString()?.trim()?.uppercase() ?: ""
-        val branch = b.etBranch.text?.toString()?.trim() ?: ""
+        val accountNumber = binding.etAccountNumber.text?.toString()?.trim() ?: ""
+        val ifsc = binding.etIfsc.text?.toString()?.trim()?.uppercase() ?: ""
+        val branch = binding.etBranch.text?.toString()?.trim() ?: ""
 
         val msg = when {
             accountNumber.isEmpty() -> activity.getString(R.string.msgBankAccountEmpty)
@@ -83,10 +91,13 @@ object BankDetailsDialogHelper {
                         SharedPreferenceHelper.setSharedPreferenceBoolean(
                             activity, Constant.KEY_BANK_DETAILS_ADDED, true
                         )
+                        // Dialog window is gone once the host is destroyed — dismiss() / onBankAdded() would crash
+                        if (activity.isFinishing || activity.isDestroyed) return
                         ToastUtil.showSuccess(activity, activity.getString(R.string.msgBankDetailsSaved))
                         dialog.dismiss()
                         onBankAdded()
                     } else {
+                        if (activity.isFinishing || activity.isDestroyed) return
                         val errMsg = ApiHelper.parseErrorMessage(
                             activity, response.code(), response.errorBody()?.string()
                         )
@@ -96,6 +107,7 @@ object BankDetailsDialogHelper {
 
                 override fun onFailure(call: Call<BankDetailsV2Item>, t: Throwable) {
                     showProgress.set(false)
+                    if (activity.isFinishing || activity.isDestroyed) return
                     ToastUtil.showDelete(
                         activity,
                         t.localizedMessage ?: activity.getString(R.string.errGeneric)

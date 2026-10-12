@@ -26,7 +26,6 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmLogoutBinding
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
@@ -275,32 +274,12 @@ class HomeActivity : BaseActivity() {
 
                 binding.llMyAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    val bankAdded = SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_BANK_DETAILS_ADDED, false)
-                    if (!bankAdded) {
-                        BankDetailsDialogHelper.show(
-                            activity = mActivity,
-                            authorization = SharedPreferenceHelper.bearerToken(mActivity),
-                            onBankAdded = { MyAccountActivity.start(mActivity) },
-                            onComplete = {  }
-                        )
-                    } else {
-                        MyAccountActivity.start(mActivity)
-                    }
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { MyAccountActivity.start(mActivity) }
                 }
 
                 binding.cvLoadWallet -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    val bankAdded = SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_BANK_DETAILS_ADDED, false)
-                    if (!bankAdded) {
-                        BankDetailsDialogHelper.show(
-                            activity = mActivity,
-                            authorization = SharedPreferenceHelper.bearerToken(mActivity),
-                            onBankAdded = { LoadWalletActivity.start(mActivity) },
-                            onComplete = {  }
-                        )
-                    } else {
-                        LoadWalletActivity.start(mActivity)
-                    }
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { LoadWalletActivity.start(mActivity) }
                 }
 
                 logoutDialogBinding?.btnLogout -> {

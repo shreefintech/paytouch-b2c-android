@@ -21,22 +21,21 @@ object PanCardDialogHelper {
      * Shows the PAN card dialog.
      *
      * @param onSuccess   PAN was saved successfully — proceed to the next step.
-     * @param onSkip      User tapped "Skip for now" — treat the same as success for the caller.
      * @param onDismissed User closed the dialog via the X button — caller decides whether to proceed.
+     *                    Back press / outside tap fires nothing.
      */
     fun show(
         activity: Activity,
         authorization: String,
         onSuccess: () -> Unit,
-        onSkip: (() -> Unit)? = null,
         onDismissed: (() -> Unit)? = null
     ) {
-        val b = DialogPanBinding.inflate(activity.layoutInflater)
+        val binding = DialogPanBinding.inflate(activity.layoutInflater)
         val showProgress = ObservableBoolean(false)
-        b.showProgress = showProgress
+        binding.showProgress = showProgress
 
         val dialog = Dialog(activity)
-        dialog.setContentView(b.root)
+        dialog.setContentView(binding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
         dialog.window?.setLayout(
@@ -50,18 +49,21 @@ object PanCardDialogHelper {
         dialog.setOnDismissListener {
             when (dismissReason) {
                 DismissReason.SUCCESS -> onSuccess()
-                DismissReason.SKIP    -> onSkip?.invoke()
-                DismissReason.CANCEL  -> onDismissed?.invoke()
+                DismissReason.CLOSE   -> onDismissed?.invoke()
+                DismissReason.CANCEL  -> Unit
             }
         }
 
-        b.onClickListener = android.view.View.OnClickListener { view ->
+        binding.onClickListener = android.view.View.OnClickListener { view ->
             when (view) {
-                b.cardClose -> dialog.dismiss()
-                b.cardSubmit -> {
+                binding.cardClose -> {
+                    dismissReason = DismissReason.CLOSE
+                    dialog.dismiss()
+                }
+                binding.cardSubmit -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgress.get()) return@OnClickListener
-                    onSubmit(activity, authorization, b, showProgress, dialog) {
+                    onSubmit(activity, authorization, binding, showProgress, dialog) {
                         dismissReason = DismissReason.SUCCESS
                     }
                 }
@@ -74,12 +76,12 @@ object PanCardDialogHelper {
     private fun onSubmit(
         activity: Activity,
         authorization: String,
-        b: DialogPanBinding,
+        binding: DialogPanBinding,
         showProgress: ObservableBoolean,
         dialog: Dialog,
         onBeforeDismiss: () -> Unit
     ) {
-        val pan = b.etPanNumber.text?.toString()?.trim()?.uppercase() ?: ""
+        val pan = binding.etPanNumber.text?.toString()?.trim()?.uppercase() ?: ""
         if (pan.isEmpty()) {
             ToastUtil.showDelete(activity, activity.getString(R.string.msgPanEmpty))
             return
@@ -102,10 +104,13 @@ object PanCardDialogHelper {
                         SharedPreferenceHelper.setSharedPreferenceBoolean(
                             activity, Constant.KEY_PAN_ADDED, true
                         )
+                        // Dialog window is gone once the host is destroyed — dismiss() would crash
+                        if (activity.isFinishing || activity.isDestroyed) return
                         ToastUtil.showSuccess(activity, activity.getString(R.string.msgPanSaved))
                         onBeforeDismiss()
                         dialog.dismiss()
                     } else {
+                        if (activity.isFinishing || activity.isDestroyed) return
                         ToastUtil.showDelete(
                             activity,
                             ApiHelper.parseErrorMessage(activity, response.code(), response.errorBody()?.string())
@@ -115,6 +120,7 @@ object PanCardDialogHelper {
 
                 override fun onFailure(call: Call<PanV2Item>, t: Throwable) {
                     showProgress.set(false)
+                    if (activity.isFinishing || activity.isDestroyed) return
                     ToastUtil.showDelete(
                         activity,
                         t.localizedMessage ?: activity.getString(R.string.errGeneric)
@@ -123,5 +129,6 @@ object PanCardDialogHelper {
             })
     }
 
-    private enum class DismissReason { SUCCESS, SKIP, CANCEL }
+    // CANCEL = back press / outside tap
+    private enum class DismissReason { SUCCESS, CLOSE, CANCEL }
 }

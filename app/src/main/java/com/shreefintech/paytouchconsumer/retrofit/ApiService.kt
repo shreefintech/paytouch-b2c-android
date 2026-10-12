@@ -712,13 +712,10 @@ interface ApiService {
     ): Call<RegisterItem>
 
     @GET("${AUTH}v2/address/states")
-    fun getAddressStates(
-        @Header("Authorization") authorization: String
-    ): Call<General<List<StateItem>>>
+    fun getAddressStates(): Call<General<List<StateItem>>>
 
     @GET("${AUTH}v2/address/states/{state_id}/cities")
     fun getAddressCities(
-        @Header("Authorization") authorization: String,
         @Path("state_id") stateId: String
     ): Call<General<List<CityItem>>>
 

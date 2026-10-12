@@ -46,9 +46,9 @@ class CreateAccountV2Activity : BaseActivity() {
     private val showProgress = ObservableBoolean(false)
     private var isPasswordVisible = false
     private var isConfirmPasswordVisible = false
-    private var isAadhaarVisible = false
 
     private var aadhaarUri: Uri? = null
+    private val aadhaarDir by lazy { File(filesDir, Constant.REG_AADHAAR_DIR) }
     private var stateList = listOf<StateItem>()
     private var cityList = listOf<CityItem>()
     private var selectedStateId = ""
@@ -164,20 +164,6 @@ class CreateAccountV2Activity : BaseActivity() {
                 inWindow = error != FilePickerUtil.FilePickerError.CameraPermissionBlocked
             )
         }
-
-        val storageDir = File(filesDir, Constant.REG_AADHAAR_DIR)
-        binding.flUploadAadhaarBtn.setOnClickListener {
-            if (Utility.stopClick()) return@setOnClickListener
-            filePickerUtil.showSourceChooser(storageDir)
-        }
-        binding.flEditAadhaar.setOnClickListener {
-            if (Utility.stopClick()) return@setOnClickListener
-            filePickerUtil.showSourceChooser(storageDir)
-        }
-        binding.ivDeleteAadhaar.setOnClickListener {
-            if (Utility.stopClick()) return@setOnClickListener
-            clearAadhaarSlot()
-        }
     }
 
     private fun showAadhaarPreview(uri: Uri) {
@@ -215,11 +201,13 @@ class CreateAccountV2Activity : BaseActivity() {
     private fun loadStates() {
         viewModel.loadStates(
             onLoading = { setStateLoading(true) },
-            onSuccess = { states ->
+            onSuccess = onSuccess@{ states ->
+                if (isDestroyed) return@onSuccess
                 setStateLoading(false)
                 stateList = states
             },
-            onError = { msg ->
+            onError = onError@{ msg ->
+                if (isDestroyed) return@onError
                 setStateLoading(false)
                 ToastUtil.showDelete(mActivity, msg)
             }
@@ -289,12 +277,12 @@ class CreateAccountV2Activity : BaseActivity() {
             passwordConfirmation = binding.etConfirmPassword.text?.toString() ?: "",
             aadhaarNumber = binding.etAadhaarNumber.text?.toString()?.trim() ?: "",
             aadhaarUri = uri,
-            contentResolver = contentResolver,
             stateId = selectedStateId,
             cityId = selectedCityId,
             referralCode = binding.etReferralCode.text?.toString()?.trim() ?: "",
             onLoading = { showProgress.set(true) },
-            onSuccess = {
+            onSuccess = onSuccess@{
+                if (isDestroyed) return@onSuccess
                 showProgress.set(false)
                 ToastUtil.showSuccess(mActivity, getString(R.string.msgAccountCreatedSuccessfully), inWindow = false)
                 val intent = Intent(mActivity, LoginActivity::class.java).apply {
@@ -303,7 +291,8 @@ class CreateAccountV2Activity : BaseActivity() {
                 startActivity(intent)
                 finish()
             },
-            onError = { msg ->
+            onError = onError@{ msg ->
+                if (isDestroyed) return@onError
                 showProgress.set(false)
                 ToastUtil.showDelete(mActivity, msg)
             }
@@ -323,48 +312,19 @@ class CreateAccountV2Activity : BaseActivity() {
                 }
                 binding.flStateAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (stateList.isEmpty()) {
-                        loadStates()
-                        return@OnClickListener
-                    }
-                    CustomDropdown.showDropdown(
-                        activity = mActivity,
-                        anchorView = binding.flStateAnchor,
-                        arrowView = binding.ivStateArrow,
-                        textView = binding.tvState,
-                        items = stateList.mapNotNull { it.name }
-                    ) { _, index ->
-                        val state = stateList.getOrNull(index) ?: return@showDropdown
-                        selectedStateId = state.id ?: ""
-                        binding.tvState.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-                        selectedCityId = ""
-                        cityList = emptyList()
-                        binding.tvCity.text = getString(R.string.hintSelectCity)
-                        binding.tvCity.setTextColor(ContextCompat.getColor(mActivity, android.R.color.darker_gray))
-                        if (selectedStateId.isNotEmpty()) loadCities(selectedStateId)
-                    }
+                    showStateDropdown()
                 }
                 binding.flCityAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (selectedStateId.isEmpty()) {
-                        ToastUtil.showDelete(mActivity, getString(R.string.msgStateEmpty))
-                        return@OnClickListener
-                    }
-                    if (cityList.isEmpty()) {
-                        if (selectedStateId.isNotEmpty()) loadCities(selectedStateId)
-                        return@OnClickListener
-                    }
-                    CustomDropdown.showDropdown(
-                        activity = mActivity,
-                        anchorView = binding.flCityAnchor,
-                        arrowView = binding.ivCityArrow,
-                        textView = binding.tvCity,
-                        items = cityList.mapNotNull { it.name }
-                    ) { _, index ->
-                        val city = cityList.getOrNull(index) ?: return@showDropdown
-                        selectedCityId = city.id ?: ""
-                        binding.tvCity.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
-                    }
+                    showCityDropdown()
+                }
+                binding.flUploadAadhaarBtn, binding.flEditAadhaar -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    filePickerUtil.showSourceChooser(aadhaarDir)
+                }
+                binding.ivDeleteAadhaar -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    clearAadhaarSlot()
                 }
                 binding.ivPasswordToggle -> togglePasswordVisibility()
                 binding.ivConfirmPasswordToggle -> toggleConfirmPasswordVisibility()
@@ -372,15 +332,62 @@ class CreateAccountV2Activity : BaseActivity() {
         }
     }
 
+    private fun showStateDropdown() {
+        if (stateList.isEmpty()) {
+            loadStates()
+            return
+        }
+        CustomDropdown.showDropdown(
+            activity = mActivity,
+            anchorView = binding.flStateAnchor,
+            arrowView = binding.ivStateArrow,
+            textView = binding.tvState,
+            items = stateList.map { it.name.orEmpty() }
+        ) { _, index ->
+            val state = stateList.getOrNull(index) ?: return@showDropdown
+            selectedStateId = state.id ?: ""
+            binding.tvState.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
+            selectedCityId = ""
+            cityList = emptyList()
+            binding.tvCity.text = getString(R.string.hintSelectCity)
+            binding.tvCity.setTextColor(ContextCompat.getColor(mActivity, android.R.color.darker_gray))
+            if (selectedStateId.isNotEmpty()) loadCities(selectedStateId)
+        }
+    }
+
+    private fun showCityDropdown() {
+        if (selectedStateId.isEmpty()) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgStateEmpty))
+            return
+        }
+        if (cityList.isEmpty()) {
+            loadCities(selectedStateId)
+            return
+        }
+        CustomDropdown.showDropdown(
+            activity = mActivity,
+            anchorView = binding.flCityAnchor,
+            arrowView = binding.ivCityArrow,
+            textView = binding.tvCity,
+            items = cityList.map { it.name.orEmpty() }
+        ) { _, index ->
+            val city = cityList.getOrNull(index) ?: return@showDropdown
+            selectedCityId = city.id ?: ""
+            binding.tvCity.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
+        }
+    }
+
     private fun loadCities(stateId: String) {
         viewModel.loadCities(
             stateId = stateId,
             onLoading = { setCityLoading(true) },
-            onSuccess = { cities ->
+            onSuccess = onSuccess@{ cities ->
+                if (isDestroyed) return@onSuccess
                 setCityLoading(false)
                 cityList = cities
             },
-            onError = { msg ->
+            onError = onError@{ msg ->
+                if (isDestroyed) return@onError
                 setCityLoading(false)
                 ToastUtil.showDelete(mActivity, msg)
             }

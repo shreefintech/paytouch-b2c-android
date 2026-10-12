@@ -89,8 +89,7 @@ class EarningWalletActivity : BaseActivity() {
         lockBehavior = BottomSheetBehavior.from(lockSheet.root)
         lockBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         lockBehavior.addBottomSheetCallback(sheetCallback())
-        lockSheet.tvLockInfo.text =
-            getString(R.string.msgLockInfo, Constant.EARNING_MIN_LOCK_AMOUNT)
+        lockSheet.tvLockInfo.text = getString(R.string.msgLockInfo, Constant.EARNING_MIN_LOCK_AMOUNT)
 
         withdrawSheet = binding.incSheetWithdraw
         withdrawBehavior = BottomSheetBehavior.from(withdrawSheet.root)
@@ -124,12 +123,7 @@ class EarningWalletActivity : BaseActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                maxOf(imeInsets.bottom, systemBars.bottom)
-            )
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, maxOf(imeInsets.bottom, systemBars.bottom))
             if (imeInsets.bottom > 0) Utility.scrollToFocused(mActivity)
             optInSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
             lockSheet.root.setPadding(0, 0, 0, maxOf(imeInsets.bottom, systemBars.bottom))
@@ -158,19 +152,17 @@ class EarningWalletActivity : BaseActivity() {
                         Utility.hideKeyboard(mActivity)
                         if (!isAnySheetOpen()) binding.viewBg.gone()
                     }
-
                     else -> {}
                 }
             }
-
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         }
     }
 
     private fun isAnySheetOpen() =
         optInBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
-                lockBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
-                withdrawBehavior.state == BottomSheetBehavior.STATE_EXPANDED
+        lockBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
+        withdrawBehavior.state == BottomSheetBehavior.STATE_EXPANDED
 
     // endregion
 
@@ -224,8 +216,7 @@ class EarningWalletActivity : BaseActivity() {
 
         if (interestAccrued > 0.0) {
             binding.cardInterestPill.visible()
-            binding.tvInterestPill.text =
-                getString(R.string.labelInterestEarned, Utility.formatAmount(interestAccrued))
+            binding.tvInterestPill.text = getString(R.string.labelInterestEarned, Utility.formatAmount(interestAccrued))
         } else {
             binding.cardInterestPill.gone()
         }
@@ -241,8 +232,7 @@ class EarningWalletActivity : BaseActivity() {
         if (pendingAmt > 0.0) {
             binding.llPendingPill.visible()
             val dateStr = Utility.formatDate(item.withdrawalAvailableAt, "dd MMM")
-            binding.tvPendingPill.text =
-                getString(R.string.msgPendingWithdrawal, Utility.formatAmount(pendingAmt), dateStr)
+            binding.tvPendingPill.text = getString(R.string.msgPendingWithdrawal, Utility.formatAmount(pendingAmt), dateStr)
             binding.btnWithdraw.isEnabled = false
             binding.btnWithdraw.alpha = 0.45f
         } else {
@@ -266,12 +256,7 @@ class EarningWalletActivity : BaseActivity() {
             binding.cardStatusBadge.setCardBackgroundColor(
                 ContextCompat.getColor(mActivity, R.color.earningSuccessBg)
             )
-            binding.tvStatusBadge.setTextColor(
-                ContextCompat.getColor(
-                    mActivity,
-                    R.color.earningSuccessText
-                )
-            )
+            binding.tvStatusBadge.setTextColor(ContextCompat.getColor(mActivity, R.color.earningSuccessText))
             binding.tvStatusBadge.text = getString(R.string.labelStatusActive)
             binding.progressStatus.progress = Constant.EARNING_LOCK_DAYS
             binding.progressStatus.progressTintList =
@@ -283,12 +268,7 @@ class EarningWalletActivity : BaseActivity() {
             binding.cardStatusBadge.setCardBackgroundColor(
                 ContextCompat.getColor(mActivity, R.color.earningWarnBg)
             )
-            binding.tvStatusBadge.setTextColor(
-                ContextCompat.getColor(
-                    mActivity,
-                    R.color.earningWarnTitle
-                )
-            )
+            binding.tvStatusBadge.setTextColor(ContextCompat.getColor(mActivity, R.color.earningWarnTitle))
             binding.tvStatusBadge.text = getString(R.string.labelStatusLocked)
             val daysElapsed = ((now - agingMs) / (1000L * 60 * 60 * 24)).toInt()
                 .coerceIn(0, Constant.EARNING_LOCK_DAYS - 1)
@@ -297,8 +277,7 @@ class EarningWalletActivity : BaseActivity() {
                 ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.earningWarnTitle))
             binding.progressStatus.progressBackgroundTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(mActivity, R.color.earningWarnBg))
-            binding.tvStatusDate.text =
-                getString(R.string.labelLockedSince, agingDateStr, activeDateStr)
+            binding.tvStatusDate.text = getString(R.string.labelLockedSince, agingDateStr, activeDateStr)
         }
     }
 
@@ -314,8 +293,7 @@ class EarningWalletActivity : BaseActivity() {
         if (showGoldWarn) {
             withdrawSheet.llGoldWarning.visible()
             val remaining = (lockedBalance - entered).coerceAtLeast(0.0)
-            withdrawSheet.tvGoldWarning.text =
-                getString(R.string.msgGoldWarning, Utility.formatAmount(remaining))
+            withdrawSheet.tvGoldWarning.text = getString(R.string.msgGoldWarning, Utility.formatAmount(remaining))
         } else {
             withdrawSheet.llGoldWarning.gone()
         }
@@ -323,14 +301,12 @@ class EarningWalletActivity : BaseActivity() {
         val showInterest = interestAccrued > 0.0 && entered > 0.0 && !isOverLimit
         if (showInterest) {
             withdrawSheet.llInterestRow.visible()
-            withdrawSheet.tvLostInterest.text =
-                getString(R.string.msgLostInterest, Utility.formatAmount(interestAccrued))
+            withdrawSheet.tvLostInterest.text = getString(R.string.msgLostInterest, Utility.formatAmount(interestAccrued))
         } else {
             withdrawSheet.llInterestRow.gone()
         }
 
-        withdrawSheet.llWarnBox.visibility =
-            if (showGoldWarn || showInterest) View.VISIBLE else View.GONE
+        withdrawSheet.llWarnBox.visibility = if (showGoldWarn || showInterest) View.VISIBLE else View.GONE
         setWithdrawButtonEnabled(entered > 0.0 && !isOverLimit)
     }
 
@@ -351,13 +327,29 @@ class EarningWalletActivity : BaseActivity() {
         optInBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
+    // PAN is optional — X on the PAN dialog still opens opt-in; back press / outside tap opens nothing
+    private fun onLockMoney() {
+        if (isOptedIn) {
+            openLockSheet()
+            return
+        }
+        if (SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_PAN_ADDED, false)) {
+            openOptInSheet()
+            return
+        }
+        PanCardDialogHelper.show(
+            activity = mActivity,
+            authorization = SharedPreferenceHelper.bearerToken(mActivity),
+            onSuccess = { },
+            onDismissed = { openOptInSheet() }
+        )
+    }
+
     private fun openLockSheet() {
         lockSheet.etLockAmount.text?.clear()
         lockSheet.tvLockWalletBalance.text = Utility.formatAmount(walletBalance)
-        val activeDateMs =
-            System.currentTimeMillis() + Constant.EARNING_LOCK_DAYS.toLong() * 24 * 60 * 60 * 1000
-        lockSheet.tvStartsEarning.text =
-            getString(R.string.msgStartsEarning, Utility.formatMillis(activeDateMs, "d MMM yyyy"))
+        val activeDateMs = System.currentTimeMillis() + Constant.EARNING_LOCK_DAYS.toLong() * 24 * 60 * 60 * 1000
+        lockSheet.tvStartsEarning.text = getString(R.string.msgStartsEarning, Utility.formatMillis(activeDateMs, "d MMM yyyy"))
         lockSheet.tvLockError.gone()
         setLockButtonEnabled(false)
         lockBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -402,10 +394,7 @@ class EarningWalletActivity : BaseActivity() {
             return
         }
         if (amount < Constant.EARNING_MIN_LOCK_AMOUNT) {
-            ToastUtil.showDelete(
-                mActivity,
-                getString(R.string.errMinLockAmount, Constant.EARNING_MIN_LOCK_AMOUNT)
-            )
+            ToastUtil.showDelete(mActivity, getString(R.string.errMinLockAmount, Constant.EARNING_MIN_LOCK_AMOUNT))
             return
         }
         if (amount > walletBalance) {
@@ -467,13 +456,10 @@ class EarningWalletActivity : BaseActivity() {
                 when {
                     withdrawBehavior.state == BottomSheetBehavior.STATE_EXPANDED ->
                         withdrawBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
                     lockBehavior.state == BottomSheetBehavior.STATE_EXPANDED ->
                         lockBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
                     optInBehavior.state == BottomSheetBehavior.STATE_EXPANDED ->
                         optInBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
                     else -> {
                         setResult(resultCode)
                         isEnabled = false
@@ -491,86 +477,56 @@ class EarningWalletActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
-
                 binding.btnLockMoney -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (!isDataLoaded) return@OnClickListener
-                    if (!isOptedIn) {
-                        if (!SharedPreferenceHelper.getSharedPreferenceBoolean(
-                                mActivity,
-                                Constant.KEY_PAN_ADDED,
-                                false
-                            )
-                        ) {
-                            PanCardDialogHelper.show(
-                                activity = mActivity,
-                                authorization = SharedPreferenceHelper.bearerToken(mActivity),
-                                onSuccess = { openOptInSheet() },
-                                onSkip = { }
-                            )
-                        } else {
-                            openOptInSheet()
-                        }
-                    } else {
-                        openLockSheet()
-                    }
+                    onLockMoney()
                 }
-
                 binding.btnWithdraw -> {
                     if (Utility.stopClick()) return@OnClickListener
                     openWithdrawSheet()
                 }
-
                 optInSheet.ivCloseOptIn -> {
                     if (Utility.stopClick()) return@OnClickListener
                     optInBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 }
-
                 optInSheet.llTerms -> {
                     optInSheet.cbOptInTerms.isChecked = !optInSheet.cbOptInTerms.isChecked
                 }
-
                 optInSheet.btnOptIn -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onOptIn()
                 }
-
                 lockSheet.ivCloseLock -> {
                     if (Utility.stopClick()) return@OnClickListener
                     lockBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 }
-
                 lockSheet.chipLock500 -> {
                     if (Utility.stopClick()) return@OnClickListener
                     val amtStr = Constant.EARNING_QUICK_LOCK_AMOUNT.toString()
                     lockSheet.etLockAmount.setText(amtStr)
                     lockSheet.etLockAmount.setSelection(amtStr.length)
                 }
-
                 lockSheet.chipLock1000 -> {
                     if (Utility.stopClick()) return@OnClickListener
                     val amtStr = Constant.EARNING_DEFAULT_LOCK_AMOUNT.toString()
                     lockSheet.etLockAmount.setText(amtStr)
                     lockSheet.etLockAmount.setSelection(amtStr.length)
                 }
-
                 lockSheet.chipLockAll -> {
                     if (Utility.stopClick()) return@OnClickListener
                     val all = walletBalance.toLong().toString()
                     lockSheet.etLockAmount.setText(all)
                     lockSheet.etLockAmount.setSelection(all.length)
                 }
-
                 lockSheet.btnLock -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onLock()
                 }
-
                 withdrawSheet.ivCloseWithdraw -> {
                     if (Utility.stopClick()) return@OnClickListener
                     withdrawBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 }
-
                 withdrawSheet.btnWithdrawSheet -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onWithdraw()
@@ -586,8 +542,7 @@ class EarningWalletActivity : BaseActivity() {
         val textColor = if (enabled) R.color.white else R.color.earningDisabledText
         optInSheet.btnOptIn.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
         optInSheet.tvBtnOptInLabel.setTextColor(ContextCompat.getColor(mActivity, textColor))
-        optInSheet.ivBtnOptInIcon.imageTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(mActivity, textColor))
+        optInSheet.ivBtnOptInIcon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(mActivity, textColor))
         optInSheet.btnOptIn.isClickable = enabled
         optInSheet.btnOptIn.isFocusable = enabled
     }
@@ -597,8 +552,7 @@ class EarningWalletActivity : BaseActivity() {
         val textColor = if (enabled) R.color.white else R.color.earningDisabledText
         lockSheet.btnLock.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
         lockSheet.tvBtnLockLabel.setTextColor(ContextCompat.getColor(mActivity, textColor))
-        lockSheet.ivBtnLockIcon.imageTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(mActivity, textColor))
+        lockSheet.ivBtnLockIcon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(mActivity, textColor))
         lockSheet.btnLock.isClickable = enabled
         lockSheet.btnLock.isFocusable = enabled
     }
@@ -606,15 +560,9 @@ class EarningWalletActivity : BaseActivity() {
     private fun setWithdrawButtonEnabled(enabled: Boolean) {
         val bgColor = if (enabled) R.color.primary else R.color.earningDisabledBg
         val textColor = if (enabled) R.color.white else R.color.earningDisabledText
-        withdrawSheet.btnWithdrawSheet.setCardBackgroundColor(
-            ContextCompat.getColor(
-                mActivity,
-                bgColor
-            )
-        )
+        withdrawSheet.btnWithdrawSheet.setCardBackgroundColor(ContextCompat.getColor(mActivity, bgColor))
         withdrawSheet.tvBtnWithdrawLabel.setTextColor(ContextCompat.getColor(mActivity, textColor))
-        withdrawSheet.ivBtnWithdrawIcon.imageTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(mActivity, textColor))
+        withdrawSheet.ivBtnWithdrawIcon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(mActivity, textColor))
         withdrawSheet.btnWithdrawSheet.isClickable = enabled
         withdrawSheet.btnWithdrawSheet.isFocusable = enabled
     }

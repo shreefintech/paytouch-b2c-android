@@ -1,11 +1,9 @@
 package com.shreefintech.paytouchconsumer.auth.viewmodel
 
 import android.app.Application
-import android.content.ContentResolver
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -14,6 +12,10 @@ import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.getString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -30,27 +32,25 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
-            onError(getApplication<Application>().getString(R.string.msgNoInternet))
+            onError(getString(R.string.msgNoInternet))
             return
         }
         onLoading()
-        ApiClient.apiService.getAddressStates("").enqueue(object : Callback<General<List<StateItem>>> {
+        ApiClient.apiService.getAddressStates().enqueue(object : Callback<General<List<StateItem>>> {
             override fun onResponse(
                 call: Call<General<List<StateItem>>>,
                 response: Response<General<List<StateItem>>>
             ) {
-                if (response.isSuccessful && response.body()?.data != null) {
-                    onSuccess(response.body()!!.data!!)
+                val states = response.body()?.data
+                if (response.isSuccessful && states != null) {
+                    onSuccess(states)
                 } else {
-                    val msg = ApiHelper.parseErrorMessage(
-                        getApplication(), response.code(), response.errorBody()?.string()
-                    )
-                    onError(msg)
+                    onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                 }
             }
 
             override fun onFailure(call: Call<General<List<StateItem>>>, t: Throwable) {
-                onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }
@@ -62,27 +62,25 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
-            onError(getApplication<Application>().getString(R.string.msgNoInternet))
+            onError(getString(R.string.msgNoInternet))
             return
         }
         onLoading()
-        ApiClient.apiService.getAddressCities("", stateId).enqueue(object : Callback<General<List<CityItem>>> {
+        ApiClient.apiService.getAddressCities(stateId).enqueue(object : Callback<General<List<CityItem>>> {
             override fun onResponse(
                 call: Call<General<List<CityItem>>>,
                 response: Response<General<List<CityItem>>>
             ) {
-                if (response.isSuccessful && response.body()?.data != null) {
-                    onSuccess(response.body()!!.data!!)
+                val cities = response.body()?.data
+                if (response.isSuccessful && cities != null) {
+                    onSuccess(cities)
                 } else {
-                    val msg = ApiHelper.parseErrorMessage(
-                        getApplication(), response.code(), response.errorBody()?.string()
-                    )
-                    onError(msg)
+                    onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                 }
             }
 
             override fun onFailure(call: Call<General<List<CityItem>>>, t: Throwable) {
-                onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
             }
         })
     }
@@ -95,7 +93,6 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
         passwordConfirmation: String,
         aadhaarNumber: String,
         aadhaarUri: Uri,
-        contentResolver: ContentResolver,
         stateId: String,
         cityId: String,
         referralCode: String,
@@ -104,68 +101,71 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
-            onError(getApplication<Application>().getString(R.string.msgNoInternet))
+            onError(getString(R.string.msgNoInternet))
             return
         }
         onLoading()
-        Thread {
-            try {
-                val mimeType = contentResolver.getType(aadhaarUri) ?: "image/jpeg"
-                val extension = when {
-                    mimeType.contains("pdf") -> ".pdf"
-                    mimeType.contains("png") -> ".png"
-                    else -> ".jpg"
-                }
-                val bytes = contentResolver.openInputStream(aadhaarUri)?.use { it.readBytes() }
-                if (bytes == null) {
-                    postMain { onError(getApplication<Application>().getString(R.string.errGeneric)) }
-                    return@Thread
-                }
-                if (bytes.size > 5 * 1024 * 1024) {
-                    postMain { onError(getApplication<Application>().getString(R.string.msgAadhaarPhotoInvalid)) }
-                    return@Thread
-                }
-
-                val toText: String.() -> RequestBody = { toRequestBody("text/plain".toMediaTypeOrNull()) }
-                val photoBody = RequestBody.create(mimeType.toMediaTypeOrNull(), bytes)
-                val photoPart = MultipartBody.Part.createFormData("aadhaar_photo", "aadhaar$extension", photoBody)
-
-                ApiClient.apiService.registerV2(
-                    name.toText(),
-                    mobile.toText(),
-                    email.toText(),
-                    password.toText(),
-                    passwordConfirmation.toText(),
-                    aadhaarNumber.toText(),
-                    photoPart,
-                    stateId.toText(),
-                    cityId.toText(),
-                    referralCode.toText(),
-                    "android".toText()
-                ).enqueue(object : Callback<RegisterItem> {
-                    override fun onResponse(call: Call<RegisterItem>, response: Response<RegisterItem>) {
-                        if (response.isSuccessful) {
-                            onSuccess()
-                        } else {
-                            val msg = ApiHelper.parseErrorMessage(
-                                getApplication(), response.code(), response.errorBody()?.string()
-                            )
-                            onError(msg)
-                        }
-                    }
-
-                    override fun onFailure(call: Call<RegisterItem>, t: Throwable) {
-                        onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
-                    }
-                })
-            } catch (e: Exception) {
-                Utility.logError(e)
-                postMain { onError(getApplication<Application>().getString(R.string.errGeneric)) }
+        viewModelScope.launch {
+            val mimeType = getApplication<Application>().contentResolver.getType(aadhaarUri) ?: "image/jpeg"
+            val bytes = withContext(Dispatchers.IO) { readBytes(aadhaarUri) }
+            if (bytes == null) {
+                onError(getString(R.string.errGeneric))
+                return@launch
             }
-        }.start()
+            if (bytes.size > AADHAAR_MAX_BYTES) {
+                onError(getString(R.string.msgAadhaarPhotoInvalid))
+                return@launch
+            }
+
+            val extension = when {
+                mimeType.contains("pdf") -> ".pdf"
+                mimeType.contains("png") -> ".png"
+                else -> ".jpg"
+            }
+            val photoPart = MultipartBody.Part.createFormData(
+                "aadhaar_photo", "aadhaar$extension", bytes.toRequestBody(mimeType.toMediaTypeOrNull())
+            )
+
+            ApiClient.apiService.registerV2(
+                name.toTextBody(),
+                mobile.toTextBody(),
+                email.toTextBody(),
+                password.toTextBody(),
+                passwordConfirmation.toTextBody(),
+                aadhaarNumber.toTextBody(),
+                photoPart,
+                stateId.toTextBody(),
+                cityId.toTextBody(),
+                referralCode.toTextBody(),
+                "android".toTextBody()
+            ).enqueue(object : Callback<RegisterItem> {
+                override fun onResponse(call: Call<RegisterItem>, response: Response<RegisterItem>) {
+                    if (response.isSuccessful) {
+                        onSuccess()
+                    } else {
+                        onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+                    }
+                }
+
+                override fun onFailure(call: Call<RegisterItem>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+        }
     }
 
-    private fun postMain(block: () -> Unit) {
-        Handler(Looper.getMainLooper()).post(block)
+    private fun readBytes(uri: Uri): ByteArray? {
+        return try {
+            getApplication<Application>().contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        } catch (e: Exception) {
+            Utility.logError(e)
+            null
+        }
+    }
+
+    private fun String.toTextBody(): RequestBody = toRequestBody("text/plain".toMediaTypeOrNull())
+
+    private companion object {
+        const val AADHAAR_MAX_BYTES = 5 * 1024 * 1024
     }
 }
