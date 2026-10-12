@@ -273,9 +273,10 @@
 
                                         <!-- Member Code -->
                                         <LinearLayout
-                                            android:layout_width="wrap_content"
+                                            android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:layout_marginTop="4dp"
+                                            android:gravity="center_vertical"
                                             android:orientation="horizontal">
 
                                             <androidx.appcompat.widget.AppCompatTextView
@@ -290,12 +291,37 @@
 
                                             <androidx.appcompat.widget.AppCompatTextView
                                                 android:id="@+id/tvMemberCode"
-                                                android:layout_width="wrap_content"
+                                                android:layout_width="0dp"
                                                 android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:ellipsize="end"
                                                 android:fontFamily="@font/proza_libre_medium"
                                                 android:includeFontPadding="false"
+                                                android:maxLines="1"
                                                 android:textColor="@color/account_card_label"
                                                 android:textSize="@dimen/text_size_12" />
+
+                                            <!-- Edit profile -->
+                                            <com.google.android.material.card.MaterialCardView
+                                                android:id="@+id/cvEditProfile"
+                                                android:layout_width="28dp"
+                                                android:layout_height="28dp"
+                                                android:layout_marginStart="@dimen/margin_small"
+                                                android:contentDescription="@string/btnEditProfile"
+                                                android:onClickListener="@{onClickListener}"
+                                                app:cardBackgroundColor="@color/white"
+                                                app:cardCornerRadius="14dp"
+                                                app:cardElevation="0dp"
+                                                app:strokeWidth="0dp">
+
+                                                <androidx.appcompat.widget.AppCompatImageView
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="match_parent"
+                                                    android:importantForAccessibility="no"
+                                                    android:padding="6dp"
+                                                    android:src="@drawable/ic_edit_placeholder"
+                                                    android:tint="@color/primary" />
+                                            </com.google.android.material.card.MaterialCardView>
                                         </LinearLayout>
                                     </LinearLayout>
                                 </LinearLayout>

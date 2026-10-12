@@ -956,6 +956,13 @@
     <string name="msgBankDetailsRequired">Add your bank details to create your Virtual Account and start paying bills with your PayTouch Wallet.</string>
     <string name="msgBankDetailsSaved">Bank details saved successfully</string>
 
+    <!-- My Account — Edit Profile Dialog -->
+    <string name="titleEditProfile">Edit Profile</string>
+    <string name="msgEditProfileSubtitle">Update your personal details.</string>
+    <string name="btnUpdateProfile">Update</string>
+    <string name="msgProfileUpdated">Your details have been updated.</string>
+    <string name="btnEditProfile">Edit profile</string>
+
     <!-- B2C V2 Onboarding — PAN Sheet -->
     <string name="titleAddPanCard">Add PAN Card</string>
     <string name="msgPanCardSubtitle">You can lock your money without PAN. To earn interest on your locked amount, please add your PAN details.</string>
