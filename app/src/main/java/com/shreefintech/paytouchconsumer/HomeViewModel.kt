@@ -99,9 +99,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Silent — Home stays usable if /api/user fails; the flag is re-checked on the next Home launch. */
     fun checkAadhaarRejected(onRejected: () -> Unit) {
-        // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
-        // switch the upload result to LiveData if Home ever stops being portrait-locked
-        if (isAadhaarUploading) return
         if (!Utility.isInternetAvailable(getApplication())) return
         aadhaarCheckCall?.cancel()
         aadhaarCheckCall = ApiClient.apiService.getUser(bearerToken()).also {
@@ -115,6 +112,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     response.body()?.panAdded?.let {
                         SharedPreferenceHelper.setSharedPreferenceBoolean(getApplication(), Constant.KEY_PAN_ADDED, it)
                     }
+                    // Checked at response time so the flags above still refresh while an upload is in flight.
+                    // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
+                    // switch the upload result to LiveData if Home ever stops being portrait-locked
+                    if (isAadhaarUploading) return
                     if (response.isSuccessful && response.body()?.aadhaarRejected == true) onRejected()
                 }
 

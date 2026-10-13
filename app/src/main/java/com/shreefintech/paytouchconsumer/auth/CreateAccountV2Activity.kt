@@ -85,10 +85,10 @@ class CreateAccountV2Activity : BaseActivity() {
         )
 
         binding.onClickListener = onClickListener()
+        binding.showProgress = showProgress
 
         // TODO(B2C-194): seasonal Navratri — revert after festival
         Glide.with(this).load(R.drawable.img_garba_couple).into(binding.ivWalletIllustration)
-        binding.showProgress = showProgress
 
         onBack()
         setupInputFilters()
