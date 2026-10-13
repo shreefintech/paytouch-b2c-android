@@ -94,8 +94,10 @@ object BankDetailsDialogHelper {
                         // Dialog window is gone once the host is destroyed — dismiss() / onBankAdded() would crash
                         if (activity.isFinishing || activity.isDestroyed) return
                         ToastUtil.showSuccess(activity, activity.getString(R.string.msgBankDetailsSaved))
+                        // User may have closed the dialog mid-request — don't proceed (e.g. pay) after they backed out
+                        val wasShowing = dialog.isShowing
                         dialog.dismiss()
-                        onBankAdded()
+                        if (wasShowing) onBankAdded()
                     } else {
                         if (activity.isFinishing || activity.isDestroyed) return
                         val errMsg = ApiHelper.parseErrorMessage(
