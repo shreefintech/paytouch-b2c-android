@@ -32,6 +32,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.loadAddressCities
+import com.shreefintech.paytouchconsumer.utill.loadAddressStates
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -199,7 +201,7 @@ class CreateAccountV2Activity : BaseActivity() {
     }
 
     private fun loadStates() {
-        viewModel.loadStates(
+        viewModel.loadAddressStates(
             onLoading = { setStateLoading(true) },
             onSuccess = onSuccess@{ states ->
                 if (isDestroyed) return@onSuccess
@@ -379,7 +381,7 @@ class CreateAccountV2Activity : BaseActivity() {
     }
 
     private fun loadCities(stateId: String) {
-        viewModel.loadCities(
+        viewModel.loadAddressCities(
             stateId = stateId,
             onLoading = { setCityLoading(true) },
             onSuccess = onSuccess@{ cities ->

@@ -2,12 +2,15 @@ package com.shreefintech.paytouchconsumer
 
 import android.app.Application
 import android.location.Location
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
+import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
@@ -15,6 +18,12 @@ import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -82,6 +91,88 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     t.printStackTrace()
                 }
             })
+    }
+
+    // Survives Activity recreation — a recreated Home must not re-block while the previous upload is in flight
+    private var isAadhaarUploading = false
+    private var aadhaarCheckCall: Call<UserProfileItem>? = null
+
+    /** Silent — Home stays usable if /api/user fails; the flag is re-checked on the next Home launch. */
+    fun checkAadhaarRejected(onRejected: () -> Unit) {
+        // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
+        // switch the upload result to LiveData if Home ever stops being portrait-locked
+        if (isAadhaarUploading) return
+        if (!Utility.isInternetAvailable(getApplication())) return
+        aadhaarCheckCall?.cancel()
+        aadhaarCheckCall = ApiClient.apiService.getUser(bearerToken()).also {
+            it.enqueue(object : Callback<UserProfileItem> {
+                override fun onResponse(call: Call<UserProfileItem>, response: Response<UserProfileItem>) {
+                    if (aadhaarCheckCall === call) aadhaarCheckCall = null
+                    if (response.isSuccessful && response.body()?.aadhaarRejected == true) onRejected()
+                }
+
+                override fun onFailure(call: Call<UserProfileItem>, t: Throwable) {
+                    if (aadhaarCheckCall === call) aadhaarCheckCall = null
+                    t.printStackTrace()
+                }
+            })
+        }
+    }
+
+    /** Releases the pending check's callback (and the Activity it captures). */
+    fun cancelAadhaarCheck() {
+        aadhaarCheckCall?.cancel()
+        aadhaarCheckCall = null
+    }
+
+    fun reuploadAadhaar(
+        aadhaarNumber: String,
+        aadhaarUri: Uri,
+        onLoading: () -> Unit,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        onLoading()
+        isAadhaarUploading = true
+        viewModelScope.launch {
+            // Size already capped by FilePickerUtil (2 MB) — no re-check here
+            val photoPart = withContext(Dispatchers.IO) {
+                Utility.uriToFilePart(getApplication(), aadhaarUri, "aadhaar_photo", "aadhaar")
+            }
+            if (photoPart == null) {
+                isAadhaarUploading = false
+                onError(getString(R.string.errGeneric))
+                return@launch
+            }
+
+            ApiClient.apiService.reuploadAadhaar(
+                bearerToken(),
+                aadhaarNumber.toRequestBody("text/plain".toMediaTypeOrNull()),
+                photoPart
+            ).enqueue(object : Callback<MessageItem> {
+                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+                    isAadhaarUploading = false
+                    val body = response.body()
+                    // Only an explicit success:false is a failure — the key may be absent (like /logout)
+                    when {
+                        !response.isSuccessful -> onError(
+                            ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string())
+                        )
+                        body?.success == false -> onError(body.message ?: getString(R.string.errGeneric))
+                        else -> onSuccess(body?.message ?: getString(R.string.msgAadhaarReuploaded))
+                    }
+                }
+
+                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
+                    isAadhaarUploading = false
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+        }
     }
 
     private fun callLogout(onComplete: () -> Unit, onError: (String) -> Unit) {

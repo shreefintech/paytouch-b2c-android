@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgress"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
+
+    <!-- Blocking dialog — intentionally no close button -->
+    <LinearLayout
+        android:id="@+id/llRoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_transaction_item"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="24dp">
+
+        <!-- Title -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/titleReuploadAadhaar"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_18" />
+
+        <!-- Subtitle -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/proza_libre_medium"
+            android:text="@string/msgReuploadAadhaarSubtitle"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_12" />
+
+        <!-- Aadhaar Number label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelAadharCardNumber"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13" />
+
+        <!-- Aadhaar Number input -->
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etAadhaarNumber"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_input_field"
+            android:ellipsize="end"
+            android:fontFamily="@font/proza_libre_medium"
+            android:hint="@string/hintAadharCardNumber"
+            android:includeFontPadding="false"
+            android:inputType="number|textNoSuggestions"
+            android:maxLength="12"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/margin_small"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="?attr/colorTextHint"
+            android:textSize="@dimen/text_size_13" />
+
+        <!-- Aadhaar Photo label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:ellipsize="end"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:includeFontPadding="false"
+            android:text="@string/labelAadharFront"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13" />
+
+        <!-- Aadhaar Photo upload zone — same as registration -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/kyc_upload_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_upload_area"
+            android:clickable="true"
+            android:focusable="true">
+
+            <!-- Upload prompt (visible before file) -->
+            <LinearLayout
+                android:id="@+id/llUploadPrompt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.shreefintech.paytouchconsumer.widget.LiquidGlassButton
+                    android:id="@+id/flUploadAadhaarBtn"
+                    android:layout_width="@dimen/btn_height"
+                    android:layout_height="@dimen/btn_height"
+                    android:onClickListener="@{onClickListener}"
+                    app:glassCornerRadius="@dimen/submit_btn_radius"
+                    app:normalTint="@android:color/transparent"
+                    app:pressedTint="@color/upload_btn_color">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/margin_small"
+                        android:src="@drawable/ic_upload"
+                        android:tint="@color/primary" />
+
+                </com.shreefintech.paytouchconsumer.widget.LiquidGlassButton>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_extra_small"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelAadharFront"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_12" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_tiny"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:includeFontPadding="false"
+                    android:text="@string/msgUploadHint"
+                    android:textColor="@color/hint_color"
+                    android:textSize="@dimen/text_size_10" />
+
+            </LinearLayout>
+
+            <!-- Preview card (GONE until file selected) -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:background="@android:color/transparent"
+                app:cardBackgroundColor="@color/upload_doc_card_bg"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivPreviewAadhaar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Edit / Delete row (GONE until file selected) -->
+            <LinearLayout
+                android:id="@+id/llEditDeleteAadhaar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="@dimen/margin_extra_small"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:id="@+id/flEditAadhaar"
+                    android:layout_width="@dimen/upload_edit_size"
+                    android:layout_height="@dimen/upload_edit_size"
+                    android:layout_marginHorizontal="@dimen/margin_medium"
+                    android:layout_marginTop="@dimen/margin_tiny"
+                    android:onClickListener="@{onClickListener}">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_edit_placeholder"
+                        android:tint="@color/form_wizard_success" />
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/flDeleteAadhaar"
+                    android:layout_width="@dimen/upload_edit_size"
+                    android:layout_height="@dimen/upload_edit_size"
+                    android:layout_marginHorizontal="@dimen/margin_medium"
+                    android:layout_marginTop="@dimen/margin_small">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivDeleteAadhaar"
+                        android:layout_width="@dimen/upload_edit_size"
+                        android:layout_height="@dimen/upload_edit_size"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:onClickListener="@{onClickListener}"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_cross"
+                        android:tint="@color/form_wizard_reject" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Submit -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/btn_height"
+            android:layout_marginTop="@dimen/margin_extra_large"
+            android:onClickListener="@{onClickListener}"
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:text="@string/btnSubmit"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_16"
+                    android:visibility="@{showProgress ? View.GONE : View.VISIBLE}" />
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:indeterminateTint="@color/white"
+                    android:visibility="@{showProgress ? View.VISIBLE : View.GONE}" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</layout>

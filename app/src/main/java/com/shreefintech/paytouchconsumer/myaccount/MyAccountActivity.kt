@@ -1,29 +1,44 @@
 package com.shreefintech.paytouchconsumer.myaccount
 
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
+import android.util.Patterns
 import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.databinding.ObservableBoolean
 
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityMyAccountBinding
+import com.shreefintech.paytouchconsumer.databinding.DialogEditProfileBinding
 import com.shreefintech.paytouchconsumer.myaccount.viewmodel.MyAccountViewModel
+import com.shreefintech.paytouchconsumer.retrofit.model.CityItem
+import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
+import com.shreefintech.paytouchconsumer.utill.loadAddressCities
+import com.shreefintech.paytouchconsumer.utill.loadAddressStates
+import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import androidx.core.view.isVisible
+import androidx.core.net.toUri
 
 class MyAccountActivity : BaseActivity() {
 
@@ -33,6 +48,22 @@ class MyAccountActivity : BaseActivity() {
     private var isAccountInfoLoading = true
     private var isReferEarnLoading = false
     private var currentTab = TAB_ACCOUNT_INFO
+
+    // ── Edit Profile dialog state ──
+    private val showProgressUpdate = ObservableBoolean(false)
+    private var accountInfo: AccountInfoItem? = null
+    private var editProfileDialog: Dialog? = null
+    private var editProfileBinding: DialogEditProfileBinding? = null
+    private var isStatesLoading = false
+    private var stateList = listOf<StateItem>()
+    private var cityList = listOf<CityItem>()
+    // State whose cities are in cityList — reused across dialog opens instead of refetching
+    private var cityListStateId: String? = null
+    // Pre-selected in the Edit Profile dialog — sourced from account-overview `address`
+    private var savedState: StateItem? = null
+    private var savedCity: CityItem? = null
+    private var selectedState: StateItem? = null
+    private var selectedCity: CityItem? = null
 
     companion object {
         private const val TAB_ACCOUNT_INFO = 0
@@ -146,12 +177,15 @@ class MyAccountActivity : BaseActivity() {
     private fun populateAccountInfo(data: AccountInfoItem) {
         // Hidden tab is animated by selectTab() when the user switches back to it
         if (currentTab == TAB_ACCOUNT_INFO) AnimationHelper.animateChildren(binding.llAccountInfoContent)
+        accountInfo = data
         binding.tvMemberName.text = data.name ?: "--"
         binding.tvStatus.text = data.member?.status ?: "--"
         binding.tvMemberCode.text = data.member?.memberCode ?: "--"
         binding.tvMobileNo.text = data.contact?.mobile ?: "--"
         binding.tvEmail.text = data.contact?.email ?: "--"
         binding.tvHomeAddress.text = data.homeAddress ?: "--"
+        savedState = data.address?.state?.takeIf { it.id != null }
+        savedCity = data.address?.city?.takeIf { it.id != null }
         binding.tvRegistrationDate.text = Utility.formatDate(data.membership?.registeredOn, "dd-MM-yyyy")
         binding.tvActivationDate.text = Utility.formatDate(data.membership?.activatedOn, "dd-MM-yyyy")
         binding.tvBalance.text = if (data.walletBalance != null) Utility.formatAmount(data.walletBalance) else "--"
@@ -259,6 +293,12 @@ class MyAccountActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     selectTab(TAB_REFER_EARN)
                 }
+                binding.cvEditProfile -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    // No prefill data until account info loads successfully
+                    if (isAccountInfoLoading || accountInfo == null) return@OnClickListener
+                    showEditProfileDialog()
+                }
                 binding.cvViewKycDetails -> {
                     if (Utility.stopClick()) return@OnClickListener
                     KycDetailsActivity.start(mActivity)
@@ -287,6 +327,234 @@ class MyAccountActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    // ── Edit Profile ──────────────────────────────────────────
+
+    private fun showEditProfileDialog() {
+        if (editProfileDialog?.isShowing == true) return
+        val dialogBinding = DialogEditProfileBinding.inflate(layoutInflater)
+        dialogBinding.showProgress = showProgressUpdate
+        dialogBinding.onClickListener = editProfileClickListener(dialogBinding)
+
+        dialogBinding.etName.setText(accountInfo?.name.orEmpty())
+        dialogBinding.etEmail.setText(accountInfo?.contact?.email.orEmpty())
+        selectedState = savedState
+        selectedCity = savedCity
+        setDropdownValue(dialogBinding.tvState, selectedState?.name, R.string.hintSelectState)
+        setDropdownValue(dialogBinding.tvCity, selectedCity?.name, R.string.hintSelectCity)
+
+        val dialog = Dialog(mActivity)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.88).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.setCancelable(true)
+        dialog.setOnDismissListener {
+            editProfileDialog = null
+            editProfileBinding = null
+        }
+        editProfileDialog = dialog
+        editProfileBinding = dialogBinding
+        dialog.show()
+
+        when {
+            isStatesLoading -> setFieldLoading(dialogBinding.pbStateLoading, dialogBinding.ivStateArrow, dialogBinding.flStateAnchor, true)
+            stateList.isEmpty() -> loadStates()
+        }
+        val stateId = selectedState?.id
+        if (stateId != cityListStateId) {
+            // Cached cities belong to another state (picked earlier, then dismissed without saving)
+            cityList = emptyList()
+            cityListStateId = null
+            stateId?.let { loadCities(it) }
+        }
+    }
+
+    private fun editProfileClickListener(dialogBinding: DialogEditProfileBinding): View.OnClickListener {
+        return View.OnClickListener { view ->
+            when (view) {
+                dialogBinding.cardClose -> editProfileDialog?.dismiss()
+                dialogBinding.flStateAnchor -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    showStateDropdown(dialogBinding)
+                }
+                dialogBinding.flCityAnchor -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    showCityDropdown(dialogBinding)
+                }
+                dialogBinding.cardSubmit -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressUpdate.get()) return@OnClickListener
+                    onUpdateProfile(dialogBinding)
+                }
+            }
+        }
+    }
+
+    private fun showStateDropdown(dialogBinding: DialogEditProfileBinding) {
+        if (stateList.isEmpty()) {
+            loadStates()
+            return
+        }
+        CustomDropdown.showDropdown(
+            activity = mActivity,
+            anchorView = dialogBinding.flStateAnchor,
+            arrowView = dialogBinding.ivStateArrow,
+            textView = dialogBinding.tvState,
+            items = stateList.map { it.name.orEmpty() }
+        ) { _, index ->
+            val state = stateList.getOrNull(index) ?: return@showDropdown
+            setDropdownValue(dialogBinding.tvState, state.name, R.string.hintSelectState)
+            if (state.id == selectedState?.id) return@showDropdown
+            selectedState = state
+            selectedCity = null
+            cityList = emptyList()
+            cityListStateId = null
+            setDropdownValue(dialogBinding.tvCity, null, R.string.hintSelectCity)
+            // No id = nothing to load — clear a spinner left by the previous state's in-flight request
+            state.id?.let { loadCities(it) }
+                ?: setFieldLoading(dialogBinding.pbCityLoading, dialogBinding.ivCityArrow, dialogBinding.flCityAnchor, false)
+        }
+    }
+
+    private fun showCityDropdown(dialogBinding: DialogEditProfileBinding) {
+        val stateId = selectedState?.id
+        if (stateId == null) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgStateEmpty))
+            return
+        }
+        if (cityList.isEmpty()) {
+            loadCities(stateId)
+            return
+        }
+        CustomDropdown.showDropdown(
+            activity = mActivity,
+            anchorView = dialogBinding.flCityAnchor,
+            arrowView = dialogBinding.ivCityArrow,
+            textView = dialogBinding.tvCity,
+            items = cityList.map { it.name.orEmpty() }
+        ) { _, index ->
+            val city = cityList.getOrNull(index) ?: return@showDropdown
+            selectedCity = city
+            setDropdownValue(dialogBinding.tvCity, city.name, R.string.hintSelectCity)
+        }
+    }
+
+    private fun loadStates() {
+        if (isStatesLoading) return
+        viewModel.loadAddressStates(
+            onLoading = {
+                isStatesLoading = true
+                editProfileBinding?.let { setFieldLoading(it.pbStateLoading, it.ivStateArrow, it.flStateAnchor, true) }
+            },
+            onSuccess = onSuccess@{ states ->
+                isStatesLoading = false
+                if (isDestroyed) return@onSuccess
+                stateList = states
+                editProfileBinding?.let { setFieldLoading(it.pbStateLoading, it.ivStateArrow, it.flStateAnchor, false) }
+            },
+            onError = onError@{ msg ->
+                isStatesLoading = false
+                if (isDestroyed) return@onError
+                val dialogBinding = editProfileBinding ?: return@onError
+                setFieldLoading(dialogBinding.pbStateLoading, dialogBinding.ivStateArrow, dialogBinding.flStateAnchor, false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
+    private fun loadCities(stateId: String) {
+        viewModel.loadAddressCities(
+            stateId = stateId,
+            onLoading = {
+                editProfileBinding?.let { setFieldLoading(it.pbCityLoading, it.ivCityArrow, it.flCityAnchor, true) }
+            },
+            onSuccess = onSuccess@{ cities ->
+                // Stale response — user picked another state while this one was in flight
+                if (isDestroyed || stateId != selectedState?.id) return@onSuccess
+                cityList = cities
+                cityListStateId = stateId
+                editProfileBinding?.let { setFieldLoading(it.pbCityLoading, it.ivCityArrow, it.flCityAnchor, false) }
+            },
+            onError = onError@{ msg ->
+                if (isDestroyed || stateId != selectedState?.id) return@onError
+                val dialogBinding = editProfileBinding ?: return@onError
+                setFieldLoading(dialogBinding.pbCityLoading, dialogBinding.ivCityArrow, dialogBinding.flCityAnchor, false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
+    private fun onUpdateProfile(dialogBinding: DialogEditProfileBinding) {
+        Utility.hideKeyboard(dialogBinding.root)
+        val name = dialogBinding.etName.text?.toString()?.trim().orEmpty()
+        val email = dialogBinding.etEmail.text?.toString()?.trim().orEmpty()
+        val stateId = selectedState?.id?.toIntOrNull()
+        val cityId = selectedCity?.id?.toIntOrNull()
+
+        val msg = when {
+            name.isEmpty() -> { dialogBinding.etName.requestFocus(); getString(R.string.msgNameEmpty) }
+            name.any { !it.isLetter() && !it.isWhitespace() } -> { dialogBinding.etName.requestFocus(); getString(R.string.msgNameInvalid) }
+            email.isEmpty() -> { dialogBinding.etEmail.requestFocus(); getString(R.string.msgEmailEmpty) }
+            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> { dialogBinding.etEmail.requestFocus(); getString(R.string.msgEmailInvalid) }
+            stateId == null -> getString(R.string.msgStateEmpty)
+            cityId == null -> getString(R.string.msgCityEmpty)
+            else -> null
+        }
+        if (msg != null || stateId == null || cityId == null) {
+            ToastUtil.showDelete(mActivity, msg ?: getString(R.string.errGeneric))
+            return
+        }
+
+        // Dismiss only this dialog — a late response must not close one reopened after a manual dismiss
+        val dialog = editProfileDialog
+        viewModel.updateProfile(
+            request = EditProfileRequest(name, email, stateId, cityId),
+            onLoading = { showProgressUpdate.set(true) },
+            onSuccess = onSuccess@{ data, message ->
+                showProgressUpdate.set(false)
+                if (isDestroyed) return@onSuccess
+                savedState = data.state ?: selectedState
+                savedCity = data.city ?: selectedCity
+                data.email?.let {
+                    SharedPreferenceHelper.setSharedPreferenceString(mActivity, Constant.KEY_EMAIL, it)
+                }
+                dialog?.dismiss()
+                ToastUtil.showSuccess(mActivity, message)
+                // Home address is derived server-side from state/city — refetch instead of patching fields
+                loadAccountInfo()
+            },
+            onError = onError@{ errMsg ->
+                showProgressUpdate.set(false)
+                if (isDestroyed) return@onError
+                ToastUtil.showDelete(mActivity, errMsg)
+            }
+        )
+    }
+
+    private fun setDropdownValue(textView: TextView, value: String?, @StringRes hintRes: Int) {
+        textView.text = value ?: getString(hintRes)
+        textView.setTextColor(
+            if (value != null) ContextCompat.getColor(mActivity, R.color.black)
+            else getThemeColor(R.attr.colorTextHint)
+        )
+    }
+
+    private fun setFieldLoading(progress: View, arrow: View, anchor: View, loading: Boolean) {
+        progress.visibility = if (loading) View.VISIBLE else View.GONE
+        arrow.visibility = if (loading) View.GONE else View.VISIBLE
+        anchor.isClickable = !loading
+        anchor.isFocusable = !loading
+    }
+
+    override fun onDestroy() {
+        // Dismiss here so the dialog window doesn't leak past the Activity
+        editProfileDialog?.dismiss()
+        super.onDestroy()
     }
 
     // ── Share Helpers ─────────────────────────────────────────
@@ -322,7 +590,7 @@ class MyAccountActivity : BaseActivity() {
         val link = binding.tvReferralLink.text.toString().takeIf { it != "--" } ?: return
         val message = getString(R.string.msgShareReferralInfo) + "\n\n$link"
         val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
+            data = "mailto:".toUri()
             putExtra(Intent.EXTRA_SUBJECT, getString(R.string.titleReferAndEarn))
             putExtra(Intent.EXTRA_TEXT, message)
         }

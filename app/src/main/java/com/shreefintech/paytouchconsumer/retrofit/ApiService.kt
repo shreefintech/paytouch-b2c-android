@@ -87,6 +87,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransacti
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
@@ -604,6 +606,12 @@ interface ApiService {
         @Header("Authorization") authorization: String
     ): Call<AccountInfoItem>
 
+    @POST("${AUTH}profile")
+    fun updateProfile(
+        @Header("Authorization") authorization: String,
+        @Body request: EditProfileRequest
+    ): Call<General<EditProfileDataItem>>
+
     @GET("${AUTH}referral-info")
     fun getReferralInfo(
         @Header("Authorization") authorization: String
@@ -710,6 +718,15 @@ interface ApiService {
         @Part("referral_code") referralCode: RequestBody,
         @Part("platform") platform: RequestBody
     ): Call<RegisterItem>
+
+    // Re-upload after KYC rejection — triggered by `aadhaar_rejected` on /api/user
+    @Multipart
+    @POST("${AUTH}kyc/aadhaar")
+    fun reuploadAadhaar(
+        @Header("Authorization") authorization: String,
+        @Part("aadhaar_number") aadhaarNumber: RequestBody,
+        @Part aadhaarPhoto: MultipartBody.Part
+    ): Call<MessageItem>
 
     @GET("${AUTH}v2/address/states")
     fun getAddressStates(): Call<General<List<StateItem>>>

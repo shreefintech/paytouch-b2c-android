@@ -58,6 +58,7 @@ object Constant {
     const val KYC_IDENTITY_DOCS_DIR = "kyc_docs/identity"
     const val KYC_BANK_DOCS_DIR = "kyc_docs/bank"
     const val REG_AADHAAR_DIR = "reg_docs/aadhaar"
+    const val KYC_AADHAAR_REUPLOAD_DIR = "reg_docs/aadhaar_reupload"
     const val KYC_IMAGE_MAX_BYTES = 800 * 1024
 
     // Max decoded bitmap height (PDF pages, preview images) — tall pages / huge images otherwise allocate 100 MB+ and crash on draw
