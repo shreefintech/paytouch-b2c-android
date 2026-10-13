@@ -476,7 +476,7 @@
     <string name="msgViewReceiptSubtitle">Tap to see full payment details</string>
     <string name="labelTotalEarnings">Total Earnings</string>
     <string name="msgEarnPerReferral">Earn ₹2 for each referral</string>
-    <string name="msgShareReferralInfo">Share your referral link with friends and earn ₹2 for each successful referral.</string>
+    <string name="msgShareReferralInfo">Share your referral link with friends and earn up to ₹20 for each successful referral.</string>
     <string name="labelInviteFriends">Invite Friends</string>
     <string name="btnCopy">Copy</string>
     <string name="btnWhatsapp">Whatsapp</string>
@@ -973,5 +973,10 @@
     <string name="hintAadhaarPhoto">JPG, PNG or PDF · max 5 MB</string>
     <string name="msgAadhaarPhotoRequired">Please upload your Aadhaar document</string>
     <string name="msgAadhaarPhotoInvalid">File must be JPG, PNG or PDF · max 5 MB</string>
+
+    <!-- Aadhaar re-upload (KYC rejected) — blocking dialog on Home -->
+    <string name="titleReuploadAadhaar">Re-upload Aadhaar</string>
+    <string name="msgReuploadAadhaarSubtitle">Your Aadhar details were rejected. Please re-enter your Aadhar number and upload a clear photo to continue.</string>
+    <string name="msgAadhaarReuploaded">Aadhaar submitted successfully</string>
 
 </resources>

@@ -719,6 +719,15 @@ interface ApiService {
         @Part("platform") platform: RequestBody
     ): Call<RegisterItem>
 
+    // Re-upload after KYC rejection — triggered by `aadhaar_rejected` on /api/user
+    @Multipart
+    @POST("${AUTH}kyc/aadhaar")
+    fun reuploadAadhaar(
+        @Header("Authorization") authorization: String,
+        @Part("aadhaar_number") aadhaarNumber: RequestBody,
+        @Part aadhaarPhoto: MultipartBody.Part
+    ): Call<MessageItem>
+
     @GET("${AUTH}v2/address/states")
     fun getAddressStates(): Call<General<List<StateItem>>>
 

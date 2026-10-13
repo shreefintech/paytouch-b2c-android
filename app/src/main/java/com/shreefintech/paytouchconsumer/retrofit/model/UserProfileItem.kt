@@ -10,5 +10,6 @@ data class UserProfileItem(
     @field:SerializedName("requires_kyc")             val requiresKyc: Boolean?,
     @field:SerializedName("requires_mpin")            val requiresMpin: Boolean?,
     @field:SerializedName("bank_details_added")       val bankDetailsAdded: Boolean?,
-    @field:SerializedName("pan_added")                val panAdded: Boolean?
+    @field:SerializedName("pan_added")                val panAdded: Boolean?,
+    @field:SerializedName("aadhaar_rejected")         val aadhaarRejected: Boolean?
 )

@@ -36,6 +36,7 @@ import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import androidx.core.view.isVisible
+import androidx.core.net.toUri
 
 class MyAccountActivity : BaseActivity() {
 
@@ -54,7 +55,7 @@ class MyAccountActivity : BaseActivity() {
     private var isStatesLoading = false
     private var stateList = listOf<StateItem>()
     private var cityList = listOf<CityItem>()
-    // account-overview doesn't return state/city ids — remembered from the last successful update
+    // Pre-selected in the Edit Profile dialog — sourced from account-overview `address`
     private var savedState: StateItem? = null
     private var savedCity: CityItem? = null
     private var selectedState: StateItem? = null
@@ -179,6 +180,8 @@ class MyAccountActivity : BaseActivity() {
         binding.tvMobileNo.text = data.contact?.mobile ?: "--"
         binding.tvEmail.text = data.contact?.email ?: "--"
         binding.tvHomeAddress.text = data.homeAddress ?: "--"
+        savedState = data.address?.state?.takeIf { it.id != null }
+        savedCity = data.address?.city?.takeIf { it.id != null }
         binding.tvRegistrationDate.text = Utility.formatDate(data.membership?.registeredOn, "dd-MM-yyyy")
         binding.tvActivationDate.text = Utility.formatDate(data.membership?.activatedOn, "dd-MM-yyyy")
         binding.tvBalance.text = if (data.walletBalance != null) Utility.formatAmount(data.walletBalance) else "--"
@@ -571,7 +574,7 @@ class MyAccountActivity : BaseActivity() {
         val link = binding.tvReferralLink.text.toString().takeIf { it != "--" } ?: return
         val message = getString(R.string.msgShareReferralInfo) + "\n\n$link"
         val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
+            data = "mailto:".toUri()
             putExtra(Intent.EXTRA_SUBJECT, getString(R.string.titleReferAndEarn))
             putExtra(Intent.EXTRA_TEXT, message)
         }

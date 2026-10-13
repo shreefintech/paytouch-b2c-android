@@ -2,12 +2,15 @@ package com.shreefintech.paytouchconsumer
 
 import android.app.Application
 import android.location.Location
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
+import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
@@ -15,6 +18,13 @@ import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.getString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -84,6 +94,83 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             })
     }
 
+    /** Silent — Home stays usable if /api/user fails; the flag is re-checked on the next Home launch. */
+    fun checkAadhaarRejected(onRejected: () -> Unit) {
+        if (!Utility.isInternetAvailable(getApplication())) return
+        ApiClient.apiService.getUser(bearerToken())
+            .enqueue(object : Callback<UserProfileItem> {
+                override fun onResponse(call: Call<UserProfileItem>, response: Response<UserProfileItem>) {
+                    if (response.isSuccessful && response.body()?.aadhaarRejected == true) onRejected()
+                }
+
+                override fun onFailure(call: Call<UserProfileItem>, t: Throwable) {
+                    t.printStackTrace()
+                }
+            })
+    }
+
+    fun reuploadAadhaar(
+        aadhaarNumber: String,
+        aadhaarUri: Uri,
+        onLoading: () -> Unit,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        onLoading()
+        viewModelScope.launch {
+            val mimeType = getApplication<Application>().contentResolver.getType(aadhaarUri) ?: "image/jpeg"
+            val bytes = withContext(Dispatchers.IO) { readBytes(aadhaarUri) }
+            if (bytes == null) {
+                onError(getString(R.string.errGeneric))
+                return@launch
+            }
+            if (bytes.size > AADHAAR_MAX_BYTES) {
+                onError(getString(R.string.msgAadhaarPhotoInvalid))
+                return@launch
+            }
+
+            val extension = when {
+                mimeType.contains("pdf") -> ".pdf"
+                mimeType.contains("png") -> ".png"
+                else -> ".jpg"
+            }
+            val photoPart = MultipartBody.Part.createFormData(
+                "aadhaar_photo", "aadhaar$extension", bytes.toRequestBody(mimeType.toMediaTypeOrNull())
+            )
+
+            ApiClient.apiService.reuploadAadhaar(
+                bearerToken(),
+                aadhaarNumber.toRequestBody("text/plain".toMediaTypeOrNull()),
+                photoPart
+            ).enqueue(object : Callback<MessageItem> {
+                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+                    if (response.isSuccessful) {
+                        onSuccess(response.body()?.message ?: getString(R.string.msgAadhaarReuploaded))
+                    } else {
+                        onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+                    }
+                }
+
+                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+        }
+    }
+
+    private fun readBytes(uri: Uri): ByteArray? {
+        return try {
+            getApplication<Application>().contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        } catch (e: Exception) {
+            Utility.logError(e)
+            null
+        }
+    }
+
     private fun callLogout(onComplete: () -> Unit, onError: (String) -> Unit) {
         val fcmToken = SharedPreferenceHelper.getSharedPreferenceString(
             getApplication(), Constant.KEY_FCM_TOKEN, ""
@@ -109,5 +196,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
                 }
             })
+    }
+
+    private companion object {
+        const val AADHAAR_MAX_BYTES = 5 * 1024 * 1024
     }
 }

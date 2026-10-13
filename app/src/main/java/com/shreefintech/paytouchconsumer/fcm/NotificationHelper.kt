@@ -8,6 +8,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
@@ -49,6 +51,32 @@ object NotificationHelper {
             ?.createNotificationChannel(channel)
     }
 
+    /** Full-colour PayTouch logo, scaled to fit the notification large-icon box (aspect ratio kept). */
+    private fun largeIcon(context: Context): Bitmap? {
+        return try {
+            val res = context.resources
+            // inScaled = false — drawable/ is mdpi, so a default decode upscales the 1224px logo ~3x (20 MB+) on xxhdpi
+            val src = BitmapFactory.decodeResource(
+                res, R.drawable.img_paytouch, BitmapFactory.Options().apply { inScaled = false }
+            ) ?: return null
+            val boxW = res.getDimensionPixelSize(android.R.dimen.notification_large_icon_width)
+            val boxH = res.getDimensionPixelSize(android.R.dimen.notification_large_icon_height)
+            val scale = minOf(boxW.toFloat() / src.width, boxH.toFloat() / src.height)
+            val scaled = Bitmap.createScaledBitmap(
+                src,
+                (src.width * scale).toInt().coerceAtLeast(1),
+                (src.height * scale).toInt().coerceAtLeast(1),
+                true
+            )
+            if (scaled !== src) src.recycle()
+            scaled
+        } catch (e: OutOfMemoryError) {
+            // Notification still posts without a large icon
+            e.printStackTrace()
+            null
+        }
+    }
+
     fun showNotification(context: Context, title: String, message: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ActivityCompat.checkSelfPermission(
@@ -73,6 +101,7 @@ object NotificationHelper {
             context, context.getString(R.string.labelNotificationChannelId)
         )
             .setSmallIcon(R.drawable.img_paytouch)
+            .setLargeIcon(largeIcon(context))
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))

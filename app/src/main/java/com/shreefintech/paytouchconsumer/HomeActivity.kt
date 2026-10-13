@@ -4,7 +4,9 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -21,12 +23,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmLogoutBinding
+import com.shreefintech.paytouchconsumer.databinding.DialogReuploadAadhaarBinding
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
@@ -45,11 +49,16 @@ import com.shreefintech.paytouchconsumer.rewards.LevelUpActivity
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
 import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
+import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 class HomeActivity : BaseActivity() {
 
@@ -73,6 +82,14 @@ class HomeActivity : BaseActivity() {
 
     // True when the location flow ended while Home was not in front — asked again in onResume()
     private var isNotificationPermissionPending = false
+
+    // ── Aadhaar re-upload dialog (blocking — shown while /api/user says aadhaar_rejected) ──
+    private val showProgressAadhaar = ObservableBoolean(false)
+    private var aadhaarDialog: Dialog? = null
+    private var aadhaarBinding: DialogReuploadAadhaarBinding? = null
+    private var aadhaarUri: Uri? = null
+    private val aadhaarDir by lazy { File(filesDir, Constant.KYC_AADHAAR_REUPLOAD_DIR) }
+    private lateinit var filePickerUtil: FilePickerUtil
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,10 +127,15 @@ class HomeActivity : BaseActivity() {
         binding.onClickListener = listener
         binding.lytToolbar.onClickListener = listener
         onBack()
+        setupAadhaarPicker()
 
         // Skip on config change / process restore — once per Home launch is enough
         if (savedInstanceState == null) {
             locationHelper.start()
+        }
+        // Every create — the dialog doesn't survive recreation, so the block must be re-applied
+        viewModel.checkAadhaarRejected {
+            if (!isFinishing && !isDestroyed) showReuploadAadhaarDialog()
         }
     }
 
@@ -213,6 +235,166 @@ class HomeActivity : BaseActivity() {
         dialog.show()
     }
 
+
+    // ── Aadhaar Re-upload ─────────────────────────────────────
+
+    private fun setupAadhaarPicker() {
+        // Registers activity-result launchers — must run before onStart()
+        filePickerUtil = FilePickerUtil(this)
+        filePickerUtil.onSuccess = { result ->
+            aadhaarUri = result.uri
+            aadhaarBinding?.let { showAadhaarPreview(it, result.uri) }
+        }
+        filePickerUtil.onError = { error ->
+            ToastUtil.showDelete(
+                mActivity,
+                filePickerUtil.getErrorMessage(error),
+                inWindow = error != FilePickerUtil.FilePickerError.CameraPermissionBlocked
+            )
+        }
+    }
+
+    private fun showReuploadAadhaarDialog() {
+        if (aadhaarDialog?.isShowing == true) return
+        val dialogBinding = DialogReuploadAadhaarBinding.inflate(layoutInflater)
+        showProgressAadhaar.set(false)
+        aadhaarUri = null
+        dialogBinding.showProgress = showProgressAadhaar
+        dialogBinding.onClickListener = aadhaarClickListener(dialogBinding)
+        dialogBinding.etAadhaarNumber.filters = arrayOf(
+            InputFilter.LengthFilter(12), Utility.digitFilter(), Utility.EmojiExcludeFilter()
+        )
+
+        val dialog = Dialog(mActivity)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.88).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        // Blocks the app — no back, no outside tap, no close button; only a successful submit dismisses it
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setOnDismissListener {
+            aadhaarDialog = null
+            aadhaarBinding = null
+        }
+        aadhaarDialog = dialog
+        aadhaarBinding = dialogBinding
+        dialog.show()
+
+        val root = dialogBinding.llRoot as ViewGroup
+        dialogBinding.flUploadAadhaarBtn.attach(root)
+        listOf(dialogBinding.flEditAadhaar, dialogBinding.flDeleteAadhaar).forEach {
+            LiquidGlassEffect.attach(
+                targetView = it,
+                rootView = root,
+                cornerRadius = resources.getDimensionPixelSize(R.dimen.filter_btn_radius),
+                distortion = 0f,
+                blur = resources.getDimensionPixelSize(R.dimen.filter_btn_blure),
+                tintColor = ContextCompat.getColor(mActivity, R.color.filter_bg)
+            )
+        }
+    }
+
+    private fun aadhaarClickListener(dialogBinding: DialogReuploadAadhaarBinding): View.OnClickListener {
+        return View.OnClickListener { view ->
+            when (view) {
+                dialogBinding.flUploadAadhaarBtn, dialogBinding.flEditAadhaar -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressAadhaar.get()) return@OnClickListener
+                    filePickerUtil.showSourceChooser(aadhaarDir)
+                }
+                dialogBinding.ivDeleteAadhaar -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressAadhaar.get()) return@OnClickListener
+                    clearAadhaarSlot(dialogBinding)
+                }
+                dialogBinding.cardSubmit -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressAadhaar.get()) return@OnClickListener
+                    onSubmitAadhaar(dialogBinding)
+                }
+            }
+        }
+    }
+
+    private fun showAadhaarPreview(dialogBinding: DialogReuploadAadhaarBinding, uri: Uri) {
+        dialogBinding.llUploadPrompt.visibility = View.GONE
+        dialogBinding.ivPreviewAadhaar.visibility = View.VISIBLE
+        dialogBinding.llEditDeleteAadhaar.visibility = View.VISIBLE
+
+        if (contentResolver.getType(uri) == "application/pdf") {
+            dialogBinding.ivPreviewAadhaar.setImageResource(R.drawable.ic_file_not_found)
+            val targetWidth = dialogBinding.ivPreviewAadhaar.width.takeIf { it > 0 }
+                ?: resources.displayMetrics.widthPixels / 2
+            lifecycleScope.launch(Dispatchers.IO) {
+                val bmp = Utility.renderPdfFirstPage(mActivity, uri, targetWidth)
+                withContext(Dispatchers.Main) {
+                    // Dialog may have been replaced / file changed while rendering
+                    if (aadhaarBinding !== dialogBinding || aadhaarUri != uri) return@withContext
+                    Glide.with(mActivity).load(bmp).into(dialogBinding.ivPreviewAadhaar)
+                }
+            }
+        } else {
+            Glide.with(this)
+                .load(uri)
+                .placeholder(R.drawable.ic_file_not_found)
+                .error(R.drawable.ic_file_not_found)
+                .into(dialogBinding.ivPreviewAadhaar)
+        }
+    }
+
+    private fun clearAadhaarSlot(dialogBinding: DialogReuploadAadhaarBinding) {
+        aadhaarUri = null
+        Glide.with(this).clear(dialogBinding.ivPreviewAadhaar)
+        dialogBinding.ivPreviewAadhaar.visibility = View.GONE
+        dialogBinding.llEditDeleteAadhaar.visibility = View.GONE
+        dialogBinding.llUploadPrompt.visibility = View.VISIBLE
+    }
+
+    private fun onSubmitAadhaar(dialogBinding: DialogReuploadAadhaarBinding) {
+        Utility.hideKeyboard(dialogBinding.root)
+        val aadhaar = dialogBinding.etAadhaarNumber.text?.toString()?.trim().orEmpty()
+        val uri = aadhaarUri
+        val msg = when {
+            aadhaar.isEmpty() -> { dialogBinding.etAadhaarNumber.requestFocus(); getString(R.string.msgAadharEmpty) }
+            aadhaar.length != 12 -> { dialogBinding.etAadhaarNumber.requestFocus(); getString(R.string.msgAadharInvalid) }
+            uri == null -> getString(R.string.msgAadhaarPhotoRequired)
+            else -> null
+        }
+        if (msg != null || uri == null) {
+            ToastUtil.showDelete(mActivity, msg ?: getString(R.string.errGeneric))
+            return
+        }
+
+        viewModel.reuploadAadhaar(
+            aadhaarNumber = aadhaar,
+            aadhaarUri = uri,
+            onLoading = { showProgressAadhaar.set(true) },
+            onSuccess = onSuccess@{ message ->
+                showProgressAadhaar.set(false)
+                if (isDestroyed) return@onSuccess
+                aadhaarDialog?.dismiss()
+                aadhaarUri = null
+                Utility.deleteKycDirs(mActivity, Constant.KYC_AADHAAR_REUPLOAD_DIR)
+                ToastUtil.showSuccess(mActivity, message)
+            },
+            onError = onError@{ errMsg ->
+                showProgressAadhaar.set(false)
+                if (isDestroyed) return@onError
+                ToastUtil.showDelete(mActivity, errMsg)
+            }
+        )
+    }
+
+    override fun onDestroy() {
+        // Dismiss here so the dialog window doesn't leak past the Activity
+        aadhaarDialog?.dismiss()
+        if (isFinishing) Utility.deleteKycDirs(mActivity, Constant.KYC_AADHAAR_REUPLOAD_DIR)
+        super.onDestroy()
+    }
 
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
