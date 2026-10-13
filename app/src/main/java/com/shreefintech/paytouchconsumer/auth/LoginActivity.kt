@@ -80,7 +80,7 @@ class LoginActivity : BaseActivity() {
         updateToggleUi(LoginMode.PASSWORD)
 
         // TODO(B2C-194): seasonal Navratri — revert after festival
-        BannerSliderHelper(this, binding.incBannerSlider.vpBanner).attachToLifecycle(this)
+        BannerSliderHelper(binding.incBannerSlider.vpBanner).attachToLifecycle(this)
     }
 
 

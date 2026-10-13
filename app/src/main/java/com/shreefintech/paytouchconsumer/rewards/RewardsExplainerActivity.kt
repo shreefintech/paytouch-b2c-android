@@ -32,7 +32,6 @@ class RewardsExplainerActivity : BaseActivity() {
 
     private lateinit var binding: ActivityRewardsExplainerBinding
     private val viewModel: RewardsViewModel by viewModels()
-    private var selectedTier = RewardsTier.BRONZE
     private val loopAnimators = mutableListOf<Animator>()
     private var progressAnimator: ValueAnimator? = null
 
@@ -222,7 +221,6 @@ class RewardsExplainerActivity : BaseActivity() {
     // ── All Levels tabs ─────────────────────────────────────────────────────
 
     private fun selectTierTab(tier: RewardsTier) {
-        selectedTier = tier
         val tabs = mapOf(
             RewardsTier.BRONZE   to Pair(binding.tabBronze,   binding.panelBronze),
             RewardsTier.SILVER   to Pair(binding.tabSilver,   binding.panelSilver),

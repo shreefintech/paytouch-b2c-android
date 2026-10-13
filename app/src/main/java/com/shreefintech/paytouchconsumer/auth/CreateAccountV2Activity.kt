@@ -332,8 +332,14 @@ class CreateAccountV2Activity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     clearAadhaarSlot()
                 }
-                binding.ivPasswordToggle -> togglePasswordVisibility()
-                binding.ivConfirmPasswordToggle -> toggleConfirmPasswordVisibility()
+                binding.ivPasswordToggle -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    togglePasswordVisibility()
+                }
+                binding.ivConfirmPasswordToggle -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    toggleConfirmPasswordVisibility()
+                }
             }
         }
     }

@@ -43,7 +43,10 @@ object BankDetailsDialogHelper {
 
         binding.onClickListener = android.view.View.OnClickListener { view ->
             when (view) {
-                binding.cardClose -> dialog.dismiss()
+                binding.cardClose -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    dialog.dismiss()
+                }
                 binding.cardSubmit -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgress.get()) return@OnClickListener

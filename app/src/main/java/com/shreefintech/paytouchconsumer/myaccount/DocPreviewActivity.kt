@@ -255,6 +255,7 @@ class DocPreviewActivity : BaseActivity() {
                 page.close()
             }
         } catch (e: Exception) {
+            Utility.logError(e)
             showError(getString(R.string.errCannotRenderPdf, e.message))
         } catch (e: OutOfMemoryError) {
             e.printStackTrace()

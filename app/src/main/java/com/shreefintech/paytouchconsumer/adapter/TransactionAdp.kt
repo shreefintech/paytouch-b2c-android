@@ -79,4 +79,9 @@ class TransactionAdp(
     }
 
     override fun getItemCount(): Int = mArrayList.size
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        Glide.with(holder.itemView.context).clear(holder.binding.ivCategoryIcon)
+        super.onViewRecycled(holder)
+    }
 }

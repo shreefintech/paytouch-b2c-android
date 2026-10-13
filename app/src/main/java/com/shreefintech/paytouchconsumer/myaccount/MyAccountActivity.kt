@@ -377,7 +377,10 @@ class MyAccountActivity : BaseActivity() {
     private fun editProfileClickListener(dialogBinding: DialogEditProfileBinding): View.OnClickListener {
         return View.OnClickListener { view ->
             when (view) {
-                dialogBinding.cardClose -> editProfileDialog?.dismiss()
+                dialogBinding.cardClose -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    editProfileDialog?.dismiss()
+                }
                 dialogBinding.flStateAnchor -> {
                     if (Utility.stopClick()) return@OnClickListener
                     showStateDropdown(dialogBinding)

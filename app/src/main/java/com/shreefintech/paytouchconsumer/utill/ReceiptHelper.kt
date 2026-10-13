@@ -49,6 +49,7 @@ object ReceiptHelper {
             view.draw(canvas)
             bitmap
         } catch (e: OutOfMemoryError) {
+            e.printStackTrace()
             null
         }
     }

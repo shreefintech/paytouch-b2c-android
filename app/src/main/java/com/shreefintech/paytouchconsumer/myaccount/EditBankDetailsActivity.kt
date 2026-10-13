@@ -27,10 +27,6 @@ import com.shreefintech.paytouchconsumer.kyc.bank.model.EditBankPassItem
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.pdf.PdfRenderer
-import android.os.ParcelFileDescriptor
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.utill.PdfThumbnailRepository
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
@@ -39,7 +35,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import androidx.core.graphics.createBitmap
 
 class EditBankDetailsActivity : BaseActivity() {
 
@@ -195,14 +190,14 @@ class EditBankDetailsActivity : BaseActivity() {
             if (isPdf) {
                 binding.ivPreviewProof.setImageResource(R.drawable.ic_file_not_found)
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val bmp = renderLocalPdf(loadUri)
+                    val bmp = Utility.renderPdfFirstPage(mActivity, loadUri)
                     withContext(Dispatchers.Main) {
                         if (isDestroyed || isFinishing) return@withContext
                         if (bmp != null) binding.ivPreviewProof.setImageBitmap(bmp)
                     }
                 }
             } else {
-                Glide.with(mActivity)
+                Glide.with(this@EditBankDetailsActivity)
                     .load(loadUri)
                     .placeholder(R.drawable.ic_file_not_found)
                     .error(R.drawable.ic_file_not_found)
@@ -230,43 +225,6 @@ class EditBankDetailsActivity : BaseActivity() {
         }
     }
 
-    private fun renderLocalPdf(uri: Uri): Bitmap? {
-        return try {
-            val tempFile = File(cacheDir, "edit_bank_proof_preview.pdf")
-            tempFile.delete()
-            contentResolver.openInputStream(uri)?.use { input ->
-                tempFile.outputStream().use { output -> input.copyTo(output) }
-            }
-            if (!tempFile.exists() || tempFile.length() == 0L) return null
-            val fd = ParcelFileDescriptor.open(tempFile, ParcelFileDescriptor.MODE_READ_ONLY)
-            val renderer = PdfRenderer(fd)
-            try {
-                val page = renderer.openPage(0)
-                page.use { page ->
-                    if (page.width <= 0 || page.height <= 0) return null
-                    val scale = Utility.pdfRenderScale(page.width, page.height, 800)
-                    val bmp = createBitmap(
-                        (page.width * scale).toInt().coerceAtLeast(1),
-                        (page.height * scale).toInt().coerceAtLeast(1)
-                    )
-                    bmp.eraseColor(Color.WHITE)
-                    page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                    bmp
-                }
-            } finally {
-                renderer.close()
-                fd.close()
-                tempFile.delete()
-            }
-        } catch (e: Exception) {
-            Utility.logError(e)
-            null
-        } catch (e: OutOfMemoryError) {
-            e.printStackTrace()
-            null
-        }
-    }
-
     private fun isPdfUrl(url: String) = url.lowercase().let {
         it.endsWith(".pdf") || it.contains(".pdf?") || it.contains("type=pdf")
     }
@@ -275,7 +233,7 @@ class EditBankDetailsActivity : BaseActivity() {
         thumbnailJob?.cancel()
         thumbnailJob = null
         proofUri = null
-        Glide.with(mActivity).clear(binding.ivPreviewProof)
+        Glide.with(this@EditBankDetailsActivity).clear(binding.ivPreviewProof)
         binding.pbProofLoading.visibility    = View.GONE
         binding.ivPreviewProof.visibility    = View.GONE
         binding.llEditDeleteProof.visibility = View.GONE

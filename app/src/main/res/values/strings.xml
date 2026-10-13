@@ -261,8 +261,6 @@
 
     <!-- Referral History -->
     <string name="titleReferralHistory">Referral History</string>
-    <string name="tabTransactions">Transactions</string>
-    <string name="tabReferrals">Referrals</string>
     <string name="tabWallet">Wallet</string>
 
     <!-- Transaction Report screen -->
@@ -697,7 +695,7 @@
     <string name="labelNarration">Narration</string>
     <string name="hintNarration">Reason for withdrawal (optional)</string>
     <string name="btnProceedWithdraw">Proceed Withdraw →</string>
-    <string name="msgSecurePaymentPaytouch">100% secure payment powered by PayTouch</string>
+    <string name="msgSecurePaymentPaytouch" formatted="false">100% secure payment powered by PayTouch</string>
     <string name="labelImps">IMPS</string>
     <string name="labelNeft">NEFT</string>
     <string name="labelRtgs">RTGS</string>
@@ -738,14 +736,14 @@
     <string name="titleEarningWallet">Earning Wallet</string>
     <string name="labelLockedBalance">Locked balance</string>
     <string name="labelInterestEarned">+%1$s interest earned</string>
-    <string name="labelEarnRate">Earning 11% a year</string>
+    <string name="labelEarnRate" formatted="false">Earning 11% a year</string>
     <string name="labelStatusActive">ACTIVE</string>
     <string name="labelStatusLocked">LOCKED</string>
     <string name="labelEarningsSince">Earning since %1$s</string>
     <string name="labelLockedSince">Locked since %1$s · earning since %2$s</string>
     <string name="msgPendingWithdrawal">%1$s arriving on %2$s</string>
     <string name="titleHowItWorks">How it works</string>
-    <string name="msgHowItWorks1">Money earns 11% a year once it stays locked 30 days.</string>
+    <string name="msgHowItWorks1" formatted="false">Money earns 11% a year once it stays locked 30 days.</string>
     <string name="msgHowItWorks2">Interest moves to your Wallet Balance in ₹1,000 chunks.</string>
     <string name="msgHowItWorks3">Withdrawals reach your Wallet Balance in 3 days. One at a time.</string>
     <string name="msgHowItWorks4">Withdrawing loses interest not yet moved, and can lower your Gold level.</string>
@@ -754,7 +752,7 @@
     <!-- Earning Wallet — Opt-in sheet -->
     <string name="titleOptIn">Start your Earning Wallet</string>
     <string name="msgOptInSubtitle">You opt in once. After that you can lock money anytime.</string>
-    <string name="msgOptInRule1Title">11% a year</string>
+    <string name="msgOptInRule1Title" formatted="false">11% a year</string>
     <string name="msgOptInRule1Desc">Once money stays locked 30 days.</string>
     <string name="msgOptInRule2Title">Interest moves in ₹1,000 chunks</string>
     <string name="msgOptInRule2Desc">Straight to your Wallet Balance.</string>
@@ -786,7 +784,6 @@
     <string name="errAgreeToTerms">Please agree to the terms and conditions</string>
 
     <!-- Rewards Explainer screen -->
-    <string name="labelFestiveSeason">Festive Season</string>
     <string name="subtitleRewardsHero">Level up by paying bills, referring friends, and locking money. Your cashback grows with you.</string>
     <string name="labelBronzeAllCaps">BRONZE</string>
     <string name="labelSilverAllCaps">SILVER</string>
@@ -797,7 +794,7 @@
     <string name="fmtPercent">%1$.2f%%</string>
     <string name="labelMyRank">My Rank </string>
     <string name="titleCashbackGrows">Cashback grows every level</string>
-    <string name="subtitleCashbackGrows">From 0.05% at Bronze III up to 0.50% at Platinum — your cashback rate increases as you level up.</string>
+    <string name="subtitleCashbackGrows" formatted="false">From 0.05% at Bronze III up to 0.50% at Platinum — your cashback rate increases as you level up.</string>
     <string name="labelPlatAbbrev">Plat.</string>
     <string name="titleAllLevels">All Levels</string>
     <string name="subtitleAllLevels">Tap a tier to see what it takes to reach each level.</string>
@@ -814,7 +811,6 @@
 
     <!-- Level cards — sub-level names, triggers, cashback values -->
     <string name="labelLifetimePayments">Lifetime Payments</string>
-    <string name="labelReferrals">Referrals</string>
     <plurals name="fmtReferralsCount">
         <item quantity="one">%d referral</item>
         <item quantity="other">%d referrals</item>
@@ -889,9 +885,9 @@
 
 
 
-    <string name="titleRewardsHero">Level up and earn up to 0.50% back</string>
+    <string name="titleRewardsHero" formatted="false">Level up and earn up to 0.50% back</string>
 
-    <string name="labelRewardsHeroHighlight">0.50% back</string>
+    <string name="labelRewardsHeroHighlight" formatted="false">0.50% back</string>
     <string name="labelCashbackSuffix"> cashback on every bill</string>
     <string name="titleRoadToLevel">Road to %1$s</string>
     <!--  progress line per next.metric  -->
@@ -948,7 +944,7 @@
     <string name="msgLevelUpSubGold2">₹1,000 locked in your Earning Wallet for 30+ days.</string>
     <string name="msgLevelUpSubGold1">₹4,000 locked for 30+ days. Platinum is in sight.</string>
     <string name="msgLevelUpSubPlatinum">90 days in a row at Gold I. This level is yours forever.</string>
-    <string name="coming_soon">Coming Soon</string>
+    <string name="labelComingSoon">Coming Soon</string>
     <string name="labelAppVersion">Version %1$s</string>
 
     <!-- B2C V2 Onboarding — Bank Details Dialog -->

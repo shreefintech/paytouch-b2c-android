@@ -212,11 +212,11 @@ class EarningWalletActivity : BaseActivity() {
         interestAccrued = item.interestAccrued ?: 0.0
         val pendingAmt = item.pendingWithdrawalAmount ?: 0.0
 
-        binding.tvLockedBalance.text = Utility.formatAmount(lockedBalance)
+        binding.tvLockedBalance.text = Utility.formatAmount(lockedBalance.toString())
 
         if (interestAccrued > 0.0) {
             binding.cardInterestPill.visible()
-            binding.tvInterestPill.text = getString(R.string.labelInterestEarned, Utility.formatAmount(interestAccrued))
+            binding.tvInterestPill.text = getString(R.string.labelInterestEarned, Utility.formatAmount(interestAccrued.toString()))
         } else {
             binding.cardInterestPill.gone()
         }
@@ -232,7 +232,7 @@ class EarningWalletActivity : BaseActivity() {
         if (pendingAmt > 0.0) {
             binding.llPendingPill.visible()
             val dateStr = Utility.formatDate(item.withdrawalAvailableAt, "dd MMM")
-            binding.tvPendingPill.text = getString(R.string.msgPendingWithdrawal, Utility.formatAmount(pendingAmt), dateStr)
+            binding.tvPendingPill.text = getString(R.string.msgPendingWithdrawal, Utility.formatAmount(pendingAmt.toString()), dateStr)
             binding.btnWithdraw.isEnabled = false
             binding.btnWithdraw.alpha = 0.45f
         } else {
@@ -293,7 +293,7 @@ class EarningWalletActivity : BaseActivity() {
         if (showGoldWarn) {
             withdrawSheet.llGoldWarning.visible()
             val remaining = (lockedBalance - entered).coerceAtLeast(0.0)
-            withdrawSheet.tvGoldWarning.text = getString(R.string.msgGoldWarning, Utility.formatAmount(remaining))
+            withdrawSheet.tvGoldWarning.text = getString(R.string.msgGoldWarning, Utility.formatAmount(remaining.toString()))
         } else {
             withdrawSheet.llGoldWarning.gone()
         }
@@ -301,7 +301,7 @@ class EarningWalletActivity : BaseActivity() {
         val showInterest = interestAccrued > 0.0 && entered > 0.0 && !isOverLimit
         if (showInterest) {
             withdrawSheet.llInterestRow.visible()
-            withdrawSheet.tvLostInterest.text = getString(R.string.msgLostInterest, Utility.formatAmount(interestAccrued))
+            withdrawSheet.tvLostInterest.text = getString(R.string.msgLostInterest, Utility.formatAmount(interestAccrued.toString()))
         } else {
             withdrawSheet.llInterestRow.gone()
         }
@@ -345,7 +345,7 @@ class EarningWalletActivity : BaseActivity() {
 
     private fun openLockSheet() {
         lockSheet.etLockAmount.text?.clear()
-        lockSheet.tvLockWalletBalance.text = Utility.formatAmount(walletBalance)
+        lockSheet.tvLockWalletBalance.text = Utility.formatAmount(walletBalance.toString())
         val activeDateMs = System.currentTimeMillis() + Constant.EARNING_LOCK_DAYS.toLong() * 24 * 60 * 60 * 1000
         lockSheet.tvStartsEarning.text = getString(R.string.msgStartsEarning, Utility.formatMillis(activeDateMs, "d MMM yyyy"))
         lockSheet.tvLockError.gone()
@@ -355,7 +355,7 @@ class EarningWalletActivity : BaseActivity() {
 
     private fun openWithdrawSheet() {
         withdrawSheet.etWithdrawAmount.text?.clear()
-        withdrawSheet.tvWithdrawLockedBalance.text = Utility.formatAmount(lockedBalance)
+        withdrawSheet.tvWithdrawLockedBalance.text = Utility.formatAmount(lockedBalance.toString())
         withdrawSheet.tvWithdrawError.gone()
         withdrawSheet.llWarnBox.gone()
         setWithdrawButtonEnabled(false)

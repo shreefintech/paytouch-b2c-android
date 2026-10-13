@@ -63,6 +63,8 @@ class EditBankDetailsViewModel(application: Application) : AndroidViewModel(appl
                     val body = response.body()
                     if (response.isSuccessful && body?.success == true) {
                         onSuccess(body.message ?: getString(R.string.msgBankDetailsSubmitSuccess))
+                    } else if (response.isSuccessful) {
+                        onError(body?.message ?: getString(R.string.errGeneric))
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(
