@@ -34,6 +34,8 @@ import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
+import com.shreefintech.paytouchconsumer.utill.loadAddressCities
+import com.shreefintech.paytouchconsumer.utill.loadAddressStates
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import androidx.core.view.isVisible
 import androidx.core.net.toUri
@@ -444,7 +446,7 @@ class MyAccountActivity : BaseActivity() {
 
     private fun loadStates() {
         if (isStatesLoading) return
-        viewModel.loadStates(
+        viewModel.loadAddressStates(
             onLoading = {
                 isStatesLoading = true
                 editProfileBinding?.let { setFieldLoading(it.pbStateLoading, it.ivStateArrow, it.flStateAnchor, true) }
@@ -466,7 +468,7 @@ class MyAccountActivity : BaseActivity() {
     }
 
     private fun loadCities(stateId: String) {
-        viewModel.loadCities(
+        viewModel.loadAddressCities(
             stateId = stateId,
             onLoading = {
                 editProfileBinding?.let { setFieldLoading(it.pbCityLoading, it.ivCityArrow, it.flCityAnchor, true) }

@@ -87,7 +87,7 @@ Displays KYC-verified profile data. Shows a shimmer placeholder while the API ca
 
 Text fields fall back to `"--"` when null.
 
-**Edit profile (pencil next to Member Code):** Opens `dialog_edit_profile` — name, email, state, city prefilled from `AccountInfoItem` (`address.state` / `address.city`). States/cities load from `v2/address/states` / `v2/address/cities`. Submit calls `POST /api/profile`; on success the stored email is updated and account info is re-fetched (home address is derived server-side). Ignored until account info has loaded.
+**Edit profile (pencil next to Member Code):** Opens `dialog_edit_profile` — name, email, state, city prefilled from `AccountInfoItem` (`address.state` / `address.city`). States/cities load from `v2/address/states` / `v2/address/states/{state_id}/cities`. Submit calls `POST /api/profile`; on success the stored email is updated and account info is re-fetched (home address is derived server-side). Ignored until account info has loaded.
 
 **"View KYC Details" button:** Navigates to `KycDetailsActivity` (in this package) — fetches `GET /api/dashboard-kyc/my-account` via `KycDetailsViewModel`. Document taps open `DocPreviewActivity` with `extra_file_url` + `extra_file_title`.
 
