@@ -112,6 +112,8 @@ class RewardsExplainerActivity : BaseActivity() {
     }
 
     private fun populateHero(data: RewardsLevelItem) {
+        // Late response after onDestroy would restart the progress animator on a dead binding
+        if (isFinishing || isDestroyed) return
         val tier = RewardsTier.from(data.stage)
 
         binding.ivYourBadge.setImageResource(tier.badgeRes)
@@ -186,7 +188,6 @@ class RewardsExplainerActivity : BaseActivity() {
         stopHeroLoops()
         if (!animationsEnabled()) return
 
-        binding.ivHeroRays.setLayerType(View.LAYER_TYPE_HARDWARE, null)
         loopAnimators += ObjectAnimator.ofFloat(binding.ivHeroRays, View.ROTATION, 0f, 360f).apply {
             duration = 50_000L
             repeatCount = ValueAnimator.INFINITE
@@ -210,7 +211,6 @@ class RewardsExplainerActivity : BaseActivity() {
     private fun stopHeroLoops() {
         loopAnimators.forEach { it.cancel() }
         loopAnimators.clear()
-        binding.ivHeroRays.setLayerType(View.LAYER_TYPE_NONE, null)
         binding.ivHeroRays.rotation = 0f
         heroBadges().forEach { it.translationY = 0f }
     }

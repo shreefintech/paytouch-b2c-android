@@ -98,7 +98,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private var isAadhaarUploading = false
     private var aadhaarCheckCall: Call<UserProfileItem>? = null
 
-    /** Silent — Home stays usable if /api/user fails; the flag is re-checked on the next Home launch. */
+    /**
+     * Silent — Home stays usable if /api/user fails; the flag is re-checked on the next Home launch.
+     * Also the post-login source of the bank/PAN onboarding flags (see [saveOnboardingFlags]) — keep this call.
+     */
     fun checkAadhaarRejected(onRejected: () -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) return
         aadhaarCheckCall?.cancel()
