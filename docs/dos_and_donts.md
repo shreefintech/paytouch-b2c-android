@@ -1,36 +1,10 @@
 # PayTouch Consumer — DOs and DON'Ts
 
-Every rule here is derived from a specific pattern or requirement for this project. The reason is given for each so you can judge edge cases rather than blindly following the rule.
+Rules **not** already stated in `CLAUDE.md` (core architecture, naming, network, loading-state, click, RecyclerView rules live there — not repeated here), plus the full Category Module rules. UI code snippets: `docs/code_patterns.md`.
 
 ---
 
-## DOs — Patterns to Keep and Enforce
-
-### Architecture
-
-**DO use `ApiClient` as the only Retrofit source.**
-This project has exactly one `ApiClient` class. ViewModels call `ApiClient.apiService` directly for standard API calls. No Activity should create its own Retrofit instance. If additional base URLs are needed (e.g., VPS backend), create one named client per URL with a clear, stable name.
-
-**DO use `SharedPreferenceHelper` as the ONLY SharedPreferences access point.**
-Every read and write must go through `SharedPreferenceHelper`. No Activity or ViewModel should call `getSharedPreferences()` directly. Having multiple scattered stores for the same user data causes bugs and confusion.
-
-**DO put all URLs, keys, and string constants in `Constant.kt`.**
-Never hardcode a string that is used in more than one place. Every URL, API key, SharedPreferences key name, and bundle key belongs in `Constant.kt`.
-
-**DO call `Utility.isInternetAvailable()` before every network request.**
-This is a critical UX requirement. Never make an API call without this check. Show a user-facing message via `ToastUtil` if there is no internet.
-
-**DO read the transaction ID from the payment API response — never generate it client-side.**
-The backend generates and returns the transaction ID in the `process-payment` / `process-direct` response. `Utility.generateTransactionId()` was removed; do not recreate it. Do not include a `transaction_id` field in any payment request DTO.
-
-**DO enforce the mandatory onboarding sequence: KYC → MPIN.**
-The server drives this via flags (`requires_kyc`, `requires_mpin`). Always check these flags after login and route accordingly. Never allow a user to skip a step. `requires_virtual_account` is permanently retired — virtual account creation is handled server-side after KYC approval; do not add client-side routing for it.
-
-**DO apply platform fee calculation before showing the final payment amount.**
-Fee tiers (₹4 / ₹8 / ₹20 / ₹30 based on amount range) must be calculated and displayed before the user confirms payment. This logic belongs in a ViewModel, not an Activity.
-
-**DO handle 401 responses globally via an OkHttp interceptor.**
-A `SessionInterceptor` (or equivalent) must catch any 401 response, clear all SharedPreferences, and launch LoginActivity with a cleared back stack. This must not be implemented per-ViewModel.
+## DOs
 
 **DO validate inputs before any API call.**
 | Field | Rule |
@@ -42,121 +16,45 @@ A `SessionInterceptor` (or equivalent) must catch any 401 response, clear all Sh
 | MPIN | Exactly 4 digits; confirmation must match |
 | Email | Standard email format |
 
-**DO use the `when` block + `Utility.stopClick()` guard for all click handling.**
-One centralized `onClickListener()` per Activity that delegates to a `when` block. Every case must call `Utility.stopClick()` before any navigation, API call, or state change.
+**DO enforce the mandatory onboarding sequence: KYC → MPIN.** Server flags `requires_kyc`, `requires_mpin` drive routing after login; never allow skipping. `requires_virtual_account` is permanently retired — no client routing for it.
 
-**DO extend `BaseActivity` for every screen.**
-All Activities must extend `BaseActivity`. Never extend `AppCompatActivity` directly.
+**DO calculate the platform fee (tiers in `business_logic.md` §7) in a ViewModel and show it before the user confirms payment.**
 
-**DO use `ToastUtil` for all user-facing messages.**
-Never call `Toast.makeText()` directly in any Activity, ViewModel, or utility class.
+**DO handle 401 globally via an OkHttp interceptor** (`SessionInterceptor` or equivalent): clear all SharedPreferences, launch LoginActivity with cleared back stack. Never per-ViewModel.
 
-**DO use `ApiHelper.parseErrorMessage()` to extract error text from failed API responses.**
-Never show a raw server error string or exception message to the user. Always parse it through `ApiHelper`.
+**DO use a date picker for every date field** (DOB, date-range filters) — never free text. **DO auto-calculate age** from the DOB picker result.
 
-**DO show loading state inside the button that triggered the API call — never use a full-screen loader or alpha-only dimming.**
-Every button that triggers a network call must contain both its label/icon and a `ProgressBar` child. Use one `ObservableBoolean` per button declared in the layout `<data>` block and toggled in Kotlin. Set it `true` before the call and `false` in both `onResponse` and `onFailure`. Guard the click handler with `if (showProgressXxx.get()) return`. For dropdown/list fields, show a small spinner inside the field slot (replacing the arrow icon) — never affect the rest of the screen. See the **Button & List Loading State Rule** section in `CLAUDE.md` for the full pattern with XML and Kotlin examples.
+**DO play audio feedback after every payment** — `payment_success.mp3` / `payment_failed.mp3`; release the MediaPlayer in `onDestroy()`.
 
-**DO use a date picker for all date input fields.**
-For DOB, date range filters, and any other date field — use a picker dialog, never a free-text input.
-
-**DO auto-calculate age from the selected date of birth.**
-Never make users manually enter their age. Calculate it from the DOB picker result.
-
-**DO use `notifyItemChanged(position)` for single-item RecyclerView updates.**
-Never call `notifyDataSetChanged()` for a single item change. Use targeted updates.
-
-**DO rely on API endpoints for transaction history — there is no local database.**
-Transaction history per module comes from `api/{category}/payment-history` (recent) and `api/{category}/payment-reports` (filtered). Do not add a Room DB; the server is the source of truth for all payment records.
-
-**DO play audio feedback after every payment.**
-`payment_success.mp3` and `payment_failed.mp3` must play after every transaction result. Clean up the MediaPlayer in `onDestroy()`.
-
-**DO use `ActivityResultLauncher` for all activity results and file picking.**
-The `startActivityForResult()` / `onActivityResult()` APIs are deprecated. Use `registerForActivityResult()` everywhere.
-
-**DO prefer Data Binding (`android:onClickListener="@{onClickListener}"`) over programmatic `setOnClickListener()`.**
-Data Binding is the project's established pattern. Use it consistently.
+**DO rely on API endpoints for transaction history** — `api/{category}/payment-history` (recent) and `api/{category}/payment-reports` (filtered).
 
 ---
 
-## DON'Ts — Anti-Patterns to Avoid
+## DON'Ts
 
-### Architecture
+**DON'T put network calls in Activities.** ViewModels call `ApiClient.apiService` and surface results via `onLoading`/`onSuccess`/`onError` callbacks.
 
-**DON'T put network calls in Activities.**
-All network calls must go in a ViewModel. The ViewModel calls `ApiClient.apiService` directly and surfaces results via `onLoading`/`onSuccess`/`onError` callbacks. Activities are pure UI responders.
+**DON'T wrap Retrofit calls in `viewModelScope.launch`.** Repository, LiveData, StateFlow are NOT required for one-shot API calls. Use them only when data must outlive the screen, needs caching/pagination of heavy data, is a continuous stream (WebSocket, polling), or is observed by multiple screens.
 
-**DON'T use `suspend fun` or coroutines for Retrofit API calls.**
-All Retrofit endpoint declarations must return `Call<T>` (not `Response<T>`) and must be invoked with `.enqueue()`. Never use `suspend fun` on an `ApiService` method, and never wrap a Retrofit call in `viewModelScope.launch`. The `.enqueue()` callback already executes on the main thread — no dispatcher needed.
+**DON'T create multiple SharedPreferences stores** for the same user's session data.
 
-```kotlin
-// Correct
-fun someEndpoint(...): Call<SomeItem>
+**DON'T create multiple Retrofit instances for the same base URL** — exactly one named client per distinct backend.
 
-// Wrong — do not use
-suspend fun someEndpoint(...): Response<SomeItem>
-```
+**DON'T hardcode active URLs/keys/tokens in Activity/ViewModel code.** Commented-out dev reference URLs (ngrok, localhost) inside `Constant.kt` are acceptable and must not be removed.
 
-**Repository, LiveData, and StateFlow are NOT required for standard one-shot API calls.** Use them only when:
-- Data must outlive the screen (shared across multiple destinations)
-- Data is heavy and needs caching or pagination
-- Data represents a continuous stream of updates (WebSocket, polling)
-- Multiple screens must observe the same data simultaneously
+**DON'T store a token or shared state in a static/`companion object` mutable field** (race condition). Use `SharedPreferenceHelper` or a Repository singleton.
 
-**DON'T create multiple SharedPreferences stores for the same user.**
-Use one store, accessed through `SharedPreferenceHelper`. Do not call `getSharedPreferences()` with different store names for the same user's session data.
+**DON'T put business logic (fees, status routing, validation) in Adapters or Activities.** Passing `context` as a function parameter to a ViewModel for a single operation is acceptable; storing it is not.
 
-**DON'T create multiple Retrofit instances for the same base URL.**
-One `ApiClient` per distinct base URL. If a second distinct backend is needed (e.g., VPS admin), create exactly one named client for it — not a new instance for each screen.
+**DON'T store user-facing strings in Kotlin/Java** — all go in `strings.xml`.
 
-**DON'T hardcode any active URL, key, or token in Activity/ViewModel code.**
-All constants belong in `Constant.kt`. Commented-out development reference URLs (e.g. ngrok, localhost) inside `Constant.kt` are acceptable and must not be removed — they serve as reference during development.
+**DON'T load images with Glide without `.placeholder()` and `.error()`.**
 
-**DON'T store a static mutable field for a token or shared state.**
-Storing a dynamic token in a `companion object` or `static` field is a race condition anti-pattern. Use `SharedPreferenceHelper` or a Repository singleton.
+**DON'T add Room/SQLite/any local persistence for payment records** — the server is the source of truth.
 
-**DON'T put business logic in Adapters or Activities.**
-Fee calculation, status routing, and validation belong in a ViewModel or dedicated utility. Activities respond to UI events and update views — nothing more.
+**DON'T mix backends within one feature** — e.g. never `paytouch.in` for step A and `admin.paytouch.in` for step B of the same payment flow.
 
-**DON'T store Activity or Context references as fields inside ViewModels.**
-ViewModels must not hold `Activity`, `Fragment`, or `Context` as a class-level property — this causes memory leaks. Passing `context` as a function parameter for a single operation is acceptable.
-
-**DON'T skip the internet check before any API call.**
-`Utility.isInternetAvailable()` must be called every time, no exceptions.
-
-**DON'T call `notifyDataSetChanged()` on a RecyclerView for a single-item update.**
-This causes full list re-renders and visual flicker. Use `notifyItemChanged(position)`.
-
-**DON'T use raw `Toast.makeText()` directly.**
-All messages go through `ToastUtil`. This is non-negotiable.
-
-**DON'T store user-facing strings in Kotlin/Java code.**
-All user-visible messages must be in `strings.xml`.
-
-**DON'T load images with Glide without specifying a placeholder and error drawable.**
-`Glide.with(context).load(url).into(view)` without `.placeholder()` and `.error()` leaves blank space during load and on failure.
-
-**DON'T use `startActivity()` without calling `Utility.stopClick()` first.**
-Rapid taps can launch duplicate Activities. Every click handler must be guarded before any navigation.
-
-**DON'T name adapters with the suffix `Adapter` — use `Adp`.**
-Convention: `TransactionAdp`, not `TransactionAdapter`. Consistent naming makes the codebase scannable.
-
-**DON'T name models with suffixes like `Response` or `Model` — use `Item`.**
-Convention: `TransactionItem`, not `TransactionResponse` or `TransactionModel`.
-
-**DON'T add a Room DB for transaction storage.**
-There is no local database in this project. Transaction history is fetched from the API. Do not introduce Room, SQLite, or any local persistence layer for payment records.
-
-**DON'T mix multiple API backends for the same feature.**
-Each feature must use exactly one base URL for all its calls. Do not call `paytouch.in` for step A and `admin.paytouch.in` for step B of the same payment flow.
-
-**DON'T suppress VPS sync failures silently.**
-VPS sync calls are non-blocking, but failures must be logged so issues can be detected and debugged.
-
-**DON'T use a full-screen progress dialog, overlay, or pure alpha dimming for button-triggered API calls.**
-Full-screen loaders block the entire UI unnecessarily. Alpha-only dimming gives no clear feedback that a network call is in flight. Always show a `ProgressBar` inside the specific button that was tapped. For field-level list loading (dropdown, selector), show a localized spinner inside that field only — never a full-screen indicator. One `ObservableBoolean` per button; never a single shared `isLoading` flag driving multiple buttons' states.
+**DON'T suppress VPS sync failures silently** — they're non-blocking but must be logged.
 
 ---
 
@@ -208,17 +106,8 @@ If one of these is missing a field required by a new module, add it to the exist
 
 ---
 
-### ViewModel Base Class
+> ViewModel base class: see `CLAUDE.md` rule 13.
 
-| ViewModel | Base Class |
-|---|---|
-| `{Category}ViewModel` (main payment screen) | `BaseBillViewModel` |
-| `{Category}RecentTransactionViewModel` | `AndroidViewModel` |
-| `{Category}TransactionReportViewModel` | `AndroidViewModel` |
-| `{Category}TransactionStatusViewModel` | `AndroidViewModel` |
-| `{Category}SmsReceiptViewModel` | `AndroidViewModel` — **not** `BaseBillViewModel`; receipt only needs `bearerToken()`, not balance checks |
-
----
 
 ### Extension Functions — Never Re-implement
 
@@ -234,14 +123,6 @@ If one of these is missing a field required by a new module, add it to the exist
 | `Utility.maskNumber(number)` | `utill/Utility.kt` | Masked account/mobile display in list rows — format `9876*****0` (first 4 + `*****` + last 1) |
 
 If a ViewModel declares a private copy of any of the above, delete it and use the shared function.
-
-#### Date format by screen — use exactly the format below, never the wrong one
-
-| Screen | Format string | Output example |
-|---|---|---|
-| Recent transaction list (`{Category}RecentTransactionViewModel`) | `"dd MMM yyyy"` | `11 Jul 2026` |
-| Transaction detail (`TransactionDetailActivity`) | `"dd/MM/yyyy"` | `11/07/2026` |
-| Any other full datetime display | `"dd/MM/yyyy hh:mm a"` | `11/07/2026 03:45 PM` |
 
 #### Amount formatting — never use raw string templates
 

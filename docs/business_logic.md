@@ -397,14 +397,7 @@ User enters a top-up amount, the app creates an HDFC payment order, then opens `
 
 ## 13. Transaction ID
 
-### Ownership
-Transaction IDs are **generated and returned by the backend** in the `process-payment` (or `process-direct`) response. The client must never generate a transaction ID before or during the API call.
-
-### Rules
-- Do not pass a `transaction_id` field in any payment request DTO
-- Read the transaction ID from the API response and store it for status lookup and receipts
-- `Utility.generateTransactionId()` was removed — do not recreate it
-- The ID format (`PYTCH…`) is set by the server; the client treats it as an opaque string
+Backend-generated, returned in the `process-payment` / `process-direct` response; read it from there for status lookups and receipts. Never generated client-side, never sent in a request DTO (`Utility.generateTransactionId()` was removed — do not recreate). Format `PYTCH…` is server-set; treat as an opaque string.
 
 ---
 
@@ -457,9 +450,7 @@ Transaction IDs are **generated and returned by the backend** in the `process-pa
 
 ## 16. Internet Connectivity
 
-### Rules
-- `Utility.isInternetAvailable(context)` must be called before every API request
-- If no internet: show message via `ToastUtil`, do not make the API call
+`Utility.isInternetAvailable(context)` before every API request; offline → `ToastUtil` message, no call. Full offline UX: `docs/no_internet_handling.md`.
 
 ---
 
