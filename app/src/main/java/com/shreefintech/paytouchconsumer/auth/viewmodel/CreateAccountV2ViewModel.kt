@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -112,14 +113,9 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
                 onError(getString(R.string.errGeneric))
                 return@launch
             }
-            if (bytes.size > AADHAAR_MAX_BYTES) {
-                onError(getString(R.string.msgAadhaarPhotoInvalid))
-                return@launch
-            }
 
             val extension = when {
                 mimeType.contains("pdf") -> ".pdf"
-                mimeType.contains("png") -> ".png"
                 else -> ".jpg"
             }
             val photoPart = MultipartBody.Part.createFormData(
@@ -137,7 +133,7 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
                 stateId.toTextBody(),
                 cityId.toTextBody(),
                 referralCode.toTextBody(),
-                "android".toTextBody()
+                Constant.FCM_PLATFORM_ANDROID.toTextBody()
             ).enqueue(object : Callback<RegisterItem> {
                 override fun onResponse(call: Call<RegisterItem>, response: Response<RegisterItem>) {
                     if (response.isSuccessful) {
@@ -164,8 +160,4 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
     }
 
     private fun String.toTextBody(): RequestBody = toRequestBody("text/plain".toMediaTypeOrNull())
-
-    private companion object {
-        const val AADHAAR_MAX_BYTES = 5 * 1024 * 1024
-    }
 }

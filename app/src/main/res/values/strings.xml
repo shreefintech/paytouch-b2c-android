@@ -963,8 +963,6 @@
 
     <!-- B2C V2 Registration — Aadhaar document upload -->
     <string name="labelAadhaarPhoto">Upload Aadhaar Document</string>
-    <string name="hintAadhaarPhoto">JPG, PNG or PDF · max 5 MB</string>
     <string name="msgAadhaarPhotoRequired">Please upload your Aadhaar document</string>
-    <string name="msgAadhaarPhotoInvalid">File must be JPG, PNG or PDF · max 5 MB</string>
 
 </resources>

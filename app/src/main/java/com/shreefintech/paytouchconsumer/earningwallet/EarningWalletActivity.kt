@@ -340,7 +340,7 @@ class EarningWalletActivity : BaseActivity() {
         PanCardDialogHelper.show(
             activity = mActivity,
             authorization = SharedPreferenceHelper.bearerToken(mActivity),
-            onSuccess = { },
+            onSuccess = { openOptInSheet() },
             onDismissed = { openOptInSheet() }
         )
     }

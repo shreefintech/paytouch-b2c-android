@@ -304,6 +304,7 @@ class CreateAccountV2Activity : BaseActivity() {
             when (view) {
                 binding.llCreateAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (showProgress.get()) return@OnClickListener
                     onCreateAccount()
                 }
                 binding.tvBackToSignIn -> {
