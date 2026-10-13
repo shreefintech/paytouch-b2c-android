@@ -11,10 +11,3 @@ data class EditProfileDataItem(
     @field:SerializedName("state")  val state: StateItem?,
     @field:SerializedName("city")   val city: CityItem?
 )
-
-data class EditProfileRequest(
-    @field:SerializedName("name")     val name: String,
-    @field:SerializedName("email")    val email: String,
-    @field:SerializedName("state_id") val stateId: Int,
-    @field:SerializedName("city_id")  val cityId: Int
-)

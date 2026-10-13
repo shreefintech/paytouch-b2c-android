@@ -55,6 +55,8 @@ class MyAccountActivity : BaseActivity() {
     private var isStatesLoading = false
     private var stateList = listOf<StateItem>()
     private var cityList = listOf<CityItem>()
+    // State whose cities are in cityList — reused across dialog opens instead of refetching
+    private var cityListStateId: String? = null
     // Pre-selected in the Edit Profile dialog — sourced from account-overview `address`
     private var savedState: StateItem? = null
     private var savedCity: CityItem? = null
@@ -337,7 +339,6 @@ class MyAccountActivity : BaseActivity() {
         dialogBinding.etEmail.setText(accountInfo?.contact?.email.orEmpty())
         selectedState = savedState
         selectedCity = savedCity
-        cityList = emptyList()
         setDropdownValue(dialogBinding.tvState, selectedState?.name, R.string.hintSelectState)
         setDropdownValue(dialogBinding.tvCity, selectedCity?.name, R.string.hintSelectCity)
 
@@ -362,7 +363,13 @@ class MyAccountActivity : BaseActivity() {
             isStatesLoading -> setFieldLoading(dialogBinding.pbStateLoading, dialogBinding.ivStateArrow, dialogBinding.flStateAnchor, true)
             stateList.isEmpty() -> loadStates()
         }
-        selectedState?.id?.let { loadCities(it) }
+        val stateId = selectedState?.id
+        if (stateId != cityListStateId) {
+            // Cached cities belong to another state (picked earlier, then dismissed without saving)
+            cityList = emptyList()
+            cityListStateId = null
+            stateId?.let { loadCities(it) }
+        }
     }
 
     private fun editProfileClickListener(dialogBinding: DialogEditProfileBinding): View.OnClickListener {
@@ -404,6 +411,7 @@ class MyAccountActivity : BaseActivity() {
             selectedState = state
             selectedCity = null
             cityList = emptyList()
+            cityListStateId = null
             setDropdownValue(dialogBinding.tvCity, null, R.string.hintSelectCity)
             state.id?.let { loadCities(it) }
         }
@@ -465,6 +473,7 @@ class MyAccountActivity : BaseActivity() {
                 // Stale response — user picked another state while this one was in flight
                 if (isDestroyed || stateId != selectedState?.id) return@onSuccess
                 cityList = cities
+                cityListStateId = stateId
                 editProfileBinding?.let { setFieldLoading(it.pbCityLoading, it.ivCityArrow, it.flCityAnchor, false) }
             },
             onError = onError@{ msg ->
@@ -497,6 +506,8 @@ class MyAccountActivity : BaseActivity() {
             return
         }
 
+        // Dismiss only this dialog — a late response must not close one reopened after a manual dismiss
+        val dialog = editProfileDialog
         viewModel.updateProfile(
             request = EditProfileRequest(name, email, stateId, cityId),
             onLoading = { showProgressUpdate.set(true) },
@@ -508,7 +519,7 @@ class MyAccountActivity : BaseActivity() {
                 data.email?.let {
                     SharedPreferenceHelper.setSharedPreferenceString(mActivity, Constant.KEY_EMAIL, it)
                 }
-                editProfileDialog?.dismiss()
+                dialog?.dismiss()
                 ToastUtil.showSuccess(mActivity, message)
                 // Home address is derived server-side from state/city — refetch instead of patching fields
                 loadAccountInfo()

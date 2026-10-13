@@ -333,7 +333,10 @@ class HomeActivity : BaseActivity() {
                 val bmp = Utility.renderPdfFirstPage(mActivity, uri, targetWidth)
                 withContext(Dispatchers.Main) {
                     // Dialog may have been replaced / file changed while rendering
-                    if (aadhaarBinding !== dialogBinding || aadhaarUri != uri) return@withContext
+                    if (aadhaarBinding !== dialogBinding || aadhaarUri != uri) {
+                        bmp?.recycle()
+                        return@withContext
+                    }
                     Glide.with(mActivity).load(bmp).into(dialogBinding.ivPreviewAadhaar)
                 }
             }

@@ -178,6 +178,9 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
                     val data = body?.data
                     if (response.isSuccessful && body?.success == true && data != null) {
                         onSuccess(data, body.message ?: getString(R.string.msgProfileUpdated))
+                    } else if (response.isSuccessful) {
+                        // HTTP 200 with success:false — errorBody() is null, the reason is in body.message
+                        onError(body?.message ?: getString(R.string.errGeneric))
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(
