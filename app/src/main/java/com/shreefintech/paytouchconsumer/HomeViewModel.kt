@@ -19,6 +19,7 @@ import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
+import com.shreefintech.paytouchconsumer.utill.saveOnboardingFlags
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -106,12 +107,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 override fun onResponse(call: Call<UserProfileItem>, response: Response<UserProfileItem>) {
                     if (aadhaarCheckCall === call) aadhaarCheckCall = null
                     // Only /api/user drives the bank/PAN flags — login lands here without passing through Splash
-                    response.body()?.bankDetailsAdded?.let {
-                        SharedPreferenceHelper.setSharedPreferenceBoolean(getApplication(), Constant.KEY_BANK_DETAILS_ADDED, it)
-                    }
-                    response.body()?.panAdded?.let {
-                        SharedPreferenceHelper.setSharedPreferenceBoolean(getApplication(), Constant.KEY_PAN_ADDED, it)
-                    }
+                    saveOnboardingFlags(response.body())
                     // Checked at response time so the flags above still refresh while an upload is in flight.
                     // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
                     // switch the upload result to LiveData if Home ever stops being portrait-locked

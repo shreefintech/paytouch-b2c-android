@@ -19,7 +19,7 @@ object BankDetailsDialogHelper {
 
     /** Runs [action] when bank details exist; otherwise asks for them first and runs [action] once saved. */
     fun runIfBankAdded(activity: Activity, action: () -> Unit) {
-        if (SharedPreferenceHelper.getSharedPreferenceBoolean(activity, Constant.KEY_BANK_DETAILS_ADDED, true)) {
+        if (SharedPreferenceHelper.getSharedPreferenceBoolean(activity, Constant.KEY_BANK_DETAILS_ADDED, false)) {
             action()
         } else {
             show(activity, SharedPreferenceHelper.bearerToken(activity), onBankAdded = action)

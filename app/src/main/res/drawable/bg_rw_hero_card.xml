@@ -7,7 +7,7 @@
         android:centerX="0.5"
         android:centerY="0"
         android:gradientRadius="420dp"
-        android:startColor="#5A1A5E"
-        android:centerColor="#2A0B30"
-        android:endColor="#1C0721" />
+        android:startColor="@color/rw_hero_start"
+        android:centerColor="@color/rw_hero_center"
+        android:endColor="@color/rw_hero_end" />
 </shape>

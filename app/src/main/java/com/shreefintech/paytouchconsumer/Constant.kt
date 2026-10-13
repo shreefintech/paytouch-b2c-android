@@ -117,7 +117,7 @@ object Constant {
     const val DIR_RECEIPTS = "receipts"
 
     // B2C onboarding flags — cleared on logout via clearSharedPreference()
-    // Set from /api/user only (Splash + Home), never from login; read with default true when unset
+    // Set from /api/user only (Splash + Home), never from login; read with default false when unset (fail closed)
     const val KEY_BANK_DETAILS_ADDED = "BANK_DETAILS_ADDED"
     const val KEY_PAN_ADDED = "PAN_ADDED"
 

@@ -344,6 +344,8 @@ amount > 40000           → fee = ₹30
 - Balance is fetched fresh from the API on every Home/dashboard load
 - `Load Wallet` opens `LoadWalletActivity` which routes to the HDFC payment WebView
 - Earning Wallet lock: minimum `Constant.EARNING_MIN_LOCK_AMOUNT` (₹100), maximum = main wallet balance. Below-minimum is rejected on tap of Lock (toast), not shown live while typing; over-balance shows an inline error and disables the button.
+- Earning Wallet lock requires PAN: when `KEY_PAN_ADDED` is false (or unset), tapping Lock Money shows the PAN dialog first — for opted-in users too. Submitting PAN continues to the opt-in or lock sheet; closing the dialog opens nothing.
+- Bank/PAN onboarding flags (`KEY_BANK_DETAILS_ADDED`, `KEY_PAN_ADDED`) are set only from `/api/user` (Splash + Home), never from login, and read with default `false` — if `/api/user` hasn't answered yet, the bank/PAN dialog is shown rather than skipped.
 
 ### API Endpoints
 | Method | Path | Purpose |

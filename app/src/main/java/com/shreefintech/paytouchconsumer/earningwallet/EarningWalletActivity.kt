@@ -328,9 +328,10 @@ class EarningWalletActivity : BaseActivity() {
     }
 
     private fun onLockMoney() {
-        // PAN dialog comes first whenever PAN is missing — even for opted-in users
+        // PAN is mandatory to lock — the dialog comes first whenever PAN is missing, even for opted-in users;
+        // closing it opens nothing
         val proceed = { if (isOptedIn) openLockSheet() else openOptInSheet() }
-        if (SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_PAN_ADDED, true)) {
+        if (SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_PAN_ADDED, false)) {
             proceed()
             return
         }
