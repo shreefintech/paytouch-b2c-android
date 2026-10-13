@@ -1,10 +1,15 @@
 package com.shreefintech.paytouchconsumer.rewards
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.view.animation.DecelerateInterpolator
+import android.provider.Settings
+import android.view.animation.LinearInterpolator
+import android.view.animation.PathInterpolator
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -12,7 +17,6 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityRewardsExplainerBinding
@@ -29,6 +33,8 @@ class RewardsExplainerActivity : BaseActivity() {
     private lateinit var binding: ActivityRewardsExplainerBinding
     private val viewModel: RewardsViewModel by viewModels()
     private var selectedTier = RewardsTier.BRONZE
+    private val loopAnimators = mutableListOf<Animator>()
+    private var progressAnimator: ValueAnimator? = null
 
     companion object {
         fun start(context: Context) {
@@ -54,11 +60,25 @@ class RewardsExplainerActivity : BaseActivity() {
         val listener = onClickListener()
         binding.onClickListener = listener
 
-        Glide.with(this).load(R.drawable.img_hero_background_with_levels).into(binding.ivHeroBg)
         setupHeroHeadline()
         onBack()
         retryCallback = { loadLevel() }
         loadLevel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startHeroLoops()
+    }
+
+    override fun onPause() {
+        stopHeroLoops()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        progressAnimator?.cancel()
+        super.onDestroy()
     }
 
     private fun loadLevel() {
@@ -137,15 +157,67 @@ class RewardsExplainerActivity : BaseActivity() {
         }
     }
 
+    /** Bar grows 0 → value: 1.2 s, after 0.6 s, CSS ease-out. Static when animations are off. */
     private fun animateLevelProgress(progress: Float) {
-        ValueAnimator.ofInt(0, (progress * 100).toInt()).apply {
-            duration = 1000
-            startDelay = 500
-            interpolator = DecelerateInterpolator()
+        progressAnimator?.cancel()
+        val value = (progress * 100).toInt()
+        if (!animationsEnabled()) {
+            binding.viewProgressFill.progress = value
+            return
+        }
+        progressAnimator = ValueAnimator.ofInt(0, value).apply {
+            duration = 1_200L
+            startDelay = 600L
+            interpolator = PathInterpolator(0f, 0f, 0.58f, 1f)
             addUpdateListener { anim -> binding.viewProgressFill.progress = anim.animatedValue as Int }
             start()
         }
     }
+
+    // ── Hero motion ─────────────────────────────────────────────────────────
+
+    private fun heroBadges() = listOf(
+        binding.llHeroBadgeBronze, binding.llHeroBadgeSilver,
+        binding.llHeroBadgeGold, binding.llHeroBadgePlatinum
+    )
+
+    /** Rays turn once every 50 s; shields float 9dp on a 3.2 s cycle, staggered 0.3 s. */
+    private fun startHeroLoops() {
+        stopHeroLoops()
+        if (!animationsEnabled()) return
+
+        binding.ivHeroRays.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        loopAnimators += ObjectAnimator.ofFloat(binding.ivHeroRays, View.ROTATION, 0f, 360f).apply {
+            duration = 50_000L
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = LinearInterpolator()
+            start()
+        }
+        val lift = -9f * resources.displayMetrics.density
+        val easeInOut = PathInterpolator(0.42f, 0f, 0.58f, 1f)
+        heroBadges().forEachIndexed { i, badge ->
+            loopAnimators += ObjectAnimator.ofFloat(badge, View.TRANSLATION_Y, 0f, lift).apply {
+                duration = 1_600L
+                startDelay = i * 300L
+                repeatCount = ValueAnimator.INFINITE
+                repeatMode = ValueAnimator.REVERSE
+                interpolator = easeInOut
+                start()
+            }
+        }
+    }
+
+    private fun stopHeroLoops() {
+        loopAnimators.forEach { it.cancel() }
+        loopAnimators.clear()
+        binding.ivHeroRays.setLayerType(View.LAYER_TYPE_NONE, null)
+        binding.ivHeroRays.rotation = 0f
+        heroBadges().forEach { it.translationY = 0f }
+    }
+
+    private fun animationsEnabled(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ValueAnimator.areAnimatorsEnabled()
+        else Settings.Global.getFloat(contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) != 0f
 
     // ── All Levels tabs ─────────────────────────────────────────────────────
 
