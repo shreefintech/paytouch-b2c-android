@@ -395,6 +395,8 @@ class HomeActivity : BaseActivity() {
     override fun onDestroy() {
         // Dismiss here so the dialog window doesn't leak past the Activity
         aadhaarDialog?.dismiss()
+        // Its callback holds this Activity — a recreated Home starts its own check
+        viewModel.cancelAadhaarCheck()
         if (isFinishing) Utility.deleteKycDirs(mActivity, Constant.KYC_AADHAAR_REUPLOAD_DIR)
         super.onDestroy()
     }

@@ -235,13 +235,15 @@ object Utility {
      * Must be called off the main thread.
      */
     fun uriToFilePart(context: Context, uri: Uri, partName: String, fileName: String): MultipartBody.Part? {
-        val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
-        val bytes = try {
-            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        // getType() is inside the try too — a revoked URI grant throws SecurityException from either call
+        val (mimeType, bytes) = try {
+            val resolver = context.contentResolver
+            (resolver.getType(uri) ?: "image/jpeg") to resolver.openInputStream(uri)?.use { it.readBytes() }
         } catch (e: Exception) {
             logError(e)
-            null
-        } ?: return null
+            return null
+        }
+        if (bytes == null) return null
         val extension = when {
             mimeType.contains("pdf") -> ".pdf"
             mimeType.contains("png") -> ".png"

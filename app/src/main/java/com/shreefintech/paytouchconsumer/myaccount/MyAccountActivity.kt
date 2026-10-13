@@ -413,7 +413,9 @@ class MyAccountActivity : BaseActivity() {
             cityList = emptyList()
             cityListStateId = null
             setDropdownValue(dialogBinding.tvCity, null, R.string.hintSelectCity)
+            // No id = nothing to load — clear a spinner left by the previous state's in-flight request
             state.id?.let { loadCities(it) }
+                ?: setFieldLoading(dialogBinding.pbCityLoading, dialogBinding.ivCityArrow, dialogBinding.flCityAnchor, false)
         }
     }
 

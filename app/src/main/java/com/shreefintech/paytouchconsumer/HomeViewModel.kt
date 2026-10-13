@@ -95,6 +95,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     // Survives Activity recreation — a recreated Home must not re-block while the previous upload is in flight
     private var isAadhaarUploading = false
+    private var aadhaarCheckCall: Call<UserProfileItem>? = null
 
     /** Silent — Home stays usable if /api/user fails; the flag is re-checked on the next Home launch. */
     fun checkAadhaarRejected(onRejected: () -> Unit) {
@@ -102,16 +103,26 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         // switch the upload result to LiveData if Home ever stops being portrait-locked
         if (isAadhaarUploading) return
         if (!Utility.isInternetAvailable(getApplication())) return
-        ApiClient.apiService.getUser(bearerToken())
-            .enqueue(object : Callback<UserProfileItem> {
+        aadhaarCheckCall?.cancel()
+        aadhaarCheckCall = ApiClient.apiService.getUser(bearerToken()).also {
+            it.enqueue(object : Callback<UserProfileItem> {
                 override fun onResponse(call: Call<UserProfileItem>, response: Response<UserProfileItem>) {
+                    if (aadhaarCheckCall === call) aadhaarCheckCall = null
                     if (response.isSuccessful && response.body()?.aadhaarRejected == true) onRejected()
                 }
 
                 override fun onFailure(call: Call<UserProfileItem>, t: Throwable) {
+                    if (aadhaarCheckCall === call) aadhaarCheckCall = null
                     t.printStackTrace()
                 }
             })
+        }
+    }
+
+    /** Releases the pending check's callback (and the Activity it captures). */
+    fun cancelAadhaarCheck() {
+        aadhaarCheckCall?.cancel()
+        aadhaarCheckCall = null
     }
 
     fun reuploadAadhaar(
