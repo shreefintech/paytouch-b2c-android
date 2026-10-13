@@ -108,6 +108,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             it.enqueue(object : Callback<UserProfileItem> {
                 override fun onResponse(call: Call<UserProfileItem>, response: Response<UserProfileItem>) {
                     if (aadhaarCheckCall === call) aadhaarCheckCall = null
+                    // Only /api/user drives the bank/PAN flags — login lands here without passing through Splash
+                    response.body()?.bankDetailsAdded?.let {
+                        SharedPreferenceHelper.setSharedPreferenceBoolean(getApplication(), Constant.KEY_BANK_DETAILS_ADDED, it)
+                    }
+                    response.body()?.panAdded?.let {
+                        SharedPreferenceHelper.setSharedPreferenceBoolean(getApplication(), Constant.KEY_PAN_ADDED, it)
+                    }
                     if (response.isSuccessful && response.body()?.aadhaarRejected == true) onRejected()
                 }
 

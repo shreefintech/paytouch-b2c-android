@@ -36,7 +36,7 @@
                 android:layout_height="170dp"
                 android:layout_marginTop="@dimen/margin_medium"
                 android:scaleType="fitEnd"
-                android:src="@drawable/img_wallet_recolored"
+                android:src="@android:color/transparent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

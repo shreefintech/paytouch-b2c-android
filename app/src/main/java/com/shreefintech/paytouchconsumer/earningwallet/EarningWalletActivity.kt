@@ -327,21 +327,18 @@ class EarningWalletActivity : BaseActivity() {
         optInBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    // PAN is optional — X on the PAN dialog still opens opt-in; back press / outside tap opens nothing
     private fun onLockMoney() {
-        if (isOptedIn) {
-            openLockSheet()
-            return
-        }
-        if (SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_PAN_ADDED, false)) {
-            openOptInSheet()
+        // PAN dialog comes first whenever PAN is missing — even for opted-in users
+        val proceed = { if (isOptedIn) openLockSheet() else openOptInSheet() }
+        if (SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_PAN_ADDED, true)) {
+            proceed()
             return
         }
         PanCardDialogHelper.show(
             activity = mActivity,
             authorization = SharedPreferenceHelper.bearerToken(mActivity),
-            onSuccess = { openOptInSheet() },
-            onDismissed = { openOptInSheet() }
+            onSuccess = proceed,
+            onDismissed = {}
         )
     }
 
