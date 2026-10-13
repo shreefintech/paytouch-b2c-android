@@ -22,5 +22,7 @@ data class UserItem(
     @field:SerializedName("referred_by")       val referredBy: String?,
     @field:SerializedName("referral_earnings") val referralEarnings: String?,
     @field:SerializedName("created_at")        val createdAt: String?,
-    @field:SerializedName("updated_at")        val updatedAt: String?
+    @field:SerializedName("updated_at")        val updatedAt: String?,
+    @field:SerializedName("bank_details_added") val bankDetailsAdded: Boolean?,
+    @field:SerializedName("pan_added")          val panAdded: Boolean?
 )

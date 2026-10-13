@@ -57,6 +57,7 @@ object Constant {
     const val KYC_SELFIE_DIR = "kyc"
     const val KYC_IDENTITY_DOCS_DIR = "kyc_docs/identity"
     const val KYC_BANK_DOCS_DIR = "kyc_docs/bank"
+    const val REG_AADHAAR_DIR = "reg_docs/aadhaar"
     const val KYC_IMAGE_MAX_BYTES = 800 * 1024
 
     // Max decoded bitmap height (PDF pages, preview images) — tall pages / huge images otherwise allocate 100 MB+ and crash on draw
@@ -113,6 +114,10 @@ object Constant {
 
     // Image storage — sub-folder of filesDir; must match <files-path> entries in file_provider_paths.xml
     const val DIR_RECEIPTS = "receipts"
+
+    // B2C onboarding flags — set from login response; cleared on logout via clearSharedPreference()
+    const val KEY_BANK_DETAILS_ADDED = "BANK_DETAILS_ADDED"
+    const val KEY_PAN_ADDED = "PAN_ADDED"
 
     // Earning Wallet
     const val EARNING_LOCK_DAYS = 30

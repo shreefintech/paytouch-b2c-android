@@ -951,4 +951,18 @@
     <string name="coming_soon">Coming Soon</string>
     <string name="labelAppVersion">Version %1$s</string>
 
+    <!-- B2C V2 Onboarding — Bank Details Dialog -->
+    <string name="titleAddBankDetails">Add Bank Details</string>
+    <string name="msgBankDetailsRequired">Add your bank details to create your Virtual Account and start paying bills with your PayTouch Wallet.</string>
+    <string name="msgBankDetailsSaved">Bank details saved successfully</string>
+
+    <!-- B2C V2 Onboarding — PAN Sheet -->
+    <string name="titleAddPanCard">Add PAN Card</string>
+    <string name="msgPanCardSubtitle">You can lock your money without PAN. To earn interest on your locked amount, please add your PAN details.</string>
+    <string name="msgPanSaved">PAN added successfully</string>
+
+    <!-- B2C V2 Registration — Aadhaar document upload -->
+    <string name="labelAadhaarPhoto">Upload Aadhaar Document</string>
+    <string name="msgAadhaarPhotoRequired">Please upload your Aadhaar document</string>
+
 </resources>

@@ -24,6 +24,8 @@ import com.shreefintech.paytouchconsumer.databinding.SheetEarningWithdrawBinding
 import com.shreefintech.paytouchconsumer.earningwallet.viewmodel.EarningWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
+import com.shreefintech.paytouchconsumer.utill.PanCardDialogHelper
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -325,6 +327,24 @@ class EarningWalletActivity : BaseActivity() {
         optInBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
+    // PAN is optional — X on the PAN dialog still opens opt-in; back press / outside tap opens nothing
+    private fun onLockMoney() {
+        if (isOptedIn) {
+            openLockSheet()
+            return
+        }
+        if (SharedPreferenceHelper.getSharedPreferenceBoolean(mActivity, Constant.KEY_PAN_ADDED, false)) {
+            openOptInSheet()
+            return
+        }
+        PanCardDialogHelper.show(
+            activity = mActivity,
+            authorization = SharedPreferenceHelper.bearerToken(mActivity),
+            onSuccess = { openOptInSheet() },
+            onDismissed = { openOptInSheet() }
+        )
+    }
+
     private fun openLockSheet() {
         lockSheet.etLockAmount.text?.clear()
         lockSheet.tvLockWalletBalance.text = Utility.formatAmount(walletBalance)
@@ -460,7 +480,7 @@ class EarningWalletActivity : BaseActivity() {
                 binding.btnLockMoney -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (!isDataLoaded) return@OnClickListener
-                    if (!isOptedIn) openOptInSheet() else openLockSheet()
+                    onLockMoney()
                 }
                 binding.btnWithdraw -> {
                     if (Utility.stopClick()) return@OnClickListener

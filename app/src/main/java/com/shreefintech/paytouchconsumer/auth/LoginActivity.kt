@@ -299,7 +299,7 @@ class LoginActivity : BaseActivity() {
 
                 binding.llCreateAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, CreateAccountActivity::class.java))
+                    startActivity(Intent(mActivity, CreateAccountV2Activity::class.java))
                 }
 
                 binding.ivPasswordToggle -> {

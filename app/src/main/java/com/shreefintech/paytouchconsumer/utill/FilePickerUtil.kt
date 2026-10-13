@@ -223,6 +223,12 @@ class FilePickerUtil(activity: AppCompatActivity) {
             cameraOutputFile = null
             file.delete()
             onError?.invoke(FilePickerError.CameraUnavailable)
+        } catch (e: IllegalArgumentException) {
+            // FileProvider path not registered in file_provider_paths.xml for this storageDir
+            Utility.logError(e)
+            cameraOutputFile = null
+            file.delete()
+            onError?.invoke(FilePickerError.CameraUnavailable)
         }
     }
 

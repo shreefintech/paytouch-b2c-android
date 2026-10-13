@@ -93,6 +93,11 @@ import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
 import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
+import com.shreefintech.paytouchconsumer.retrofit.model.CityItem
+import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Item
+import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Request
+import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Item
+import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletActionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletAmountRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
@@ -687,4 +692,42 @@ interface ApiService {
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Call<General<List<UnifiedTransactionItem>>>
+
+    // ── B2C V2 Registration & Onboarding ─────────────────────────────────────
+
+    @Multipart
+    @POST("${AUTH}v2/register")
+    fun registerV2(
+        @Part("name") name: RequestBody,
+        @Part("mobile") mobile: RequestBody,
+        @Part("email") email: RequestBody,
+        @Part("password") password: RequestBody,
+        @Part("password_confirmation") passwordConfirmation: RequestBody,
+        @Part("aadhaar_number") aadhaarNumber: RequestBody,
+        @Part aadhaarPhoto: MultipartBody.Part,
+        @Part("state_id") stateId: RequestBody,
+        @Part("city_id") cityId: RequestBody,
+        @Part("referral_code") referralCode: RequestBody,
+        @Part("platform") platform: RequestBody
+    ): Call<RegisterItem>
+
+    @GET("${AUTH}v2/address/states")
+    fun getAddressStates(): Call<General<List<StateItem>>>
+
+    @GET("${AUTH}v2/address/states/{state_id}/cities")
+    fun getAddressCities(
+        @Path("state_id") stateId: String
+    ): Call<General<List<CityItem>>>
+
+    @POST("${AUTH}v2/bank-details")
+    fun addBankDetails(
+        @Header("Authorization") authorization: String,
+        @Body body: BankDetailsV2Request
+    ): Call<BankDetailsV2Item>
+
+    @POST("${AUTH}v2/pan")
+    fun addPan(
+        @Header("Authorization") authorization: String,
+        @Body body: PanV2Request
+    ): Call<PanV2Item>
 }

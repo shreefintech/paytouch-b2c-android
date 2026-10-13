@@ -44,6 +44,7 @@ import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
 import com.shreefintech.paytouchconsumer.rewards.LevelUpActivity
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -273,12 +274,12 @@ class HomeActivity : BaseActivity() {
 
                 binding.llMyAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    MyAccountActivity.start(mActivity)
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { MyAccountActivity.start(mActivity) }
                 }
 
                 binding.cvLoadWallet -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    LoadWalletActivity.start(mActivity)
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { LoadWalletActivity.start(mActivity) }
                 }
 
                 logoutDialogBinding?.btnLogout -> {
