@@ -220,6 +220,7 @@
 - White card with "Categories" title
 - 3×3 grid of category tiles (Electricity, Gas, Prepaid, TV Cable, DTH, Fastag, Loan, My Account, Tax)
 - Load Wallet button at the bottom of the card
+- **Aadhaar re-upload dialog (blocking):** on every create, `GET /api/user` is checked; when `aadhaar_rejected == true` a non-cancelable dialog asks for the Aadhaar number + document and submits to `POST /api/kyc/aadhaar`. Only a successful submit dismisses it. If `/api/user` fails, Home stays usable and the check repeats on the next launch.
 
 ---
 
@@ -375,6 +376,7 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules �
 **Exit points:**
 - Back → `HomeActivity`
 - "View KYC Details" → `KycDetailsActivity`
+- Pencil icon next to Member Code → Edit Profile dialog (name, email, state, city — stays on this screen)
 
 **Tabs:**
 

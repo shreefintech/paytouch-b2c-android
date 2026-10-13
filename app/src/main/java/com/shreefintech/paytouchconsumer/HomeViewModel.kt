@@ -23,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -94,8 +93,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             })
     }
 
+    // Survives Activity recreation — a recreated Home must not re-block while the previous upload is in flight
+    private var isAadhaarUploading = false
+
     /** Silent — Home stays usable if /api/user fails; the flag is re-checked on the next Home launch. */
     fun checkAadhaarRejected(onRejected: () -> Unit) {
+        // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
+        // switch the upload result to LiveData if Home ever stops being portrait-locked
+        if (isAadhaarUploading) return
         if (!Utility.isInternetAvailable(getApplication())) return
         ApiClient.apiService.getUser(bearerToken())
             .enqueue(object : Callback<UserProfileItem> {
@@ -121,26 +126,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         onLoading()
+        isAadhaarUploading = true
         viewModelScope.launch {
-            val mimeType = getApplication<Application>().contentResolver.getType(aadhaarUri) ?: "image/jpeg"
-            val bytes = withContext(Dispatchers.IO) { readBytes(aadhaarUri) }
-            if (bytes == null) {
+            // Size already capped by FilePickerUtil (2 MB) — no re-check here
+            val photoPart = withContext(Dispatchers.IO) {
+                Utility.uriToFilePart(getApplication(), aadhaarUri, "aadhaar_photo", "aadhaar")
+            }
+            if (photoPart == null) {
+                isAadhaarUploading = false
                 onError(getString(R.string.errGeneric))
                 return@launch
             }
-            if (bytes.size > AADHAAR_MAX_BYTES) {
-                onError(getString(R.string.msgAadhaarPhotoInvalid))
-                return@launch
-            }
-
-            val extension = when {
-                mimeType.contains("pdf") -> ".pdf"
-                mimeType.contains("png") -> ".png"
-                else -> ".jpg"
-            }
-            val photoPart = MultipartBody.Part.createFormData(
-                "aadhaar_photo", "aadhaar$extension", bytes.toRequestBody(mimeType.toMediaTypeOrNull())
-            )
 
             ApiClient.apiService.reuploadAadhaar(
                 bearerToken(),
@@ -148,26 +144,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 photoPart
             ).enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
-                    if (response.isSuccessful) {
-                        onSuccess(response.body()?.message ?: getString(R.string.msgAadhaarReuploaded))
-                    } else {
-                        onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+                    isAadhaarUploading = false
+                    val body = response.body()
+                    // Only an explicit success:false is a failure — the key may be absent (like /logout)
+                    when {
+                        !response.isSuccessful -> onError(
+                            ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string())
+                        )
+                        body?.success == false -> onError(body.message ?: getString(R.string.errGeneric))
+                        else -> onSuccess(body?.message ?: getString(R.string.msgAadhaarReuploaded))
                     }
                 }
 
                 override fun onFailure(call: Call<MessageItem>, t: Throwable) {
+                    isAadhaarUploading = false
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
-        }
-    }
-
-    private fun readBytes(uri: Uri): ByteArray? {
-        return try {
-            getApplication<Application>().contentResolver.openInputStream(uri)?.use { it.readBytes() }
-        } catch (e: Exception) {
-            Utility.logError(e)
-            null
         }
     }
 
@@ -196,9 +189,5 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
                 }
             })
-    }
-
-    private companion object {
-        const val AADHAAR_MAX_BYTES = 5 * 1024 * 1024
     }
 }

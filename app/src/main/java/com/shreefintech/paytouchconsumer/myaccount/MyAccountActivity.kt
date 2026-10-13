@@ -5,7 +5,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
@@ -34,6 +33,7 @@ import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 import androidx.core.view.isVisible
 import androidx.core.net.toUri
@@ -291,7 +291,8 @@ class MyAccountActivity : BaseActivity() {
                 }
                 binding.cvEditProfile -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (isAccountInfoLoading) return@OnClickListener
+                    // No prefill data until account info loads successfully
+                    if (isAccountInfoLoading || accountInfo == null) return@OnClickListener
                     showEditProfileDialog()
                 }
                 binding.cvViewKycDetails -> {
@@ -524,7 +525,7 @@ class MyAccountActivity : BaseActivity() {
         textView.text = value ?: getString(hintRes)
         textView.setTextColor(
             if (value != null) ContextCompat.getColor(mActivity, R.color.black)
-            else ContextCompat.getColor(mActivity, android.R.color.darker_gray)
+            else getThemeColor(R.attr.colorTextHint)
         )
     }
 

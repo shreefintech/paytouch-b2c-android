@@ -27,6 +27,9 @@ import androidx.exifinterface.media.ExifInterface
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.NumberFormat
@@ -224,6 +227,29 @@ object Utility {
     } catch (e: OutOfMemoryError) {
         e.printStackTrace()
         null
+    }
+
+    /**
+     * Reads a picked document into a multipart file part named [partName], uploaded as
+     * "[fileName].pdf|.png|.jpg" by mime type. Returns null if the file can't be read.
+     * Must be called off the main thread.
+     */
+    fun uriToFilePart(context: Context, uri: Uri, partName: String, fileName: String): MultipartBody.Part? {
+        val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+        val bytes = try {
+            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        } catch (e: Exception) {
+            logError(e)
+            null
+        } ?: return null
+        val extension = when {
+            mimeType.contains("pdf") -> ".pdf"
+            mimeType.contains("png") -> ".png"
+            else -> ".jpg"
+        }
+        return MultipartBody.Part.createFormData(
+            partName, "$fileName$extension", bytes.toRequestBody(mimeType.toMediaTypeOrNull())
+        )
     }
 
     /**

@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
@@ -107,20 +106,13 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
         }
         onLoading()
         viewModelScope.launch {
-            val mimeType = getApplication<Application>().contentResolver.getType(aadhaarUri) ?: "image/jpeg"
-            val bytes = withContext(Dispatchers.IO) { readBytes(aadhaarUri) }
-            if (bytes == null) {
+            val photoPart = withContext(Dispatchers.IO) {
+                Utility.uriToFilePart(getApplication(), aadhaarUri, "aadhaar_photo", "aadhaar")
+            }
+            if (photoPart == null) {
                 onError(getString(R.string.errGeneric))
                 return@launch
             }
-
-            val extension = when {
-                mimeType.contains("pdf") -> ".pdf"
-                else -> ".jpg"
-            }
-            val photoPart = MultipartBody.Part.createFormData(
-                "aadhaar_photo", "aadhaar$extension", bytes.toRequestBody(mimeType.toMediaTypeOrNull())
-            )
 
             ApiClient.apiService.registerV2(
                 name.toTextBody(),
@@ -147,15 +139,6 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
-        }
-    }
-
-    private fun readBytes(uri: Uri): ByteArray? {
-        return try {
-            getApplication<Application>().contentResolver.openInputStream(uri)?.use { it.readBytes() }
-        } catch (e: Exception) {
-            Utility.logError(e)
-            null
         }
     }
 
