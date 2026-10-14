@@ -78,6 +78,7 @@ class LoadWalletActivity : BaseActivity() {
     private var selectedPaymentMode = MODE_IMPS
 
     private var currentWalletBalance: String? = null
+    private var levelProgressAnimator: ValueAnimator? = null
 
     private var confirmDialog: Dialog? = null
     private var confirmDialogBinding: DialogConfirmPaymentBinding? = null
@@ -219,6 +220,7 @@ class LoadWalletActivity : BaseActivity() {
     override fun onDestroy() {
         withdrawSuccessDialog?.dismiss()
         withdrawSoundPlayer.release()
+        levelProgressAnimator?.cancel()
         super.onDestroy()
     }
 
@@ -431,7 +433,7 @@ class LoadWalletActivity : BaseActivity() {
 
     private fun bindWithdrawDetails(dialogBinding: DialogWithdrawSuccessBinding, data: WithdrawDataItem) {
         val status = resolveWithdrawStatus(data.status)
-        Glide.with(mActivity).asGif().load(status.gifRes).into(dialogBinding.ivStatusGif)
+        Glide.with(this@LoadWalletActivity).asGif().load(status.gifRes).into(dialogBinding.ivStatusGif)
 
         dialogBinding.tvTitle.setText(status.titleRes)
         dialogBinding.tvSubtitle.text = data.statusMessage?.takeIf { it.isNotBlank() }
@@ -590,7 +592,8 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun animateLevelProgress(progress: Float) {
-        ValueAnimator.ofInt(0, (progress * 100).toInt()).apply {
+        levelProgressAnimator?.cancel()
+        levelProgressAnimator = ValueAnimator.ofInt(0, (progress * 100).toInt()).apply {
             duration = 1200
             startDelay = 600
             interpolator = DecelerateInterpolator()

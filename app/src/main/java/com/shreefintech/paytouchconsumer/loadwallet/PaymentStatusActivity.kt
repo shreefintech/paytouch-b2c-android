@@ -167,7 +167,7 @@ class PaymentStatusActivity : BaseActivity() {
     }
 
     private fun loadGif(@DrawableRes gifRes: Int, @RawRes soundRes: Int) {
-        Glide.with(mActivity)
+        Glide.with(this@PaymentStatusActivity)
             .asGif()
             .load(gifRes)
             .placeholder(R.drawable.ic_file_not_found)

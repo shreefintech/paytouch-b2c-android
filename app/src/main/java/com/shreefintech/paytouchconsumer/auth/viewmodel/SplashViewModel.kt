@@ -2,13 +2,12 @@ package com.shreefintech.paytouchconsumer.auth.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
-import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.saveOnboardingFlags
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -43,15 +42,5 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                     onError(t.localizedMessage ?: getApplication<Application>().getString(R.string.errGeneric))
                 }
             })
-    }
-
-    // Refresh on every launch — sessions created before B2C-234 never got these flags from login
-    private fun saveOnboardingFlags(user: UserProfileItem?) {
-        user?.bankDetailsAdded?.let {
-            SharedPreferenceHelper.setSharedPreferenceBoolean(getApplication(), Constant.KEY_BANK_DETAILS_ADDED, it)
-        }
-        user?.panAdded?.let {
-            SharedPreferenceHelper.setSharedPreferenceBoolean(getApplication(), Constant.KEY_PAN_ADDED, it)
-        }
     }
 }

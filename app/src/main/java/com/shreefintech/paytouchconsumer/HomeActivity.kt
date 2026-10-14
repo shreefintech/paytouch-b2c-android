@@ -35,7 +35,6 @@ import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
-import com.shreefintech.paytouchconsumer.fastag.FastagActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.LoadWalletActivity
@@ -121,7 +120,7 @@ class HomeActivity : BaseActivity() {
         loadCategoryIcons()
 
         // TODO(B2C-194): seasonal Navratri — revert after festival
-        BannerSliderHelper(this, binding.incBannerSlider.vpBanner).attachToLifecycle(this)
+        BannerSliderHelper(binding.incBannerSlider.vpBanner).attachToLifecycle(this)
 
         val listener = onClickListener()
         binding.onClickListener = listener
@@ -337,7 +336,7 @@ class HomeActivity : BaseActivity() {
                         bmp?.recycle()
                         return@withContext
                     }
-                    Glide.with(mActivity).load(bmp).into(dialogBinding.ivPreviewAadhaar)
+                    Glide.with(this@HomeActivity).load(bmp).into(dialogBinding.ivPreviewAadhaar)
                 }
             }
         } else {
@@ -395,6 +394,7 @@ class HomeActivity : BaseActivity() {
     override fun onDestroy() {
         // Dismiss here so the dialog window doesn't leak past the Activity
         aadhaarDialog?.dismiss()
+        logoutDialog?.dismiss()
         // Its callback holds this Activity — a recreated Home starts its own check
         viewModel.cancelAadhaarCheck()
         if (isFinishing) Utility.deleteKycDirs(mActivity, Constant.KYC_AADHAAR_REUPLOAD_DIR)
@@ -446,7 +446,7 @@ class HomeActivity : BaseActivity() {
 
                 binding.llFastag -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    ToastUtil.showWarning(mActivity, getString(R.string.coming_soon))
+                    ToastUtil.showWarning(mActivity, getString(R.string.labelComingSoon))
                 }
 
                 binding.llLoan -> {

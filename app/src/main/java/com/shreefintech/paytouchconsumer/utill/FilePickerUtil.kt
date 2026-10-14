@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import android.provider.OpenableColumns
 import android.provider.Settings
 import android.view.LayoutInflater
@@ -18,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.os.bundleOf
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -181,10 +181,10 @@ class FilePickerUtil(activity: AppCompatActivity) {
             pendingCameraStorageDir = state.getString(STATE_PENDING_CAMERA_DIR)?.let(::File)
         }
         registry.registerSavedStateProvider(STATE_PROVIDER_KEY) {
-            bundleOf(
-                STATE_CAMERA_OUTPUT_PATH to cameraOutputFile?.absolutePath,
-                STATE_PENDING_CAMERA_DIR to pendingCameraStorageDir?.absolutePath
-            )
+            Bundle().apply {
+                putString(STATE_CAMERA_OUTPUT_PATH, cameraOutputFile?.absolutePath)
+                putString(STATE_PENDING_CAMERA_DIR, pendingCameraStorageDir?.absolutePath)
+            }
         }
     }
 

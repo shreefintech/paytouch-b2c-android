@@ -114,6 +114,7 @@ class BankDetailsActivity : BaseActivity() {
                     try {
                         startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
                     } catch (e: ActivityNotFoundException) {
+                        e.printStackTrace()
                         ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
                     }
                 }

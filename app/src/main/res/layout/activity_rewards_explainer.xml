@@ -41,44 +41,58 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:orientation="vertical"
                 android:paddingBottom="@dimen/page_margin_vertical">
 
 
                 <!-- ═══ SECTION 1: HERO CARD ═══ -->
+                <!-- Shadow tint is API 28+ only; older devices ignore it and fall back to the default grey shadow -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/page_margin_horizontal"
                     android:layout_marginTop="@dimen/margin_medium"
+                    android:outlineAmbientShadowColor="@color/rw_hero_shadow"
+                    android:outlineSpotShadowColor="@color/rw_hero_shadow"
                     app:cardBackgroundColor="#00000000"
                     app:cardCornerRadius="28dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
+                    app:cardElevation="12dp"
+                    app:strokeWidth="0dp"
+                    tools:targetApi="p">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_rw_hero">
+                        android:background="@drawable/bg_rw_hero_card">
 
-                        <!-- Image: 0dp height, stretched to the content's top and bottom -->
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/ivHeroBg"
+                        <!-- Rotating rays: same height as the content, big square clipped inside -->
+                        <FrameLayout
                             android:layout_width="0dp"
                             android:layout_height="0dp"
-                            android:scaleType="fitXY"
-                            app:layout_constraintHeight_min="459dp"
-                            tools:src="@drawable/img_hero_background_with_levels"
+                            android:clipChildren="true"
                             app:layout_constraintBottom_toBottomOf="@id/llHeroContent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="@id/llHeroContent" />
+                            app:layout_constraintTop_toTopOf="@id/llHeroContent">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/ivHeroRays"
+                                android:layout_width="560dp"
+                                android:layout_height="560dp"
+                                android:layout_gravity="center_horizontal|top"
+                                android:layout_marginTop="-30dp"
+                                android:importantForAccessibility="no"
+                                android:scaleType="fitXY"
+                                android:src="@drawable/img_rw_hero_rays" />
+                        </FrameLayout>
 
                         <!-- Content: this decides the card height -->
                         <LinearLayout
                             android:id="@+id/llHeroContent"
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:paddingStart="18dp"
                             android:paddingTop="22dp"
@@ -93,15 +107,13 @@
                                 android:id="@+id/tvHeroHeadline"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="14dp"
                                 android:fontFamily="@font/proza_libre_extra_bold"
                                 android:includeFontPadding="false"
                                 android:letterSpacing="-0.017"
-                                android:maxLines="2"
                                 android:lineSpacingMultiplier="1.12"
                                 android:text="@string/titleRewardsHero"
                                 android:textColor="#FFFFFF"
-                                android:textSize="20sp" />
+                                android:textSize="23sp" />
 
                             <!-- Subtitle -->
                             <androidx.appcompat.widget.AppCompatTextView
@@ -110,26 +122,29 @@
                                 android:layout_marginTop="14dp"
                                 android:fontFamily="@font/proza_libre_regular"
                                 android:includeFontPadding="false"
-                                android:maxLines="2"
                                 android:lineSpacingMultiplier="1.45"
                                 android:text="@string/subtitleRewardsHero"
                                 android:textColor="#CCFFFFFF"
                                 android:textSize="11sp" />
 
-                            <!-- 4 tier shields (delete this row if your image already shows them) -->
+                            <!-- 4 tier shields: Bronze/Platinum 18dp down, Silver/Gold 6dp down (arc) -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="14dp"
                                 android:baselineAligned="false"
+                                android:clipChildren="false"
+                                android:clipToPadding="false"
                                 android:orientation="horizontal"
-                                android:visibility="invisible"
-                                android:paddingHorizontal="6dp">
+                                android:paddingHorizontal="6dp"
+                                android:paddingTop="6dp"
+                                android:paddingBottom="2dp">
 
                                 <LinearLayout
+                                    android:id="@+id/llHeroBadgeBronze"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="12dp"
+                                    android:layout_marginTop="18dp"
                                     android:layout_weight="1"
                                     android:gravity="center_horizontal"
                                     android:orientation="vertical">
@@ -152,8 +167,10 @@
                                 </LinearLayout>
 
                                 <LinearLayout
+                                    android:id="@+id/llHeroBadgeSilver"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
                                     android:layout_weight="1"
                                     android:gravity="center_horizontal"
                                     android:orientation="vertical">
@@ -176,8 +193,10 @@
                                 </LinearLayout>
 
                                 <LinearLayout
+                                    android:id="@+id/llHeroBadgeGold"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
                                     android:layout_weight="1"
                                     android:gravity="center_horizontal"
                                     android:orientation="vertical">
@@ -200,9 +219,10 @@
                                 </LinearLayout>
 
                                 <LinearLayout
+                                    android:id="@+id/llHeroBadgePlatinum"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="12dp"
+                                    android:layout_marginTop="18dp"
                                     android:layout_weight="1"
                                     android:gravity="center_horizontal"
                                     android:orientation="vertical">
@@ -225,13 +245,12 @@
                                 </LinearLayout>
                             </LinearLayout>
 
-                            <!-- Your level card: paste the white card block from my previous message here
-                                 (LinearLayout id cardYourLevel, marginTop 14dp) -->
+                            <!-- White "Your level" card → opens My Rank -->
                             <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/cardYourLevel"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="50dp"
+                                android:layout_marginTop="14dp"
                                 android:foreground="?selectableItemBackground"
                                 android:onClick="@{onClickListener}"
                                 app:cardBackgroundColor="@color/white"
@@ -254,7 +273,7 @@
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:id="@+id/ivYourBadge"
                                         android:layout_width="34dp"
-                                        android:layout_height="39dp"
+                                        android:layout_height="38dp"
                                         android:src="@drawable/ic_shield_bronze" />
 
                                     <LinearLayout
@@ -272,18 +291,18 @@
                                             android:text="@string/labelYourLevel"
                                             android:maxLines="1"
                                             android:textColor="#6E5763"
-                                            android:textSize="11sp" />
+                                            android:textSize="12sp" />
 
                                         <androidx.appcompat.widget.AppCompatTextView
                                             android:id="@+id/tvYourTierName"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:layout_marginTop="2dp"
+                                            android:layout_marginTop="3dp"
                                             android:maxLines="1"
                                             android:fontFamily="@font/proza_libre_extra_bold"
                                             android:includeFontPadding="false"
                                             android:textColor="#2B0B33"
-                                            android:textSize="15sp"
+                                            android:textSize="18sp"
                                             tools:text="Bronze II" />
                                     </LinearLayout>
 
@@ -301,18 +320,18 @@
                                             android:text="@string/labelCashback"
                                             android:maxLines="1"
                                             android:textColor="#6E5763"
-                                            android:textSize="10sp" />
+                                            android:textSize="12sp" />
 
                                         <androidx.appcompat.widget.AppCompatTextView
                                             android:id="@+id/tvYourCashback"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:layout_marginTop="2dp"
+                                            android:layout_marginTop="3dp"
                                             android:fontFamily="@font/proza_libre_extra_bold"
                                             android:includeFontPadding="false"
                                             android:maxLines="1"
                                             android:textColor="#D52662"
-                                            android:textSize="15sp"
+                                            android:textSize="18sp"
                                             tools:text="0.10%" />
                                     </LinearLayout>
                                 </LinearLayout>

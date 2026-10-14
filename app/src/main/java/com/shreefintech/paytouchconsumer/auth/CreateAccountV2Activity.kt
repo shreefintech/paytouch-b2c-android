@@ -87,6 +87,9 @@ class CreateAccountV2Activity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.showProgress = showProgress
 
+        // TODO(B2C-194): seasonal Navratri — revert after festival
+        Glide.with(this).load(R.drawable.img_garba_couple).into(binding.ivWalletIllustration)
+
         onBack()
         setupInputFilters()
         setupTermsText()
@@ -329,8 +332,14 @@ class CreateAccountV2Activity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     clearAadhaarSlot()
                 }
-                binding.ivPasswordToggle -> togglePasswordVisibility()
-                binding.ivConfirmPasswordToggle -> toggleConfirmPasswordVisibility()
+                binding.ivPasswordToggle -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    togglePasswordVisibility()
+                }
+                binding.ivConfirmPasswordToggle -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    toggleConfirmPasswordVisibility()
+                }
             }
         }
     }

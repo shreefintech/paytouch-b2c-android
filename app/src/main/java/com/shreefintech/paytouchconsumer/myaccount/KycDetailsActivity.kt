@@ -143,9 +143,9 @@ class KycDetailsActivity : BaseActivity() {
         binding.tvBankStatus.text = statusLabel(bank.status)
         binding.tvBankStatus.setTextColor(statusColor(bank.status))
 
+        binding.llBankAccounts.removeAllViews()
         val accounts = bank.accounts ?: return
         val canEdit = bank.canEdit == true
-        binding.llBankAccounts.removeAllViews()
         accounts.forEachIndexed { index, account ->
             val item = ItemKycBankAccountBinding.inflate(layoutInflater, binding.llBankAccounts, false)
             item.tvAccountNumber.text = account.accountNumber ?: "--"

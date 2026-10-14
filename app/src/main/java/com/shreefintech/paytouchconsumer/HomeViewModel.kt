@@ -5,7 +5,6 @@ import android.location.Location
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -19,6 +18,7 @@ import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
+import com.shreefintech.paytouchconsumer.utill.saveOnboardingFlags
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -97,17 +97,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private var isAadhaarUploading = false
     private var aadhaarCheckCall: Call<UserProfileItem>? = null
 
-    /** Silent — Home stays usable if /api/user fails; the flag is re-checked on the next Home launch. */
+    /**
+     * Silent — Home stays usable if /api/user fails; the flag is re-checked on the next Home launch.
+     * Also the post-login source of the bank/PAN onboarding flags (see [saveOnboardingFlags]) — keep this call.
+     */
     fun checkAadhaarRejected(onRejected: () -> Unit) {
-        // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
-        // switch the upload result to LiveData if Home ever stops being portrait-locked
-        if (isAadhaarUploading) return
         if (!Utility.isInternetAvailable(getApplication())) return
         aadhaarCheckCall?.cancel()
         aadhaarCheckCall = ApiClient.apiService.getUser(bearerToken()).also {
             it.enqueue(object : Callback<UserProfileItem> {
                 override fun onResponse(call: Call<UserProfileItem>, response: Response<UserProfileItem>) {
                     if (aadhaarCheckCall === call) aadhaarCheckCall = null
+                    // Only /api/user drives the bank/PAN flags — login lands here without passing through Splash
+                    saveOnboardingFlags(response.body())
+                    // Checked at response time so the flags above still refresh while an upload is in flight.
+                    // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
+                    // switch the upload result to LiveData if Home ever stops being portrait-locked
+                    if (isAadhaarUploading) return
                     if (response.isSuccessful && response.body()?.aadhaarRejected == true) onRejected()
                 }
 

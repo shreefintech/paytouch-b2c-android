@@ -20,7 +20,7 @@
 
 **Exit points:**
 - Login success, `requires_kyc = true` → `KycActivity`
-- Login success, `requires_mpin = true` → MPIN creation screen (planned)
+- Login success, `requires_mpin = true` → `ResetMpinActivity` (create mode, via `buildCreateIntent()`)
 - Login success, all clear → `HomeActivity`
 - "Register" tap → `CreateAccountActivity`
 - "Forgot Password" tap → `OtpVerificationActivity` (password reset)
@@ -260,7 +260,7 @@ Full module implemented. Mirrors Electricity exactly.
 
 ### ✅ DTH Module
 
-Full module implemented. DTH is a **plan-selection** module (`isMobileCategory = true`) — no fetch-bill step; user selects a plan before paying. See `docs/dth.md` for full detail.
+Full module implemented. DTH is a **plan-selection** module (`isMobileCategory = true`) — no fetch-bill step; user selects a plan before paying.
 
 | Screen | Class | Package |
 |---|---|---|
@@ -542,7 +542,7 @@ All detail taps → TransactionDetailActivity ✅ (shared by all modules)
 
 ## Intent Extras Reference
 
-All object passing between activities uses `Gson().toJson(item)` into a single `putExtra` key. See the Object Transfer Rule in `CLAUDE.md`.
+All object passing between activities uses `Gson().toJson(item)` into a single `putExtra` key. Rule: `CLAUDE.md` → UI Rules (Intent passing); code: `docs/code_patterns.md`.
 
 | From | To | Extra Key | Type | Purpose |
 |---|---|---|---|---|

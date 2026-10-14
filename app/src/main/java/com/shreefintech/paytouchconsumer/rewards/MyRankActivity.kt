@@ -99,7 +99,7 @@ class MyRankActivity : BaseActivity() {
             onError = { msg ->
                 binding.shimmerLayout.stopShimmer()
                 binding.shimmerLayout.visibility = View.GONE
-                ToastUtil.showDelete(mActivity, msg.ifEmpty { getString(R.string.errRankLoad) })
+                ToastUtil.showDelete(mActivity, msg.ifEmpty { getString(R.string.errRankLoad) }, inWindow = false)
                 finish()
             }
         )

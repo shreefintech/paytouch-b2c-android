@@ -95,8 +95,11 @@ class SplashActivity : BaseActivity() {
         appUpdateManager.appUpdateInfo
             .addOnSuccessListener { info ->
                 if (!isScreenAlive()) return@addOnSuccessListener
-                if (info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                    info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                val availability = info.updateAvailability()
+                // In-progress must be resumed here too — onResume's check can lose the race and be skipped
+                if (availability == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS ||
+                    (availability == UpdateAvailability.UPDATE_AVAILABLE &&
+                        info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))) {
                     launchImmediateUpdate(info)
                 } else if (!updateLaunching) {
                     // No update needed, or update already launched from onResume

@@ -1,6 +1,5 @@
 package com.shreefintech.paytouchconsumer.utill
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -10,7 +9,6 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.BannerAdp
 
 class BannerSliderHelper(
-    private val context: Context,
     private val viewPager: ViewPager2
 ) : DefaultLifecycleObserver {
 

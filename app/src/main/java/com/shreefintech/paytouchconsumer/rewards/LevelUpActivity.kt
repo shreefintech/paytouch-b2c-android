@@ -166,14 +166,14 @@ class LevelUpActivity : BaseActivity() {
 
     private fun fetchAndShow() {
         if (!Utility.isInternetAvailable(mActivity)) {
-            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet), inWindow = false)
             finish()
             return
         }
         viewModel.fetchLevel(
             // Glide in bind() throws if the screen was closed before the response arrived
             onSuccess = { if (!isFinishing && !isDestroyed) show(it) },
-            onError = { msg -> ToastUtil.showDelete(mActivity, msg); finish() }
+            onError = { msg -> ToastUtil.showDelete(mActivity, msg, inWindow = false); finish() }
         )
     }
 

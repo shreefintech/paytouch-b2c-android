@@ -172,7 +172,7 @@ class BillPaymentStatusActivity : BaseActivity() {
     }
 
     private fun loadGif(@DrawableRes gifRes: Int, @RawRes soundRes: Int) {
-        Glide.with(mActivity)
+        Glide.with(this@BillPaymentStatusActivity)
             .asGif()
             .load(gifRes)
             .placeholder(R.drawable.ic_file_not_found)
@@ -203,7 +203,7 @@ class BillPaymentStatusActivity : BaseActivity() {
     private fun copyTransactionId() {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(ClipData.newPlainText("transaction_id", transactionId))
-        ToastUtil.showSuccess(mActivity, getString(R.string.msgOrderIdCopied))
+        ToastUtil.showSuccess(mActivity, getString(R.string.msgCopiedToClipboard))
         binding.ivCopyId.setImageResource(R.drawable.ic_toast_tick)
         autoFinishHandler.postDelayed({ binding.ivCopyId.setImageResource(R.drawable.ic_copy) }, 1500L)
     }

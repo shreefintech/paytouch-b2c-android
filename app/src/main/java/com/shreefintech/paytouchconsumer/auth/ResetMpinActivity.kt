@@ -12,6 +12,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.HomeActivity
@@ -68,6 +69,9 @@ class ResetMpinActivity : BaseActivity() {
 
         binding.onClickListener = onClickListener()
         binding.showProgress    = showProgress
+
+        // TODO(B2C-194): seasonal Navratri — revert after festival
+        Glide.with(this).load(R.drawable.img_garba_couple).into(binding.ivWalletIllustration)
 
         if (isCreateMode) applyCreateModeLabels()
         setupMpinBoxes()

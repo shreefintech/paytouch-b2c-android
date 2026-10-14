@@ -317,7 +317,7 @@ object Utility {
                 val bos = ByteArrayOutputStream()
                 bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
                 val bytes = bos.toByteArray()
-                if (bytes.size <= maxBytes || quality == 40) {
+                if (bytes.size <= maxBytes || quality <= 40) {
                     file.writeBytes(bytes)
                     break
                 }

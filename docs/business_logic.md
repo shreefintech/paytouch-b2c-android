@@ -344,6 +344,8 @@ amount > 40000           → fee = ₹30
 - Balance is fetched fresh from the API on every Home/dashboard load
 - `Load Wallet` opens `LoadWalletActivity` which routes to the HDFC payment WebView
 - Earning Wallet lock: minimum `Constant.EARNING_MIN_LOCK_AMOUNT` (₹100), maximum = main wallet balance. Below-minimum is rejected on tap of Lock (toast), not shown live while typing; over-balance shows an inline error and disables the button.
+- Earning Wallet lock requires PAN: when `KEY_PAN_ADDED` is false (or unset), tapping Lock Money shows the PAN dialog first — for opted-in users too. Submitting PAN continues to the opt-in or lock sheet; closing the dialog opens nothing.
+- Bank/PAN onboarding flags (`KEY_BANK_DETAILS_ADDED`, `KEY_PAN_ADDED`) are set only from `/api/user` (Splash + Home), never from login, and read with default `false` — if `/api/user` hasn't answered yet, the bank/PAN dialog is shown rather than skipped.
 
 ### API Endpoints
 | Method | Path | Purpose |
@@ -395,14 +397,7 @@ User enters a top-up amount, the app creates an HDFC payment order, then opens `
 
 ## 13. Transaction ID
 
-### Ownership
-Transaction IDs are **generated and returned by the backend** in the `process-payment` (or `process-direct`) response. The client must never generate a transaction ID before or during the API call.
-
-### Rules
-- Do not pass a `transaction_id` field in any payment request DTO
-- Read the transaction ID from the API response and store it for status lookup and receipts
-- `Utility.generateTransactionId()` was removed — do not recreate it
-- The ID format (`PYTCH…`) is set by the server; the client treats it as an opaque string
+Backend-generated, returned in the `process-payment` / `process-direct` response; read it from there for status lookups and receipts. Never generated client-side, never sent in a request DTO (`Utility.generateTransactionId()` was removed — do not recreate). Format `PYTCH…` is server-set; treat as an opaque string.
 
 ---
 
@@ -455,9 +450,7 @@ Transaction IDs are **generated and returned by the backend** in the `process-pa
 
 ## 16. Internet Connectivity
 
-### Rules
-- `Utility.isInternetAvailable(context)` must be called before every API request
-- If no internet: show message via `ToastUtil`, do not make the API call
+`Utility.isInternetAvailable(context)` before every API request; offline → `ToastUtil` message, no call. Full offline UX: `docs/no_internet_handling.md`.
 
 ---
 

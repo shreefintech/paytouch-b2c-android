@@ -99,16 +99,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 Constant.KEY_REFERRAL_CODE,
                 user.referralCode ?: ""
             )
-            SharedPreferenceHelper.setSharedPreferenceBoolean(
-                getApplication(),
-                Constant.KEY_BANK_DETAILS_ADDED,
-                user.bankDetailsAdded ?: false
-            )
-            SharedPreferenceHelper.setSharedPreferenceBoolean(
-                getApplication(),
-                Constant.KEY_PAN_ADDED,
-                user.panAdded ?: false
-            )
             fireVpsRegistration(
                 user.id ?: 0,
                 user.mobile ?: "",

@@ -470,6 +470,7 @@ class SelfieCaptureActivity : BaseActivity() {
                     Matrix().apply { postRotate(rotation.toFloat()) }, true
                 ).also { if (it !== source) source.recycle() }
             } catch (e: OutOfMemoryError) {
+                e.printStackTrace()
                 source.recycle()
                 return false
             }

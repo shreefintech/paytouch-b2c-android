@@ -131,6 +131,11 @@
     <color name="rw_gold_icon">#8A5800</color>
     <!--  card shadow tint, used on API 28+ = rgba(213,38,98,0.2)  -->
     <color name="rw_card_shadow">#33D52662</color>
+    <!--  hero card radial gradient + its shadow tint (API 28+)  -->
+    <color name="rw_hero_start">#5A1A5E</color>
+    <color name="rw_hero_center">#2A0B30</color>
+    <color name="rw_hero_end">#1C0721</color>
+    <color name="rw_hero_shadow">#592A0B30</color>
 
     <!--  tier glow / rays tint  -->
     <color name="rank_tint_bronze">#F6AA6E</color>

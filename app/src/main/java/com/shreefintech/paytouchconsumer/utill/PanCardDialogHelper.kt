@@ -57,6 +57,7 @@ object PanCardDialogHelper {
         binding.onClickListener = android.view.View.OnClickListener { view ->
             when (view) {
                 binding.cardClose -> {
+                    if (Utility.stopClick()) return@OnClickListener
                     dismissReason = DismissReason.CLOSE
                     dialog.dismiss()
                 }
