@@ -72,7 +72,7 @@ class LoginActivity : BaseActivity() {
         binding.showProgress = showProgress
 
         // TODO(B2C-194): seasonal Navratri — revert after festival
-        Glide.with(this).load(R.drawable.img_garba_couple).into(binding.ivWalletIllustration)
+        Glide.with(this).load(R.drawable.img_login_top).into(binding.ivWalletIllustration)
 
         onBack()
         setupInputFilters()
