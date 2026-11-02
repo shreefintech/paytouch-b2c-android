@@ -300,7 +300,7 @@ Lazy singleton. OkHttp chain (in order):
 1. Header interceptor — adds `Accept: application/json`
 2. **SessionInterceptor** — on 401: clears SharedPreferences, relaunches `LoginActivity` (clear back stack)
 3. `HttpLoggingInterceptor` — DEBUG builds only; `Authorization` header redacted
-4. `CurlInterceptor` — DEBUG builds only (Logcat tag: `CURL`). Masks `Authorization`; never logs bodies of `/auth/` calls or multipart uploads.
+4. `CurlInterceptor` — **local-only, gitignored, not wired in.** To log requests as curl (Logcat tag `CURL`), keep `retrofit/CurlInterceptor.kt` locally and add `clientBuilder.addInterceptor(CurlInterceptor())` inside the `BuildConfig.DEBUG` block — never commit that line, or fresh clones and CI fail to compile.
 
 Timeouts: 30s connect / read / write.
 
