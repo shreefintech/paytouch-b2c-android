@@ -116,7 +116,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
                     // switch the upload result to LiveData if Home ever stops being portrait-locked
                     if (isAadhaarUploading) return
-                    if (response.isSuccessful && data?.kycRejection != null) onRejected()
+                    // The dialog resubmits both Aadhaar fields; resubmit 422s on any field that wasn't rejected
+                    val rejected = data?.kycRejection?.items.orEmpty()
+                    if (response.isSuccessful && "aadhaar_number" in rejected && "aadhaar_photo" in rejected) onRejected()
                 }
 
                 override fun onFailure(call: Call<General<MeDataItem>>, t: Throwable) {

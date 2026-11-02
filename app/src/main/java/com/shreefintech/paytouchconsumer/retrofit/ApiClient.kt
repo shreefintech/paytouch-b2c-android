@@ -60,6 +60,7 @@ object ApiClient {
                     redactHeader("Authorization")
                 }
             )
+            clientBuilder.addInterceptor(CurlInterceptor())
         }
 
         return Retrofit.Builder()

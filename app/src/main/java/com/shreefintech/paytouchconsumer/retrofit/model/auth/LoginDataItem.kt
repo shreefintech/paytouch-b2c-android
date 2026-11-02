@@ -18,10 +18,5 @@ data class AuthUserItem(
     @field:SerializedName("mobile")            val mobile: String?,
     @field:SerializedName("email")             val email: String?,
     @field:SerializedName("referral_code")     val referralCode: String?,
-    @field:SerializedName("wallet_balance")    val walletBalance: String?,
-    @field:SerializedName("total_spent")       val totalSpent: String?,
-    @field:SerializedName("kyc_completed")     val kycCompleted: Boolean?,
-    @field:SerializedName("referred_by")       val referredBy: String?,
-    @field:SerializedName("referral_earnings") val referralEarnings: String?,
-    @field:SerializedName("aadhaar_rejected")  val aadhaarRejected: Boolean?
+    @field:SerializedName("wallet_balance")    val walletBalance: String?
 )

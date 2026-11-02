@@ -220,7 +220,7 @@
 - White card with "Categories" title
 - 3×3 grid of category tiles (Electricity, Gas, Prepaid, TV Cable, DTH, Fastag, Loan, My Account, Tax)
 - Load Wallet button at the bottom of the card
-- **Aadhaar re-upload dialog (blocking):** on every create, `GET mobile/auth/me` is checked; when the top-level `kyc_rejection` is non-null a non-cancelable dialog asks for the Aadhaar number + document and submits to `POST mobile/kyc/individual/resubmit`. Only a successful submit dismisses it. If `auth/me` fails, Home stays usable and the check repeats on the next launch.
+- **Aadhaar re-upload dialog (blocking):** on every create, `GET mobile/auth/me` is checked; when `kyc_rejection.items` contains both `aadhaar_number` and `aadhaar_photo` a non-cancelable dialog asks for the Aadhaar number + document and submits to `POST mobile/kyc/individual/resubmit`. Only a successful submit dismisses it. If `auth/me` fails, Home stays usable and the check repeats on the next launch.
 
 ---
 

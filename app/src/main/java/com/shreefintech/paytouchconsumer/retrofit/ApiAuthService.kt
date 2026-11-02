@@ -121,7 +121,7 @@ interface ApiAuthService {
         @Part("platform") platform: RequestBody
     ): Call<MessageItem>
 
-    // Re-upload after KYC rejection — triggered by top-level `kyc_rejection` on auth/me; resubmit takes only the rejected items
+    // Re-upload after KYC rejection — triggered when `kyc_rejection.items` on auth/me has both Aadhaar items; resubmit takes only the rejected items
     @Multipart
     @POST("${CHANNEL}kyc/individual/resubmit")
     fun reuploadAadhaar(
