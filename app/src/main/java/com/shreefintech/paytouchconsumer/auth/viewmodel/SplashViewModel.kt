@@ -17,7 +17,7 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
 
     fun validateSession(
         authorization: String,
-        onSuccess: (String?) -> Unit,
+        onSuccess: (MeDataItem?) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -31,8 +31,9 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                     response: Response<General<MeDataItem>>
                 ) {
                     if (response.isSuccessful) {
-                        saveOnboardingFlags(response.body()?.data?.user)
-                        onSuccess(response.body()?.data?.nextStep)
+                        val data = response.body()?.data
+                        saveOnboardingFlags(data?.bankDetailsAdded, data?.panAdded, data?.nextStep)
+                        onSuccess(data)
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(

@@ -15,6 +15,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.saveOnboardingFlags
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -91,6 +92,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 user.id ?: 0, user.mobile ?: "", user.email ?: "", user.referralCode ?: ""
             )
         }
+        saveOnboardingFlags(data.bankDetailsAdded, null, data.nextStep)
         // Covers every post-login route (Home / KYC / Create MPIN)
         NotificationHelper.syncToken(getApplication())
     }

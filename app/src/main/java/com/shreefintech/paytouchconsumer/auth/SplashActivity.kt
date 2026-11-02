@@ -17,13 +17,11 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.BuildConfig
 import com.shreefintech.paytouchconsumer.Constant
-import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
 import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
-import com.shreefintech.paytouchconsumer.kyc.KycActivity
-import com.shreefintech.paytouchconsumer.enums.NextStep
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -35,7 +33,7 @@ class SplashActivity : BaseActivity() {
     private val handler = Handler(Looper.getMainLooper())
 
     private var sessionValid = false
-    private var nextStep: NextStep? = null
+    private var meData: MeDataItem? = null
     private var apiFinished = false
     private var timerFinished = false
 
@@ -135,7 +133,7 @@ class SplashActivity : BaseActivity() {
         apiFinished = false
         timerFinished = false
         sessionValid = false
-        nextStep = null
+        meData = null
         handler.removeCallbacks(timerRunnable)
         handler.postDelayed(timerRunnable, 5000L)
         fetchSession()
@@ -155,25 +153,24 @@ class SplashActivity : BaseActivity() {
         val tokenType = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN_TYPE, "Bearer") ?: "Bearer"
         viewModel.validateSession(
             authorization = "$tokenType $token",
-            onSuccess = { step -> onApiDone(true, step) },
+            onSuccess = { data -> onApiDone(true, data) },
             onError = { onApiDone(false, null) }
         )
     }
 
-    private fun onApiDone(valid: Boolean, step: String?) {
+    private fun onApiDone(valid: Boolean, data: MeDataItem?) {
         sessionValid = valid
-        nextStep = NextStep.from(step)
+        meData = data
         apiFinished = true
         if (timerFinished) redirect()
     }
 
     private fun redirect() {
         NotificationHelper.syncToken(mActivity)
-        val intent = when {
-            !sessionValid                                                                -> Intent(mActivity, LoginActivity::class.java)
-            nextStep == NextStep.KYC_REQUIRED || nextStep == NextStep.PENDING_APPROVAL  -> Intent(mActivity, KycActivity::class.java)
-            // TODO(B2C-147): nextStep == NextStep.MPIN_REQUIRED → ResetMpinActivity.buildCreateIntent(mActivity)
-            else                                                                        -> Intent(mActivity, HomeActivity::class.java)
+        val intent = if (sessionValid) {
+            NextStepRouter.intentFor(mActivity, meData?.nextStep, meData?.mpinRequired)
+        } else {
+            Intent(mActivity, LoginActivity::class.java)
         }
         navigate(intent)
     }

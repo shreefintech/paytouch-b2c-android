@@ -19,14 +19,11 @@ import androidx.databinding.ObservableBoolean
 import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
-import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.LoginViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoginBinding
 import com.shreefintech.paytouchconsumer.enums.LoginMode
-import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
 import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -259,12 +256,7 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun navigateAfterLogin(data: LoginDataItem?) {
-        val intent = when (NextStep.from(data?.nextStep)) {
-            NextStep.KYC_REQUIRED, NextStep.PENDING_APPROVAL -> Intent(mActivity, KycActivity::class.java)
-            // TODO(B2C-147): NextStep.MPIN_REQUIRED → ResetMpinActivity.buildCreateIntent(mActivity)
-            else                                             -> Intent(mActivity, HomeActivity::class.java)
-        }
-        startActivity(intent)
+        startActivity(NextStepRouter.intentFor(mActivity, data?.nextStep, data?.mpinRequired))
         finishAffinity()
     }
 

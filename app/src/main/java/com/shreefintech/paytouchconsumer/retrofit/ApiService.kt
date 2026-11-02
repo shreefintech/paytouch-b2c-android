@@ -9,8 +9,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.MpinItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetCredentialRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetTokenDataItem
@@ -190,12 +188,12 @@ interface ApiService {
         @Body request: ResetCredentialRequest
     ): Call<MessageItem>
 
-    // TODO(B2C-147): createMpin endpoint path unconfirmed — update when backend finalises
-    @POST("${CHANNEL}auth/mpin/create")
+    // Same response shape as auth/me; 422 if an MPIN is already set
+    @POST("${CHANNEL}auth/mpin")
     fun createMpin(
         @Header("Authorization") token: String,
         @Body body: CreateMpinRequest
-    ): Call<MpinItem>
+    ): Call<General<MeDataItem>>
 
     // ── Wallet ────────────────────────────────────────────────────────────────
 
@@ -665,7 +663,7 @@ interface ApiService {
     // ── B2C V2 Registration & Onboarding ─────────────────────────────────────
 
     @Multipart
-    @POST("${CHANNEL}v2/register")
+    @POST("${CHANNEL}auth/register/individual")
     fun registerV2(
         @Part("name") name: RequestBody,
         @Part("mobile") mobile: RequestBody,
@@ -678,7 +676,7 @@ interface ApiService {
         @Part("city_id") cityId: RequestBody,
         @Part("referral_code") referralCode: RequestBody,
         @Part("platform") platform: RequestBody
-    ): Call<RegisterItem>
+    ): Call<MessageItem>
 
     // Re-upload after KYC rejection — triggered by `aadhaar_rejected` on /api/user
     @Multipart
@@ -689,10 +687,10 @@ interface ApiService {
         @Part aadhaarPhoto: MultipartBody.Part
     ): Call<MessageItem>
 
-    @GET("${CHANNEL}v2/address/states")
+    @GET("${CHANNEL}address/states")
     fun getAddressStates(): Call<General<List<StateItem>>>
 
-    @GET("${CHANNEL}v2/address/states/{state_id}/cities")
+    @GET("${CHANNEL}address/states/{state_id}/cities")
     fun getAddressCities(
         @Path("state_id") stateId: String
     ): Call<General<List<CityItem>>>
