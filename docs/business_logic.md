@@ -33,8 +33,8 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 | POST | `auth/logout` | Invalidate session on server |
 | POST | `device-token`, `location` | FCM token / user location |
 | GET | `address/states`, `address/states/{state_id}/cities` | Registration address pickers |
-| POST | `kyc/aadhaar` | Aadhaar re-upload after rejection |
-| POST | `v2/bank-details`, `v2/pan` | Bank / PAN onboarding dialogs |
+| POST | `kyc/individual/resubmit` | Aadhaar re-upload after rejection (rejected items only) |
+| POST | `kyc/individual/bank-details`, `kyc/individual/pan` | Bank / PAN onboarding dialogs |
 
 ### Request Fields (Login — `LoginRequest`, JSON)
 - `mobile` (String, required)
@@ -56,10 +56,11 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - `next_step` (String) — see routing above
 - `mpin_required` (Boolean)
 - `bank_details_added` (Boolean)
+- `pan_added` (Boolean)
 - `user` (`AuthUserItem`): `id`, `name`, `mobile`, `email`, `referral_code`, `wallet_balance`, `total_spent`, `kyc_completed`, `referred_by`, `referral_earnings`, `aadhaar_rejected`
 
 ### Response Fields (`auth/me` and `auth/mpin` — `data`, `MeDataItem`)
-- `user` (`AuthUserItem`), `next_step`, `mpin_required`, `bank_details_added`, `aadhaar_added`, `pan_added`
+- `user` (`AuthUserItem`), `next_step`, `mpin_required`, `bank_details_added`, `aadhaar_added`, `pan_added`, `kyc_rejection` (non-null while a rejection is open → Home Aadhaar re-upload dialog)
 
 ### State Transitions
 ```

@@ -121,9 +121,9 @@ interface ApiAuthService {
         @Part("platform") platform: RequestBody
     ): Call<MessageItem>
 
-    // Re-upload after KYC rejection — triggered by `user.aadhaar_rejected` on auth/me
+    // Re-upload after KYC rejection — triggered by top-level `kyc_rejection` on auth/me; resubmit takes only the rejected items
     @Multipart
-    @POST("${CHANNEL}kyc/aadhaar")
+    @POST("${CHANNEL}kyc/individual/resubmit")
     fun reuploadAadhaar(
         @Header("Authorization") authorization: String,
         @Part("aadhaar_number") aadhaarNumber: RequestBody,
@@ -138,13 +138,13 @@ interface ApiAuthService {
         @Path("state_id") stateId: String
     ): Call<General<List<CityItem>>>
 
-    @POST("${CHANNEL}v2/bank-details")
+    @POST("${CHANNEL}kyc/individual/bank-details")
     fun addBankDetails(
         @Header("Authorization") authorization: String,
         @Body body: BankDetailsV2Request
     ): Call<BankDetailsV2Item>
 
-    @POST("${CHANNEL}v2/pan")
+    @POST("${CHANNEL}kyc/individual/pan")
     fun addPan(
         @Header("Authorization") authorization: String,
         @Body body: PanV2Request

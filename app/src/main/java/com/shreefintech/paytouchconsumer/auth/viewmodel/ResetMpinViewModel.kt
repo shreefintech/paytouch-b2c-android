@@ -52,7 +52,7 @@ class ResetMpinViewModel(application: Application) : AndroidViewModel(applicatio
     fun createMpin(
         mpin: String,
         onLoading: () -> Unit,
-        onSuccess: (MeDataItem?) -> Unit,
+        onSuccess: (MeDataItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -63,9 +63,9 @@ class ResetMpinViewModel(application: Application) : AndroidViewModel(applicatio
         ApiAuthClient.apiService.createMpin(bearerToken(), CreateMpinRequest(mpin, mpin))
             .enqueue(object : Callback<General<MeDataItem>> {
                 override fun onResponse(call: Call<General<MeDataItem>>, response: Response<General<MeDataItem>>) {
-                    if (response.isSuccessful) {
-                        val data = response.body()?.data
-                        saveOnboardingFlags(data?.bankDetailsAdded, data?.panAdded, data?.nextStep)
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        saveOnboardingFlags(data.bankDetailsAdded, data.panAdded, data.nextStep)
                         onSuccess(data)
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))

@@ -92,7 +92,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 user.id ?: 0, user.mobile ?: "", user.email ?: "", user.referralCode ?: ""
             )
         }
-        saveOnboardingFlags(data.bankDetailsAdded, null, data.nextStep)
+        saveOnboardingFlags(data.bankDetailsAdded, data.panAdded, data.nextStep)
         // Covers every post-login route (Home / KYC / Create MPIN)
         NotificationHelper.syncToken(getApplication())
     }

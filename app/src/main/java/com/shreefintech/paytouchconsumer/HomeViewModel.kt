@@ -110,14 +110,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 override fun onResponse(call: Call<General<MeDataItem>>, response: Response<General<MeDataItem>>) {
                     if (aadhaarCheckCall === call) aadhaarCheckCall = null
                     val data = response.body()?.data
-                    val user = data?.user
                     // Refreshes the bank/PAN flags on every Home launch
                     saveOnboardingFlags(data?.bankDetailsAdded, data?.panAdded, data?.nextStep)
                     // Checked at response time so the flags above still refresh while an upload is in flight.
                     // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
                     // switch the upload result to LiveData if Home ever stops being portrait-locked
                     if (isAadhaarUploading) return
-                    if (response.isSuccessful && user?.aadhaarRejected == true) onRejected()
+                    if (response.isSuccessful && data?.kycRejection != null) onRejected()
                 }
 
                 override fun onFailure(call: Call<General<MeDataItem>>, t: Throwable) {

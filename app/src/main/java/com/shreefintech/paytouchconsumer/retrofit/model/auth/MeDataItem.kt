@@ -9,5 +9,7 @@ data class MeDataItem(
     @field:SerializedName("mpin_required")      val mpinRequired: Boolean?,
     @field:SerializedName("bank_details_added") val bankDetailsAdded: Boolean?,
     @field:SerializedName("aadhaar_added")      val aadhaarAdded: Boolean?,
-    @field:SerializedName("pan_added")          val panAdded: Boolean?
+    @field:SerializedName("pan_added")          val panAdded: Boolean?,
+    // Non-null only while a KYC rejection is open — drives the Aadhaar re-upload dialog on Home
+    @field:SerializedName("kyc_rejection")      val kycRejection: Any?
 )

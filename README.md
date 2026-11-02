@@ -306,7 +306,7 @@ Timeouts: 30s connect / read / write.
 
 ### ApiAuthClient — `backend-b2c.paytouch.in/api/`
 
-Auth + onboarding endpoints (`ApiAuthService`, prefix `mobile/`): `auth/*`, `device-token`, `location`, `address/*`, `kyc/aadhaar`, `v2/bank-details`, `v2/pan`. Built with `ApiClient.buildRetrofit(Constant.BASE_URL_AUTH)`, so it gets the same interceptor chain and timeouts as `ApiClient`. Initialised in `MyApp` after `ApiClient.init()`.
+Auth + onboarding endpoints (`ApiAuthService`, prefix `mobile/`): `auth/*`, `device-token`, `location`, `address/*`, `kyc/individual/resubmit`, `kyc/individual/bank-details`, `kyc/individual/pan`. Built with `ApiClient.buildRetrofit(Constant.BASE_URL_AUTH)`, so it gets the same interceptor chain and timeouts as `ApiClient`. Initialised in `MyApp` after `ApiClient.init()`.
 
 ### ApiAdminClient — `admin.paytouch.in`
 
