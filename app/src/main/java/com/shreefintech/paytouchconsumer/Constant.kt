@@ -34,6 +34,9 @@ object Constant {
     const val FCM_PLATFORM_ANDROID = "android"
     const val FCM_LANGUAGE_DEFAULT = "en"
 
+    // Top-level `error_code` on a 403 from money calls (pay, top-up, withdraw)
+    const val ERROR_CODE_USER_BLOCKED = "USER_BLOCKED"
+
     // Location — true once the system location permission popup has been shown at least once.
     // Distinguishes "never asked" from "permanently denied" (both report no rationale).
     const val KEY_LOCATION_ASKED = "LOCATION_ASKED"
