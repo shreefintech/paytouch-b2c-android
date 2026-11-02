@@ -36,6 +36,7 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
+import com.shreefintech.paytouchconsumer.kyc.KycStatusActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.LoadWalletActivity
 import com.shreefintech.paytouchconsumer.location.LocationPermissionHelper
@@ -82,7 +83,7 @@ class HomeActivity : BaseActivity() {
     // True when the location flow ended while Home was not in front — asked again in onResume()
     private var isNotificationPermissionPending = false
 
-    // ── Aadhaar re-upload dialog (blocking — shown while auth/me returns kyc_rejection) ──
+    // ── Aadhaar dialog (blocking — shown while auth/me returns kyc_rejection or an Aadhaar next_step) ──
     private val showProgressAadhaar = ObservableBoolean(false)
     private var aadhaarDialog: Dialog? = null
     private var aadhaarBinding: DialogReuploadAadhaarBinding? = null
@@ -133,9 +134,19 @@ class HomeActivity : BaseActivity() {
             locationHelper.start()
         }
         // Every create — the dialog doesn't survive recreation, so the block must be re-applied
-        viewModel.checkAadhaarRejected {
-            if (!isFinishing && !isDestroyed) showReuploadAadhaarDialog()
-        }
+        checkKycStep()
+    }
+
+    private fun checkKycStep() {
+        viewModel.checkAadhaarRejected(
+            onRejected = { if (!isFinishing && !isDestroyed) showReuploadAadhaarDialog() },
+            onPendingApproval = { nextStep ->
+                if (isFinishing || isDestroyed) return@checkAadhaarRejected
+                startActivity(KycStatusActivity.buildIntent(mActivity, nextStep).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            }
+        )
     }
 
     override fun onResume() {
@@ -382,6 +393,8 @@ class HomeActivity : BaseActivity() {
                 aadhaarUri = null
                 Utility.deleteKycDirs(mActivity, Constant.KYC_AADHAAR_REUPLOAD_DIR)
                 ToastUtil.showSuccess(mActivity, message)
+                // auth/me is the source of truth after every submit — usually moves on to pending_approval
+                checkKycStep()
             },
             onError = onError@{ errMsg ->
                 showProgressAadhaar.set(false)

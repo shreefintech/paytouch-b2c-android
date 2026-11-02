@@ -6,24 +6,27 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
-import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.KycDocumentAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycDetailsBinding
 import com.shreefintech.paytouchconsumer.databinding.ItemKycBankAccountBinding
+import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.kyc.bank.model.EditBankPassItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycBankAccountDetailItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDocumentDetailItem
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import kotlin.math.abs
@@ -47,6 +50,11 @@ class KycDetailsActivity : BaseActivity() {
     }
 
     companion object {
+        // kyc_rejection.items values
+        private const val KYC_ITEM_AADHAAR_NUMBER = "aadhaar_number"
+        private const val KYC_ITEM_AADHAAR_PHOTO = "aadhaar_photo"
+        private const val KYC_ITEM_BANK_DETAILS = "bank_details"
+
         fun start(context: Context) {
             context.startActivity(Intent(context, KycDetailsActivity::class.java))
         }
@@ -92,16 +100,16 @@ class KycDetailsActivity : BaseActivity() {
             return
         }
         hideNoInternet()
-        viewModel.fetchMyAccount(
+        viewModel.fetchDetails(
             onLoading = {
                 binding.pbLoading.isVisible = true
                 binding.nsvContent.isVisible = false
             },
-            onReady = { data ->
-                if (isFinishing || isDestroyed) return@fetchMyAccount
+            onReady = { me, bank ->
+                if (isFinishing || isDestroyed) return@fetchDetails
                 binding.pbLoading.isVisible = false
                 binding.nsvContent.isVisible = true
-                populateData(data)
+                populateData(me, bank)
             },
             onError = { msg ->
                 binding.pbLoading.isVisible = false
@@ -111,96 +119,103 @@ class KycDetailsActivity : BaseActivity() {
         )
     }
 
-    private fun populateData(data: KycMyAccountItem) {
-        populateIdentity(data)
-        populateBank(data)
-        populateDocuments(data)
+    private fun populateData(me: MeDataItem, bank: WalletBankAccountItem?) {
+        val rejected = me.kycRejectedItems
+        val isComplete = NextStep.from(me.nextStep) == NextStep.COMPLETE
+        populateIdentity(me, badge(
+            isRejected = rejected.any { it == KYC_ITEM_AADHAAR_NUMBER || it == KYC_ITEM_AADHAAR_PHOTO },
+            isComplete = isComplete,
+            isOnFile   = me.aadhaarAdded == true
+        ))
+        populateBank(bank, badge(
+            isRejected = KYC_ITEM_BANK_DETAILS in rejected,
+            isComplete = isComplete,
+            isOnFile   = me.bankDetailsAdded == true
+        ))
+        // No documents source in B2C yet — the section stays hidden until one exists
+        populateDocuments(emptyList())
     }
 
-    private fun populateIdentity(data: KycMyAccountItem) {
-        val identity = data.identity ?: return
-        binding.tvMobile.text = identity.mobile ?: "--"
-        binding.tvAadhaar.text = identity.aadhaarNumber ?: "--"
-        binding.tvPan.text = identity.panNumber ?: "--"
-        binding.tvEmail.text = identity.email ?: "--"
-        val identityColor = statusColor(identity.status)
-        binding.tvIdentityStatus.text = statusLabel(identity.status)
-        binding.tvIdentityStatus.setTextColor(identityColor)
-
-        val avatarUrl = resolveFileUrl(identity.avatarUrl)
-        if (!avatarUrl.isNullOrBlank()) {
-            Glide.with(this)
-                .load(avatarUrl)
-                .placeholder(R.drawable.ic_profile)
-                .error(R.drawable.ic_profile)
-                .circleCrop()
-                .into(binding.ivAvatar)
-        }
+    private fun populateIdentity(me: MeDataItem, badge: KycBadge) {
+        binding.tvMobile.text = me.user?.mobile ?: "--"
+        binding.tvAadhaar.text = me.user?.aadhaarMasked ?: "--"
+        binding.tvEmail.text = me.user?.email ?: "--"
+        applyBadge(binding.tvIdentityStatus, badge)
+        // B2C returns no avatar or PAN number — hidden rather than shown empty
+        binding.cvAvatar.isVisible = false
+        binding.viewPanDivider.isVisible = false
+        binding.llPanColumn.isVisible = false
     }
 
-    private fun populateBank(data: KycMyAccountItem) {
-        val bank = data.bank ?: return
-        binding.tvBankStatus.text = statusLabel(bank.status)
-        binding.tvBankStatus.setTextColor(statusColor(bank.status))
+    // B2C has one withdrawal bank (bank_id 0); its card and Edit are always shown so a bank can be added
+    private fun populateBank(bank: WalletBankAccountItem?, badge: KycBadge) {
+        applyBadge(binding.tvBankStatus, badge)
 
         binding.llBankAccounts.removeAllViews()
-        val accounts = bank.accounts ?: return
-        val canEdit = bank.canEdit == true
-        accounts.forEachIndexed { index, account ->
-            val item = ItemKycBankAccountBinding.inflate(layoutInflater, binding.llBankAccounts, false)
-            item.tvAccountNumber.text = account.accountNumber ?: "--"
-            item.tvBankName.text = account.bankName ?: "--"
-            item.tvIfsc.text = account.ifsc ?: "--"
-            item.tvBranchName.text = account.branchName ?: "--"
-            if (canEdit && account.id != null) {
-                item.ivEditBank.visibility = View.VISIBLE
-                item.ivEditBank.setOnClickListener {
-                    if (Utility.stopClick()) return@setOnClickListener
-                    onEditBank(account, index)
-                }
-            }
-            binding.llBankAccounts.addView(item.root)
+        val hasBank = bank?.hasBankAccount == true
+        val item = ItemKycBankAccountBinding.inflate(layoutInflater, binding.llBankAccounts, false)
+        item.tvAccountNumber.text = bank?.accountMasked?.takeIf { hasBank } ?: "--"
+        item.tvBankName.text = bank?.bankName?.takeIf { hasBank } ?: "--"
+        item.tvIfsc.text = bank?.ifsc?.takeIf { hasBank } ?: "--"
+        // Branch is not returned by wallet/bank-account
+        item.llBranchName.isVisible = false
+        item.ivEditBank.visibility = View.VISIBLE
+        item.ivEditBank.setOnClickListener {
+            if (Utility.stopClick()) return@setOnClickListener
+            onEditBank(bank?.takeIf { hasBank })
         }
+        binding.llBankAccounts.addView(item.root)
     }
 
-    private fun onEditBank(account: KycBankAccountDetailItem, index: Int) {
-        val bankId = account.id ?: return
-        // Account's own URL first; index match is a fallback (list orders are not guaranteed to align)
-        val bankProofUrl = account.bankProofUrl
-            ?: documents.filter { it.documentType == "bank_proof" }.getOrNull(index)?.fileUrl
+    private fun onEditBank(bank: WalletBankAccountItem?) {
         val passItem = EditBankPassItem(
-            bankId            = bankId,
-            isPrimary         = account.isPrimary ?: false,
-            accountHolderName = account.accountHolderName,
-            accountNumber     = account.accountNumber,
-            bankName          = account.bankName,
-            ifsc              = account.ifsc,
-            branchName        = account.branchName,
-            bankProofUrl      = bankProofUrl
+            bankId            = EditBankPassItem.WITHDRAWAL_BANK_ID,
+            isPrimary         = true,
+            accountHolderName = bank?.holderName,
+            accountNumber     = bank?.accountMasked,
+            bankName          = bank?.bankName,
+            ifsc              = bank?.ifsc,
+            branchName        = null,
+            bankProofUrl      = null
         )
         editBankLauncher.launch(EditBankDetailsActivity.createIntent(this, passItem))
     }
 
-    private fun populateDocuments(data: KycMyAccountItem) {
-        val docs = data.documents ?: return
-        binding.tvDocumentsStatus.text = statusLabel(docs.status)
-        binding.tvDocumentsStatus.setTextColor(statusColor(docs.status))
-
-        val docList = docs.items ?: emptyList()
+    private fun populateDocuments(docList: List<KycDocumentDetailItem>) {
         documents.clear()
         documents.addAll(docList)
         documentAdp.updateList(docList)
 
-        if (docList.isEmpty()) {
-            binding.llDocumentsContent.isVisible = false
-            binding.tvNoDocuments.isVisible = true
-        } else {
-            binding.llDocumentsContent.isVisible = true
-            binding.tvNoDocuments.isVisible = false
+        val hasDocs = docList.isNotEmpty()
+        binding.llDocumentsHeader.isVisible = hasDocs
+        binding.view2.isVisible = hasDocs
+        binding.llDocumentsContent.isVisible = hasDocs
+        binding.tvNoDocuments.isVisible = false
+        if (hasDocs) {
             setupDots(docList.size)
             binding.tvDocumentTitle.text = docList[0].label ?: ""
             updateDots(0)
         }
+    }
+
+    // iOS parity: rejected when kyc_rejection.items names it, verified once complete, submitted while on file
+    private fun badge(isRejected: Boolean, isComplete: Boolean, isOnFile: Boolean): KycBadge = when {
+        isRejected -> KycBadge.REJECTED
+        isComplete -> KycBadge.VERIFIED
+        isOnFile   -> KycBadge.SUBMITTED
+        else       -> KycBadge.PENDING
+    }
+
+    private fun applyBadge(view: TextView, badge: KycBadge) {
+        view.text = getString(badge.labelRes)
+        view.setTextColor(ContextCompat.getColor(this, badge.colorRes))
+    }
+
+    private enum class KycBadge(@param:StringRes val labelRes: Int, @param:ColorRes val colorRes: Int) {
+        VERIFIED(R.string.labelVerified, R.color.colorStatusSuccess),
+        SUBMITTED(R.string.labelSubmitted, R.color.colorStatusPending),
+        PENDING(R.string.labelPending, R.color.colorStatusPending),
+        REJECTED(R.string.labelRejected, R.color.colorStatusFailed)
     }
 
     private fun setupDots(count: Int) {
@@ -227,23 +242,6 @@ class KycDetailsActivity : BaseActivity() {
     }
 
     private fun resolveFileUrl(fileUrl: String?): String? = fileUrl?.ifBlank { null }
-
-    private fun statusLabel(status: String?): String = when {
-        status.isNullOrEmpty() -> "--"
-        status.contains("approved", ignoreCase = true) ||
-                status.contains("verified", ignoreCase = true) -> getString(R.string.labelVerified)
-        status.contains("reject", ignoreCase = true) -> getString(R.string.labelRejected)
-        else -> getString(R.string.labelPending)
-    }
-
-    private fun statusColor(status: String?): Int = when {
-        status?.contains("approved", ignoreCase = true) == true ||
-                status?.contains("verified", ignoreCase = true) == true ->
-            ContextCompat.getColor(this, R.color.colorStatusSuccess)
-        status?.contains("reject", ignoreCase = true) == true ->
-            ContextCompat.getColor(this, R.color.colorStatusFailed)
-        else -> ContextCompat.getColor(this, R.color.colorStatusPending)
-    }
 
     private fun onClickListener() = View.OnClickListener { view ->
         when (view) {

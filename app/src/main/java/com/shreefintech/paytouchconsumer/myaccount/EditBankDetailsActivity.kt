@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.myaccount
 
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -23,7 +24,9 @@ import com.shreefintech.paytouchconsumer.myaccount.viewmodel.EditBankDetailsView
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityEditBankDetailsBinding
+import com.shreefintech.paytouchconsumer.databinding.DialogMpinBinding
 import com.shreefintech.paytouchconsumer.kyc.bank.model.EditBankPassItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountRequest
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -54,6 +57,8 @@ class EditBankDetailsActivity : BaseActivity() {
     private val viewModel: EditBankDetailsViewModel by viewModels()
 
     private val showProgressSave = ObservableBoolean(false)
+    private val showProgressMpin = ObservableBoolean(false)
+    private var mpinDialog: Dialog? = null
     private var isSaving = false
     private var isPasswordVisible = false
 
@@ -156,6 +161,16 @@ class EditBankDetailsActivity : BaseActivity() {
 
         if (item.isPrimary) {
             binding.cvWithdrawalNote.isVisible = true
+        }
+
+        // wallet/bank-account takes no branch, proof or password — the MPIN popup authorises the save
+        if (item.isWithdrawalBank) {
+            listOf(
+                binding.tvBranchNameLabel, binding.etBranchName,
+                binding.tvBankProofLabel, binding.flBankProof, binding.tvBankProofOptional,
+                binding.tvPasswordLabel, binding.flPassword
+            ).forEach { it.isVisible = false }
+            return
         }
 
         initialProofUrl = item.bankProofUrl
@@ -261,6 +276,7 @@ class EditBankDetailsActivity : BaseActivity() {
         val bankName      = binding.etBankName.text?.toString()?.trim()           ?: ""
         val branchName    = binding.etBranchName.text?.toString()?.trim()         ?: ""
         val password      = binding.etPassword.text?.toString()                   ?: ""
+        val isWithdrawal  = bankItem?.isWithdrawalBank == true
 
         return when {
             holderName.isEmpty() -> {
@@ -293,12 +309,12 @@ class EditBankDetailsActivity : BaseActivity() {
                 ToastUtil.showDelete(mActivity, getString(R.string.msgBankNameEmpty))
                 false
             }
-            branchName.isEmpty() -> {
+            !isWithdrawal && branchName.isEmpty() -> {
                 binding.etBranchName.requestFocus()
                 ToastUtil.showDelete(mActivity, getString(R.string.msgBranchNameEmpty))
                 false
             }
-            password.isEmpty() -> {
+            !isWithdrawal && password.isEmpty() -> {
                 binding.etPassword.requestFocus()
                 ToastUtil.showDelete(mActivity, getString(R.string.msgPasswordEmpty))
                 false
@@ -310,6 +326,10 @@ class EditBankDetailsActivity : BaseActivity() {
     private fun onSubmit() {
         if (!validate()) return
         val item = bankItem ?: return
+        if (item.isWithdrawalBank) {
+            showMpinDialog()
+            return
+        }
 
         // Snapshot all form values on the main thread before going to IO
         val holderNameSnap    = binding.etAccountHolderName.text?.toString()?.trim() ?: ""
@@ -354,6 +374,87 @@ class EditBankDetailsActivity : BaseActivity() {
                 )
             }
         }
+    }
+
+    private fun showMpinDialog() {
+        if (mpinDialog?.isShowing == true) return
+        val dialogBinding = DialogMpinBinding.inflate(layoutInflater)
+        showProgressMpin.set(false)
+        dialogBinding.showProgress = showProgressMpin
+        dialogBinding.onClickListener = View.OnClickListener { view ->
+            when (view) {
+                dialogBinding.cardClose -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressMpin.get()) return@OnClickListener
+                    mpinDialog?.dismiss()
+                }
+                dialogBinding.cardSubmit -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressMpin.get()) return@OnClickListener
+                    onSubmitMpin(dialogBinding)
+                }
+            }
+        }
+
+        val dialog = Dialog(mActivity)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.88).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.setCancelable(false)
+        dialog.setOnDismissListener { mpinDialog = null }
+        mpinDialog = dialog
+        dialog.show()
+    }
+
+    private fun onSubmitMpin(dialogBinding: DialogMpinBinding) {
+        Utility.hideKeyboard(dialogBinding.root)
+        val mpin = dialogBinding.etMpin.text?.toString()?.trim().orEmpty()
+        val msg = when {
+            mpin.isEmpty() -> getString(R.string.msgMpinEmpty)
+            mpin.length != 4 -> getString(R.string.msgMpinInvalid)
+            else -> null
+        }
+        if (msg != null) {
+            ToastUtil.showDelete(mActivity, msg)
+            return
+        }
+
+        val request = WalletBankAccountRequest(
+            holderName    = binding.etAccountHolderName.text?.toString()?.trim().orEmpty(),
+            accountNumber = binding.etAccountNumber.text?.toString()?.trim().orEmpty(),
+            ifsc          = binding.etIfscCode.text?.toString()?.trim().orEmpty(),
+            bankName      = binding.etBankName.text?.toString()?.trim().orEmpty(),
+            mpin          = mpin
+        )
+        isSaving = true
+        showProgressMpin.set(true)
+        viewModel.saveWithdrawalBank(
+            request   = request,
+            onSuccess = onSuccess@{ successMsg ->
+                isSaving = false
+                showProgressMpin.set(false)
+                if (isDestroyed || isFinishing) return@onSuccess
+                mpinDialog?.dismiss()
+                setResult(RESULT_OK, Intent().putExtra(EXTRA_SUCCESS_MSG, successMsg))
+                finish()
+            },
+            onError   = onError@{ errMsg ->
+                isSaving = false
+                showProgressMpin.set(false)
+                if (isDestroyed || isFinishing) return@onError
+                ToastUtil.showDelete(mActivity, errMsg)
+            }
+        )
+    }
+
+    override fun onDestroy() {
+        // Dismiss here so the dialog window doesn't leak past the Activity
+        mpinDialog?.dismiss()
+        super.onDestroy()
     }
 
     private fun onClickListener(): View.OnClickListener {

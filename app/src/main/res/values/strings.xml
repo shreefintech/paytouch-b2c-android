@@ -669,6 +669,10 @@
     <string name="labelVerified">Verified</string>
     <string name="labelPending">Pending</string>
     <string name="labelRejected">Rejected</string>
+    <string name="labelSubmitted">Submitted</string>
+    <string name="titleEnterMpin">Enter MPIN</string>
+    <string name="msgEnterMpinBankSubtitle">Enter your 4-digit MPIN to save this bank account</string>
+    <string name="msgBankAccountSaved">Bank account saved.</string>
     <string name="btnPreview">Preview</string>
     <string name="msgNoKycDocuments">No documents uploaded</string>
     <string name="msgDocumentNotAvailable">Document not available for preview</string>

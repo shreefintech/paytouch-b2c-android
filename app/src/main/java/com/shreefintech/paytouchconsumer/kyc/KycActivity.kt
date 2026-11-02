@@ -19,6 +19,7 @@ import com.shreefintech.paytouchconsumer.kyc.bank.BankDetailsActivity
 import com.shreefintech.paytouchconsumer.kyc.identity.IdentityVerificationActivity
 import com.shreefintech.paytouchconsumer.enums.KycSectionStatus
 import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
+import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -117,7 +118,7 @@ class KycActivity : BaseActivity() {
     private fun applyStatus(statusItem: KycStatusItem) {
         val sub = statusItem.submission
         if (KycSubmissionStatus.from(sub?.status) == KycSubmissionStatus.KYC_SUBMITTED) {
-            KycStatusActivity.start(mActivity, statusItem)
+            startActivity(KycStatusActivity.buildIntent(mActivity, NextStep.PENDING_APPROVAL.value))
             finish()
             return
         }
@@ -207,8 +208,8 @@ class KycActivity : BaseActivity() {
 
         viewModel.agreeAndFetchStatus(
             onLoading = {},
-            onReady = { statusItem ->
-                KycStatusActivity.start(mActivity, statusItem)
+            onReady = { _ ->
+                startActivity(KycStatusActivity.buildIntent(mActivity, NextStep.PENDING_APPROVAL.value))
                 finish()
             },
             onError = { msg ->

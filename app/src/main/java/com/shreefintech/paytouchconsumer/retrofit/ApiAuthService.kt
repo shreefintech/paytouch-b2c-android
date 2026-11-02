@@ -20,6 +20,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Item
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Request
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Item
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -28,6 +30,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
@@ -149,4 +152,17 @@ interface ApiAuthService {
         @Header("Authorization") authorization: String,
         @Body body: PanV2Request
     ): Call<PanV2Item>
+
+    // ── Withdrawal bank (View KYC Details / Edit Bank Details) ───────────────
+
+    @GET("${CHANNEL}wallet/bank-account")
+    fun getWalletBankAccount(
+        @Header("Authorization") authorization: String
+    ): Call<General<WalletBankAccountItem>>
+
+    @PUT("${CHANNEL}wallet/bank-account")
+    fun saveWalletBankAccount(
+        @Header("Authorization") authorization: String,
+        @Body body: WalletBankAccountRequest
+    ): Call<General<WalletBankAccountItem>>
 }

@@ -2,11 +2,16 @@ package com.shreefintech.paytouchconsumer.myaccount.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.EditBankUpdateDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountRequest
+import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -18,6 +23,42 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class EditBankDetailsViewModel(application: Application) : AndroidViewModel(application) {
+
+    /** Withdrawal bank (bank_id 0) — PUT wallet/bank-account, authorised by MPIN. */
+    fun saveWithdrawalBank(
+        request: WalletBankAccountRequest,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        ApiAuthClient.apiService.saveWalletBankAccount(bearerToken(), request)
+            .enqueue(object : Callback<General<WalletBankAccountItem>> {
+                override fun onResponse(
+                    call: Call<General<WalletBankAccountItem>>,
+                    response: Response<General<WalletBankAccountItem>>
+                ) {
+                    val body = response.body()
+                    if (response.isSuccessful && body?.data != null) {
+                        // A saved withdrawal bank clears the Add Bank Details gate on money actions
+                        SharedPreferenceHelper.setSharedPreferenceBoolean(getApplication(), Constant.KEY_BANK_DETAILS_ADDED, true)
+                        onSuccess(body.message ?: getString(R.string.msgBankAccountSaved))
+                    } else {
+                        onError(
+                            ApiHelper.parseErrorMessage(
+                                getApplication(), response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<General<WalletBankAccountItem>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+    }
 
     fun submit(
         bankId: Int,

@@ -14,6 +14,10 @@ enum class NextStep(val value: String) {
         get() = this == KYC_REQUIRED || this == AADHAAR_REQUIRED || this == KYC_RESUBMIT_REQUIRED ||
                 this == PENDING_APPROVAL || this == REGISTRATION_REJECTED
 
+    // Steps that Home resolves with the Aadhaar dialog
+    val needsAadhaar: Boolean
+        get() = this == KYC_REQUIRED || this == AADHAAR_REQUIRED || this == KYC_RESUBMIT_REQUIRED || this == REGISTRATION_REJECTED
+
     companion object {
         fun from(value: String?): NextStep? = entries.find { it.value == value }
     }

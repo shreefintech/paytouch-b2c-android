@@ -5,6 +5,7 @@ import android.location.Location
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
@@ -102,7 +103,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
      * Silent — Home stays usable if mobile/auth/me fails; the flag is re-checked on the next Home launch.
      * Also the post-login source of the bank/PAN onboarding flags (see [saveOnboardingFlags]) — keep this call.
      */
-    fun checkAadhaarRejected(onRejected: () -> Unit) {
+    fun checkAadhaarRejected(onRejected: () -> Unit, onPendingApproval: (String?) -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) return
         aadhaarCheckCall?.cancel()
         aadhaarCheckCall = ApiAuthClient.apiService.getMe(bearerToken()).also {
@@ -116,7 +117,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
                     // switch the upload result to LiveData if Home ever stops being portrait-locked
                     if (isAadhaarUploading) return
-                    if (response.isSuccessful && data?.kycRejection != null) onRejected()
+                    if (!response.isSuccessful || data == null) return
+                    val step = NextStep.from(data.nextStep)
+                    when {
+                        data.kycRejection != null || step?.needsAadhaar == true -> onRejected()
+                        step == NextStep.PENDING_APPROVAL -> onPendingApproval(data.nextStep)
+                    }
                 }
 
                 override fun onFailure(call: Call<General<MeDataItem>>, t: Throwable) {

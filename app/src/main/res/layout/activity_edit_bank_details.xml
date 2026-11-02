@@ -257,6 +257,7 @@
 
                     <!-- Branch Name -->
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvBranchNameLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_large"
@@ -287,6 +288,7 @@
 
                     <!-- Bank Proof -->
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvBankProofLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_large"
@@ -431,6 +433,7 @@
 
                     <!-- Optional note -->
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvBankProofOptional"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_extra_small"
@@ -442,6 +445,7 @@
 
                     <!-- Login Password -->
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvPasswordLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_large"
@@ -452,6 +456,7 @@
                         android:textSize="@dimen/text_size_13" />
 
                     <FrameLayout
+                        android:id="@+id/flPassword"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/input_height"
                         android:layout_marginTop="@dimen/margin_small">

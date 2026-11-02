@@ -87,8 +87,9 @@ object ApiHelper {
         // error_code is the upper-case form of the matching next_step value
         val nextStep = errorCode.lowercase()
         if (NextStep.from(nextStep)?.isKycStep == true) {
+            // CLEAR_TOP: reuses the Home/status screen already in the stack instead of stacking a second one
             context.startActivity(NextStepRouter.intentFor(context, nextStep, null).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             })
         }
     }
