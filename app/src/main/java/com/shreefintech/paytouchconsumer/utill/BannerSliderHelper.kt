@@ -17,7 +17,7 @@ class BannerSliderHelper(
     private val banners = listOf(
         R.drawable.img_banner_1, R.drawable.img_banner_2, R.drawable.img_banner_3,
         R.drawable.img_banner_4, R.drawable.img_banner_5, R.drawable.img_banner_6,
-        R.drawable.img_banner_8, R.drawable.img_banner_9
+        R.drawable.img_banner_7, R.drawable.img_banner_8, R.drawable.img_banner_9
     )
 
     private val autoScrollRunnable = Runnable { scrollToNext() }

@@ -119,7 +119,7 @@ class HomeActivity : BaseActivity() {
 
         loadCategoryIcons()
 
-        // TODO(B2C-194): seasonal Navratri — revert after festival
+        // TODO(B2C-262): seasonal Diwali — revert after festival
         BannerSliderHelper(binding.incBannerSlider.vpBanner).attachToLifecycle(this)
 
         val listener = onClickListener()

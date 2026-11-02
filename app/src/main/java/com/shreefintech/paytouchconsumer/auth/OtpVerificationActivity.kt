@@ -77,7 +77,7 @@ class OtpVerificationActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.showProgress = showProgress
 
-        // TODO(B2C-194): seasonal Navratri — revert after festival
+        // TODO(B2C-262): seasonal Diwali — revert after festival
         Glide.with(this).load(R.drawable.img_login_top).into(binding.ivWalletIllustration)
 
         onBack()
