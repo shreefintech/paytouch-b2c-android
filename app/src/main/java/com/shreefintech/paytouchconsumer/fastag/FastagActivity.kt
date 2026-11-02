@@ -17,7 +17,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
@@ -28,6 +27,8 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityFastagBinding
 import com.shreefintech.paytouchconsumer.fastag.transactions.FastagRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.fastag.transactions.FastagSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.fastag.transactions.FastagTransactionReportActivity
 import com.shreefintech.paytouchconsumer.fastag.transactions.FastagTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.fastag.viewmodel.FastagViewModel
@@ -36,6 +37,7 @@ import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
 import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.fastag.FastagOperatorItem
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -51,6 +53,7 @@ class FastagActivity : BaseActivity() {
     private var selectedOperatorName: String? = null
     private var selectedCircleId: String? = null
     private val showProgressPay = ObservableBoolean(false)
+    private var paymentMade = false
 
     private val operatorSelectionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -149,7 +152,7 @@ class FastagActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
@@ -198,9 +201,18 @@ class FastagActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                FastagSmsReceiptActivity.start(mActivity, true)
+                paymentMade = true
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_FASTAG
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -279,6 +291,7 @@ class FastagActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -328,7 +341,8 @@ class FastagActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
-                    onProceedToPay()
+                    if (paymentMade) return@OnClickListener
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { onProceedToPay() }
                 }
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener

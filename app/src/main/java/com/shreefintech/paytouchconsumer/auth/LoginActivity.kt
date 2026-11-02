@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.HomeActivity
@@ -27,6 +28,7 @@ import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
+import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -70,10 +72,16 @@ class LoginActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.showProgress = showProgress
 
+        // TODO(B2C-262): seasonal Diwali — revert after festival
+        Glide.with(this).load(R.drawable.img_login_top).into(binding.ivWalletIllustration)
+
         onBack()
         setupInputFilters()
         setupMpinBoxes()
         updateToggleUi(LoginMode.PASSWORD)
+
+        // TODO(B2C-262): seasonal Diwali — revert after festival
+        BannerSliderHelper(binding.incBannerSlider.vpBanner).attachToLifecycle(this)
     }
 
 
@@ -240,7 +248,7 @@ class LoginActivity : BaseActivity() {
             onLoading = { showProgress.set(true) },
             onSuccess = { loginData ->
                 showProgress.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.msgLoginSuccess))
+                ToastUtil.showSuccess(mActivity, getString(R.string.msgLoginSuccess), inWindow = false)
                 navigateAfterLogin(loginData)
             },
             onError = { msg ->
@@ -292,7 +300,7 @@ class LoginActivity : BaseActivity() {
 
                 binding.llCreateAccount -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, CreateAccountActivity::class.java))
+                    startActivity(Intent(mActivity, CreateAccountV2Activity::class.java))
                 }
 
                 binding.ivPasswordToggle -> {

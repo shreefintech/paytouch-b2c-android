@@ -105,7 +105,7 @@ class FastagRecentTransactionViewModel(application: Application) : AndroidViewMo
             amount            = Utility.formatAmount(item.totalPayable ?: item.amount),
             accountNumber     = item.identifier ?: "--",
             reference         = item.referenceId ?: "--",
-            categoryIconRes   = R.drawable.ic_fastag,
+            categoryIconRes   = R.drawable.img_fastag,
             isMobileCategory  = false,
             isVehicleCategory = true
         )

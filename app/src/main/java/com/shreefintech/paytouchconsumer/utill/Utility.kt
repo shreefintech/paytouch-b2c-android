@@ -1,9 +1,13 @@
 package com.shreefintech.paytouchconsumer.utill
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.pdf.PdfRenderer
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -16,45 +20,43 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
 import androidx.core.widget.NestedScrollView
+import androidx.exifinterface.media.ExifInterface
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
-import androidx.core.graphics.createBitmap
+import java.util.TimeZone
 
 object Utility {
 
-    val STATE_LIST = listOf(
-        "01" to "Andhra Pradesh",
-        "02" to "Assam",
-        "03" to "Bihar & Jharkhand",
-        "04" to "Chennai",
-        "05" to "Delhi & NCR",
-        "06" to "Gujarat",
-        "07" to "Haryana",
-        "08" to "Himachal Pradesh",
-        "09" to "Jammu & Kashmir",
-        "10" to "Karnataka",
-        "11" to "Kerala",
-        "12" to "Kolkata",
-        "13" to "Maharashtra & Goa (except Mumbai)",
-        "14" to "MP & Chattisgarh",
-        "15" to "Mumbai",
-        "16" to "North East",
-        "17" to "Orissa",
-        "18" to "Punjab",
-        "19" to "Rajasthan",
-        "20" to "Tamilnadu",
-        "21" to "UP(EAST)",
-        "22" to "UP(WEST) & Uttarakhand",
-        "23" to "West Bengal",
-        "51" to "All India (except Delhi/Mumbai)"
-    )
+    /**
+     * Prints [e] and reports it to Crashlytics as a non-fatal. Use only for unexpected failures —
+     * expected ones (no app for an intent, network errors, OOM) stay on plain printStackTrace().
+     */
+    fun logError(e: Throwable) {
+        e.printStackTrace()
+        try {
+            FirebaseCrashlytics.getInstance().recordException(e)
+        } catch (reportError: Exception) {
+            reportError.printStackTrace()
+        }
+    }
 
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
         val cleaned = createdAt.substringBefore(".").substringBefore("+")
+        val utc = TimeZone.getTimeZone("UTC")
+        val ist = TimeZone.getTimeZone("Asia/Kolkata")
         val inputFormats = listOf(
             "yyyy-MM-dd'T'HH:mm:ss",
             "dd/MM/yyyy hh:mm a",
@@ -62,10 +64,14 @@ object Utility {
             "dd/MM/yyyy",
             "yyyy-MM-dd"
         )
-        val output = SimpleDateFormat(format, Locale.getDefault())
+        val output = SimpleDateFormat(format, Locale.getDefault()).apply { timeZone = ist }
         for (pattern in inputFormats) {
             try {
-                val date = SimpleDateFormat(pattern, Locale.getDefault()).parse(cleaned)
+                val parser = SimpleDateFormat(pattern, Locale.getDefault()).apply {
+                    isLenient = false
+                    timeZone = if (pattern.contains("'T'")) utc else ist
+                }
+                val date = parser.parse(cleaned)
                 if (date != null) return output.format(date)
             } catch (_: Exception) {
             }
@@ -73,16 +79,46 @@ object Utility {
         return createdAt
     }
 
+    fun parseIsoMillis(raw: String?): Long? {
+        if (raw.isNullOrBlank()) return null
+        val cleaned = raw.substringBefore(".").substringBefore("+")
+        val utc = TimeZone.getTimeZone("UTC")
+        for (pattern in listOf("yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd")) {
+            try {
+                val date = SimpleDateFormat(pattern, Locale.getDefault()).apply { timeZone = utc }.parse(cleaned)
+                if (date != null) return date.time
+            } catch (e: Exception) { e.printStackTrace() }
+        }
+        return null
+    }
+
+    fun formatMillis(ms: Long, format: String): String {
+        val ist = TimeZone.getTimeZone("Asia/Kolkata")
+        return SimpleDateFormat(format, Locale.getDefault()).apply { timeZone = ist }.format(java.util.Date(ms))
+    }
+
+    fun isPasswordStrong(password: String): Boolean =
+        password.any { it.isUpperCase() } &&
+        password.any { it.isDigit() } &&
+        password.any { !it.isLetterOrDigit() }
+
     fun isInternetAvailable(context: Context): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        val network = connectivityManager.activeNetwork ?: return false
+        return try {
+            val network = connectivityManager.activeNetwork ?: return false
 
-        val capabilities =
-            connectivityManager.getNetworkCapabilities(network) ?: return false
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(network) ?: return false
 
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        } catch (e: SecurityException) {
+            // Android 11 platform bug — "Package android does not belong to uid".
+            // Assume online; a real outage still lands in Retrofit onFailure.
+            e.printStackTrace()
+            true
+        }
     }
 
     fun applyImeOverlapPadding(view: View, imeBottom: Int, activity: Activity) {
@@ -133,13 +169,24 @@ object Utility {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    fun formatAmount(raw: String?): String {
+    /** Opens [url] in an external browser; toasts instead of crashing when no browser is installed or enabled. */
+    fun openUrl(activity: Activity, url: String) {
+        try {
+            activity.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+        } catch (e: ActivityNotFoundException) {
+            e.printStackTrace()
+            ToastUtil.showDelete(activity, activity.getString(R.string.msgNoBrowserApp))
+        }
+    }
+
+    /** [trimZeros] drops trailing ".00" — plan cards only; bills and transactions always show paise. */
+    fun formatAmount(raw: String?, trimZeros: Boolean = false): String {
         if (raw.isNullOrBlank()) return "-"
         return try {
             val number = raw.toDouble()
             val fmt = NumberFormat.getNumberInstance(Locale.Builder().setLanguage("en").setRegion("IN").build()).apply {
                 maximumFractionDigits = 2
-                minimumFractionDigits = 0
+                minimumFractionDigits = if (trimZeros) 0 else 2
             }
             "₹${fmt.format(number)}"
         } catch (_: Exception) {
@@ -154,19 +201,149 @@ object Utility {
         return "${number.take(4)}*****${number.takeLast(1)}"
     }
 
+    /** Scale that fits a PDF page to [targetWidthPx], capped so tall pages never exceed [Constant.MAX_BITMAP_HEIGHT_PX]. */
+    fun pdfRenderScale(pageWidth: Int, pageHeight: Int, targetWidthPx: Int): Float =
+        minOf(targetWidthPx.toFloat() / pageWidth, Constant.MAX_BITMAP_HEIGHT_PX.toFloat() / pageHeight)
+
     fun renderPdfFirstPage(context: Context, uri: Uri, widthPx: Int = 800): Bitmap? = try {
         context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
             PdfRenderer(pfd).use { renderer ->
                 renderer.openPage(0).use { page ->
-                    val scale = widthPx.toFloat() / page.width
-                    val bmp = createBitmap(widthPx, (page.height * scale).toInt())
+                    if (page.width <= 0 || page.height <= 0) return@use null
+                    val scale = pdfRenderScale(page.width, page.height, widthPx)
+                    val bmp = createBitmap(
+                        (page.width * scale).toInt().coerceAtLeast(1),
+                        (page.height * scale).toInt().coerceAtLeast(1)
+                    )
                     bmp.eraseColor(Color.WHITE)
                     page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     bmp
                 }
             }
         }
-    } catch (_: Exception) { null }
+    } catch (e: Exception) {
+        logError(e)
+        null
+    } catch (e: OutOfMemoryError) {
+        e.printStackTrace()
+        null
+    }
+
+    /**
+     * Reads a picked document into a multipart file part named [partName], uploaded as
+     * "[fileName].pdf|.png|.jpg" by mime type. Returns null if the file can't be read.
+     * Must be called off the main thread.
+     */
+    fun uriToFilePart(context: Context, uri: Uri, partName: String, fileName: String): MultipartBody.Part? {
+        // getType() is inside the try too — a revoked URI grant throws SecurityException from either call
+        val (mimeType, bytes) = try {
+            val resolver = context.contentResolver
+            (resolver.getType(uri) ?: "image/jpeg") to resolver.openInputStream(uri)?.use { it.readBytes() }
+        } catch (e: Exception) {
+            logError(e)
+            return null
+        }
+        if (bytes == null) return null
+        val extension = when {
+            mimeType.contains("pdf") -> ".pdf"
+            mimeType.contains("png") -> ".png"
+            else -> ".jpg"
+        }
+        return MultipartBody.Part.createFormData(
+            partName, "$fileName$extension", bytes.toRequestBody(mimeType.toMediaTypeOrNull())
+        )
+    }
+
+    /**
+     * Re-encodes [file] in place as an upright JPEG no larger than [maxBytes] (best effort).
+     * Never throws — on decode/encode failure or OOM the original file is left untouched.
+     * Must be called off the main thread.
+     */
+    fun compressImageFile(file: File, maxBytes: Int = 2 * 1024 * 1024) {
+        try {
+            compressImageFileInternal(file, maxBytes)
+        } catch (e: OutOfMemoryError) {
+            e.printStackTrace()
+        } catch (e: Exception) {
+            logError(e)
+        }
+    }
+
+    // Longest edge kept after power-of-two subsampling; camera photos (12–50 MP) would otherwise
+    // be decoded at full size (48–200 MB) and OOM on low-end devices.
+    private const val MAX_DECODE_DIMENSION = 1600
+
+    private fun compressImageFileInternal(file: File, maxBytes: Int) {
+        val needsCompress = file.length() > maxBytes
+        val rotation = try {
+            when (ExifInterface(file.absolutePath).getAttributeInt(
+                ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL
+            )) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
+        } catch (_: Exception) { 0 }
+
+        if (!needsCompress && rotation == 0) return
+
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(file.absolutePath, bounds)
+        val longestEdge = maxOf(bounds.outWidth, bounds.outHeight)
+        if (longestEdge <= 0) return
+        var sampleSize = 1
+        while (longestEdge / (sampleSize * 2) >= MAX_DECODE_DIMENSION) sampleSize *= 2
+
+        val raw = BitmapFactory.decodeFile(
+            file.absolutePath,
+            BitmapFactory.Options().apply { inSampleSize = sampleSize }
+        ) ?: return
+        val bitmap = if (rotation != 0) {
+            try {
+                Bitmap.createBitmap(raw, 0, 0, raw.width, raw.height, Matrix().apply { postRotate(rotation.toFloat()) }, true)
+                    .also { if (it !== raw) raw.recycle() }
+            } catch (e: OutOfMemoryError) {
+                // Leave the original file untouched — compression is best effort.
+                e.printStackTrace()
+                raw.recycle()
+                return
+            }
+        } else raw
+
+        try {
+            var quality = if (needsCompress) 85 else 95
+            while (true) {
+                val bos = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
+                val bytes = bos.toByteArray()
+                if (bytes.size <= maxBytes || quality <= 40) {
+                    file.writeBytes(bytes)
+                    break
+                }
+                quality -= 15
+            }
+        } finally {
+            bitmap.recycle()
+        }
+    }
+
+    /**
+     * Deletes KYC working directories under filesDir on a background thread (safe from onCreate /
+     * onDestroy, where lifecycleScope may already be cancelled). Safe to call when they do not exist.
+     */
+    fun deleteKycDirs(context: Context, vararg relativePaths: String) {
+        val filesDir = context.applicationContext.filesDir
+        Thread {
+            relativePaths.forEach { path ->
+                try {
+                    File(filesDir, path).deleteRecursively()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }.start()
+    }
 
     fun calculatePlatformFee(amount: Double): Double {
         return when {
@@ -214,8 +391,8 @@ object Utility {
     }
 
 
-    var tapFlag = true
-    var LAST_CLICK_TIME: Long = 0
+    @Volatile var tapFlag = true
+    @Volatile var LAST_CLICK_TIME: Long = 0
 
     fun stopClick(): Boolean {
         if (SystemClock.elapsedRealtime() - LAST_CLICK_TIME < 800 && !tapFlag) {

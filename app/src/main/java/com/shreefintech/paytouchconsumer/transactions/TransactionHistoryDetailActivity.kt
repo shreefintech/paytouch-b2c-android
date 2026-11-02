@@ -17,6 +17,7 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionHistoryD
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
 import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -94,6 +95,7 @@ class TransactionHistoryDetailActivity : BaseActivity() {
 
     private fun populateData(item: TransactionHistoryDetailItem) {
         binding.svContent.visibility = View.VISIBLE
+        AnimationHelper.animateEntrance(binding.flCard, 0)
 
         binding.tvAmount.text        = Utility.formatAmount(item.amount)
         binding.tvTransactionId.text = item.referenceId ?: "--"

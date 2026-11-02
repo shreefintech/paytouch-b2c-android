@@ -11,6 +11,7 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.RawRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -26,6 +27,8 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityPaymentStatusBinding
 import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
+import com.shreefintech.paytouchconsumer.utill.StatusSoundPlayer
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -44,6 +47,8 @@ class PaymentStatusActivity : BaseActivity() {
 
     private val autoFinishHandler = Handler(Looper.getMainLooper())
     private var isNavigating = false
+    private val soundPlayer = StatusSoundPlayer()
+    private var isSoundPlayed = false
 
     companion object {
         private const val EXTRA_ITEM = "extra_item"
@@ -78,6 +83,7 @@ class PaymentStatusActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         autoFinishHandler.removeCallbacksAndMessages(null)
+        soundPlayer.release()
     }
 
     private fun populateStatus(status: String) {
@@ -90,7 +96,7 @@ class PaymentStatusActivity : BaseActivity() {
         binding.tvOrderId.text = orderId
         binding.tvAmount.text = Utility.formatAmount(amount)
         binding.tvAmount.setTextColor(statusColor)
-        loadGif(display.gifRes)
+        loadGif(display.gifRes, display.soundRes)
     }
 
     private data class StatusDisplay(
@@ -98,7 +104,8 @@ class PaymentStatusActivity : BaseActivity() {
         val description: String,
         val amountLabel: String,
         @ColorRes val statusColorRes: Int,
-        @DrawableRes val gifRes: Int
+        @DrawableRes val gifRes: Int,
+        @RawRes val soundRes: Int
     )
 
     private fun resolveStatus(status: String): StatusDisplay {
@@ -108,7 +115,8 @@ class PaymentStatusActivity : BaseActivity() {
                 description = getString(R.string.msgPaymentSuccessDescription),
                 amountLabel = getString(R.string.labelAmountPaid),
                 statusColorRes = R.color.colorStatusSuccess,
-                gifRes = R.drawable.gif_success
+                gifRes = R.drawable.gif_success,
+                soundRes = R.raw.success_sound
             )
 
             Constant.HDFC_STATUS_NEW -> StatusDisplay(
@@ -116,7 +124,8 @@ class PaymentStatusActivity : BaseActivity() {
                 description = getString(R.string.msgPaymentInitiatedDescription),
                 amountLabel = getString(R.string.labelAmountPending),
                 statusColorRes = R.color.colorStatusPending,
-                gifRes = R.drawable.gif_pending
+                gifRes = R.drawable.gif_pending,
+                soundRes = R.raw.pending_sound
             )
 
             Constant.HDFC_STATUS_PENDING_VBV, Constant.HDFC_STATUS_AUTHORIZING, Constant.HDFC_STATUS_STARTED -> StatusDisplay(
@@ -124,7 +133,8 @@ class PaymentStatusActivity : BaseActivity() {
                 description = getString(R.string.msgPaymentPendingDescription),
                 amountLabel = getString(R.string.labelAmountPending),
                 statusColorRes = R.color.colorStatusPending,
-                gifRes = R.drawable.gif_pending
+                gifRes = R.drawable.gif_pending,
+                soundRes = R.raw.pending_sound
             )
 
             Constant.HDFC_STATUS_JUSPAY_DECLINED, Constant.HDFC_STATUS_AUTHENTICATION_FAILED, Constant.HDFC_STATUS_AUTHORIZATION_FAILED -> StatusDisplay(
@@ -132,7 +142,8 @@ class PaymentStatusActivity : BaseActivity() {
                 description = getString(R.string.msgPaymentFailedDescription),
                 amountLabel = getString(R.string.labelAmountFailed),
                 statusColorRes = R.color.colorStatusFailed,
-                gifRes = R.drawable.gif_rejected
+                gifRes = R.drawable.gif_rejected,
+                soundRes = R.raw.failed_sound
             )
 
             Constant.HDFC_STATUS_AUTO_REFUNDED -> StatusDisplay(
@@ -140,7 +151,8 @@ class PaymentStatusActivity : BaseActivity() {
                 description = getString(R.string.msgPaymentRefundedDescription),
                 amountLabel = getString(R.string.labelAmountRefunded),
                 statusColorRes = R.color.colorStatusFailed,
-                gifRes = R.drawable.gif_rejected
+                gifRes = R.drawable.gif_rejected,
+                soundRes = R.raw.failed_sound
             )
 
             else -> StatusDisplay(
@@ -148,13 +160,14 @@ class PaymentStatusActivity : BaseActivity() {
                 description = getString(R.string.msgPaymentPendingDescription),
                 amountLabel = getString(R.string.labelAmountPending),
                 statusColorRes = R.color.colorStatusPending,
-                gifRes = R.drawable.gif_pending
+                gifRes = R.drawable.gif_pending,
+                soundRes = R.raw.pending_sound
             )
         }
     }
 
-    private fun loadGif(@DrawableRes gifRes: Int) {
-        Glide.with(mActivity)
+    private fun loadGif(@DrawableRes gifRes: Int, @RawRes soundRes: Int) {
+        Glide.with(this@PaymentStatusActivity)
             .asGif()
             .load(gifRes)
             .placeholder(R.drawable.ic_file_not_found)
@@ -175,16 +188,27 @@ class PaymentStatusActivity : BaseActivity() {
                     isFirstResource: Boolean
                 ): Boolean {
                     resource.setLoopCount(1)
+                    // Glide starts the GIF right after this returns — start the sound with it.
+                    playSound(soundRes)
                     return false
                 }
             })
             .into(binding.ivGif)
     }
 
+    private fun playSound(@RawRes soundRes: Int) {
+        // Glide can deliver the resource again (e.g. memory-cache reload) — the sound plays once per screen.
+        if (isSoundPlayed || isFinishing || isDestroyed) return
+        isSoundPlayed = true
+        soundPlayer.play(mActivity, soundRes)
+    }
+
     private fun copyOrderId() {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(ClipData.newPlainText("order_id", orderId))
         ToastUtil.showSuccess(mActivity, getString(R.string.msgOrderIdCopied))
+        binding.ivCopyOrderId.setImageResource(R.drawable.ic_toast_tick)
+        autoFinishHandler.postDelayed({ binding.ivCopyOrderId.setImageResource(R.drawable.ic_copy) }, 1500L)
     }
 
     private fun goToWallet() {

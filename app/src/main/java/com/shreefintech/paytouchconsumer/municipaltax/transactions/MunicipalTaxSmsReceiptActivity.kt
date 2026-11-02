@@ -30,6 +30,7 @@ import com.shreefintech.paytouchconsumer.municipaltax.viewmodel.MunicipalTaxSmsR
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
 import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
+import com.shreefintech.paytouchconsumer.utill.InAppReviewHelper
 import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -73,10 +74,11 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
             )
         }
 
-        fun start(context: Context, transactionId: String) {
+        fun start(context: Context, transactionId: String, fromPayment: Boolean = false) {
             context.startActivity(
                 Intent(context, MunicipalTaxSmsReceiptActivity::class.java).apply {
                     putExtra(EXTRA_TRANSACTION_ID, transactionId)
+                    putExtra(EXTRA_FROM_PAYMENT, fromPayment)
                 }
             )
         }
@@ -166,7 +168,7 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: MunicipalTaxLatestPaymentDataItem) {
-        val amount    = Utility.formatAmount(item.totalPayable ?: item.billAmount)
+        val amount    = Utility.formatAmount(item.billAmount ?: item.totalPayable)
         val consumerNo = item.houseNumber ?: item.subscriberNo ?: "--"
         val txnId     = item.transactionId ?: "--"
         val date      = Utility.formatDate(item.createdAt)
@@ -183,6 +185,7 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
         binding.tvCcf.text             = Utility.formatAmount(item.platformFee)
         binding.tvReceiptStatus.text   = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
+        if (isFromPayment) InAppReviewHelper.onPaymentReceiptShown(this, item.transactionId, status)
 
         val smsBodyText = getString(R.string.msgMunicipalTaxSmsBody, amount, consumerNo)
         val spannable   = SpannableString(smsBodyText)
@@ -215,6 +218,7 @@ class MunicipalTaxSmsReceiptActivity : BaseActivity() {
         binding.tvCcf.text             = Utility.formatAmount(item.platformFee)
         binding.tvReceiptStatus.text   = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
+        if (isFromPayment) InAppReviewHelper.onPaymentReceiptShown(this, item.transactionId, status)
 
         val smsBodyText = getString(R.string.msgMunicipalTaxSmsBody, amount, identifier)
         val spannable   = SpannableString(smsBodyText)

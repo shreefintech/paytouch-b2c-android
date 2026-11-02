@@ -112,4 +112,9 @@
     <dimen name="dialog_padding_horizontal">24dp</dimen>
     <dimen name="dialog_padding_top">28dp</dimen>
     <dimen name="home_toolbar_logo_height">70dp</dimen>
+
+    <!-- Slide-up toast animation -->
+    <dimen name="toast_slide_bottom_margin">88dp</dimen>
+    <dimen name="toast_slide_translate_enter">64dp</dimen>
+    <dimen name="toast_slide_translate_exit">48dp</dimen>
 </resources>

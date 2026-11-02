@@ -96,6 +96,7 @@
                     android:layout_height="4dp"
                     android:layout_gravity="top"
                     android:max="100"
+                    android:progressDrawable="@drawable/progress_rounded"
                     android:visibility="gone"
                     tools:visibility="visible"
                     tools:progress="60" />

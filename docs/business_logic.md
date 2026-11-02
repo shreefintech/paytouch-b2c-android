@@ -78,7 +78,9 @@ Both sections must be completed before KYC can be submitted. Once both are done,
 ### Rules and Constraints
 - PAN card must match regex: `[A-Z]{5}[0-9]{4}[A-Z]{1}`
 - Aadhaar number must be exactly 12 digits
-- Selfie is captured via the system camera (no CameraX dependency); a captured selfie is required to submit step 4
+- Selfie is captured in-app by `SelfieCaptureActivity` (CameraX front camera + bundled on-device ML Kit face detection) only after an active liveness check passes: face centred in the circle and looking straight → blink twice (each blink: both eyes open → closed → open within 1.5 s) → hold still, centred, eyes open. If `ImageCapture` fails it retries once, then saves the current live camera frame instead. A second face, lost face or face tracking-id change restarts the check; the whole challenge times out after 20 s. The photo is auto-captured (no manual shutter). A captured selfie is required to submit step 4
+- Camera permission is requested at runtime by `SelfieCaptureActivity`; denial or dismissing the popup shows a toast and returns to step 4 with no selfie. Only a denial after an earlier explicit "Deny" (`KEY_CAMERA_DENIED`, survives logout) is treated as "Don't ask again" and opens app settings. If the screen is restored without the permission (e.g. revoked in Settings while backgrounded), it asks again
+- The on-device liveness check is a UX gate only — it can be defeated by a replayed video. The backend must still perform its own face match of the selfie against the Aadhaar/PAN photo; never treat the client check as the sole anti-spoofing control
 - Bank Details supports 1-4 accounts; the delete icon on a card is hidden when only one account remains
 - Terms & Conditions checkbox is mandatory before Bank Details submission
 - Section completion (`identityDone` / `bankDone`) is driven by the API via `KycSectionStatus.UNDER_REVIEW` returned in the KYC status response
@@ -279,7 +281,7 @@ amount > 40000           → fee = ₹30
 
 ### Response Fields (Plans — flat)
 - `success` (Boolean)
-- `plans[].plan_type` (Int), `plans[].amount` (Int), `plans[].description` (String), `plans[].validity` (String), `plans[].talktime` (Double), `plans[].data` (String)
+- `plans[].plan_type` (Int), `plans[].amount` (Int), `plans[].description` (String), `plans[].validity` (String), `plans[].data` (String)
 - `operator_id` (String), `circle_id` (String)
 
 ### Request Fields (Process Recharge)
@@ -341,6 +343,9 @@ amount > 40000           → fee = ₹30
 ### Rules
 - Balance is fetched fresh from the API on every Home/dashboard load
 - `Load Wallet` opens `LoadWalletActivity` which routes to the HDFC payment WebView
+- Earning Wallet lock: minimum `Constant.EARNING_MIN_LOCK_AMOUNT` (₹100), maximum = main wallet balance. Below-minimum is rejected on tap of Lock (toast), not shown live while typing; over-balance shows an inline error and disables the button.
+- Earning Wallet lock requires PAN: when `KEY_PAN_ADDED` is false (or unset), tapping Lock Money shows the PAN dialog first — for opted-in users too. Submitting PAN continues to the opt-in or lock sheet; closing the dialog opens nothing.
+- Bank/PAN onboarding flags (`KEY_BANK_DETAILS_ADDED`, `KEY_PAN_ADDED`) are set only from `/api/user` (Splash + Home), never from login, and read with default `false` — if `/api/user` hasn't answered yet, the bank/PAN dialog is shown rather than skipped.
 
 ### API Endpoints
 | Method | Path | Purpose |
@@ -392,14 +397,7 @@ User enters a top-up amount, the app creates an HDFC payment order, then opens `
 
 ## 13. Transaction ID
 
-### Ownership
-Transaction IDs are **generated and returned by the backend** in the `process-payment` (or `process-direct`) response. The client must never generate a transaction ID before or during the API call.
-
-### Rules
-- Do not pass a `transaction_id` field in any payment request DTO
-- Read the transaction ID from the API response and store it for status lookup and receipts
-- `Utility.generateTransactionId()` was removed — do not recreate it
-- The ID format (`PYTCH…`) is set by the server; the client treats it as an opaque string
+Backend-generated, returned in the `process-payment` / `process-direct` response; read it from there for status lookups and receipts. Never generated client-side, never sent in a request DTO (`Utility.generateTransactionId()` was removed — do not recreate). Format `PYTCH…` is server-set; treat as an opaque string.
 
 ---
 
@@ -418,12 +416,16 @@ Transaction IDs are **generated and returned by the backend** in the `process-pa
 | `AUTH` | `PENDING_ORDER_ID` | String | HDFC order ID in progress (cleared after status check) |
 | `AUTH` | `PENDING_AMOUNT` | String | HDFC payment amount in progress (cleared after status check) |
 | `app_prefs` | `mpin_created` | Boolean | MPIN setup complete |
-| `app_prefs` | `LAST_INTERACTION` | String (Long ms) | Timestamp of last user interaction — used for idle session timeout |
 
 ### Rules
 - Token is checked at Splash; no token → go to Login
 - Any 401 response → clear ALL SharedPreferences → launch LoginActivity with `FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK`
-- **Idle session timeout:** `BaseActivity.onResume()` calls `checkSessionTimeout()`. If the elapsed time since `LAST_INTERACTION` exceeds `SESSION_TIMEOUT_MS` (5 minutes), the session is cleared and `LoginActivity` is launched with a cleared back stack. `LAST_INTERACTION` is updated on every `onUserInteraction()` call while the user is logged in.
+- **App lock (replaces the old 10-minute idle logout):** `applock/AppLockHelper` (registered in `MyApp`) shows `AppLockActivity`, which asks for the phone's own screen lock (fingerprint / face / PIN / pattern via `BiometricPrompt`, `BIOMETRIC_WEAK or DEVICE_CREDENTIAL`). The app does **not** log out; only a 401 does.
+  - Locks on a cold start with a saved session, and when the app returns from the background after more than `APP_LOCK_GRACE_MS` (1 min).
+  - When the app itself opened another app (camera, file picker, UPI app, HDFC gateway, share, browser), the grace period is `APP_LOCK_EXTERNAL_GRACE_MS` (5 min). `BaseActivity.startActivityForResult()` detects these launches, so no per-screen code is needed.
+  - Time away is measured with `SystemClock.elapsedRealtime()`, so changing the phone clock can't skip the lock.
+  - Exempt screens: Splash and the auth flow (Login, Create Account, OTP, Reset Password, Reset MPIN). A credential login (`LoginViewModel.saveSession()`) counts as unlocked.
+  - Lock screen (GPay-style): `AppLockActivity` is a transparent window, so the screen the user left stays visible behind the system prompt but cannot be touched. Cancel dims it and shows a bottom Unlock panel; Back closes the app. It must not set `screenOrientation` (a translucent Activity with a fixed orientation crashes on API 26). If the phone has no screen lock set, the lock is skipped.
 - `isLoggedIn()` = token is not null AND userId > 0
 
 ---
@@ -448,9 +450,7 @@ Transaction IDs are **generated and returned by the backend** in the `process-pa
 
 ## 16. Internet Connectivity
 
-### Rules
-- `Utility.isInternetAvailable(context)` must be called before every API request
-- If no internet: show message via `ToastUtil`, do not make the API call
+`Utility.isInternetAvailable(context)` before every API request; offline → `ToastUtil` message, no call. Full offline UX: `docs/no_internet_handling.md`.
 
 ---
 

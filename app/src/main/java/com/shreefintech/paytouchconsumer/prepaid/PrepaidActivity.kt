@@ -27,6 +27,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityPrepaidBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransactionReportActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.prepaid.viewmodel.PrepaidViewModel
@@ -35,11 +37,11 @@ import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidPlanItem
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
-import androidx.core.net.toUri
 import android.widget.LinearLayout
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
 
@@ -60,6 +62,7 @@ class PrepaidActivity : BaseActivity() {
 
     private var selectedPlan: PrepaidPlanItem? = null
     private var isPlanSelected = false
+    private var paymentMade = false
 
     private val showProgressBrowse = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -120,7 +123,7 @@ class PrepaidActivity : BaseActivity() {
         setupInputFilters()
         setupAmountWatcher()
         setupTermsText()
-        retryCallback = { loadOperators() }
+        retryCallback = { loadOperators(); loadStates() }
         loadOperators()
         loadStates()
         tabHelper = TabAnimationHelper(mActivity, binding.llTabPayBill, binding.llTabReport, binding.llTabStatus, binding.llTabSmsReceipt)
@@ -150,9 +153,9 @@ class PrepaidActivity : BaseActivity() {
                 val fee = Utility.calculatePlatformFee(amount)
                 val total = amount + fee
                 val black = ContextCompat.getColor(mActivity, R.color.black)
-                binding.tvPlatformFee.text = getString(R.string.fmtCurrencyAmount).format(fee)
+                binding.tvPlatformFee.text = Utility.formatAmount(fee.toString())
                 binding.tvPlatformFee.setTextColor(black)
-                binding.tvTotalPayable.text = getString(R.string.fmtCurrencyAmount).format(total)
+                binding.tvTotalPayable.text = Utility.formatAmount(total.toString())
                 binding.tvTotalPayable.setTextColor(black)
             }
         })
@@ -175,7 +178,7 @@ class PrepaidActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
@@ -238,9 +241,18 @@ class PrepaidActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                PrepaidSmsReceiptActivity.start(mActivity, fromPayment = true)
+                paymentMade = true
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_PREPAID
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -302,8 +314,6 @@ class PrepaidActivity : BaseActivity() {
         val plan = selectedPlan ?: return
         binding.tvSelectedPlanDescription.text = plan.description ?: "-"
         binding.tvSelectedValidity.text = plan.validity ?: "-"
-        binding.tvSelectedTalktime.text =
-            if (plan.talktime == null || plan.talktime < 0) "-" else "₹%.2f".format(plan.talktime)
         binding.tvSelectedData.text = if(plan.data.isNullOrEmpty()) "--" else plan.data
         binding.etAmount.setText(plan.amount?.toString() ?: "")
         binding.cvPlanDetails.visibility = View.VISIBLE
@@ -405,6 +415,7 @@ class PrepaidActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -467,7 +478,8 @@ class PrepaidActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
-                    onProceedToPay()
+                    if (paymentMade) return@OnClickListener
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { onProceedToPay() }
                 }
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener

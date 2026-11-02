@@ -4,7 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.applock.AppLockHelper
 import com.shreefintech.paytouchconsumer.enums.LoginMode
+import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.retrofit.ApiAdminClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
@@ -61,9 +63,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun saveSession(data: LoginDataItem) {
-        SharedPreferenceHelper.setSharedPreferenceString(
-            getApplication(), Constant.KEY_LAST_INTERACTION, System.currentTimeMillis().toString()
-        )
+        // A credential login proves identity — don't ask for the screen lock right after it.
+        AppLockHelper.unlock()
         SharedPreferenceHelper.setSharedPreferenceString(
             getApplication(), Constant.KEY_TOKEN, data.token ?: ""
         )
@@ -90,6 +91,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 user.id ?: 0, user.mobile ?: "", user.email ?: "", user.referralCode ?: ""
             )
         }
+        // Covers every post-login route (Home / KYC / Create MPIN)
+        NotificationHelper.syncToken(getApplication())
     }
 
     private fun fireVpsRegistration(id: Int, mobile: String, email: String, referralCode: String) {

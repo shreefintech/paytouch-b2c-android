@@ -1,17 +1,27 @@
 package com.shreefintech.paytouchconsumer.auth
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.BuildConfig
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
+import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.kyc.KycActivity
 import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
@@ -29,20 +39,91 @@ class SplashActivity : BaseActivity() {
     private var apiFinished = false
     private var timerFinished = false
 
+    private lateinit var appUpdateManager: AppUpdateManager
+    private var updateLaunching = false
+    private var updateCheckDone = false
+
+    private val updateLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        updateLaunching = false
+        if (result.resultCode == RESULT_CANCELED) {
+            // User declined a mandatory update — close; the prompt shows again on next launch
+            finishAffinity()
+            return@registerForActivityResult
+        }
+        // RESULT_OK or RESULT_IN_APP_UPDATE_FAILED — never lock users out on a Play-side error
+        updateCheckDone = true
+        startFlow()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Glide.with(this).asGif().load(R.drawable.gif_splash).into(binding.ivSplash)
+        Glide.with(this).load(R.drawable.paytouch_splash).into(binding.ivSplash)
+        binding.tvAppVersion.text = getString(R.string.labelAppVersion, BuildConfig.VERSION_NAME)
 
         retryCallback = { startFlow() }
-        startFlow()
+
+        appUpdateManager = AppUpdateManagerFactory.create(this)
+        checkForUpdate()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (updateCheckDone || updateLaunching || isFinishing) return
+        // Re-prompt if a previous IMMEDIATE update was started but the activity was recreated mid-flow
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+            if (!isScreenAlive()) return@addOnSuccessListener
+            if (!updateCheckDone && !updateLaunching &&
+                info.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                launchImmediateUpdate(info)
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(timerRunnable)
+    }
+
+    // Play Task listeners are not lifecycle-aware — they can fire after Back/recreation destroyed this screen
+    private fun isScreenAlive() = !isFinishing && !isDestroyed
+
+    private fun checkForUpdate() {
+        appUpdateManager.appUpdateInfo
+            .addOnSuccessListener { info ->
+                if (!isScreenAlive()) return@addOnSuccessListener
+                val availability = info.updateAvailability()
+                // In-progress must be resumed here too — onResume's check can lose the race and be skipped
+                if (availability == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS ||
+                    (availability == UpdateAvailability.UPDATE_AVAILABLE &&
+                        info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))) {
+                    launchImmediateUpdate(info)
+                } else if (!updateLaunching) {
+                    // No update needed, or update already launched from onResume
+                    updateCheckDone = true
+                    startFlow()
+                }
+            }
+            .addOnFailureListener {
+                if (!isScreenAlive()) return@addOnFailureListener
+                if (!updateLaunching) {
+                    updateCheckDone = true
+                    startFlow()
+                }
+            }
+    }
+
+    private fun launchImmediateUpdate(info: AppUpdateInfo) {
+        if (updateLaunching) return
+        updateLaunching = true
+        appUpdateManager.startUpdateFlowForResult(
+            info, updateLauncher,
+            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
+        )
     }
 
     private val timerRunnable = Runnable {
@@ -87,6 +168,7 @@ class SplashActivity : BaseActivity() {
     }
 
     private fun redirect() {
+        NotificationHelper.syncToken(mActivity)
         val intent = when {
             !sessionValid                                                                -> Intent(mActivity, LoginActivity::class.java)
             nextStep == NextStep.KYC_REQUIRED || nextStep == NextStep.PENDING_APPROVAL  -> Intent(mActivity, KycActivity::class.java)
@@ -97,9 +179,13 @@ class SplashActivity : BaseActivity() {
     }
 
     private fun navigate(intent: Intent) {
-        startActivity(intent.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        })
+        val opts = ActivityOptions.makeCustomAnimation(
+            this, R.anim.anim_activity_fade_in, R.anim.anim_activity_fade_out
+        )
+        startActivity(
+            intent.apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK },
+            opts.toBundle()
+        )
         finish()
     }
 }

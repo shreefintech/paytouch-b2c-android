@@ -143,14 +143,15 @@ class KycViewModel(application: Application) : AndroidViewModel(application) {
                     call: Call<General<KycAgreeDataItem>>,
                     response: Response<General<KycAgreeDataItem>>
                 ) {
-                    if (!response.isSuccessful) {
-                        onError(response.errorBody()?.string()?: getString(R.string.errGeneric))
-                    }
+                    // Intentional: the agree result is not checked. GET /kyc/status is the source of truth
+                    // for whether the agreement was recorded, so always read the final status from there.
                     fetchFinalStatus(onReady, onError)
                 }
 
                 override fun onFailure(call: Call<General<KycAgreeDataItem>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                    // Intentional: same as onResponse — let the status API decide the final KYC state.
+                    t.printStackTrace()
+                    fetchFinalStatus(onReady, onError)
                 }
             })
     }

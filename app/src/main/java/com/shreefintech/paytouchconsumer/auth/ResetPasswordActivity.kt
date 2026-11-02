@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
@@ -58,6 +59,9 @@ class ResetPasswordActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.showProgress    = showProgress
 
+        // TODO(B2C-262): seasonal Diwali — revert after festival
+        Glide.with(this).load(R.drawable.img_login_top).into(binding.ivWalletIllustration)
+
         onBack()
         setupInputFilters()
     }
@@ -88,7 +92,7 @@ class ResetPasswordActivity : BaseActivity() {
                 binding.etNewPassword.requestFocus()
                 getString(R.string.msgNewPasswordShort)
             }
-            !isPasswordStrong(newPassword) -> {
+            !Utility.isPasswordStrong(newPassword) -> {
                 binding.etNewPassword.requestFocus()
                 getString(R.string.msgPasswordWeak)
             }
@@ -104,13 +108,6 @@ class ResetPasswordActivity : BaseActivity() {
         }
         if (msg != null) { ToastUtil.showDelete(mActivity, msg); return false }
         return true
-    }
-
-    private fun isPasswordStrong(password: String): Boolean {
-        val hasUppercase = password.any { it.isUpperCase() }
-        val hasDigit     = password.any { it.isDigit() }
-        val hasSpecial   = password.any { !it.isLetterOrDigit() }
-        return hasUppercase && hasDigit && hasSpecial
     }
 
     private fun onChangePassword() {

@@ -61,6 +61,19 @@ object SharedPreferenceHelper {
     }
 
     /**
+     * Set a long shared preference
+     *
+     * @param key   - Key to set shared preference
+     * @param value - Value for the key
+     */
+    fun setSharedPreferenceLong(context: Context, key: String?, value: Long) {
+        val settings = context.getSharedPreferences(PREF_FILE, 0)
+        val editor = settings.edit()
+        editor.putLong(key, value)
+        editor.apply()
+    }
+
+    /**
      * Get a string shared preference
      *
      * @param key      - Key to look up in shared preferences.
@@ -96,15 +109,46 @@ object SharedPreferenceHelper {
         return settings.getBoolean(key, defValue)
     }
 
+    /**
+     * Get a long shared preference
+     *
+     * @param key      - Key to look up in shared preferences.
+     * @param defValue - Default value to be returned if shared preference isn't found.
+     * @return value - Long containing value of the shared preference if found.
+     */
+    fun getSharedPreferenceLong(context: Context, key: String?, defValue: Long): Long {
+        val settings = context.getSharedPreferences(PREF_FILE, 0)
+        return settings.getLong(key, defValue)
+    }
+
     fun clearSharedPreference(context: Context): Boolean {
         val settings = context.getSharedPreferences(PREF_FILE, 0)
-        val editor = settings.edit()
-        return editor.clear().commit()
+        // Device-level, not user-level — must survive logout so "Don't ask again" is still detected
+        val isLocationAsked = settings.getBoolean(Constant.KEY_LOCATION_ASKED, false)
+        val isCameraDenied = settings.getBoolean(Constant.KEY_CAMERA_DENIED, false)
+        // In-app review — logging out and back in must not reset the count or the 90-day cooldown
+        val reviewSuccessCount = settings.getInt(Constant.KEY_REVIEW_SUCCESS_COUNT, 0)
+        val reviewLastTxnId = settings.getString(Constant.KEY_REVIEW_LAST_TXN_ID, "")
+        val reviewLastAskedAt = settings.getLong(Constant.KEY_REVIEW_LAST_ASKED_AT, 0L)
+        return settings.edit()
+            .clear()
+            .putBoolean(Constant.KEY_LOCATION_ASKED, isLocationAsked)
+            .putBoolean(Constant.KEY_CAMERA_DENIED, isCameraDenied)
+            .putInt(Constant.KEY_REVIEW_SUCCESS_COUNT, reviewSuccessCount)
+            .putString(Constant.KEY_REVIEW_LAST_TXN_ID, reviewLastTxnId)
+            .putLong(Constant.KEY_REVIEW_LAST_ASKED_AT, reviewLastAskedAt)
+            .commit()
     }
 
     fun isLoggedIn(context: Context): Boolean {
         val token  = getSharedPreferenceString(context, Constant.KEY_TOKEN, "") ?: ""
         val userId = getSharedPreferenceString(context, Constant.KEY_USER_ID, "") ?: ""
         return token.isNotEmpty() && userId.isNotEmpty()
+    }
+
+    /** Authorization header value for the logged-in user — for callers outside a ViewModel. */
+    fun bearerToken(context: Context): String {
+        val token = getSharedPreferenceString(context, Constant.KEY_TOKEN, "") ?: ""
+        return "Bearer $token"
     }
 }

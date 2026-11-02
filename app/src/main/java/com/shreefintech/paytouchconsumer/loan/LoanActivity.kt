@@ -13,11 +13,11 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
@@ -29,6 +29,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityLoanBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loan.transactions.LoanRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.loan.transactions.LoanSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.loan.transactions.LoanTransactionReportActivity
 import com.shreefintech.paytouchconsumer.loan.transactions.LoanTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.loan.viewmodel.LoanViewModel
@@ -38,6 +40,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanBillAdditionalD
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.loan.LoanOperatorItem
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -53,6 +56,7 @@ class LoanActivity : BaseActivity() {
     private var selectedOperatorName: String? = null
     private var fetchedBillItem: LoanBillItem? = null
     private var isBillFetched = false
+    private var paymentMade = false
 
     private val operatorSelectionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -175,7 +179,7 @@ class LoanActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
@@ -243,10 +247,18 @@ class LoanActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                LoanSmsReceiptActivity.start(mActivity, fromPayment = true)
-                onReset()
+                paymentMade = true
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_LOAN
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -287,23 +299,20 @@ class LoanActivity : BaseActivity() {
     }
 
     private fun populateAdditionalDetails(details: LoanBillAdditionalDetailsItem?) {
-        if (details == null) {
-            binding.llAdditionalDetails.visibility = View.GONE
-            return
-        }
-        binding.llAdditionalDetails.visibility = View.VISIBLE
-        details.agreementNumber?.let {
-            binding.llAgreementNumberRow.visibility = View.VISIBLE
-            binding.tvBillAgreementNumber.text = it
-        } ?: run { binding.llAgreementNumberRow.visibility = View.GONE }
-        details.billNumber?.let {
-            binding.llBillNumberRow.visibility = View.VISIBLE
-            binding.tvBillBillNumber.text = it
-        } ?: run { binding.llBillNumberRow.visibility = View.GONE }
-        details.customerName?.let {
-            binding.llAdditionalCustomerNameRow.visibility = View.VISIBLE
-            binding.tvBillAdditionalCustomerName.text = it
-        } ?: run { binding.llAdditionalCustomerNameRow.visibility = View.GONE }
+        val hasAgreement = bindDetailRow(binding.llAgreementNumberRow, binding.tvBillAgreementNumber, details?.agreementNumber)
+        val hasBillNo    = bindDetailRow(binding.llBillNumberRow, binding.tvBillBillNumber, details?.billNumber)
+        val hasName      = bindDetailRow(binding.llAdditionalCustomerNameRow, binding.tvBillAdditionalCustomerName, details?.customerName)
+        // Hide the whole section when no row has a value — avoids an empty block
+        binding.llAdditionalDetails.visibility =
+            if (hasAgreement || hasBillNo || hasName) View.VISIBLE else View.GONE
+    }
+
+    /** Shows [row] with [value] when present; returns whether the row is visible. */
+    private fun bindDetailRow(row: View, textView: TextView, value: String?): Boolean {
+        val isVisible = !value.isNullOrBlank()
+        row.visibility = if (isVisible) View.VISIBLE else View.GONE
+        if (isVisible) textView.text = value
+        return isVisible
     }
 
     private fun onClearBill() {
@@ -385,6 +394,7 @@ class LoanActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -439,7 +449,8 @@ class LoanActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
-                    onProceedToPay()
+                    if (paymentMade) return@OnClickListener
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { onProceedToPay() }
                 }
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener

@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -18,10 +19,14 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.adapter.KycDocumentAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycDetailsBinding
+import com.shreefintech.paytouchconsumer.databinding.ItemKycBankAccountBinding
+import com.shreefintech.paytouchconsumer.kyc.bank.model.EditBankPassItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycBankAccountDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDocumentDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import kotlin.math.abs
 
 class KycDetailsActivity : BaseActivity() {
 
@@ -30,6 +35,16 @@ class KycDetailsActivity : BaseActivity() {
 
     private val documents = mutableListOf<KycDocumentDetailItem>()
     private lateinit var documentAdp: KycDocumentAdp
+
+    private val editBankLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val msg = result.data?.getStringExtra(EditBankDetailsActivity.EXTRA_SUCCESS_MSG)
+            if (!msg.isNullOrEmpty()) ToastUtil.showSuccess(mActivity, msg)
+            loadKycDetails()
+        }
+    }
 
     companion object {
         fun start(context: Context) {
@@ -48,7 +63,8 @@ class KycDetailsActivity : BaseActivity() {
             insets
         }
 
-        binding.onClickListener = onClickListener()
+        val listener = onClickListener()
+        binding.onClickListener = listener
         setupDocumentSlider()
         onBack()
         retryCallback = { loadKycDetails() }
@@ -59,6 +75,9 @@ class KycDetailsActivity : BaseActivity() {
         documentAdp = KycDocumentAdp(urlResolver = ::resolveFileUrl)
         documentAdp.onItemClick = { url, label -> DocPreviewActivity.start(this, url, label) }
         binding.vpDocuments.adapter = documentAdp
+        binding.vpDocuments.setPageTransformer { page, position ->
+            page.alpha = 1f - abs(position) * 0.4f
+        }
         binding.vpDocuments.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 updateDots(position)
@@ -79,6 +98,7 @@ class KycDetailsActivity : BaseActivity() {
                 binding.nsvContent.isVisible = false
             },
             onReady = { data ->
+                if (isFinishing || isDestroyed) return@fetchMyAccount
                 binding.pbLoading.isVisible = false
                 binding.nsvContent.isVisible = true
                 populateData(data)
@@ -122,11 +142,43 @@ class KycDetailsActivity : BaseActivity() {
         val bank = data.bank ?: return
         binding.tvBankStatus.text = statusLabel(bank.status)
         binding.tvBankStatus.setTextColor(statusColor(bank.status))
-        val account = bank.accounts?.firstOrNull() ?: return
-        binding.tvAccountNumber.text = account.accountNumber ?: "--"
-        binding.tvBankName.text = account.bankName ?: "--"
-        binding.tvIfsc.text = account.ifsc ?: "--"
-        binding.tvBranchName.text = account.branchName ?: "--"
+
+        binding.llBankAccounts.removeAllViews()
+        val accounts = bank.accounts ?: return
+        val canEdit = bank.canEdit == true
+        accounts.forEachIndexed { index, account ->
+            val item = ItemKycBankAccountBinding.inflate(layoutInflater, binding.llBankAccounts, false)
+            item.tvAccountNumber.text = account.accountNumber ?: "--"
+            item.tvBankName.text = account.bankName ?: "--"
+            item.tvIfsc.text = account.ifsc ?: "--"
+            item.tvBranchName.text = account.branchName ?: "--"
+            if (canEdit && account.id != null) {
+                item.ivEditBank.visibility = View.VISIBLE
+                item.ivEditBank.setOnClickListener {
+                    if (Utility.stopClick()) return@setOnClickListener
+                    onEditBank(account, index)
+                }
+            }
+            binding.llBankAccounts.addView(item.root)
+        }
+    }
+
+    private fun onEditBank(account: KycBankAccountDetailItem, index: Int) {
+        val bankId = account.id ?: return
+        // Account's own URL first; index match is a fallback (list orders are not guaranteed to align)
+        val bankProofUrl = account.bankProofUrl
+            ?: documents.filter { it.documentType == "bank_proof" }.getOrNull(index)?.fileUrl
+        val passItem = EditBankPassItem(
+            bankId            = bankId,
+            isPrimary         = account.isPrimary ?: false,
+            accountHolderName = account.accountHolderName,
+            accountNumber     = account.accountNumber,
+            bankName          = account.bankName,
+            ifsc              = account.ifsc,
+            branchName        = account.branchName,
+            bankProofUrl      = bankProofUrl
+        )
+        editBankLauncher.launch(EditBankDetailsActivity.createIntent(this, passItem))
     }
 
     private fun populateDocuments(data: KycMyAccountItem) {

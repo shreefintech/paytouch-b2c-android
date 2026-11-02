@@ -41,7 +41,7 @@ Handles wallet top-up via the HDFC payment gateway (WebView-based), displays wal
 | `LoadWalletActivity` | `LoadWalletViewModel` | Wallet balance, virtual account info, recent history preview, HDFC payment sheet |
 | `WalletTransactionsActivity` | `WalletTransactionsViewModel` | Full paginated wallet transaction history |
 | `HdfcWebViewActivity` | *(none)* | Loads the HDFC-issued payment URL in a WebView; intercepts the return URL to finish |
-| `PaymentStatusActivity` | *(none)* | Displays payment result with GIF animation; auto-navigates back after 5 s |
+| `PaymentStatusActivity` | *(none)* | Displays payment result with GIF animation + matching sound (`res/raw`); auto-navigates back after 5 s |
 
 `HdfcPaymentHelper` — singleton (`object`) that holds pending order state across the Activity boundary. Set before launching `HdfcWebViewActivity`; cleared on `LoadWalletActivity.onResume()`.
 

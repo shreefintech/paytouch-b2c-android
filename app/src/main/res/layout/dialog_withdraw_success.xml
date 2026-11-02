@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/margin_extra_large">
+
+            <!-- Header background -->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivHeaderBg"
+                android:layout_width="0dp"
+                android:layout_height="112dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/img_withdrawal_popup_bg"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Status circle -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardStatusIcon"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="36dp"
+                app:cardElevation="6dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeWidth="0dp">
+
+                <!-- Status GIF (gif_success / gif_pending / gif_rejected) — loaded via Glide by status -->
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivStatusGif"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center"
+                    android:scaleType="fitCenter"
+                    tools:src="@drawable/gif_pending" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Title -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_extra_large"
+                android:layout_marginTop="@dimen/margin_large"
+                android:fontFamily="@font/proza_libre_bold"
+                android:gravity="center"
+                android:text="@string/titleWithdrawalRequestSent"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_19"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ivHeaderBg" />
+
+            <!-- Subtitle -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_extra_large"
+                android:layout_marginTop="@dimen/margin_tiny"
+                android:fontFamily="@font/proza_libre_regular"
+                android:gravity="center"
+                android:text="@string/msgWithdrawalReachBank"
+                android:textColor="@color/sub_text_color"
+                android:textSize="@dimen/text_size_12"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+            <!-- Amount -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small"
+                android:fontFamily="@font/proza_libre_bold"
+                android:textColor="@color/primary"
+                android:textSize="28sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
+                tools:text="₹200.00" />
+
+            <!-- Status chip -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small"
+                android:background="@drawable/bg_status_pending"
+                android:drawablePadding="6dp"
+                android:fontFamily="@font/proza_libre_semi_bold"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="5dp"
+                android:text="@string/labelProcessing"
+                android:textColor="@color/toast_text_warning"
+                android:textSize="@dimen/text_size_12"
+                app:drawableStartCompat="@drawable/ic_dot_filled"
+                app:drawableTint="@color/toast_text_warning"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvAmount" />
+
+            <!-- Details card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_large"
+                app:cardBackgroundColor="@color/primary_light"
+                app:cardCornerRadius="@dimen/margin_extra_large"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvStatus"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="@dimen/margin_small_medium">
+
+                    <!-- To -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_regular"
+                            android:text="@string/labelTo"
+                            android:textColor="@color/sub_text_color"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvToBank"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_medium"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="end"
+                            android:maxLines="1"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13"
+                            tools:text="HDFC Bank ••••1234" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginVertical="@dimen/margin_small_medium"
+                        android:background="@drawable/bg_dashed_divider"
+                        android:layerType="software" />
+
+                    <!-- Transfer mode -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/proza_libre_regular"
+                            android:text="@string/labelTransferMode"
+                            android:textColor="@color/sub_text_color"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvInstantBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/margin_small"
+                            android:background="@drawable/bg_status_pending"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:paddingHorizontal="@dimen/margin_small"
+                            android:paddingVertical="@dimen/margin_tiny"
+                            android:text="@string/labelInstant"
+                            android:textColor="@color/toast_text_warning"
+                            android:textSize="@dimen/text_size_10" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvTransferMode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13"
+                            tools:text="IMPS" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginVertical="@dimen/margin_small_medium"
+                        android:background="@drawable/bg_dashed_divider"
+                        android:layerType="software" />
+
+                    <!-- Request ID -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/proza_libre_regular"
+                            android:text="@string/labelRequestId"
+                            android:textColor="@color/sub_text_color"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivCopyRequestId"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_marginEnd="@dimen/margin_extra_small"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/labelRequestId"
+                            android:onClickListener="@{onClickListener}"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_copy"
+                            android:tint="@color/primary" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvRequestId"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13"
+                            tools:text="WD123456789" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginVertical="@dimen/margin_small_medium"
+                        android:background="@drawable/bg_dashed_divider"
+                        android:layerType="software" />
+
+                    <!-- Date & time -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/proza_libre_regular"
+                            android:text="@string/labelDateAndTime"
+                            android:textColor="@color/sub_text_color"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvDateTime"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_medium"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/proza_libre_semi_bold"
+                            android:gravity="end"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13"
+                            tools:text="02 Oct 2026, 05:31 PM" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Done button -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDone"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/btn_height"
+                android:layout_marginHorizontal="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_extra_large"
+                android:onClickListener="@{onClickListener}"
+                app:cardBackgroundColor="@color/primary"
+                app:cardCornerRadius="@dimen/margin_large"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardDetails"
+                app:strokeWidth="0dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:text="@string/btnDone"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_16" />
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</layout>

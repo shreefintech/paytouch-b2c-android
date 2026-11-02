@@ -16,7 +16,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
@@ -28,6 +27,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityMunicipalTaxBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxTransactionReportActivity
 import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.municipaltax.viewmodel.MunicipalTaxViewModel
@@ -36,6 +37,7 @@ import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxFetchBillDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.municipaltax.MunicipalTaxOperatorItem
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -52,6 +54,7 @@ class MunicipalTaxActivity : BaseActivity() {
     private var selectedOperatorName: String? = null
     private var fetchedBillItem: MunicipalTaxFetchBillDataItem? = null
     private var isBillFetched = false
+    private var paymentMade = false
 
     private val operatorSelectionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -175,7 +178,7 @@ class MunicipalTaxActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
@@ -243,10 +246,18 @@ class MunicipalTaxActivity : BaseActivity() {
             dueDate      = fetchedBillItem?.dueDate ?: "",
             opName       = selectedOperatorName ?: "",
             onLoading    = { showProgressPay.set(true) },
-            onSuccess    = { _ ->
+            onSuccess    = { body ->
                 showProgressPay.set(false)
-                MunicipalTaxSmsReceiptActivity.start(mActivity, fromPayment = true)
-                onReset()
+                paymentMade = true
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_MUNICIPAL_TAX
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -363,6 +374,7 @@ class MunicipalTaxActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -421,7 +433,8 @@ class MunicipalTaxActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
-                    onProceedToPay()
+                    if (paymentMade) return@OnClickListener
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { onProceedToPay() }
                 }
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener

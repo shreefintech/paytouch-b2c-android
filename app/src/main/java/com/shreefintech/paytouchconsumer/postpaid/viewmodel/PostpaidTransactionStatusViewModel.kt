@@ -95,7 +95,7 @@ class PostpaidTransactionStatusViewModel(application: Application) : AndroidView
             transactionId    = item.transactionId ?: "--",
             amount           = Utility.formatAmount(item.billAmount ?: item.totalPayable),
             status           = item.status ?: "--",
-            categoryIconRes  = R.drawable.ic_postpaid,
+            categoryIconRes  = R.drawable.img_postpaid,
             username         = item.customerName ?: item.connectionNumber ?: "--",
             date             = item.createdAt ?: "--",
             platformFee      = Utility.formatAmount(item.platformFee),

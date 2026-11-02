@@ -26,6 +26,8 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityDthBinding
 import com.shreefintech.paytouchconsumer.dth.transactions.DthRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.dth.transactions.DthSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.dth.transactions.DthTransactionReportActivity
 import com.shreefintech.paytouchconsumer.dth.transactions.DthTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.dth.viewmodel.DthViewModel
@@ -34,10 +36,10 @@ import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
 import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPlanItem
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
-import androidx.core.net.toUri
 import android.widget.LinearLayout
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
 
@@ -53,6 +55,7 @@ class DthActivity : BaseActivity() {
 
     private var selectedPlan: DthPlanItem? = null
     private var isPlanSelected = false
+    private var paymentMade = false
 
     private val showProgressBrowse = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -166,7 +169,7 @@ class DthActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
@@ -216,10 +219,18 @@ class DthActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                DthSmsReceiptActivity.start(mActivity, fromPayment = true)
-                finish()
+                paymentMade = true
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_DTH
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -340,6 +351,7 @@ class DthActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -376,7 +388,8 @@ class DthActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
-                    onProceedToPay()
+                    if (paymentMade) return@OnClickListener
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { onProceedToPay() }
                 }
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener

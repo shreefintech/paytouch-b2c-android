@@ -10,9 +10,12 @@ data class LoginDataItem(
 )
 
 data class LoginUserItem(
-    @field:SerializedName("id")            val id: Int?,
-    @field:SerializedName("name")          val name: String?,
-    @field:SerializedName("mobile")        val mobile: String?,
-    @field:SerializedName("email")         val email: String?,
-    @field:SerializedName("referral_code") val referralCode: String?
+    @field:SerializedName("id")                 val id: Int?,
+    @field:SerializedName("name")               val name: String?,
+    @field:SerializedName("mobile")             val mobile: String?,
+    @field:SerializedName("email")              val email: String?,
+    @field:SerializedName("referral_code")      val referralCode: String?,
+    @field:SerializedName("bank_details_added") val bankDetailsAdded: Boolean?,
+    @field:SerializedName("pan_added")          val panAdded: Boolean?,
+    @field:SerializedName("aadhaar_rejected")   val aadhaarRejected: Boolean?
 )

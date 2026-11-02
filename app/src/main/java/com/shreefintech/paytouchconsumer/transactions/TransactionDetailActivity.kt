@@ -24,6 +24,7 @@ import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxS
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 class TransactionDetailActivity : BaseActivity() {
@@ -75,6 +76,7 @@ class TransactionDetailActivity : BaseActivity() {
 
     private fun populateData() {
         val item = transactionItem ?: return
+        AnimationHelper.animateEntrance(binding.flCard, 0)
         val numberLabelFmt = when {
             item.isVehicleCategory -> R.string.labelVehicleNumberFmt
             item.isMobileCategory  -> R.string.labelMobileNoFmt

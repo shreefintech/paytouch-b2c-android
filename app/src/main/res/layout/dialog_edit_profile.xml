@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgress"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_transaction_item"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="24dp">
+
+        <!-- Title -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/titleEditProfile"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_18"
+            app:layout_constraintEnd_toStartOf="@id/cardClose"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Close button -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardClose"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:onClickListener="@{onClickListener}"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/primary"
+            app:strokeWidth="1dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                android:src="@drawable/ic_cross"
+                android:tint="@color/primary" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Subtitle -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/proza_libre_medium"
+            android:text="@string/msgEditProfileSubtitle"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+        <!-- Name label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNameLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/labelFullName"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+
+        <!-- Name input -->
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etName"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_input_field"
+            android:fontFamily="@font/proza_libre_medium"
+            android:hint="@string/hintFullName"
+            android:inputType="textPersonName|textCapWords|textNoSuggestions"
+            android:maxLength="150"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/margin_small"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="?attr/colorTextHint"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvNameLabel" />
+
+        <!-- Email label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvEmailLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/labelEmailAddress"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etName" />
+
+        <!-- Email input -->
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etEmail"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_input_field"
+            android:fontFamily="@font/proza_libre_medium"
+            android:hint="@string/hintEmail"
+            android:inputType="textEmailAddress|textNoSuggestions"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/margin_small"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="?attr/colorTextHint"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvEmailLabel" />
+
+        <!-- State + City side by side -->
+        <LinearLayout
+            android:id="@+id/llStateCity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etEmail">
+
+            <!-- State column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelState"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_13" />
+
+                <FrameLayout
+                    android:id="@+id/flStateAnchor"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_height"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:background="@drawable/bg_input_field"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClickListener="@{onClickListener}">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvState"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center_vertical"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:paddingHorizontal="@dimen/margin_small"
+                        android:paddingEnd="24dp"
+                        android:text="@string/hintSelectState"
+                        android:textColor="?attr/colorTextHint"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <FrameLayout
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginEnd="@dimen/margin_small">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivStateArrow"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_down_arrow"
+                            android:tint="@color/primary" />
+
+                        <ProgressBar
+                            android:id="@+id/pbStateLoading"
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:indeterminateTint="@color/primary"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- City column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_small"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelCity"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_13" />
+
+                <FrameLayout
+                    android:id="@+id/flCityAnchor"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_height"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:background="@drawable/bg_input_field"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClickListener="@{onClickListener}">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvCity"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center_vertical"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:paddingHorizontal="@dimen/margin_small"
+                        android:paddingEnd="24dp"
+                        android:text="@string/hintSelectCity"
+                        android:textColor="?attr/colorTextHint"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <FrameLayout
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginEnd="@dimen/margin_small">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivCityArrow"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_down_arrow"
+                            android:tint="@color/primary" />
+
+                        <ProgressBar
+                            android:id="@+id/pbCityLoading"
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:indeterminateTint="@color/primary"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Submit button -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSubmit"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/btn_height"
+            android:layout_marginTop="@dimen/margin_extra_large"
+            android:onClickListener="@{onClickListener}"
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llStateCity"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:text="@string/btnUpdateProfile"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_16"
+                    android:visibility="@{showProgress ? View.GONE : View.VISIBLE}" />
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:indeterminateTint="@color/white"
+                    android:visibility="@{showProgress ? View.VISIBLE : View.GONE}" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

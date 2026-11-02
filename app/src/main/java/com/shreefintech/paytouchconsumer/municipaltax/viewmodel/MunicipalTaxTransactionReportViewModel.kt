@@ -99,7 +99,7 @@ class MunicipalTaxTransactionReportViewModel(application: Application) : Android
             transactionId    = item.transactionId ?: "--",
             amount           = Utility.formatAmount(item.amount ?: item.totalPayable),
             status           = item.status ?: "--",
-            categoryIconRes  = R.drawable.ic_tax,
+            categoryIconRes  = R.drawable.img_municipal_tax,
             username         = item.customerName ?: "--",
             date             = item.createdAt ?: "--",
             platformFee      = Utility.formatAmount(item.platformFee),

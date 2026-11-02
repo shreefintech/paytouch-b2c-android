@@ -14,8 +14,8 @@
     <string name="forgot_password">Forgot Password?</string>
     <string name="labelForgotMpin">Forgot MPIN?</string>
     <string name="sign_in">Sign In</string>
-    <string name="no_account">Don\'t Have an account?</string>
-    <string name="create_account">Create Account</string>
+    <string name="no_account">New to PayTouch?</string>
+    <string name="create_account">Sign Up</string>
 
     <string name="msgLoginSuccess">Login successful</string>
 
@@ -77,6 +77,11 @@
     <string name="subtitleResetMpin">Set a new MPIN to keep your account secure</string>
     <string name="titleCreateMpin">Create MPIN</string>
     <string name="subtitleCreateMpin">Set an MPIN to secure your account</string>
+
+    <!-- App lock screen -->
+    <string name="titleAppLock">PayTouch is locked</string>
+    <string name="msgAppLockPrompt">Use your fingerprint, face or phone screen lock to unlock</string>
+    <string name="btnUnlock">Unlock</string>
     <string name="btnCreateMpin">Create MPIN</string>
     <string name="msgMpinRules">MPIN must be a 4-digit number and shouldn\'t match your birth year or repeat the same digit</string>
     <string name="labelNewMpin">New MPIN</string>
@@ -137,6 +142,18 @@
     <string name="msgOnlyPdfJpgJpegAllowed">Only PDF, JPG, JPEG allowed.</string>
     <string name="msgFileExceeds2mbLimit">File exceeds 2MB limit.</string>
     <string name="msgUnableToReadFileTryAgain">Unable to read file. Try again.</string>
+    <string name="titleSelectDocument">Select Document</string>
+    <string name="btnTakePhoto">Take Photo</string>
+    <string name="btnChooseFile">Choose from Files</string>
+    <string name="labelUseCamera">Use camera</string>
+    <string name="labelPdfOrImage">PDF or image</string>
+    <string name="msgCameraPermissionDenied">Camera permission is required to take a photo.</string>
+    <string name="msgCameraPermissionBlockedDoc">Camera access is blocked. Open Settings → Permissions → Camera and allow it to take a photo</string>
+    <string name="msgNoCameraApp">No camera app found on this device</string>
+    <string name="msgNoFilePickerApp">No app found to pick files</string>
+    <string name="msgNoBrowserApp">No app found to open this link</string>
+    <string name="msgFileStillProcessing">Please wait, your previous file is still being processed</string>
+    <string name="msgReselectDocument">Please select the document again</string>
 
     <!-- Create Virtual Account screen -->
     <string name="titleCreateVirtualAccount">Create Virtual Account</string>
@@ -197,8 +214,7 @@
     <string name="labelValidity">Validity</string>
     <string name="labelDataBenefit">Data</string>
     <string name="labelTalktime">Talktime</string>
-    <string name="fmtPlanTalktimeData">Data: %1$s</string>
-    <string name="labelViewMore"> View more</string>
+    <string name="labelViewMore">… View more</string>
 
     <!-- Electricity screen -->
     <string name="titleElectricityBill">Electricity Bill</string>
@@ -239,8 +255,13 @@
     <string name="categoryFastag">Fastag</string>
     <string name="categoryMyAccount">My Account</string>
     <string name="btnLoadWallet">Load Wallet</string>
+    <string name="msgLoadWalletSubtitle">Add money instantly &amp; pay bills faster</string>
     <string name="categoryLoan">Loan</string>
     <string name="categoryMunicipalTax">Municipal Tax</string>
+
+    <!-- Referral History -->
+    <string name="titleReferralHistory">Referral History</string>
+    <string name="tabWallet">Wallet</string>
 
     <!-- Transaction Report screen -->
     <string name="titleTransactionReport">Transaction Report</string>
@@ -306,6 +327,21 @@
     <string name="titleGasPaymentConfirmation">Gas Payment Confirmation</string>
     <string name="titlePrepaidPaymentConfirmation">Prepaid Payment Confirmation</string>
     <string name="labelPaytouchSmsNotification">Paytouch SMS Notification</string>
+    <string name="labelNotificationChannelId" translatable="false">push_channel</string>
+    <string name="labelNotificationChannel">Payment &amp; Account Alerts</string>
+
+    <!-- Location permission -->
+    <string name="titleLocationAccess">Allow Location Access</string>
+    <string name="msgLocationAwareness">Your location helps us protect your payments and detect fraud.</string>
+    <string name="labelLocationPoints">✓  Used only to secure your payments\n✓  Taken only while you use the app, never in the background\n✓  Not used for ads or marketing</string>
+    <string name="titleLocationRationale">Location Needed for Secure Payments</string>
+    <string name="msgLocationRationale">PayTouch uses your location to help protect your payments from fraud. Please allow location access to continue.</string>
+    <string name="titleLocationSettings">Enable Location in Settings</string>
+    <string name="msgLocationSettings">Location access is turned off for PayTouch. Open Settings → Permissions → Location and choose \"Allow only while using the app\".</string>
+    <string name="msgTurnOnLocation">Please turn on location to make secure payments.</string>
+    <string name="btnAllow">Allow</string>
+    <string name="btnNotNow">Not Now</string>
+    <string name="btnOpenSettings">Open Settings</string>
     <string name="labelBConnectTxnColon">B-Connect Txn ID:</string>
     <string name="labelDateColon">Date:</string>
     <string name="labelPaytouchSignature">-Paytouch</string>
@@ -359,12 +395,13 @@
     <string name="apiErr504">Gateway Timeout</string>
     <string name="apiErr508">Server detected an infinite loop</string>
     <string name="errGeneric">Something went wrong. Please try again.</string>
+    <string name="errNoDialerApp">No app found to make calls</string>
+    <string name="errNoEmailApp">No email app found</string>
     <string name="apiErr422">Unprocessable Content</string>
     <string name="btnFetchBill">Fetch Bill</string>
     <string name="btnSearch">Search</string>
     <string name="msgEnterSearchQuery">Please enter consumer no. or transaction ID</string>
     <string name="btnClear">Clear</string>
-    <string name="msgConsumerNumberInvalid">Consumer number must be at least 10 digits</string>
     <string name="msgLoadingOperators">Loading operators, please wait…</string>
     <string name="msgLoadingStates">Loading states, please wait…</string>
     <string name="hintSearchOperator">Search</string>
@@ -434,9 +471,10 @@
     <string name="labelActivatedOn">Activated On</string>
     <string name="btnViewKycDetails">View KYC Details</string>
     <string name="btnViewReceipt">View Receipt</string>
+    <string name="msgViewReceiptSubtitle">Tap to see full payment details</string>
     <string name="labelTotalEarnings">Total Earnings</string>
-    <string name="msgEarnPerReferral">Earn ₹2 for each referral</string>
-    <string name="msgShareReferralInfo">Share your referral link with friends and earn ₹2 for each successful referral.</string>
+    <string name="msgEarnPerReferral">Earn up to ₹20 for each referral</string>
+    <string name="msgShareReferralInfo">Share your referral link with friends and earn up to ₹20 for each successful referral.</string>
     <string name="labelInviteFriends">Invite Friends</string>
     <string name="btnCopy">Copy</string>
     <string name="btnWhatsapp">Whatsapp</string>
@@ -446,6 +484,10 @@
     <string name="labelAmountZero">₹0.00</string>
     <string name="labelReferralCode">Referral Code</string>
     <string name="labelReferralLink">Referral Link</string>
+    <string name="titleContactUs">Contact Us</string>
+    <string name="msgContactUsSubtitle">We\'re here to help. Reach us anytime.</string>
+    <string name="labelCallUs">Call Us</string>
+    <string name="labelEmailUs">Email Us</string>
     <string name="btnRefresh">Refresh</string>
     <string name="latterI">i</string>
     <string name="idColon">ID:</string>
@@ -469,6 +511,23 @@
     <string name="errEnterAmount">Please enter a valid amount</string>
     <string name="hintPaymentDescription">Payment Description</string>
     <string name="btnProceedPayment">Proceed Payment</string>
+
+    <!-- Rewards Wallet & Level -->
+    <string name="labelBonusWallet">Bonus Wallet</string>
+    <string name="labelEarningWallet">Earning Wallet</string>
+    <string name="labelBonusWalletDesc">Spend only · up to 50% of a bill</string>
+    <string name="labelEarningWalletDesc">11% p.a. after 30 days locked</string>
+    <string name="labelBronze">Bronze</string>
+    <string name="labelSilver">Silver</string>
+    <string name="labelGold">Gold</string>
+    <string name="labelPlatinum">Platinum</string>
+    <string name="msgTopTier">You\'ve reached the top tier!</string>
+    <string name="labelCashbackPct">%1$.2f%% cashback</string>
+    <string name="labelMoreToNextLevel">%1$s more to next level</string>
+    <string name="msgHighestLevelPermanent">Highest level · permanent</string>
+    <string name="labelProgressAmountFormat">%1$s of %2$s</string>
+    <string name="labelProgressToNextFormat">%1$s to %2$s</string>
+    <string name="msgWalletInfo">Bills use Bonus Wallet first (up to 50%), the rest from Wallet Balance. Only Wallet Balance can be withdrawn.</string>
 
     <!-- HDFC Payment flow -->
     <string name="titlePaymentStatus">Payment Status</string>
@@ -535,6 +594,23 @@
     <string name="msgSelfieRequired">Please capture a selfie</string>
     <string name="msgIdentitySubmitSuccess">Identity verification submitted successfully</string>
 
+    <!-- KYC module — live selfie liveness check (SelfieCaptureActivity) -->
+    <string name="msgLivenessSubtitle">Your photo is taken automatically</string>
+    <string name="msgLivenessAlignFace">Place your face inside the circle</string>
+    <string name="msgLivenessSingleFace">Only one face should be visible</string>
+    <string name="msgLivenessMoveCloser">Move closer to the camera</string>
+    <string name="msgLivenessMoveBack">Move a little away from the camera</string>
+    <string name="msgLivenessLookStraight">Look straight at the camera</string>
+    <string name="msgLivenessBlink">Blink your eyes twice</string>
+    <string name="msgLivenessBlinkAgain">Good! Blink once more</string>
+    <string name="msgLivenessHoldStill">Great! Hold still with eyes open</string>
+    <string name="msgLivenessCapturing">Capturing your selfie…</string>
+    <string name="msgLivenessTimeout">Verification timed out. Please try again</string>
+    <string name="msgLivenessCaptureFailed">Could not capture selfie. Try again</string>
+    <string name="msgCameraPermissionRequired">Camera permission is required to capture your selfie</string>
+    <string name="msgCameraPermissionSettings">Camera access is blocked. Open Settings → Permissions → Camera and allow it to capture your selfie</string>
+    <string name="msgCameraUnavailable">Unable to start the camera</string>
+
     <!-- KYC module — bank details -->
     <string name="fmtBankAccountTitle">Bank Account %d</string>
     <string name="labelAccountNumber">Account Number</string>
@@ -548,7 +624,21 @@
     <string name="labelBankProof">Bank Proof</string>
     <string name="btnAddBankAccount">+ Add Another Bank Account</string>
     <string name="msgAgreeTAndC">I agree to the Terms &amp; Conditions</string>
+    <string name="labelTermsAndConditions">Terms &amp; Conditions</string>
     <string name="msgBankDetailsSubmitSuccess">Bank details submitted successfully</string>
+
+    <!-- Edit Bank Details -->
+    <string name="titleEditBankDetails">Edit Bank Details</string>
+    <string name="msgWithdrawalBankNote">This is your withdrawal account. Your next withdrawal will go to the new details.</string>
+    <string name="labelAccountHolderName">Account Holder Name</string>
+    <string name="hintAccountHolderName">Enter account holder name</string>
+    <string name="msgAccountHolderNameEmpty">Please enter account holder name.</string>
+    <string name="msgAccountNumberRange">Account number must be 9 to 18 digits.</string>
+    <string name="labelLoginPassword">Login Password</string>
+    <string name="hintLoginPassword">Password</string>
+    <string name="msgBankProofOptional">Optional — your current proof is kept if you don\'t upload a new one.</string>
+    <string name="msgLoginPasswordNote">Enter your login password to confirm this change.</string>
+    <string name="btnUpdateBankDetails">Update Bank Details</string>
 
     <!-- KYC module — bank validation -->
     <string name="msgAccountNumberEmpty">Please enter account number</string>
@@ -589,9 +679,11 @@
     <string name="errFailedToLoadImage">Failed to load image: %s</string>
     <string name="errPdfNoPages">PDF has no pages</string>
     <string name="errCannotRenderPdf">Cannot render PDF: %s</string>
+    <string name="errPdfInvalidPageDimensions">invalid page dimensions</string>
+    <string name="errWebViewUnavailable">Android System WebView is unavailable. Please update or enable it from Play Store.</string>
     <string name="errFailedToLoad">Failed to load: %s</string>
     <string name="labelPageIndicator">%1$d / %2$d</string>
-    <string name="msgLoading">Loading...</string>
+    <string name="msgLoading">Loading…</string>
     <string name="textYouLostConnection">You Lost Connection!</string>
     <string name="msgNoInternetDes">No Internet Connection Found. Check Your Connection or Try Again!</string>
     <string name="textTryAgain">Try Again</string>
@@ -603,7 +695,7 @@
     <string name="labelNarration">Narration</string>
     <string name="hintNarration">Reason for withdrawal (optional)</string>
     <string name="btnProceedWithdraw">Proceed Withdraw →</string>
-    <string name="msgSecurePaymentPaytouch">100% secure payment powered by PayTouch</string>
+    <string name="msgSecurePaymentPaytouch" formatted="false">100% secure payment powered by PayTouch</string>
     <string name="labelImps">IMPS</string>
     <string name="labelNeft">NEFT</string>
     <string name="labelRtgs">RTGS</string>
@@ -616,12 +708,269 @@
     <!-- Withdraw validation -->
     <string name="errMinWithdrawAmount">Minimum withdrawal amount is ₹100</string>
     <string name="errInsufficientBalance">Insufficient wallet balance</string>
-    <string name="msgWithdrawInitiated">Withdrawal request submitted successfully</string>
+
+    <!-- Withdraw success dialog -->
+    <string name="titleWithdrawalRequestSent">Withdrawal request sent!</string>
+    <string name="msgWithdrawalReachBank">Usually reaches your bank within a few minutes.</string>
+    <string name="titleWithdrawalSuccessful">Withdrawal successful!</string>
+    <string name="msgWithdrawalCredited">The amount has been sent to your bank account.</string>
+    <string name="titleWithdrawalFailed">Withdrawal failed</string>
+    <string name="msgWithdrawalFailed">Your withdrawal could not be completed. Please try again later.</string>
+    <string name="labelProcessing">Processing</string>
+    <string name="labelTo">To</string>
+    <string name="labelTransferMode">Transfer mode</string>
+    <string name="labelInstant">INSTANT</string>
+    <string name="labelRequestId">Request ID</string>
+    <string name="labelDateAndTime">Date &amp; time</string>
+    <string name="btnDone">Done</string>
+    <string name="labelBankAccountMasked">%1$s ••••%2$s</string>
+    <string name="msgRequestIdCopied">Request ID copied</string>
     <string name="labelCorporation">Corporation</string>
     <string name="hintSelectCorporation">Select Corporation</string>
     <string name="titleLogout">Logout</string>
     <string name="msgConfirmLogout">Are you sure you want to logout?</string>
     <string name="btnLogout">Logout</string>
     <string name="btnCancel">Cancel</string>
+
+    <!-- Earning Wallet -->
+    <string name="titleEarningWallet">Earning Wallet</string>
+    <string name="labelLockedBalance">Locked balance</string>
+    <string name="labelInterestEarned">+%1$s interest earned</string>
+    <string name="labelEarnRate" formatted="false">Earning 11% a year</string>
+    <string name="labelStatusActive">ACTIVE</string>
+    <string name="labelStatusLocked">LOCKED</string>
+    <string name="labelEarningsSince">Earning since %1$s</string>
+    <string name="labelLockedSince">Locked since %1$s · earning since %2$s</string>
+    <string name="msgPendingWithdrawal">%1$s arriving on %2$s</string>
+    <string name="titleHowItWorks">How it works</string>
+    <string name="msgHowItWorks1" formatted="false">Money earns 11% a year once it stays locked 30 days.</string>
+    <string name="msgHowItWorks2">Interest moves to your Wallet Balance in ₹1,000 chunks.</string>
+    <string name="msgHowItWorks3">Withdrawals reach your Wallet Balance in 3 days. One at a time.</string>
+    <string name="msgHowItWorks4">Withdrawing loses interest not yet moved, and can lower your Gold level.</string>
+    <string name="btnLockMoney">Lock money</string>
+
+    <!-- Earning Wallet — Opt-in sheet -->
+    <string name="titleOptIn">Start your Earning Wallet</string>
+    <string name="msgOptInSubtitle">You opt in once. After that you can lock money anytime.</string>
+    <string name="msgOptInRule1Title" formatted="false">11% a year</string>
+    <string name="msgOptInRule1Desc">Once money stays locked 30 days.</string>
+    <string name="msgOptInRule2Title">Interest moves in ₹1,000 chunks</string>
+    <string name="msgOptInRule2Desc">Straight to your Wallet Balance.</string>
+    <string name="msgOptInRule3Title">Withdraw in 3 days</string>
+    <string name="msgOptInRule3Desc">One withdrawal at a time.</string>
+    <string name="msgOptInRule4Title">Withdrawing early</string>
+    <string name="msgOptInRule4Desc">Loses interest not yet moved, and can lower your Gold level.</string>
+    <string name="msgOptInTerms">I have read and agree to the Earning Wallet terms</string>
+    <string name="btnOptIn">Opt in</string>
+
+    <!-- Earning Wallet — Lock sheet -->
+    <string name="titleLockMoney">Lock money</string>
+    <string name="msgLockInfo">Minimum ₹%1$d. Bonus Wallet money and money held for a payment in progress can\'t be locked.</string>
+    <string name="msgStartsEarning">Starts earning 11%% a year on %1$s</string>
+    <string name="btnLock">Lock</string>
+    <string name="labelAll">All</string>
+    <string name="errNotEnoughBalance">Not enough Wallet Balance</string>
+    <string name="errExceedsWalletBalance">Amount exceeds your wallet balance</string>
+    <string name="errMinLockAmount">Minimum lock amount is ₹%1$d</string>
+
+    <!-- Earning Wallet — Withdraw sheet -->
+    <string name="titleWithdrawToWallet">Withdraw to Wallet</string>
+    <string name="msgGoldWarning">This can lower your Gold level. After this you\'ll have %1$s locked.</string>
+    <string name="msgLostInterest">Interest not yet moved (%1$s) will be lost.</string>
+    <string name="msgWithdrawInfo">Arrives in your Wallet Balance in 3 days. One withdrawal at a time.</string>
+    <string name="errMoreThanLocked">More than your locked balance</string>
+    <string name="errExceedsLockedBalance">Amount exceeds your locked balance</string>
+    <string name="errMinAmount">Please enter a valid amount</string>
+    <string name="errAgreeToTerms">Please agree to the terms and conditions</string>
+
+    <!-- Rewards Explainer screen -->
+    <string name="subtitleRewardsHero">Level up by paying bills, referring friends, and locking money. Your cashback grows with you.</string>
+    <string name="labelBronzeAllCaps">BRONZE</string>
+    <string name="labelSilverAllCaps">SILVER</string>
+    <string name="labelGoldAllCaps">GOLD</string>
+    <string name="labelPlatinumAllCaps">PLATINUM</string>
+    <string name="labelYourLevel">Your Level</string>
+    <string name="labelCashback">Cashback</string>
+    <string name="fmtPercent">%1$.2f%%</string>
+    <string name="labelMyRank">My Rank </string>
+    <string name="titleCashbackGrows">Cashback grows every level</string>
+    <string name="subtitleCashbackGrows" formatted="false">From 0.05% at Bronze III up to 0.50% at Platinum — your cashback rate increases as you level up.</string>
+    <string name="labelPlatAbbrev">Plat.</string>
+    <string name="titleAllLevels">All Levels</string>
+    <string name="subtitleAllLevels">Tap a tier to see what it takes to reach each level.</string>
+
+    <!-- How it works steps -->
+    <string name="stepPayBillsTitle">Pay bills</string>
+    <string name="stepPayBillsDesc">Reach ₹10,000 in lifetime payments to leave Bronze</string>
+    <string name="stepReferFriendsTitle">Refer friends</string>
+    <string name="stepReferFriendsDesc">Friends who complete KYC move you through Silver.</string>
+    <string name="stepLockMoneyTitle">Lock money</string>
+    <string name="stepLockMoneyDesc">Keep money 30+ days in your Earning Wallet for Gold.</string>
+    <string name="stepHoldGoldTitle">Hold Gold I for 3 months</string>
+    <string name="stepHoldGoldDesc">Then Platinum is yours forever.</string>
+
+    <!-- Level cards — sub-level names, triggers, cashback values -->
+    <string name="labelLifetimePayments">Lifetime Payments</string>
+    <plurals name="fmtReferralsCount">
+        <item quantity="one">%d referral</item>
+        <item quantity="other">%d referrals</item>
+    </plurals>
+    <plurals name="fmtDaysCount">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <string name="labelPaymentsReferrals">Payments + Referrals</string>
+    <string name="labelReferralsLocking">Referrals + Locking</string>
+    <string name="labelHoldGoldI90">Hold Gold I for 90 days</string>
+    <string name="labelYou">YOU</string>
+
+    <string name="levelBronzeIII">Bronze III</string>
+    <string name="levelBronzeIIITrigger">₹0 – ₹1,000 lifetime payments</string>
+    <string name="levelBronzeII">Bronze II</string>
+    <string name="levelBronzeIITrigger">₹1,000 – ₹4,000 lifetime payments</string>
+    <string name="levelBronzeI">Bronze I</string>
+    <string name="levelBronzeITrigger">₹4,000 – ₹10,000 lifetime payments</string>
+    <string name="levelBronzeHint">Bronze levels use your total bill payments since joining PayTouch.</string>
+
+    <string name="levelSilverIII">Silver III</string>
+    <string name="levelSilverIIITrigger">0 – 5 referrals</string>
+    <string name="levelSilverII">Silver II</string>
+    <string name="levelSilverIITrigger">5 – 20 referrals</string>
+    <string name="levelSilverI">Silver I</string>
+    <string name="levelSilverITrigger">20 – 30 referrals</string>
+    <string name="levelSilverHint">Silver uses a combined score of payments and active referrals.</string>
+
+    <string name="levelGoldIII">Gold III</string>
+    <string name="levelGoldIIITrigger">Up to ₹1,000 locked 30+ days</string>
+    <string name="levelGoldII">Gold II</string>
+    <string name="levelGoldIITrigger">₹1,000 – ₹4,000 locked 30+ days</string>
+    <string name="levelGoldI">Gold I</string>
+    <string name="levelGoldITrigger">₹4,000 – ₹10,000 locked 30+ days</string>
+    <string name="levelGoldHint">Gold rewards you for growing the PayTouch community and locking funds.</string>
+
+    <string name="levelPlatinumTrigger">Hold Gold I for 90 consecutive days</string>
+    <string name="levelPlatinumHint">Platinum is permanent once earned — it never downgrades.</string>
+
+    <!-- Cashback values per level -->
+    <string name="cashback005">0.05%</string>
+    <string name="cashback010">0.10%</string>
+    <string name="cashback015">0.15%</string>
+    <string name="cashback020">0.20%</string>
+    <string name="cashback025">0.25%</string>
+    <string name="cashback030">0.30%</string>
+    <string name="cashback035">0.35%</string>
+    <string name="cashback040">0.40%</string>
+    <string name="cashback045">0.45%</string>
+    <string name="cashback050">0.50%</string>
+
+    <!-- Your Wallets section -->
+    <string name="titleYourWallets">Your Wallets</string>
+    <string name="descBonusWallet">Cashback, referral and lucky-draw money</string>
+    <string name="descBonusWalletPays">Pays up to 50% of any bill</string>
+    <string name="descBonusWalletSpend">Spend only</string>
+    <string name="descEarningWalletRate">11% p.a. after 30 days locked</string>
+    <string name="descEarningWalletUnlocks">Unlocks Gold II and I</string>
+    <string name="descEarningWalletWithdraw">Withdraw in 3 days</string>
+
+    <!-- Good to Know FAQ -->
+    <string name="titleGoodToKnow">Good to Know</string>
+    <string name="faqQ1">Can I drop to a lower level?</string>
+    <string name="faqA1">You never go back a stage. Inside Gold, Gold II and I follow your locked Earning Wallet balance, but you never drop below Gold III. Platinum is permanent.</string>
+    <string name="faqQ2">How is my cashback calculated?</string>
+    <string name="faqA2">"Cashback = bill amount × your level %. During the festive season everyone gets a flat ₹5 on bills of ₹50 or more instead.</string>
+    <string name="faqQ3">Which referrals count?</string>
+    <string name="faqA3">A friend counts toward Silver and Gold III when they complete KYC after you reach Silver.</string>
+    <string name="faqQ4">Where does my cashback go?</string>
+    <string name="faqA4">Into your Bonus Wallet. It pays up to 50% of any bill automatically and cannot be withdrawn.</string>
+
+
+
+    <string name="titleRewardsHero" formatted="false">Level up and earn up to 0.50% back</string>
+
+    <string name="labelRewardsHeroHighlight" formatted="false">0.50% back</string>
+    <string name="labelCashbackSuffix"> cashback on every bill</string>
+    <string name="titleRoadToLevel">Road to %1$s</string>
+    <!--  progress line per next.metric  -->
+    <string name="msgRankProgressTxn">%1$s of %2$s lifetime payments</string>
+    <string name="msgRankProgressReferrals">%1$s of %2$s referrals</string>
+    <string name="msgRankProgressLocked">%1$s of %2$s locked 30+ days</string>
+    <!--  rule line per next.metric  -->
+    <string name="msgRankRuleTxn">Every successful payment counts toward your next level.</string>
+    <string name="msgRankRuleReferrals">A friend counts once they complete KYC after you reached Silver.</string>
+    <string name="msgRankRuleLocked">Money kept 30+ days in your Earning Wallet counts. You never drop below Gold III.</string>
+    <!--  Gold I countdown  -->
+    <string name="labelDaysOf">of %1$d days</string>
+    <string name="msgDaysToGo">%1$d days to go</string>
+    <string name="msgRankCountdownRule">Stay at Gold I every day. If your locked balance drops below ₹4,000, the count restarts.</string>
+    <!--  Platinum  -->
+    <string name="titleRankPlatinum">Highest level · permanent</string>
+    <string name="msgRankPlatinumBody">You will never drop from Platinum.</string>
+    <string name="btnReplayCelebration">Replay celebration</string>
+    <string name="errRankLoad">Could not load your level. Please try again.</string>
+
+    <string name="btnLevelUpClose">Close</string>
+    <string name="btnLevelUpReplay">Replay</string>
+    <string name="labelLevelUpPill">LEVEL UP</string>
+    <string name="labelLevelUpHighest">HIGHEST LEVEL</string>
+    <string name="titleLevelUpYouAre">You are %1$s!</string>
+    <string name="labelLevelUpNewCashback">YOUR NEW CASHBACK</string>
+    <string name="labelLevelUpPermanentCashback">YOUR PERMANENT CASHBACK</string>
+    <string name="labelLevelUpCashbackWord">cashback</string>
+    <string name="msgLevelUpCashNoteFestive">On every bill after the festive season · until then flat ₹5 on every bill of ₹50+</string>
+    <string name="msgLevelUpCashNoteActive">On every bill you pay</string>
+    <string name="msgLevelUpCashNotePlatinum">Highest rate on every bill · never expires</string>
+    <string name="labelLevelUpTierProgress">%1$s progress</string>
+    <string name="labelLevelUpOfThree">%1$d of 3</string>
+    <string name="labelLevelUpNext">Next: %1$s</string>
+    <string name="msgLevelUpReqTxn">%1$s in lifetime payments</string>
+    <string name="msgLevelUpReqReferrals">%1$s friends complete KYC</string>
+    <string name="msgLevelUpReqLocked">%1$s locked 30+ days in Earning Wallet</string>
+    <string name="msgLevelUpReqGoldDays">Stay at Gold I for %1$s days in a row</string>
+    <string name="titleLevelUpPermanent">Platinum is permanent</string>
+    <string name="msgLevelUpPermanentBody">You will never drop from this level</string>
+    <string name="btnLevelUpContinue">Continue</string>
+    <string name="labelLevelUpMedalBronze">Bronze</string>
+    <string name="labelLevelUpMedalSilver">Silver</string>
+    <string name="labelLevelUpMedalGold">Gold</string>
+
+    <!-- one line under the title, per level -->
+    <string name="msgLevelUpSubBronze3">Welcome to PayTouch Rewards. Your journey starts now.</string>
+    <string name="msgLevelUpSubBronze2">You crossed ₹1,000 in lifetime payments.</string>
+    <string name="msgLevelUpSubBronze1">You crossed ₹4,000 in lifetime payments.</string>
+    <string name="msgLevelUpSubSilver3">₹10,000 in lifetime payments. Now invite friends to climb.</string>
+    <string name="msgLevelUpSubSilver2">5 friends joined and completed KYC.</string>
+    <string name="msgLevelUpSubSilver1">20 friends joined. Your circle is growing.</string>
+    <string name="msgLevelUpSubGold3">30 referrals. You will never drop below Gold now.</string>
+    <string name="msgLevelUpSubGold2">₹1,000 locked in your Earning Wallet for 30+ days.</string>
+    <string name="msgLevelUpSubGold1">₹4,000 locked for 30+ days. Platinum is in sight.</string>
+    <string name="msgLevelUpSubPlatinum">90 days in a row at Gold I. This level is yours forever.</string>
+    <string name="labelComingSoon">Coming Soon</string>
+    <string name="labelAppVersion">Version %1$s</string>
+
+    <!-- B2C V2 Onboarding — Bank Details Dialog -->
+    <string name="titleAddBankDetails">Add Bank Details</string>
+    <string name="msgBankDetailsRequired">Add your bank details to create your Virtual Account and start paying bills with your PayTouch Wallet.</string>
+    <string name="msgBankDetailsSaved">Bank details saved successfully</string>
+
+    <!-- My Account — Edit Profile Dialog -->
+    <string name="titleEditProfile">Edit Profile</string>
+    <string name="msgEditProfileSubtitle">Update your personal details.</string>
+    <string name="btnUpdateProfile">Update</string>
+    <string name="msgProfileUpdated">Your details have been updated.</string>
+    <string name="btnEditProfile">Edit profile</string>
+
+    <!-- B2C V2 Onboarding — PAN Sheet -->
+    <string name="titleAddPanCard">Add PAN Card</string>
+    <string name="msgPanCardSubtitle">You can lock your money without PAN. To earn interest on your locked amount, please add your PAN details.</string>
+    <string name="msgPanSaved">PAN added successfully</string>
+
+    <!-- B2C V2 Registration — Aadhaar document upload -->
+    <string name="labelAadhaarPhoto">Upload Aadhaar Document</string>
+    <string name="msgAadhaarPhotoRequired">Please upload your Aadhaar document</string>
+
+    <!-- Aadhaar re-upload (KYC rejected) — blocking dialog on Home -->
+    <string name="titleReuploadAadhaar">Re-upload Aadhaar</string>
+    <string name="msgReuploadAadhaarSubtitle">Your Aadhaar details were rejected. Please re-enter your Aadhaar number and upload a clear photo to continue.</string>
+    <string name="msgAadhaarReuploaded">Aadhaar submitted successfully</string>
 
 </resources>

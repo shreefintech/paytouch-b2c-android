@@ -15,10 +15,10 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
+import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
@@ -65,6 +65,9 @@ class CreateAccountActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.showProgress = showProgress
 
+        // TODO(B2C-262): seasonal Diwali — revert after festival
+        Glide.with(this).load(R.drawable.img_login_top).into(binding.ivWalletIllustration)
+
         onBack()
         setupInputFilters()
         setupTermsText()
@@ -100,7 +103,7 @@ class CreateAccountActivity : BaseActivity() {
 
         spannable.setSpan(object : ClickableSpan() {
             override fun onClick(widget: View) {
-                startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
             }
 
             override fun updateDrawState(ds: TextPaint) {
@@ -164,6 +167,11 @@ class CreateAccountActivity : BaseActivity() {
                 getString(R.string.msgPasswordShort)
             }
 
+            !Utility.isPasswordStrong(password) -> {
+                binding.etPassword.requestFocus()
+                getString(R.string.msgPasswordWeak)
+            }
+
             confirmPassword.isEmpty() -> {
                 binding.etConfirmPassword.requestFocus()
                 getString(R.string.msgConfirmPasswordEmpty)
@@ -208,7 +216,7 @@ class CreateAccountActivity : BaseActivity() {
             onLoading = { showProgress.set(true) },
             onSuccess = {
                 showProgress.set(false)
-                ToastUtil.showSuccess(mActivity, getString(R.string.msgAccountCreatedSuccessfully))
+                ToastUtil.showSuccess(mActivity, getString(R.string.msgAccountCreatedSuccessfully), inWindow = false)
                 val intent = Intent(mActivity, LoginActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 }

@@ -3,6 +3,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#D52662</color>
+    <color name="primary_light">#FFEEF4</color>
+    <color name="progress_track">#F7D6E2</color>
     <color name="secondary">#FCCFA1</color>
     <color name="hint_color">#4A4A4A</color>
     <color name="sub_text_color">#80000000</color>
@@ -84,10 +86,102 @@
     <color name="colorStatusPending">#D89633</color>
     <color name="colorStatusFailed">#D84C55</color>
     <color name="selfie_card_stroke">#D52662</color>
+    <color name="selfie_overlay_scrim">#99000000</color>    <!-- live selfie dim outside the face circle -->
+    <color name="selfie_circle_error">#E53935</color>       <!-- no face / multiple faces -->
+    <color name="selfie_circle_warning">#FFC107</color>     <!-- face detected but needs adjustment / blinking -->
+    <color name="selfie_circle_passed">#0BA93F</color>      <!-- blinks done, hold stage or captured -->
     <color name="personal_info_label">#6B7280</color>
     <color name="account_card_label">#FFFFF0</color>
     <color name="status_divider">#A299A1</color>
     <color name="kyc_icon_bg">#FEEEF1</color>
     <color name="preview_btn_bg">#FFC8DB</color>
     <color name="normal_card_bg_glass">#66FFFFFF</color>
+
+    <color name="home_card_bg">#72FFFFFF</color>
+
+    <color name="other_wallet_color">#CCFFFFFF</color>
+    <color name="wallet_bg_circle">#59D52662</color>
+
+    <!-- Earning Wallet design tokens -->
+    <color name="earningCardBg">#F2FFF8F5</color>
+    <color name="earningSuccessBg">#E3F5E8</color>
+    <color name="earningSuccessText">#1E7A46</color>
+    <color name="earningSuccessTextDark">#1E5E36</color>
+    <color name="earningSuccessBar">#22B573</color>
+    <color name="earningWarnBg">#FFF3D1</color>
+    <color name="earningWarnBorder">#F3D48A</color>
+    <color name="earningCardInterestBg">#FADE9B</color>
+    <color name="earningWarnTitle">#5A3A00</color>
+    <color name="earningDisabledBg">#F1E1E7</color>
+    <color name="earningDisabledText">#B79CA8</color>
+    <color name="earningDisabledOutline">#D9C3CB</color>
+    <color name="earningCloseBg">#F7EEF1</color>
+    <color name="earningChipBorder">#F3B7CB</color>
+    <color name="earningChipBg">#FFF7F9</color>
+    <color name="earningDecoTop">#FBE7EE</color>
+    <color name="earningDecoBottom">#E6A9BF</color>
+    <color name="earningInk">#1C1C1C</color>
+    <color name="earningMuted">#5C5C5C</color>
+    <color name="earningError">#D3122E</color>
+
+    <color name="rw_primary_dark">#B81D52</color>
+    <color name="rw_ink">#2B0B33</color>
+    <color name="rw_muted">#6E5763</color>
+    <color name="rw_line">#F5C4D5</color>
+    <color name="rw_gold_icon">#8A5800</color>
+    <!--  card shadow tint, used on API 28+ = rgba(213,38,98,0.2)  -->
+    <color name="rw_card_shadow">#33D52662</color>
+    <!--  hero card radial gradient + its shadow tint (API 28+)  -->
+    <color name="rw_hero_start">#5A1A5E</color>
+    <color name="rw_hero_center">#2A0B30</color>
+    <color name="rw_hero_end">#1C0721</color>
+    <color name="rw_hero_shadow">#592A0B30</color>
+
+    <!--  tier glow / rays tint  -->
+    <color name="rank_tint_bronze">#F6AA6E</color>
+    <color name="rank_tint_silver">#C8D2E1</color>
+    <color name="rank_tint_gold">#FFD65C</color>
+    <color name="rank_tint_platinum">#BEAFFF</color>
+
+    <!--  level-up celebration: tier palette (light / mid / dark / glow)  -->
+    <color name="lu_bronze_light">#F6C29A</color>
+    <color name="lu_bronze_mid">#C2733A</color>
+    <color name="lu_bronze_dark">#7A3A16</color>
+    <color name="lu_bronze_glow">#F6AA6E</color>
+    <color name="lu_silver_light">#F1F4F8</color>
+    <color name="lu_silver_mid">#A3AEBD</color>
+    <color name="lu_silver_dark">#4D5868</color>
+    <color name="lu_silver_glow">#D7E0EC</color>
+    <color name="lu_gold_light">#FFE28F</color>
+    <color name="lu_gold_mid">#E2A51A</color>
+    <color name="lu_gold_dark">#8A5800</color>
+    <color name="lu_gold_glow">#FFD65C</color>
+    <color name="lu_platinum_light">#DDF6FF</color>
+    <color name="lu_platinum_mid">#A08CFF</color>
+    <color name="lu_platinum_dark">#4A2DA6</color>
+    <color name="lu_platinum_glow">#BEAFFF</color>
+    <!--  level-up celebration: platinum title gradient  -->
+    <color name="lu_platinum_title_start">#9AE6FF</color>
+    <color name="lu_platinum_title_mid">#E3C8FF</color>
+    <color name="lu_platinum_title_end">#FFB3D9</color>
+    <!--  level-up celebration: surfaces  -->
+    <color name="lu_pip_off_stroke">#59FFFFFF</color>
+    <color name="lu_pip_off_text">#D9FFFFFF</color>
+    <color name="lu_perm_tile">#EEE9FF</color>
+    <color name="lu_seg_track">#F1E4EA</color>
+    <color name="lu_text_soft">#D1FFFFFF</color>
+    <color name="lu_text_dim">#CCFFFFFF</color>
+    <color name="lu_glow_end">#00FFFFFF</color>
+    <color name="lu_check_dot">#22B573</color>
+    <!--  level-up celebration: screen backgrounds  -->
+    <color name="lu_screen_start">#4A1550</color>
+    <color name="lu_screen_center">#2A0B30</color>
+    <color name="lu_screen_end">#1C0721</color>
+    <color name="lu_screen_platinum_start">#2F1B6B</color>
+    <color name="lu_screen_platinum_center">#170B36</color>
+    <color name="lu_screen_platinum_end">#0E0624</color>
+
+    <!--  cash pill on hero card  -->
+    <color name="rank_pill_bg">#1FFFFFFF</color>
+    <color name="rank_pill_stroke">#2EFFFFFF</color>
 </resources>

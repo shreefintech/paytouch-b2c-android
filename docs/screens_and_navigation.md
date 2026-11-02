@@ -20,7 +20,7 @@
 
 **Exit points:**
 - Login success, `requires_kyc = true` → `KycActivity`
-- Login success, `requires_mpin = true` → MPIN creation screen (planned)
+- Login success, `requires_mpin = true` → `ResetMpinActivity` (create mode, via `buildCreateIntent()`)
 - Login success, all clear → `HomeActivity`
 - "Register" tap → `CreateAccountActivity`
 - "Forgot Password" tap → `OtpVerificationActivity` (password reset)
@@ -139,8 +139,27 @@
 - Step 1: Mobile Number, Email Address
 - Step 2: Aadhaar number, front/back upload slots
 - Step 3: PAN number, front upload slot
-- Step 4: Selfie capture (system camera) with circular guide
+- Step 4: Selfie capture — "Capture" / edit opens `SelfieCaptureActivity` (live liveness check, for result)
 - Previous / Continue (Submit on last step) buttons
+
+---
+
+### ✅ SelfieCaptureActivity — "Live Selfie"
+
+**Purpose:** Capture a live selfie only after an on-device liveness check (position → blink twice → hold still).
+
+**Entry points:**
+- `IdentityVerificationActivity.captureSelfie()` (step 4 Capture / edit) — for result
+
+**Intent extras:** `extra_output_path` (String — absolute path of the JPEG file to write; primitive-only exception)
+
+**Exit points:**
+- Liveness passed + photo saved → `RESULT_OK` → back to step 4 (host compresses and shows preview)
+- Back / camera permission denied / no front camera → `RESULT_CANCELED`
+
+**Key UI elements:**
+- Full-screen front camera, dimmed outside a centred circle with a 1dp stroke (`FaceCircleOverlayView`); stroke turns green after the blink
+- Instruction text (16sp) below the circle + "taken automatically" hint
 
 ---
 
@@ -201,6 +220,7 @@
 - White card with "Categories" title
 - 3×3 grid of category tiles (Electricity, Gas, Prepaid, TV Cable, DTH, Fastag, Loan, My Account, Tax)
 - Load Wallet button at the bottom of the card
+- **Aadhaar re-upload dialog (blocking):** on every create, `GET /api/user` is checked; when `aadhaar_rejected == true` a non-cancelable dialog asks for the Aadhaar number + document and submits to `POST /api/kyc/aadhaar`. Only a successful submit dismisses it. If `/api/user` fails, Home stays usable and the check repeats on the next launch.
 
 ---
 
@@ -240,7 +260,7 @@ Full module implemented. Mirrors Electricity exactly.
 
 ### ✅ DTH Module
 
-Full module implemented. DTH is a **plan-selection** module (`isMobileCategory = true`) — no fetch-bill step; user selects a plan before paying. See `docs/dth.md` for full detail.
+Full module implemented. DTH is a **plan-selection** module (`isMobileCategory = true`) — no fetch-bill step; user selects a plan before paying.
 
 | Screen | Class | Package |
 |---|---|---|
@@ -356,6 +376,7 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules �
 **Exit points:**
 - Back → `HomeActivity`
 - "View KYC Details" → `KycDetailsActivity`
+- Pencil icon next to Member Code → Edit Profile dialog (name, email, state, city — stays on this screen)
 
 **Tabs:**
 
@@ -368,8 +389,8 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules �
 
 | Endpoint | Purpose |
 |---|---|
-| `GET api/kyc/account-info` | Fetch account profile data |
-| `GET api/referral` | Fetch referral code and link |
+| `GET api/dashboard-kyc/account-overview` | Fetch account profile data |
+| `GET api/referral-info` | Fetch referral code and link |
 
 **Pending:** `TODO(PAYTOUCH-523)` — expose `totalEarnings` and `earningPotential` on Refer & Earn tab.
 
@@ -387,7 +408,7 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules �
 
 **Package:** `myaccount/`
 
-**ViewModel:** `KycDetailsViewModel` — calls `api/kyc/my-account` (flat response, `KycMyAccountItem`)
+**ViewModel:** `KycDetailsViewModel` — calls `api/dashboard-kyc/my-account` (flat response, `KycMyAccountItem`)
 
 **Key UI elements:**
 - Identity section: avatar, mobile, Aadhaar, PAN, email, verification status chip
@@ -513,7 +534,7 @@ All detail taps → TransactionDetailActivity ✅ (shared by all modules)
 - **Onboarding back stack:** Users cannot navigate back to a completed onboarding step. Use `FLAG_ACTIVITY_CLEAR_TOP` or equivalent.
 - **Post-login stack:** After successful login/registration, the back stack is cleared — the user cannot press Back to reach the login screen from Home.
 - **Forced logout (401):** Stack completely cleared with `FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK`.
-- **Forced logout (idle timeout):** `BaseActivity.onResume()` checks `LAST_INTERACTION` in SharedPreferences. If the user has been idle for more than 5 minutes (`SESSION_TIMEOUT_MS`), the session is cleared and `LoginActivity` is launched with a cleared back stack — same as a 401 forced logout.
+- **App lock (no idle logout):** `AppLockHelper` opens the transparent `AppLockActivity` on top of the current screen (cold start with a saved session, or back from background after the grace period). Unlocking finishes it and the user is on the same screen; Back on the lock closes the app (`finishAffinity()`). Only a 401 logs the user out.
 - **Within a category:** Back navigation returns to the Category Home screen.
 - **Result refresh:** Use `ActivityResultLauncher` when a child screen's data changes should trigger a refresh on the parent screen.
 
@@ -521,7 +542,7 @@ All detail taps → TransactionDetailActivity ✅ (shared by all modules)
 
 ## Intent Extras Reference
 
-All object passing between activities uses `Gson().toJson(item)` into a single `putExtra` key. See the Object Transfer Rule in `CLAUDE.md`.
+All object passing between activities uses `Gson().toJson(item)` into a single `putExtra` key. Rule: `CLAUDE.md` → UI Rules (Intent passing); code: `docs/code_patterns.md`.
 
 | From | To | Extra Key | Type | Purpose |
 |---|---|---|---|---|

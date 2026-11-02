@@ -8,6 +8,15 @@
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgressBonus"
+            type="androidx.databinding.ObservableBoolean" />
+        <variable
+            name="showProgressEarning"
+            type="androidx.databinding.ObservableBoolean" />
+        <variable
+            name="showProgressRewards"
+            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -76,6 +85,16 @@
                 android:clipToPadding="false"
                 android:paddingBottom="@dimen/page_margin_vertical">
 
+                <!-- Shimmer skeleton shown while wallet data loads -->
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmerWallet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <include layout="@layout/lyt_shimmer_load_wallet" />
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
                 <!-- ── Total Balance tab content ── -->
                 <LinearLayout
                     android:id="@+id/llTotalBalanceContent"
@@ -137,6 +156,353 @@
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </FrameLayout>
+
+                    <!-- Bonus Wallet + Earning Wallet row -->
+                    <LinearLayout
+                        android:id="@+id/llSubWallets"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <!-- Bonus Wallet card -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardBonusWallet"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            app:cardBackgroundColor="@color/other_wallet_color"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clipChildren="false"
+                                android:clipToPadding="false">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="65dp"
+                                    android:layout_height="65dp"
+                                    android:layout_gravity="bottom|end"
+                                    android:layout_marginBottom="-25dp"
+                                    android:layout_marginEnd="-15dp"
+                                    app:cardBackgroundColor="@color/wallet_bg_circle"
+                                    app:shapeAppearance="@style/CircleCard"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelBonusWallet"
+                                            android:textColor="@color/primary"
+                                            android:textSize="@dimen/text_size_12" />
+
+                                        <com.google.android.material.card.MaterialCardView
+                                            android:layout_width="28dp"
+                                            android:layout_height="28dp"
+                                            app:cardBackgroundColor="@color/primary"
+                                            app:cardCornerRadius="14dp"
+                                            app:cardElevation="0dp"
+                                            app:strokeWidth="0dp">
+
+                                            <androidx.appcompat.widget.AppCompatImageView
+                                                android:layout_width="16dp"
+                                                android:layout_height="16dp"
+                                                android:layout_gravity="center"
+                                                android:src="@drawable/ic_gift"
+                                                android:tint="@color/white" />
+                                        </com.google.android.material.card.MaterialCardView>
+                                    </LinearLayout>
+
+                                    <FrameLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:minHeight="28dp">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvBonusBalance"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
+                                            android:includeFontPadding="false"
+                                            tools:text="₹0.00"
+                                            android:textColor="@color/primary"
+                                            android:textSize="@dimen/text_size_19"
+                                            android:visibility="@{showProgressBonus ? View.GONE : View.VISIBLE}" />
+
+                                        <ProgressBar
+                                            style="?android:attr/progressBarStyleSmall"
+                                            android:layout_width="22dp"
+                                            android:layout_height="22dp"
+                                            android:layout_gravity="center_vertical"
+                                            android:indeterminateTint="@color/primary"
+                                            android:visibility="@{showProgressBonus ? View.VISIBLE : View.GONE}" />
+                                    </FrameLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:lineSpacingMultiplier="1.35"
+                                        android:text="@string/labelBonusWalletDesc"
+                                        android:textColor="@color/sub_text_color"
+                                        android:textSize="@dimen/text_size_10" />
+                                </LinearLayout>
+                            </FrameLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Earning Wallet card -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardEarningWallet"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="1"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?selectableItemBackground"
+                            android:onClickListener="@{onClickListener}"
+                            app:cardBackgroundColor="@color/other_wallet_color"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clipChildren="false"
+                                android:clipToPadding="false">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="65dp"
+                                    android:layout_height="65dp"
+                                    android:layout_gravity="bottom|end"
+                                    android:layout_marginBottom="-25dp"
+                                    android:layout_marginEnd="-15dp"
+                                    app:cardBackgroundColor="@color/wallet_bg_circle"
+                                    app:shapeAppearance="@style/CircleCard"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/proza_libre_medium"
+                                            android:includeFontPadding="false"
+                                            android:text="@string/labelEarningWallet"
+                                            android:textColor="@color/primary"
+                                            android:textSize="@dimen/text_size_12" />
+
+                                        <com.google.android.material.card.MaterialCardView
+                                            android:layout_width="28dp"
+                                            android:layout_height="28dp"
+                                            app:cardBackgroundColor="@color/primary"
+                                            app:cardCornerRadius="14dp"
+                                            app:cardElevation="0dp"
+                                            app:strokeWidth="0dp">
+
+                                            <androidx.appcompat.widget.AppCompatImageView
+                                                android:layout_width="16dp"
+                                                android:layout_height="16dp"
+                                                android:layout_gravity="center"
+                                                android:src="@drawable/ic_lock"
+                                                android:tint="@color/white" />
+                                        </com.google.android.material.card.MaterialCardView>
+                                    </LinearLayout>
+
+                                    <FrameLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:minHeight="28dp">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tvEarningBalance"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/proza_libre_semi_bold"
+                                            android:includeFontPadding="false"
+                                            tools:text="₹0.00"
+                                            android:textColor="@color/primary"
+                                            android:textSize="@dimen/text_size_19"
+                                            android:visibility="@{showProgressEarning ? View.GONE : View.VISIBLE}" />
+
+                                        <ProgressBar
+                                            style="?android:attr/progressBarStyleSmall"
+                                            android:layout_width="22dp"
+                                            android:layout_height="22dp"
+                                            android:layout_gravity="center_vertical"
+                                            android:indeterminateTint="@color/primary"
+                                            android:visibility="@{showProgressEarning ? View.VISIBLE : View.GONE}" />
+                                    </FrameLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:includeFontPadding="false"
+                                        android:lineSpacingMultiplier="1.35"
+                                        android:text="@string/labelEarningWalletDesc"
+                                        android:textColor="@color/sub_text_color"
+                                        android:textSize="@dimen/text_size_10" />
+                                </LinearLayout>
+                            </FrameLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <!-- Level strip (compact horizontal row) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardRewardsLevel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?selectableItemBackground"
+                        android:onClickListener="@{onClickListener}"
+                        app:cardBackgroundColor="@color/other_wallet_color"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="#E58AA9"
+                        app:strokeWidth="0.8dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/ivTierBadge"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:src="@drawable/ic_shield_bronze" />
+
+                            <FrameLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:layout_weight="1"
+                                android:minHeight="50dp">
+
+                                <ProgressBar
+                                    style="?android:attr/progressBarStyleSmall"
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:indeterminateTint="@color/primary"
+                                    android:visibility="@{showProgressRewards ? View.VISIBLE : View.GONE}" />
+
+                                <LinearLayout
+                                    android:id="@+id/llRewardsContent"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:visibility="@{showProgressRewards ? View.GONE : View.VISIBLE}">
+
+                                <!-- Tier name + cashback% -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvTierName"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        tools:text="Bronze II"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_13" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvCashbackPct"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        tools:text="0.10% cashback"
+                                        android:textColor="@color/primary"
+                                        android:textSize="@dimen/text_size_12" />
+                                </LinearLayout>
+
+                                <!-- Progress bar -->
+                                <ProgressBar
+                                    android:id="@+id/viewProgressFill"
+                                    style="?android:attr/progressBarStyleHorizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="5dp"
+                                    android:layout_marginTop="10dp"
+                                    android:max="100"
+                                    android:progress="0"
+                                    android:progressDrawable="@drawable/progress_rounded_track" />
+
+                                <!-- Promo / next level text -->
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvNextLevel"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:fontFamily="@font/proza_libre_regular"
+                                    android:includeFontPadding="false"
+                                    tools:text="Festive season: flat ₹5 cashback on bills ₹50+"
+                                    android:textColor="@color/sub_text_color"
+                                    android:textSize="@dimen/text_size_10" />
+
+                                </LinearLayout>
+                            </FrameLayout>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginStart="8dp"
+                                android:src="@drawable/ic_right_arrow"
+                                android:tint="@color/primary" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- Success / Pending row -->
                     <LinearLayout
@@ -637,15 +1003,42 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Wallet usage info row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="top"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="2dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginTop="1dp"
+                            android:src="@drawable/ic_info"
+                            android:tint="@color/primary" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/proza_libre_regular"
+                            android:includeFontPadding="false"
+                            android:lineSpacingMultiplier="1.4"
+                            android:text="@string/msgWalletInfo"
+                            android:textColor="@color/sub_text_color"
+                            android:textSize="@dimen/text_size_10" />
+                    </LinearLayout>
+
                     <!-- Transaction Report section header -->
                     <LinearLayout
                         android:id="@+id/llTransactionReport"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_large"
-                        android:foreground="?selectableItemBackground"
                         android:gravity="center_vertical"
-                        android:onClickListener="@{onClickListener}"
                         android:orientation="horizontal"
                         android:paddingTop="@dimen/margin_small"
                         android:paddingBottom="@dimen/margin_small">
@@ -660,24 +1053,109 @@
                             android:textColor="@color/primary"
                             android:textSize="@dimen/text_size_14" />
 
-                        <androidx.appcompat.widget.AppCompatTextView
+                        <LinearLayout
+                            android:id="@+id/llViewAll"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/proza_libre_medium"
-                            android:includeFontPadding="false"
-                            android:text="@string/labelViewAll"
-                            android:textColor="@color/primary"
-                            android:textSize="@dimen/text_size_12" />
+                            android:gravity="center_vertical"
+                            android:foreground="?selectableItemBackground"
+                            android:onClickListener="@{onClickListener}"
+                            android:orientation="horizontal">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:layout_marginStart="4dp"
-                            android:src="@drawable/ic_right_arrow"
-                            android:tint="@color/primary" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:includeFontPadding="false"
+                                android:text="@string/labelViewAll"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_size_12" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginStart="4dp"
+                                android:src="@drawable/ic_right_arrow"
+                                android:tint="@color/primary" />
+                        </LinearLayout>
                     </LinearLayout>
 
-                    <!-- Recent transactions list -->
+                    <!-- Wallet / Referral History tab row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:cardBackgroundColor="@android:color/transparent"
+                            app:cardCornerRadius="@dimen/card_corner_radius"
+                            app:cardElevation="0dp"
+                            app:strokeColor="?attr/colorPrimary"
+                            app:strokeWidth="1dp">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:padding="3dp">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cvTabWallet"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:onClickListener="@{onClickListener}"
+                                    app:cardCornerRadius="@dimen/card_corner_radius"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvTabWallet"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="?selectableItemBackground"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:paddingStart="14dp"
+                                        android:paddingTop="6dp"
+                                        android:paddingEnd="14dp"
+                                        android:paddingBottom="6dp"
+                                        android:text="@string/tabWallet"
+                                        android:textSize="@dimen/text_size_13" />
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cvTabReferralHistory"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="2dp"
+                                    android:onClickListener="@{onClickListener}"
+                                    app:cardCornerRadius="@dimen/card_corner_radius"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvTabReferralHistory"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="?selectableItemBackground"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:paddingStart="14dp"
+                                        android:paddingTop="6dp"
+                                        android:paddingEnd="14dp"
+                                        android:paddingBottom="6dp"
+                                        android:text="@string/titleReferralHistory"
+                                        android:textSize="@dimen/text_size_13" />
+                                </com.google.android.material.card.MaterialCardView>
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <!-- Recent items list (wallet or referral based on tab) -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvTransactions"
                         android:layout_width="match_parent"
@@ -719,28 +1197,6 @@
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
-
-        <View
-            android:id="@+id/viewDimmer"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="#99000000"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ProgressBar
-            android:id="@+id/pbLoading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminateTint="@color/white"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

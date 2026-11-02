@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ItemTransactionBinding
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 class TransactionAdp(
@@ -16,6 +18,7 @@ class TransactionAdp(
 ) : RecyclerView.Adapter<TransactionAdp.ViewHolder>() {
 
     var onClickItem: ((TransactionItem) -> Unit)? = null
+    private val animatedPositions = mutableSetOf<Int>()
 
     inner class ViewHolder(val binding: ItemTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -30,7 +33,7 @@ class TransactionAdp(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         holder.binding.apply {
-            ivCategoryIcon.setImageResource(item.categoryIconRes)
+            Glide.with(mContext).load(item.categoryIconRes).placeholder(R.drawable.ic_file_not_found).into(ivCategoryIcon)
             tvMobile.text = Utility.maskNumber(item.mobileNumber)
             tvTransactionId.text = item.transactionId
             tvAmount.text = item.amount
@@ -60,13 +63,25 @@ class TransactionAdp(
                 onClickItem?.invoke(mArrayList[pos])
             }
         }
+
+        // Only first-screen rows animate, so only they need tracking.
+        val visibleCount = AnimationHelper.visibleCount(holder.itemView.parent as? RecyclerView)
+        if (position < visibleCount && animatedPositions.add(position)) {
+            AnimationHelper.animateListRowEntrance(holder.binding.root, position, visibleCount)
+        }
     }
 
     fun updateList(items: List<TransactionItem>) {
+        animatedPositions.clear()
         mArrayList.clear()
         mArrayList.addAll(items)
         notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = mArrayList.size
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        Glide.with(holder.itemView.context).clear(holder.binding.ivCategoryIcon)
+        super.onViewRecycled(holder)
+    }
 }

@@ -8,6 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.utill.Utility
+import com.shreefintech.paytouchconsumer.utill.saveOnboardingFlags
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,6 +31,7 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                     response: Response<General<MeDataItem>>
                 ) {
                     if (response.isSuccessful) {
+                        saveOnboardingFlags(response.body()?.data?.user)
                         onSuccess(response.body()?.data?.nextStep)
                     } else {
                         onError(

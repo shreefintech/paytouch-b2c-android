@@ -2,10 +2,6 @@ package com.shreefintech.paytouchconsumer.kyc.identity
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -22,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.lifecycleScope
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityIdentityVerificationBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -33,10 +30,13 @@ import com.shreefintech.paytouchconsumer.kyc.identity.fragment.KycStep4Fragment
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.io.File
 
 class IdentityVerificationActivity : BaseActivity() {
@@ -61,19 +61,19 @@ class IdentityVerificationActivity : BaseActivity() {
     private lateinit var filePickerUtil: FilePickerUtil
     private var onDocumentPicked: ((Uri) -> Unit)? = null
 
-    // ─── Selfie capture via system camera ──────────────────────────────────────
+    // ─── Live selfie capture with liveness check (SelfieCaptureActivity) ───────
     private var cameraOutputFile: File? = null
     private var cameraOutputUri: Uri? = null
     private var onSelfieCaptured: ((Uri) -> Unit)? = null
-    private val cameraLauncher =
-        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+    private val selfieLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val file = cameraOutputFile
             val uri = cameraOutputUri
             val callback = onSelfieCaptured
             onSelfieCaptured = null
-            if (success && file != null && uri != null && callback != null) {
+            if (result.resultCode == RESULT_OK && file != null && file.exists() && uri != null && callback != null) {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    compressIfNeeded(file)
+                    Utility.compressImageFile(file, Constant.KYC_IMAGE_MAX_BYTES)
                     withContext(Dispatchers.Main) { callback(uri) }
                 }
             }
@@ -83,6 +83,9 @@ class IdentityVerificationActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityIdentityVerificationBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Fresh launch: nothing references earlier KYC files, so drop any left by a killed process.
+        if (savedInstanceState == null) clearKycFiles()
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.clRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -116,6 +119,7 @@ class IdentityVerificationActivity : BaseActivity() {
     private fun onBack() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                if (showProgressSubmit.get()) return
                 if (!viewModel.goToPreviousStep()) {
                     setResult(resultCode)
                     finish()
@@ -180,76 +184,41 @@ class IdentityVerificationActivity : BaseActivity() {
 
     private fun setupFilePicker() {
         filePickerUtil = FilePickerUtil(this)
-        filePickerUtil.onSuccess =
-            { result -> onDocumentPicked?.invoke(result.uri); onDocumentPicked = null }
+        filePickerUtil.cameraMaxBytes = Constant.KYC_IMAGE_MAX_BYTES
+        filePickerUtil.onSuccess = { result ->
+            val callback = onDocumentPicked
+            onDocumentPicked = null
+            // Null after process death — the fragment callback is gone, so ask the user to pick again.
+            if (callback != null) callback(result.uri)
+            else ToastUtil.showDelete(mActivity, getString(R.string.msgReselectDocument))
+        }
         filePickerUtil.onError = { error ->
             onDocumentPicked = null
-            ToastUtil.showDelete(mActivity, filePickerUtil.getErrorMessage(error))
+            // Blocked → Settings opens on top, so an in-window toast would never be seen.
+            ToastUtil.showDelete(
+                mActivity,
+                filePickerUtil.getErrorMessage(error),
+                inWindow = error != FilePickerUtil.FilePickerError.CameraPermissionBlocked
+            )
         }
     }
 
     fun pickDocument(onPicked: (Uri) -> Unit) {
-        onDocumentPicked = onPicked
-        filePickerUtil.openPicker()
+        // Assign only once the chooser opens — overwriting during an in-flight pick would hand its file to this slot
+        if (filePickerUtil.showSourceChooser(File(filesDir, Constant.KYC_IDENTITY_DOCS_DIR))) {
+            onDocumentPicked = onPicked
+        }
     }
 
     fun captureSelfie(onCaptured: (Uri) -> Unit) {
-        val dir = File(cacheDir, "kyc").also { it.mkdirs() }
+        val dir = File(filesDir, Constant.KYC_SELFIE_DIR).also { it.mkdirs() }
         val file = File(dir, "selfie_${System.currentTimeMillis()}.jpg")
         val uri =
             FileProvider.getUriForFile(mActivity, "${mActivity.packageName}.fileprovider", file)
         cameraOutputFile = file
         cameraOutputUri = uri
         onSelfieCaptured = onCaptured
-        cameraLauncher.launch(uri)
-    }
-
-    private fun compressIfNeeded(file: File) {
-        val maxBytes = 2 * 1024 * 1024
-        val needsCompress = file.length() > maxBytes
-        val rotation = exifRotation(file.absolutePath)
-        if (!needsCompress && rotation == 0) return
-
-        val raw = BitmapFactory.decodeFile(file.absolutePath) ?: return
-        val bitmap = if (rotation != 0) {
-            Bitmap.createBitmap(
-                raw,
-                0,
-                0,
-                raw.width,
-                raw.height,
-                Matrix().apply { postRotate(rotation.toFloat()) },
-                true
-            )
-                .also { if (it !== raw) raw.recycle() }
-        } else raw
-
-        var quality = if (needsCompress) 85 else 95
-        while (true) {
-            val bos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos)
-            val bytes = bos.toByteArray()
-            if (bytes.size <= maxBytes || quality == 40) {
-                file.writeBytes(bytes)
-                break
-            }
-            quality -= 15
-        }
-        bitmap.recycle()
-    }
-
-    private fun exifRotation(path: String): Int = try {
-        when (ExifInterface(path).getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_NORMAL
-        )) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> 90
-            ExifInterface.ORIENTATION_ROTATE_180 -> 180
-            ExifInterface.ORIENTATION_ROTATE_270 -> 270
-            else -> 0
-        }
-    } catch (_: Exception) {
-        0
+        selfieLauncher.launch(SelfieCaptureActivity.buildIntent(mActivity, file))
     }
 
     // ─── Navigation ─────────────────────────────────────────────────────────────
@@ -282,13 +251,14 @@ class IdentityVerificationActivity : BaseActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val cr = contentResolver
-                val panBytes = panUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
-                val aadhaarFrontBytes =
-                    aadhaarFrontUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
-                val aadhaarBackBytes =
-                    aadhaarBackUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
-                val selfieBytes =
-                    selfieUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } }
+                val (panBytes, aadhaarFrontBytes, aadhaarBackBytes, selfieBytes) = coroutineScope {
+                    listOf(
+                        async { panUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } } },
+                        async { aadhaarFrontUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } } },
+                        async { aadhaarBackUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } } },
+                        async { selfieUri?.let { cr.openInputStream(it)?.use { s -> s.readBytes() } } }
+                    ).awaitAll()
+                }
 
                 withContext(Dispatchers.Main) {
                     if (panBytes == null || aadhaarFrontBytes == null || aadhaarBackBytes == null || selfieBytes == null) {
@@ -305,7 +275,8 @@ class IdentityVerificationActivity : BaseActivity() {
                             showProgressSubmit.set(false)
                             ToastUtil.showSuccess(
                                 mActivity,
-                                getString(R.string.msgIdentitySubmitSuccess)
+                                getString(R.string.msgIdentitySubmitSuccess),
+                                inWindow = false
                             )
                             resultCode = 1
                             setResult(resultCode)
@@ -319,7 +290,11 @@ class IdentityVerificationActivity : BaseActivity() {
                         }
                     )
                 }
+            } catch (e: CancellationException) {
+                // Activity destroyed mid-read — there is no UI to update, so skip the error toast.
+                e.printStackTrace()
             } catch (e: Exception) {
+                Utility.logError(e)
                 withContext(Dispatchers.Main) {
                     showProgressSubmit.set(false)
                     ToastUtil.showDelete(
@@ -336,11 +311,13 @@ class IdentityVerificationActivity : BaseActivity() {
             when (view) {
                 binding.lytToolbar.ivBack -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressSubmit.get()) return@OnClickListener
                     onBackPressedDispatcher.onBackPressed()
                 }
 
                 binding.btnCapture -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressSubmit.get()) return@OnClickListener
                     (currentFragment() as? KycStep4Fragment)?.triggerCapture()
                 }
 
@@ -351,5 +328,17 @@ class IdentityVerificationActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    // ─── KYC file cleanup ───────────────────────────────────────────────────────
+
+    private fun clearKycFiles() {
+        Utility.deleteKycDirs(mActivity, Constant.KYC_IDENTITY_DOCS_DIR, Constant.KYC_SELFIE_DIR)
+    }
+
+    override fun onDestroy() {
+        // Submitted, abandoned or logged out — the captured ID images are no longer needed.
+        if (isFinishing) clearKycFiles()
+        super.onDestroy()
     }
 }

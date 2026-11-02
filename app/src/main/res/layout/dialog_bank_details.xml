@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
+            name="showProgress"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_transaction_item"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="24dp">
+
+        <!-- Title -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/titleAddBankDetails"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_18"
+            app:layout_constraintEnd_toStartOf="@id/cardClose"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Close button -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardClose"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:onClickListener="@{onClickListener}"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/primary"
+            app:strokeWidth="1dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                android:src="@drawable/ic_cross"
+                android:tint="@color/primary" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Subtitle -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/proza_libre_medium"
+            android:text="@string/msgBankDetailsRequired"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+        <!-- Account Number label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAccountNumberLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/labelBankAccountNumber"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+
+        <!-- Account Number input -->
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etAccountNumber"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_input_field"
+            android:fontFamily="@font/proza_libre_medium"
+            android:hint="@string/hintBankAccountNumber"
+            android:inputType="number"
+            android:maxLength="18"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/margin_small"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="?attr/colorTextHint"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvAccountNumberLabel" />
+
+        <!-- IFSC label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvIfscLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/labelIfscCode"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etAccountNumber" />
+
+        <!-- IFSC input -->
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etIfsc"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_input_field"
+            android:fontFamily="@font/proza_libre_medium"
+            android:hint="@string/hintIfscCode"
+            android:inputType="textCapCharacters|textNoSuggestions"
+            android:maxLength="11"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/margin_small"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="?attr/colorTextHint"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvIfscLabel" />
+
+        <!-- Branch label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvBranchLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/labelBranchName"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etIfsc" />
+
+        <!-- Branch input -->
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etBranch"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:background="@drawable/bg_input_field"
+            android:fontFamily="@font/proza_libre_medium"
+            android:hint="@string/hintBranchName"
+            android:inputType="textCapWords|textNoSuggestions"
+            android:maxLength="100"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/margin_small"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="?attr/colorTextHint"
+            android:textSize="@dimen/text_size_13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvBranchLabel" />
+
+        <!-- Submit button -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSubmit"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/btn_height"
+            android:layout_marginTop="@dimen/margin_extra_large"
+            android:onClickListener="@{onClickListener}"
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etBranch"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/proza_libre_medium"
+                    android:text="@string/btnSubmit"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_16"
+                    android:visibility="@{showProgress ? View.GONE : View.VISIBLE}" />
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:indeterminateTint="@color/white"
+                    android:visibility="@{showProgress ? View.VISIBLE : View.GONE}" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

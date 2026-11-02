@@ -168,10 +168,10 @@ Receipt card captured via shared `ReceiptHelper` for download and share.
 
 ## Intent Data Passing
 
-`DthSmsReceiptActivity` is started with only `context` and `fromPayment`:
+`DthSmsReceiptActivity` is started from `BillPaymentStatusActivity` with `context`, `transactionId`, and `fromPayment = true`:
 
 ```kotlin
-DthSmsReceiptActivity.start(context, fromPayment = true)
+DthSmsReceiptActivity.start(mActivity, transactionId, fromPayment = true)
 ```
 
 `DthTransactionReportActivity` / `DthTransactionStatusActivity` navigate to the **shared** `TransactionDetailActivity` (not a DTH-specific detail screen):
@@ -239,12 +239,12 @@ All endpoints declared in `ApiService.kt` under the `// ── DTH ──` secti
 | Aspect | Gas / Electricity | Prepaid | DTH |
 |---|---|---|---|
 | Bill fetch step | Required | None | None |
-| Circle selection | N/A | User picks from local STATE_LIST | Not applicable |
+| Circle selection | N/A | User picks from live `GET api/states` list | Not applicable |
 | Plan selection screen | N/A | `PrepaidPlanSelectionActivity` | `DthPlanSelectionActivity` |
 | Transactions type param | `"electricity"` / `"gas"` | `"mobile_recharge"` | `"dth"` |
 | Status search field | Transaction ID | Mobile number | Transaction ID |
 | `isMobileCategory` | `false` | `true` | `true` |
-| Category icon | `ic_electricity` / `ic_gas` | `ic_mobile` | `ic_broadband` |
+| Category icon | `img_electricity` / `img_gas` | `img_prepaid` | `img_dth` |
 | SMS ViewModel base | `BaseBillViewModel` (Elec/Gas) / `AndroidViewModel` (Prepaid) | `AndroidViewModel` | `AndroidViewModel` |
 | Payment endpoint | `process-payment` | `process-direct` | `process-direct` |
 

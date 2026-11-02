@@ -6,9 +6,11 @@ import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.ForgotCredentialRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MpinItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetCredentialRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetTokenDataItem
@@ -47,6 +49,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReport
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasVerifyPaymentDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.kyc.EditBankUpdateDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycAgreeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycMyAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycSignatoryDataItem
@@ -89,10 +92,24 @@ import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransacti
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
+import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
+import com.shreefintech.paytouchconsumer.retrofit.model.CityItem
+import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Item
+import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Request
+import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Item
+import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletActionDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletAmountRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawRequest
@@ -124,7 +141,24 @@ interface ApiService {
 
     @POST("${CHANNEL}auth/logout")
     fun logout(
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        @Body body: LogoutRequest
+    ): Call<MessageItem>
+
+    // ── Push Notifications ────────────────────────────────────────────────────
+
+    @POST("${CHANNEL}device-token")
+    fun registerDeviceToken(
+        @Header("Authorization") authorization: String?,
+        @Body body: DeviceTokenRequest
+    ): Call<MessageItem>
+
+    // ── Location ──────────────────────────────────────────────────────────────
+
+    @POST("${CHANNEL}location")
+    fun sendLocation(
+        @Header("Authorization") authorization: String,
+        @Body body: UserLocationRequest
     ): Call<MessageItem>
 
     // ── Authentication ────────────────────────────────────────────────────────
@@ -165,6 +199,21 @@ interface ApiService {
 
     // ── Wallet ────────────────────────────────────────────────────────────────
 
+    @GET("${CHANNEL}bonus-wallet")
+    fun getBonusWallet(
+        @Header("Authorization") authorization: String
+    ): Call<General<BonusWalletItem?>>
+
+    @GET("${CHANNEL}earning-wallet")
+    fun getEarningWallet(
+        @Header("Authorization") authorization: String
+    ): Call<General<EarningWalletItem?>>
+
+    @GET("${CHANNEL}level")
+    fun getRewardsLevel(
+        @Header("Authorization") authorization: String
+    ): Call<General<RewardsLevelItem?>>
+
     @GET("${CHANNEL}wallet/user-data")
     fun getUserWalletData(
         @Header("Authorization") authorization: String
@@ -182,6 +231,23 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body request: WithdrawRequest
     ): Call<General<WithdrawDataItem>>
+
+    @POST("${CHANNEL}earning-wallet/opt-in")
+    fun postEarningWalletOptIn(
+        @Header("Authorization") authorization: String
+    ): Call<General<EarningWalletActionDataItem>>
+
+    @POST("${CHANNEL}earning-wallet/lock")
+    fun postEarningWalletLock(
+        @Header("Authorization") authorization: String,
+        @Body request: EarningWalletAmountRequest
+    ): Call<General<EarningWalletActionDataItem>>
+
+    @POST("${CHANNEL}earning-wallet/withdraw")
+    fun postEarningWalletWithdraw(
+        @Header("Authorization") authorization: String,
+        @Body request: EarningWalletAmountRequest
+    ): Call<General<EarningWalletActionDataItem>>
 
     // ── Transaction Detail ────────────────────────────────────────────────────
 
@@ -501,6 +567,12 @@ interface ApiService {
         @Header("Authorization") authorization: String
     ): Call<AccountInfoItem>
 
+    @POST("${CHANNEL}profile")
+    fun updateProfile(
+        @Header("Authorization") authorization: String,
+        @Body request: EditProfileRequest
+    ): Call<General<EditProfileDataItem>>
+
     @GET("${CHANNEL}referral-info")
     fun getReferralInfo(
         @Header("Authorization") authorization: String
@@ -559,6 +631,13 @@ interface ApiService {
         @Header("Authorization") authorization: String
     ): Call<KycMyAccountItem>
 
+    @Multipart
+    @POST("${CHANNEL}dashboard-kyc/bank-account")
+    fun editBankAccount(
+        @Header("Authorization") authorization: String,
+        @Part parts: List<MultipartBody.Part>
+    ): Call<General<EditBankUpdateDataItem>>
+
     // ── HDFC Payment Gateway ──────────────────────────────────────────────────
 
     @POST("${CHANNEL}hdfc/orders")
@@ -582,4 +661,51 @@ interface ApiService {
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Call<General<List<UnifiedTransactionItem>>>
+
+    // ── B2C V2 Registration & Onboarding ─────────────────────────────────────
+
+    @Multipart
+    @POST("${CHANNEL}v2/register")
+    fun registerV2(
+        @Part("name") name: RequestBody,
+        @Part("mobile") mobile: RequestBody,
+        @Part("email") email: RequestBody,
+        @Part("password") password: RequestBody,
+        @Part("password_confirmation") passwordConfirmation: RequestBody,
+        @Part("aadhaar_number") aadhaarNumber: RequestBody,
+        @Part aadhaarPhoto: MultipartBody.Part,
+        @Part("state_id") stateId: RequestBody,
+        @Part("city_id") cityId: RequestBody,
+        @Part("referral_code") referralCode: RequestBody,
+        @Part("platform") platform: RequestBody
+    ): Call<RegisterItem>
+
+    // Re-upload after KYC rejection — triggered by `aadhaar_rejected` on /api/user
+    @Multipart
+    @POST("${CHANNEL}kyc/aadhaar")
+    fun reuploadAadhaar(
+        @Header("Authorization") authorization: String,
+        @Part("aadhaar_number") aadhaarNumber: RequestBody,
+        @Part aadhaarPhoto: MultipartBody.Part
+    ): Call<MessageItem>
+
+    @GET("${CHANNEL}v2/address/states")
+    fun getAddressStates(): Call<General<List<StateItem>>>
+
+    @GET("${CHANNEL}v2/address/states/{state_id}/cities")
+    fun getAddressCities(
+        @Path("state_id") stateId: String
+    ): Call<General<List<CityItem>>>
+
+    @POST("${CHANNEL}v2/bank-details")
+    fun addBankDetails(
+        @Header("Authorization") authorization: String,
+        @Body body: BankDetailsV2Request
+    ): Call<BankDetailsV2Item>
+
+    @POST("${CHANNEL}v2/pan")
+    fun addPan(
+        @Header("Authorization") authorization: String,
+        @Body body: PanV2Request
+    ): Call<PanV2Item>
 }

@@ -17,7 +17,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ObservableBoolean
@@ -29,6 +28,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityElectricityBinding
 import com.shreefintech.paytouchconsumer.electricity.transactions.ElectricityTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.RecentTransactionActivity
 import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.electricity.transactions.TransactionReportActivity
 import com.shreefintech.paytouchconsumer.electricity.viewmodel.ElectricityViewModel
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
@@ -37,6 +38,7 @@ import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.electricity.ElectricityOperatorItem
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -52,6 +54,7 @@ class ElectricityActivity : BaseActivity() {
     private var selectedOperatorName: String? = null
     private var fetchedBillItem: ElectricityBillItem? = null
     private var isBillFetched = false
+    private var paymentMade = false
 
     private val showProgressFetch = ObservableBoolean(false)
     private val showProgressPay = ObservableBoolean(false)
@@ -174,7 +177,7 @@ class ElectricityActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
@@ -242,9 +245,18 @@ class ElectricityActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                SmsReceiptActivity.start(mActivity, fromPayment = true)
+                paymentMade = true
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_ELECTRICITY
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -276,8 +288,8 @@ class ElectricityActivity : BaseActivity() {
     private fun showBillDetails() {
         val bill = fetchedBillItem ?: return
         binding.tvBillCustomerName.text = bill.userName ?: "-"
-        binding.tvBillDueDate.text = bill.dueDate ?: "-"
-        binding.tvBillDate.text = bill.billDate ?: "-"
+        binding.tvBillDueDate.text = Utility.formatDate(bill.dueDate, "dd/MM/yyyy")
+        binding.tvBillDate.text = Utility.formatDate(bill.billDate, "dd/MM/yyyy")
         binding.tvBillAmount.text = bill.billAmount ?: "-"
         binding.tvBillConnectionNumber.text =
             bill.cellNumber ?: binding.etConsumerNumber.text?.toString()?.trim() ?: "-"
@@ -314,6 +326,7 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
+        // Consumer number length varies by operator — no minimum enforced; backend validates.
         Utility.hideKeyboard(mActivity)
         fetchBill(connectionNumber)
     }
@@ -325,6 +338,7 @@ class ElectricityActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.msgConsumerNumberEmpty))
             return
         }
+        // Consumer number length varies by operator — no minimum enforced; backend validates.
         if (selectedOperatorId.isNullOrEmpty()) {
             ToastUtil.showDelete(mActivity, getString(R.string.msgSelectCompany))
             return
@@ -365,6 +379,7 @@ class ElectricityActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -419,7 +434,8 @@ class ElectricityActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
-                    onProceedToPay()
+                    if (paymentMade) return@OnClickListener
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { onProceedToPay() }
                 }
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener

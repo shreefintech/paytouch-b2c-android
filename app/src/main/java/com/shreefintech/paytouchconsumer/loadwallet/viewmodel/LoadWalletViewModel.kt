@@ -8,6 +8,9 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletItem
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
@@ -39,8 +42,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     call: Call<General<WalletDataItem>>,
                     response: Response<General<WalletDataItem>>
                 ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        onSuccess(response.body()!!.data!!)
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        onSuccess(data)
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(
@@ -77,8 +81,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 response: Response<General<HdfcOrderItem>>
             ) {
                 val body = response.body()
-                if (response.isSuccessful && body?.data != null) {
-                    onSuccess(body.data!!)
+                val data = body?.data
+                if (response.isSuccessful && data != null) {
+                    onSuccess(data)
                 } else {
                     onError(
                         body?.message ?: ApiHelper.parseErrorMessage(
@@ -130,8 +135,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     call: Call<General<WalletHistoryPageItem>>,
                     response: Response<General<WalletHistoryPageItem>>
                 ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        val rawList = response.body()!!.data!!.data ?: emptyList()
+                    val page = response.body()?.data
+                    if (response.isSuccessful && page != null) {
+                        val rawList = page.data ?: emptyList()
                         val list = ArrayList<WalletTransactionItem>()
                         rawList.forEach { list.add(WalletTransactionItem.from(it)) }
                         onSuccess(list)
@@ -145,6 +151,102 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 }
 
                 override fun onFailure(call: Call<General<WalletHistoryPageItem>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+    }
+
+    fun fetchBonusWallet(
+        onSuccess: (BonusWalletItem) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        ApiClient.apiService.getBonusWallet(bearerToken())
+            .enqueue(object : Callback<General<BonusWalletItem?>> {
+                override fun onResponse(
+                    call: Call<General<BonusWalletItem?>>,
+                    response: Response<General<BonusWalletItem?>>
+                ) {
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        onSuccess(data)
+                    } else {
+                        onError(
+                            ApiHelper.parseErrorMessage(
+                                getApplication(), response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<General<BonusWalletItem?>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+    }
+
+    fun fetchEarningWallet(
+        onSuccess: (EarningWalletItem) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        ApiClient.apiService.getEarningWallet(bearerToken())
+            .enqueue(object : Callback<General<EarningWalletItem?>> {
+                override fun onResponse(
+                    call: Call<General<EarningWalletItem?>>,
+                    response: Response<General<EarningWalletItem?>>
+                ) {
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        onSuccess(data)
+                    } else {
+                        onError(
+                            ApiHelper.parseErrorMessage(
+                                getApplication(), response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<General<EarningWalletItem?>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+    }
+
+    fun fetchRewardsLevel(
+        onSuccess: (RewardsLevelItem) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        ApiClient.apiService.getRewardsLevel(bearerToken())
+            .enqueue(object : Callback<General<RewardsLevelItem?>> {
+                override fun onResponse(
+                    call: Call<General<RewardsLevelItem?>>,
+                    response: Response<General<RewardsLevelItem?>>
+                ) {
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        onSuccess(data)
+                    } else {
+                        onError(
+                            ApiHelper.parseErrorMessage(
+                                getApplication(), response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<General<RewardsLevelItem?>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
@@ -176,8 +278,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 response: Response<General<WithdrawDataItem>>
             ) {
                 val body = response.body()
-                if (response.isSuccessful && body?.data != null) {
-                    onSuccess(body.data!!)
+                val data = body?.data
+                if (response.isSuccessful && data != null) {
+                    onSuccess(data)
                 } else {
                     onError(
                         body?.message ?: ApiHelper.parseErrorMessage(

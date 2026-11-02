@@ -49,7 +49,7 @@ class TransactionFilterHelper(
             isVehicleCategory -> {
                 sheetBinding.tvSearchLabel.text = activity.getString(R.string.labelVehicleNumber)
                 sheetBinding.etSearch.hint      = activity.getString(R.string.hintVehicleNumber)
-                sheetBinding.etSearch.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+                sheetBinding.etSearch.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
                 sheetBinding.etSearch.filters   = arrayOf(
                     InputFilter.LengthFilter(10),
                     InputFilter { source, start, end, _, _, _ ->

@@ -141,7 +141,7 @@ class RecentTransactionViewModel(application: Application) : AndroidViewModel(ap
             amount            = Utility.formatAmount(item.totalPayable ?: item.amount),
             accountNumber     = item.identifier ?: "-",
             reference         = item.referenceId ?: "-",
-            categoryIconRes   = R.drawable.ic_electricity,
+            categoryIconRes   = R.drawable.img_electricity,
             isMobileCategory  = false
         )
     }

@@ -2,7 +2,6 @@ package com.shreefintech.paytouchconsumer.gas
 
 import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -27,6 +26,8 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityGasBinding
 import com.shreefintech.paytouchconsumer.gas.transactions.GasRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.gas.transactions.GasSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionReportActivity
 import com.shreefintech.paytouchconsumer.gas.transactions.GasTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.gas.viewmodel.GasViewModel
@@ -35,6 +36,7 @@ import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
 import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasBillItem
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasOperatorItem
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
@@ -52,6 +54,7 @@ class GasActivity : BaseActivity() {
     private var selectedOperatorName: String? = null
     private var fetchedBillItem: GasBillItem? = null
     private var isBillFetched = false
+    private var paymentMade = false
 
     private val operatorSelectionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -174,7 +177,7 @@ class GasActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constant.URL_PLATFORM_TERMS)))
+                    Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
@@ -242,9 +245,18 @@ class GasActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                GasSmsReceiptActivity.start(mActivity, fromPayment = true)
+                paymentMade = true
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_GAS
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -276,8 +288,8 @@ class GasActivity : BaseActivity() {
     private fun showBillDetails() {
         val bill = fetchedBillItem ?: return
         binding.tvBillCustomerName.text = bill.customerName ?: "-"
-        binding.tvBillDueDate.text = bill.dueDate ?: "-"
-        binding.tvBillDate.text = bill.billDate ?: "-"
+        binding.tvBillDueDate.text = Utility.formatDate(bill.dueDate, "dd/MM/yyyy")
+        binding.tvBillDate.text = Utility.formatDate(bill.billDate, "dd/MM/yyyy")
         binding.tvBillAmount.text = bill.billAmount ?: "-"
         binding.tvBillConnectionNumber.text =
             bill.cellNumber ?: binding.etConsumerNumber.text?.toString()?.trim() ?: "-"
@@ -365,6 +377,7 @@ class GasActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -419,7 +432,8 @@ class GasActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
-                    onProceedToPay()
+                    if (paymentMade) return@OnClickListener
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { onProceedToPay() }
                 }
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener

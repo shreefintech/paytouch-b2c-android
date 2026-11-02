@@ -1,13 +1,23 @@
 package com.shreefintech.paytouchconsumer.loadwallet
 
+import android.animation.ValueAnimator
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
-import androidx.databinding.ObservableBoolean
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.animation.DecelerateInterpolator
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.widget.TextViewCompat
+import androidx.databinding.ObservableBoolean
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -18,8 +28,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmPaymentBinding
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmWithdrawBinding
+import com.shreefintech.paytouchconsumer.databinding.DialogWithdrawSuccessBinding
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
+import com.shreefintech.paytouchconsumer.adapter.ReferralHistoryAdp
 import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoadWalletBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetMakePaymentBinding
@@ -29,8 +41,16 @@ import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
+import com.shreefintech.paytouchconsumer.earningwallet.EarningWalletActivity
+import com.shreefintech.paytouchconsumer.rewards.RewardsExplainerActivity
+import com.shreefintech.paytouchconsumer.enums.RewardsTier
+import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletHistoryItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
+import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
+import com.shreefintech.paytouchconsumer.utill.StatusSoundPlayer
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -44,6 +64,11 @@ class LoadWalletActivity : BaseActivity() {
     private var currentTab = TAB_TOTAL_BALANCE
     private val transactionList = ArrayList<WalletTransactionItem>()
     private lateinit var transactionAdp: WalletTransactionAdp
+    private val referralList = ArrayList<BonusWalletHistoryItem>()
+    private lateinit var referralAdp: ReferralHistoryAdp
+
+    private enum class RecentTab { WALLET, REFERRAL }
+    private var currentRecentTab = RecentTab.WALLET
 
     private lateinit var sheetBinding: SheetMakePaymentBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<View>
@@ -53,6 +78,7 @@ class LoadWalletActivity : BaseActivity() {
     private var selectedPaymentMode = MODE_IMPS
 
     private var currentWalletBalance: String? = null
+    private var levelProgressAnimator: ValueAnimator? = null
 
     private var confirmDialog: Dialog? = null
     private var confirmDialogBinding: DialogConfirmPaymentBinding? = null
@@ -66,6 +92,23 @@ class LoadWalletActivity : BaseActivity() {
     private var pendingWithdrawMode: String = MODE_IMPS
     private var pendingWithdrawNarration: String = ""
     private val showProgressWithdraw = ObservableBoolean(false)
+
+    private var withdrawSuccessDialog: Dialog? = null
+    private var withdrawSuccessDialogBinding: DialogWithdrawSuccessBinding? = null
+    private var withdrawRequestId: String? = null
+    private val withdrawSoundPlayer = StatusSoundPlayer()
+
+    private val showProgressBonus   = ObservableBoolean(false)
+    private val showProgressEarning = ObservableBoolean(false)
+    private val showProgressRewards = ObservableBoolean(false)
+
+    private var isWalletEntrancePlayed = false
+    private var isWalletLoading = false
+    private var hasWalletData = false
+
+    private val earningWalletLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result -> if (result.resultCode == 1) loadData() }
 
     companion object {
         private const val TAB_TOTAL_BALANCE = 0
@@ -130,10 +173,14 @@ class LoadWalletActivity : BaseActivity() {
         )
 
         binding.onClickListener = onClickListener()
+        binding.showProgressBonus   = showProgressBonus
+        binding.showProgressEarning = showProgressEarning
+        binding.showProgressRewards = showProgressRewards
         setupRecyclerView()
         setupPaymentSheet()
         setupWithdrawSheet()
         selectTab(TAB_TOTAL_BALANCE)
+        selectRecentTab(RecentTab.WALLET)
         onBack()
         retryCallback = { loadData() }
         loadData()
@@ -168,6 +215,13 @@ class LoadWalletActivity : BaseActivity() {
                 )
             }
         )
+    }
+
+    override fun onDestroy() {
+        withdrawSuccessDialog?.dismiss()
+        withdrawSoundPlayer.release()
+        levelProgressAnimator?.cancel()
+        super.onDestroy()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -304,6 +358,7 @@ class LoadWalletActivity : BaseActivity() {
         withdrawConfirmDialog = dialog
         dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.88).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -327,17 +382,130 @@ class LoadWalletActivity : BaseActivity() {
             paymentMode = pendingWithdrawMode,
             narration = pendingWithdrawNarration,
             onLoading = { showProgressWithdraw.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { data ->
                 showProgressWithdraw.set(false)
                 withdrawConfirmDialog?.dismiss()
-                ToastUtil.showWarning(mActivity, getString(R.string.msgWithdrawInitiated))
+                showWithdrawSuccessDialog(data)
                 fetchWalletData()
             },
             onError = { msg ->
                 showProgressWithdraw.set(false)
-                ToastUtil.showDelete(mActivity, msg)
+                ToastUtil.showDelete(mActivity, msg, inWindow = false)
             }
         )
+    }
+
+    private fun showWithdrawSuccessDialog(data: WithdrawDataItem) {
+        if (isFinishing || isDestroyed) return
+        withdrawSuccessDialog?.dismiss()
+        withdrawRequestId = data.requestId
+
+        val dialogBinding = DialogWithdrawSuccessBinding.inflate(layoutInflater)
+        withdrawSuccessDialogBinding = dialogBinding
+        dialogBinding.onClickListener = onClickListener()
+
+        val dialog = Dialog(mActivity)
+        withdrawSuccessDialog = dialog
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.88).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setOnDismissListener {
+            withdrawSuccessDialog = null
+            withdrawSuccessDialogBinding = null
+            withdrawRequestId = null
+        }
+
+        bindWithdrawDetails(dialogBinding, data)
+        val soundRes = when (data.status?.uppercase()) {
+            Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED -> R.raw.success_sound
+            Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> R.raw.failed_sound
+            else -> R.raw.pending_sound
+        }
+        withdrawSoundPlayer.play(mActivity, soundRes)
+        dialog.show()
+    }
+
+    private fun bindWithdrawDetails(dialogBinding: DialogWithdrawSuccessBinding, data: WithdrawDataItem) {
+        val status = resolveWithdrawStatus(data.status)
+        Glide.with(this@LoadWalletActivity).asGif().load(status.gifRes).into(dialogBinding.ivStatusGif)
+
+        dialogBinding.tvTitle.setText(status.titleRes)
+        dialogBinding.tvSubtitle.text = data.statusMessage?.takeIf { it.isNotBlank() }
+            ?: getString(status.subtitleRes)
+        dialogBinding.tvAmount.text = Utility.formatAmount(data.amount)
+        dialogBinding.tvStatus.text = data.statusLabel?.takeIf { it.isNotBlank() }
+            ?: data.status?.takeIf { it.isNotBlank() }
+            ?: getString(R.string.labelProcessing)
+        dialogBinding.tvStatus.setBackgroundResource(status.chipBgRes)
+        val chipTextColor = ContextCompat.getColor(mActivity, status.chipTextColorRes)
+        dialogBinding.tvStatus.setTextColor(chipTextColor)
+        TextViewCompat.setCompoundDrawableTintList(dialogBinding.tvStatus, ColorStateList.valueOf(chipTextColor))
+
+        val accountLast4 = data.accountNumberMasked?.takeLast(4).orEmpty()
+        dialogBinding.tvToBank.text = when {
+            data.bankName.isNullOrBlank() -> accountLast4.ifEmpty { "--" }
+            accountLast4.isEmpty() -> data.bankName
+            else -> getString(R.string.labelBankAccountMasked, data.bankName, accountLast4)
+        }
+
+        val transferMode = data.transferMode?.takeIf { it.isNotBlank() } ?: pendingWithdrawMode
+        dialogBinding.tvTransferMode.text = transferMode
+        dialogBinding.tvInstantBadge.visibility =
+            if (transferMode.equals(MODE_IMPS, ignoreCase = true)) View.VISIBLE else View.GONE
+
+        dialogBinding.tvRequestId.text = data.requestId?.takeIf { it.isNotBlank() } ?: "--"
+        dialogBinding.ivCopyRequestId.visibility =
+            if (data.requestId.isNullOrBlank()) View.GONE else View.VISIBLE
+        dialogBinding.tvDateTime.text = data.requestedAtDisplay?.takeIf { it.isNotBlank() } ?: "--"
+    }
+
+    private data class WithdrawStatusDisplay(
+        @StringRes val titleRes: Int,
+        @StringRes val subtitleRes: Int,
+        @DrawableRes val gifRes: Int,
+        @DrawableRes val chipBgRes: Int,
+        @ColorRes val chipTextColorRes: Int
+    )
+
+    private fun resolveWithdrawStatus(status: String?): WithdrawStatusDisplay {
+        return when (status?.uppercase()) {
+            Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED -> WithdrawStatusDisplay(
+                titleRes = R.string.titleWithdrawalSuccessful,
+                subtitleRes = R.string.msgWithdrawalCredited,
+                gifRes = R.drawable.gif_success,
+                chipBgRes = R.drawable.bg_status_success,
+                chipTextColorRes = R.color.toast_text_success
+            )
+
+            Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> WithdrawStatusDisplay(
+                titleRes = R.string.titleWithdrawalFailed,
+                subtitleRes = R.string.msgWithdrawalFailed,
+                gifRes = R.drawable.gif_rejected,
+                chipBgRes = R.drawable.bg_status_failed,
+                chipTextColorRes = R.color.toast_text_delete
+            )
+
+            else -> WithdrawStatusDisplay(
+                titleRes = R.string.titleWithdrawalRequestSent,
+                subtitleRes = R.string.msgWithdrawalReachBank,
+                gifRes = R.drawable.gif_pending,
+                chipBgRes = R.drawable.bg_status_pending,
+                chipTextColorRes = R.color.toast_text_warning
+            )
+        }
+    }
+
+    private fun copyWithdrawRequestId() {
+        val requestId = withdrawRequestId?.takeIf { it.isNotBlank() } ?: return
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("request_id", requestId))
+        ToastUtil.showSuccess(mActivity, getString(R.string.msgRequestIdCopied))
     }
 
     private fun loadData() {
@@ -348,6 +516,90 @@ class LoadWalletActivity : BaseActivity() {
         hideNoInternet()
         fetchWalletData()
         fetchRecentHistory()
+        fetchBonusWallet()
+        fetchEarningWallet()
+        fetchRewardsLevel()
+    }
+
+    private fun fetchBonusWallet() {
+        showProgressBonus.set(true)
+        viewModel.fetchBonusWallet(
+            onSuccess = { data ->
+                showProgressBonus.set(false)
+                binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet)
+                val referralRows = (data.history ?: emptyList()).filter { it.isReferral }.take(2)
+                referralAdp.updateList(referralRows)
+                if (currentRecentTab == RecentTab.REFERRAL) updateEmptyState()
+            },
+            onError = { msg ->
+                showProgressBonus.set(false)
+                binding.tvBonusBalance.text = "--"
+                ToastUtil.showDelete(mActivity, msg)
+                referralAdp.updateList(emptyList())
+                if (currentRecentTab == RecentTab.REFERRAL) updateEmptyState()
+            }
+        )
+    }
+
+    private fun fetchRewardsLevel() {
+        showProgressRewards.set(true)
+        viewModel.fetchRewardsLevel(
+            onSuccess = { data ->
+                showProgressRewards.set(false)
+                populateLevel(data)
+            },
+            onError = {
+                showProgressRewards.set(false)
+                binding.tvTierName.text = "--"
+                binding.ivTierBadge.setImageDrawable(null)
+                binding.tvCashbackPct.text = "--"
+                binding.tvNextLevel.text = "--"
+            }
+        )
+    }
+
+    private fun fetchEarningWallet() {
+        showProgressEarning.set(true)
+        viewModel.fetchEarningWallet(
+            onSuccess = { data ->
+                showProgressEarning.set(false)
+                binding.tvEarningBalance.text = Utility.formatAmount(data.principal)
+            },
+            onError = {
+                showProgressEarning.set(false)
+                binding.tvEarningBalance.text = "--"
+            }
+        )
+    }
+
+    private fun populateLevel(data: RewardsLevelItem) {
+        val tier = RewardsTier.from(data.stage)
+        binding.tvTierName.text = data.label ?: getString(tier.labelRes)
+        binding.tvCashbackPct.text = getString(R.string.labelCashbackPct, data.cashbackPercent ?: 0.0)
+        binding.ivTierBadge.setImageResource(tier.badgeRes)
+
+        val next = data.next
+        val remaining = next?.remaining ?: 0.0
+        binding.tvNextLevel.text = when {
+            remaining > 0 -> getString(R.string.labelMoreToNextLevel, Utility.formatAmount(remaining.toString()))
+            else -> getString(R.string.msgTopTier)
+        }
+
+        val current = next?.current ?: 0.0
+        val target = next?.target ?: 0.0
+        val progress = if (target > 0) (current / target).toFloat().coerceIn(0f, 1f) else 1f
+        animateLevelProgress(progress)
+    }
+
+    private fun animateLevelProgress(progress: Float) {
+        levelProgressAnimator?.cancel()
+        levelProgressAnimator = ValueAnimator.ofInt(0, (progress * 100).toInt()).apply {
+            duration = 1200
+            startDelay = 600
+            interpolator = DecelerateInterpolator()
+            addUpdateListener { anim -> binding.viewProgressFill.progress = anim.animatedValue as Int }
+            start()
+        }
     }
 
     private fun validateAndShowConfirmDialog() {
@@ -385,6 +637,7 @@ class LoadWalletActivity : BaseActivity() {
         confirmDialog = dialog
         dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.88).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -423,7 +676,7 @@ class LoadWalletActivity : BaseActivity() {
                 }
                 val payUrl = data.paymentLinks?.web.orEmpty()
                 if (payUrl.isEmpty()) {
-                    ToastUtil.showDelete(mActivity, getString(R.string.errGeneric))
+                    ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
                     return@createHdfcOrder
                 }
                 Utility.hideKeyboard(mActivity)
@@ -438,7 +691,7 @@ class LoadWalletActivity : BaseActivity() {
             },
             onError = { msg ->
                 showProgressPay.set(false)
-                ToastUtil.showDelete(mActivity, msg)
+                ToastUtil.showDelete(mActivity, msg, inWindow = false)
             }
         )
     }
@@ -461,6 +714,7 @@ class LoadWalletActivity : BaseActivity() {
         viewModel.fetchUserWalletData(
             onLoading = { showLoading() },
             onSuccess = { data ->
+                if (isFinishing || isDestroyed) return@fetchUserWalletData
                 hideLoading()
                 populateWalletData(data)
             },
@@ -475,31 +729,48 @@ class LoadWalletActivity : BaseActivity() {
         viewModel.fetchRecentHistory(
             onSuccess = { list ->
                 transactionAdp.updateList(list)
-                updateEmptyState()
+                if (currentRecentTab == RecentTab.WALLET) updateEmptyState()
             },
             onError = { msg ->
                 ToastUtil.showDelete(mActivity, msg)
-                updateEmptyState()
+                if (currentRecentTab == RecentTab.WALLET) updateEmptyState()
             }
         )
     }
 
+    // Shimmer and balance content belong to the Total Balance tab only — selectTab() re-applies
+    // this state when the user switches tabs mid-load.
     private fun showLoading() {
-        binding.viewDimmer.visibility = View.VISIBLE
-        binding.pbLoading.visibility = View.VISIBLE
+        isWalletLoading = true
+        binding.llTotalBalanceContent.visibility = View.GONE
+        if (currentTab != TAB_TOTAL_BALANCE) return
+        binding.shimmerWallet.visibility = View.VISIBLE
+        binding.shimmerWallet.startShimmer()
     }
 
     private fun hideLoading() {
-        binding.viewDimmer.visibility = View.GONE
-        binding.pbLoading.visibility = View.GONE
+        isWalletLoading = false
+        binding.shimmerWallet.stopShimmer()
+        binding.shimmerWallet.visibility = View.GONE
+        binding.llTotalBalanceContent.visibility =
+            if (currentTab == TAB_TOTAL_BALANCE) View.VISIBLE else View.GONE
+    }
+
+    // Deferred until the Total Balance tab is visible so the entrance never plays on a hidden view.
+    private fun playWalletEntranceIfNeeded() {
+        if (isWalletEntrancePlayed || !hasWalletData || currentTab != TAB_TOTAL_BALANCE) return
+        isWalletEntrancePlayed = true
+        AnimationHelper.animateChildren(binding.llTotalBalanceContent)
     }
 
     private fun populateWalletData(data: WalletDataItem) {
+        hasWalletData = true
+        playWalletEntranceIfNeeded()
         currentWalletBalance = data.walletBalance
         binding.tvWalletBalance.text = Utility.formatAmount(data.walletBalance)
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
-        binding.tvAccountHolder.text = data.name ?: data.mobile ?: "--"
+        binding.tvAccountHolder.text = data.name ?: "--"
         binding.tvIfscCode.text = data.ifsc ?: "--"
         binding.tvBankName.text = data.bankName ?: "--"
         Glide.with(mActivity as Context)
@@ -518,25 +789,57 @@ class LoadWalletActivity : BaseActivity() {
         transactionAdp.onClickItem = { transactionId ->
             if (!Utility.stopClick()) TransactionHistoryDetailActivity.start(mActivity, transactionId)
         }
-        binding.rvTransactions.apply {
-            layoutManager = LinearLayoutManager(mActivity)
-            adapter = transactionAdp
-        }
+        referralAdp = ReferralHistoryAdp(mActivity, referralList)
+        // Adapter is attached by selectRecentTab() so the list follows the selected tab
+        binding.rvTransactions.layoutManager = LinearLayoutManager(mActivity)
         // Keep both views hidden until fetchRecentHistory() resolves — avoids flashing "No transactions" while loading
         binding.tvNoTransactions.visibility = View.GONE
         binding.rvTransactions.visibility = View.GONE
     }
 
     private fun updateEmptyState() {
-        val isEmpty = transactionList.isEmpty()
+        val isEmpty = if (currentRecentTab == RecentTab.WALLET) transactionList.isEmpty() else referralList.isEmpty()
         binding.tvNoTransactions.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.rvTransactions.visibility = if (isEmpty) View.GONE else View.VISIBLE
+    }
+
+    private fun selectRecentTab(tab: RecentTab) {
+        currentRecentTab = tab
+        updateRecentTabVisuals()
+        binding.rvTransactions.adapter = if (tab == RecentTab.WALLET) transactionAdp else referralAdp
+        updateEmptyState()
+    }
+
+    private fun updateRecentTabVisuals() {
+        val primary = ContextCompat.getColor(mActivity, R.color.primary)
+        val white = ContextCompat.getColor(mActivity, R.color.white)
+        val transparent = ContextCompat.getColor(mActivity, android.R.color.transparent)
+        if (currentRecentTab == RecentTab.WALLET) {
+            binding.cvTabWallet.setCardBackgroundColor(primary)
+            binding.tvTabWallet.setTextColor(white)
+            binding.cvTabReferralHistory.setCardBackgroundColor(transparent)
+            binding.tvTabReferralHistory.setTextColor(primary)
+        } else {
+            binding.cvTabWallet.setCardBackgroundColor(transparent)
+            binding.tvTabWallet.setTextColor(primary)
+            binding.cvTabReferralHistory.setCardBackgroundColor(primary)
+            binding.tvTabReferralHistory.setTextColor(white)
+        }
     }
 
     private fun selectTab(tab: Int) {
         currentTab = tab
         val isTotalBalance = tab == TAB_TOTAL_BALANCE
-        binding.llTotalBalanceContent.visibility = if (isTotalBalance) View.VISIBLE else View.GONE
+        if (isTotalBalance && isWalletLoading) {
+            binding.shimmerWallet.visibility = View.VISIBLE
+            binding.shimmerWallet.startShimmer()
+        } else {
+            binding.shimmerWallet.stopShimmer()
+            binding.shimmerWallet.visibility = View.GONE
+        }
+        val showContent = isTotalBalance && !isWalletLoading
+        binding.llTotalBalanceContent.visibility = if (showContent) View.VISIBLE else View.GONE
+        if (showContent) playWalletEntranceIfNeeded()
         binding.tvComingSoon.visibility = if (isTotalBalance) View.GONE else View.VISIBLE
     }
 
@@ -564,6 +867,16 @@ class LoadWalletActivity : BaseActivity() {
                     onBackPressedDispatcher.onBackPressed()
                 }
 
+                binding.cardEarningWallet -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    earningWalletLauncher.launch(Intent(mActivity, EarningWalletActivity::class.java))
+                }
+
+                binding.cardRewardsLevel -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    RewardsExplainerActivity.start(mActivity)
+                }
+
                 binding.llMakePayment -> {
                     if (Utility.stopClick()) return@OnClickListener
                     showPaymentSheet()
@@ -574,9 +887,23 @@ class LoadWalletActivity : BaseActivity() {
                     showWithdrawSheet()
                 }
 
-                binding.llTransactionReport -> {
+                binding.llViewAll -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    WalletTransactionsActivity.start(mActivity)
+                    val tab = if (currentRecentTab == RecentTab.WALLET)
+                        WalletTransactionsActivity.TAB_WALLET
+                    else
+                        WalletTransactionsActivity.TAB_REFERRAL
+                    WalletTransactionsActivity.start(mActivity, tab)
+                }
+
+                binding.cvTabWallet -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (currentRecentTab != RecentTab.WALLET) selectRecentTab(RecentTab.WALLET)
+                }
+
+                binding.cvTabReferralHistory -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (currentRecentTab != RecentTab.REFERRAL) selectRecentTab(RecentTab.REFERRAL)
                 }
 
                 sheetBinding.ivClose -> {
@@ -616,6 +943,16 @@ class LoadWalletActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressWithdraw.get()) return@OnClickListener
                     startWithdraw()
+                }
+
+                withdrawSuccessDialogBinding?.ivCopyRequestId -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    copyWithdrawRequestId()
+                }
+
+                withdrawSuccessDialogBinding?.cardDone -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    withdrawSuccessDialog?.dismiss()
                 }
             }
         }

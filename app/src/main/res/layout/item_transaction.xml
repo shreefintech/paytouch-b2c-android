@@ -20,22 +20,11 @@
             android:orientation="horizontal"
             android:padding="@dimen/margin_medium">
 
-            <!-- Category icon circle -->
-            <com.google.android.material.card.MaterialCardView
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivCategoryIcon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:shapeAppearance="@style/CircleCard"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="?attr/colorPrimary">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/ivCategoryIcon"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    tools:src="@drawable/ic_electricity" />
-            </com.google.android.material.card.MaterialCardView>
+                tools:src="@drawable/ic_electricity" />
 
             <!-- Mobile number + Transaction ID -->
             <LinearLayout

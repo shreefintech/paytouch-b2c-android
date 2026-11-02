@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -11,9 +13,9 @@ android {
     defaultConfig {
         applicationId = "com.shreefintech.paytouchconsumer"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 5
-        versionName = "1.4"
+        targetSdk = 37
+        versionCode = 10
+        versionName = "1.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,6 +38,18 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    packaging {
+        jniLibs {
+            // ponytail: webpdecoder requires uncompressed .so for direct dlopen; remove when zjupure/webpdecoder drops this requirement
+            useLegacyPackaging = true
+        }
+    }
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -63,6 +77,7 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.zjupure:webpdecoder:2.7.4.16.0")
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
@@ -70,4 +85,27 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation("androidx.fragment:fragment-ktx:1.8.5")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    // Firebase — versions managed by the BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.14.0"))
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-crashlytics")
+
+    // Location — single current-location fetch + "turn on location" resolution dialog
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // KYC live selfie — CameraX preview/analysis/capture + on-device (bundled) face detection for liveness
+    implementation("androidx.camera:camera-camera2:1.4.2")
+    implementation("androidx.camera:camera-lifecycle:1.4.2")
+    implementation("androidx.camera:camera-view:1.4.2")
+    implementation("com.google.mlkit:face-detection:16.1.7")
+
+    // App lock — phone's own screen lock (fingerprint / face / PIN / pattern)
+    implementation("androidx.biometric:biometric:1.1.0")
+
+    // In-app update — force users to update before proceeding past splash
+    implementation("com.google.android.play:app-update:2.1.0")
+
+    // In-app review — Google Play rating sheet after a successful bill payment
+    implementation("com.google.android.play:review:2.0.2")
 }

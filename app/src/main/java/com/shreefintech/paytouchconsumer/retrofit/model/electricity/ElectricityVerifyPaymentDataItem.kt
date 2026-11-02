@@ -6,6 +6,7 @@ data class ElectricityVerifyPaymentDataItem(
     @field:SerializedName("id")             val id: Int?,
     @field:SerializedName("customer_name")  val customerName: String?,
     @field:SerializedName("subscriber_no")  val subscriberNo: String?,
+    @field:SerializedName("bill_amount")    val billAmount: String?,
     @field:SerializedName("amount")         val amount: String?,
     @field:SerializedName("platform_fee")   val platformFee: String?,
     @field:SerializedName("total_payable")  val totalPayable: String?,

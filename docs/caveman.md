@@ -53,57 +53,9 @@ People in India pay 10+ different bills every month — electricity, phone, gas,
 
 ---
 
-## Key Screens and Their Purpose
+## Key Screens
 
-| Screen | Class | Status |
-|---|---|---|
-| Login | `LoginActivity` | ✅ Implemented (UI + API) |
-| Register | `CreateAccountActivity` | ✅ Implemented (UI + API) |
-| OTP Verification | `OtpVerificationActivity` | ✅ Implemented (UI + API) |
-| Reset Password | `ResetPasswordActivity` | ✅ Implemented (UI + API) |
-| Reset MPIN | `ResetMpinActivity` | ✅ Implemented (UI + API) |
-| KYC | `KycActivity` (+ `IdentityVerificationActivity`, `BankDetailsActivity`) | ✅ Implemented (UI + API) |
-| KYC Status | `KycStatusActivity` | ✅ Implemented (UI + API) |
-| Home / Dashboard | `HomeActivity` | ✅ Implemented (UI + API) |
-| Electricity — Pay | `ElectricityActivity` | ✅ Implemented (UI + API) |
-| Electricity — Recent Transactions | `RecentTransactionActivity` | ✅ Implemented (UI + API) |
-| Electricity — Report | `TransactionReportActivity` | ✅ Implemented (UI + API) |
-| Electricity — Status | `ElectricityTransactionStatusActivity` | ✅ Implemented (UI + API) |
-| Electricity — SMS Receipt | `SmsReceiptActivity` | ✅ Implemented (UI + API) |
-| Gas — Pay | `GasActivity` | ✅ Implemented (UI + API) |
-| Gas — Recent Transactions | `GasRecentTransactionActivity` | ✅ Implemented (UI + API) |
-| Gas — Report | `GasTransactionReportActivity` | ✅ Implemented (UI + API) |
-| Gas — Status | `GasTransactionStatusActivity` | ✅ Implemented (UI + API) |
-| Gas — SMS Receipt | `GasSmsReceiptActivity` | ✅ Implemented (UI + API) |
-| DTH — Pay | `DthActivity` | ✅ Implemented (UI + API) |
-| DTH — Plan Selection | `DthPlanSelectionActivity` | ✅ Implemented (UI + API) |
-| DTH — Recent Transactions | `DthRecentTransactionActivity` | ✅ Implemented (UI + API) |
-| DTH — Report | `DthTransactionReportActivity` | ✅ Implemented (UI + API) |
-| DTH — Status | `DthTransactionStatusActivity` | ✅ Implemented (UI + API) |
-| DTH — SMS Receipt | `DthSmsReceiptActivity` | ✅ Implemented (UI + API) |
-| Prepaid — Pay | `PrepaidActivity` | ✅ Implemented (UI + API) |
-| Prepaid — Plan Selection | `PrepaidPlanSelectionActivity` | ✅ Implemented (UI + API) |
-| Prepaid — Recent Transactions | `PrepaidRecentTransactionActivity` | ✅ Implemented (UI + API) |
-| Prepaid — Report | `PrepaidTransactionReportActivity` | ✅ Implemented (UI + API) |
-| Prepaid — Status | `PrepaidTransactionStatusActivity` | ✅ Implemented (UI + API) |
-| Prepaid — SMS Receipt | `PrepaidSmsReceiptActivity` | ✅ Implemented (UI + API) |
-| Postpaid — Pay | `PostpaidActivity` | ✅ Implemented (UI + API) |
-| Postpaid — Recent Transactions | `PostpaidRecentTransactionActivity` | ✅ Implemented (UI + API) |
-| Postpaid — Report | `PostpaidTransactionReportActivity` | ✅ Implemented (UI + API) |
-| Postpaid — Status | `PostpaidTransactionStatusActivity` | ✅ Implemented (UI + API) |
-| Postpaid — SMS Receipt | `PostpaidSmsReceiptActivity` | ✅ Implemented (UI + API) |
-| Shared Transaction Detail | `TransactionDetailActivity` | ✅ Implemented (shared by all modules) |
-| FASTag — Pay / Recharge | `FastagActivity` + transactions | ✅ Implemented (UI + API) |
-| Loan Repayment — Pay | `LoanActivity` + transactions | ✅ Implemented (UI + API) |
-| Municipal Tax — Pay | `MunicipalTaxActivity` + transactions | ✅ Implemented (UI + API) |
-| My Account | `MyAccountActivity` | ✅ Implemented (UI + API) |
-| KYC Details | `KycDetailsActivity` | ✅ Implemented (UI + API) |
-| Document Preview | `DocPreviewActivity` | ✅ Implemented (PDF + image + WebView fallback) |
-| Load Wallet — Balance + Top-up | `LoadWalletActivity` | ✅ Implemented (UI + API) |
-| Load Wallet — Transaction History | `WalletTransactionsActivity` | ✅ Implemented (UI + API) |
-| Load Wallet — HDFC WebView | `HdfcWebViewActivity` | ✅ Implemented (UI + API) |
-| Load Wallet — Payment Status | `PaymentStatusActivity` | ✅ Implemented (UI + API) |
-| Cable TV module | TBD | 📋 Planned |
+Full screen list, per-module class/package tables, navigation tree and intent extras: `docs/screens_and_navigation.md`. Cable TV is the only planned module.
 
 ---
 
@@ -152,23 +104,10 @@ A user who skips any step cannot access payment features. The server drives this
 
 ## Important Business Rules (App-Wide)
 
-1. **Internet check first:** Always call `Utility.isInternetAvailable()` before any network request. If no connection, show message and abort.
+Internet check, transaction-ID ownership → `CLAUDE.md`. Platform fee tiers, transaction history endpoints, payment sounds → `docs/business_logic.md`.
 
-2. **Platform fees:** Every payment carries a service fee:
-   - Under ₹1,000 → ₹4
-   - ₹1,000–₹5,000 → ₹8
-   - ₹5,001–₹40,000 → ₹20
-   - Above ₹40,000 → ₹30
-
-3. **Transaction ID ownership:** Transaction IDs are generated and returned by the backend in the payment response. Do not generate transaction IDs client-side. `Utility.generateTransactionId()` was removed — do not recreate it.
-
-4. **Transaction history:** Full payment history per category is available via API (`/api/{category}/payment-reports`, `/api/{category}/payment-history`). No local database is used for transaction storage.
-
-5. **Payment sound feedback:** A success or failure sound plays after every payment attempt.
-
-6. **Payment gateways:** Bill payments use the PayTouch platform. Wallet top-up uses the HDFC SmartGateway (WebView flow via `LoadWalletActivity` → `HdfcWebViewActivity`).
-
-7. **Referral code:** New users can enter a referral code during registration (optional).
+- **Payment gateways:** Bill payments use the PayTouch platform. Wallet top-up uses the HDFC SmartGateway (WebView flow via `LoadWalletActivity` → `HdfcWebViewActivity`).
+- **Referral code:** New users can enter a referral code during registration (optional).
 
 ---
 
@@ -185,3 +124,54 @@ A user who skips any step cannot access payment features. The server drives this
 | Firebase Analytics | User behaviour analytics |
 | Firebase Crashlytics | Crash reporting |
 | UPI apps | App-to-app UPI payment intents |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Language | Kotlin (JVM 11) |
+| UI | Views with ViewBinding + DataBinding; Jetpack Compose for new isolated components only |
+| Networking | Retrofit 2.11 + OkHttp 4 + Gson 2.13 |
+| Architecture | Hybrid MVVM (some screens are Activity-driven, some use ViewModel) |
+| Image loading | Glide 4.16 |
+| Auth | Bearer token stored in SharedPreferences |
+| Push | Firebase Cloud Messaging 25.0 (planned) |
+| Analytics | Firebase Analytics + Crashlytics |
+| Min/Target SDK | 24 / 37 |
+
+---
+
+## Package Structure (top-level)
+
+```
+com.shreefintech.paytouchconsumer/
+├── auth/           # Login, OTP, password/MPIN flows, create-account
+├── applock/        # AppLockHelper (lifecycle-based lock rules) + AppLockActivity (phone screen lock prompt)
+├── kyc/            # KYC hub (KycActivity), kyc/identity/IdentityVerificationActivity, kyc/bank/BankDetailsActivity, KycStatusActivity; virtual account is server-side — no client Activity
+├── home/           # Home/Dashboard (HomeActivity — currently at root level, will move here)
+├── electricity/    # Electricity bill payment + transaction history (canonical module template)
+├── gas/            # Gas bill payment + transaction history
+├── prepaid/        # Mobile prepaid recharge — operator + circle + plan selection
+├── postpaid/       # Mobile postpaid bill payment
+├── dth/            # DTH recharge — operator + plan selection
+├── fastag/         # FASTag recharge — vehicle number + amount, real-time fee, no bill-fetch
+├── loan/           # Loan repayment — bill-fetch pattern; circleId = "0"
+├── municipaltax/   # Municipal tax payment — bill-fetch pattern
+├── loadwallet/     # Wallet top-up via HDFC gateway (LoadWallet, HdfcWebView, PaymentStatus, WalletTransactions)
+├── myaccount/      # My Account — two-tab profile viewer (Account Info + Refer & Earn), KycDetails, DocPreview
+├── transactions/   # Shared TransactionDetailActivity + TransactionItem model (never duplicated per module)
+├── adapter/        # Shared adapters: TransactionAdp, RecentTransactionAdp, PrepaidPlanAdp, DthPlanAdp
+├── fcm/            # Push notifications — MyFirebaseMessagingService + NotificationHelper (channel, token register)
+├── location/       # LocationPermissionHelper — disclosure dialog → permission → one foreground fix for payment risk checks
+├── enums/          # Project-wide enums (LoginMode, etc.)
+├── glass/          # LiquidGlassEffect custom blur UI components
+├── retrofit/       # All networking (ApiService, ApiClient, ApiHelper, models)
+├── utill/          # Shared utilities — spelling "utill" is intentional, never rename
+├── widget/         # Reusable custom views (LiquidGlassButton, CustomDropdown, etc.)
+├── BaseActivity.kt
+├── BaseBillViewModel.kt
+├── HomeActivity.kt
+└── Constant.kt
+```

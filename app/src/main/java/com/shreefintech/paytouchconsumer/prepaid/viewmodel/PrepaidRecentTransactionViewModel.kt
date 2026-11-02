@@ -136,7 +136,7 @@ class PrepaidRecentTransactionViewModel(application: Application) : AndroidViewM
             amount            = Utility.formatAmount(item.totalPayable ?: item.amount),
             accountNumber     = item.identifier ?: "-",
             reference         = item.referenceId ?: "-",
-            categoryIconRes   = R.drawable.ic_prepaid,
+            categoryIconRes   = R.drawable.img_prepaid,
             isMobileCategory  = true
         )
     }

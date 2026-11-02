@@ -2,7 +2,7 @@
 
 Handles the full gas bill payment flow: operator selection, bill fetch, payment processing, and all transaction history screens.
 
-**Gas mirrors Electricity exactly** (`electricity/` is the canonical reference for this pattern — see `electricity/README.md`). Only the operator/consumer terminology, the category icon (`R.drawable.ic_gas`), and the `api/gas/*` endpoints differ. Read this file for what's Gas-specific; read the Electricity README for the parts that are identical everywhere.
+**Gas mirrors Electricity exactly** (`electricity/` is the canonical reference for this pattern — see `electricity/README.md`). Only the operator/consumer terminology, the category icon (`R.drawable.img_gas`), and the `api/gas/*` endpoints differ. Read this file for what's Gas-specific; read the Electricity README for the parts that are identical everywhere.
 
 ---
 
@@ -146,10 +146,10 @@ The receipt card (`cvReceiptCard`) is captured via the shared `ReceiptHelper` (i
 
 ## Intent Data Passing
 
-`GasSmsReceiptActivity` is started with only `context` and `fromPayment`:
+`GasSmsReceiptActivity` is started from `BillPaymentStatusActivity` with `context`, `transactionId`, and `fromPayment = true`:
 
 ```kotlin
-GasSmsReceiptActivity.start(context, fromPayment = true)
+GasSmsReceiptActivity.start(mActivity, transactionId, fromPayment = true)
 ```
 
 `GasTransactionReportActivity` / `GasTransactionStatusActivity` navigate to the **shared** `TransactionDetailActivity` (not a gas-specific detail screen) using the generic `TransactionItem`, serialized to JSON exactly as every other module does:
@@ -226,6 +226,6 @@ Gas is itself a copy of Electricity with names swapped — use either as the tem
 3. `retrofit/model/{category}/` — new DTOs matching the new endpoint's actual field names (check the API contract first, never guess).
 4. Add the new endpoints to `ApiService.kt` under a new `// ── {Category} ──` section.
 5. `{Category}RecentTransactionActivity` + `ViewModel`, `{Category}TransactionReportActivity` + `ViewModel`, `{Category}TransactionStatusActivity` + `ViewModel`, `{Category}SmsReceiptActivity` + `ViewModel` — copy the Gas transaction screens verbatim, reusing the shared `RecentTransactionItem`, `TransactionItem`, `RecentTransactionAdp`, `TransactionAdp`, `TransactionDetailActivity`, `TransactionFilterHelper`, and `ReceiptHelper`. **Never fork these.**
-6. Pass `R.drawable.ic_{category}` as `categoryIconRes` in the new ViewModel's mapping functions — that's the only visual difference between modules' transaction rows.
+6. Pass `R.drawable.img_{category}` as `categoryIconRes` in the new ViewModel's mapping functions — that's the only visual difference between modules' transaction rows.
 
 This list matches the "Transaction Screens — Shared Structure Across All Modules" rule in the project's `CLAUDE.md`.

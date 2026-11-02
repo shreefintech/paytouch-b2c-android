@@ -2,6 +2,7 @@ package com.shreefintech.paytouchconsumer.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +19,7 @@ class DthPlanAdp(
 
     var onClickItem: ((DthPlanItem) -> Unit)? = null
 
-    inner class ViewHolder(val binding: ItemPrepaidPlanBinding) :
+    class ViewHolder(val binding: ItemPrepaidPlanBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -41,9 +42,10 @@ class DthPlanAdp(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mArrayList[position]
         holder.binding.apply {
-            tvPlanAmount.text = Utility.formatAmount(item.amount?.toString())
+            tvPlanAmount.text = Utility.formatAmount(item.amount?.toString(), trimZeros = true)
             tvPlanValidity.text = item.validity ?: "--"
             tvPlanDescription.text = item.description ?: "--"
+            cvDataChip.visibility = View.GONE
         }
         holder.binding.root.setOnClickListener {
             val pos = holder.bindingAdapterPosition
@@ -59,8 +61,4 @@ class DthPlanAdp(
 
     override fun getItemCount(): Int = mArrayList.size
 
-    private fun formatTalktime(talktime: Double?): String {
-        if (talktime == null || talktime < 0) return "-"
-        return Utility.formatAmount(talktime.toString())
-    }
 }

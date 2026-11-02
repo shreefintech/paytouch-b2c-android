@@ -27,6 +27,8 @@ import com.shreefintech.paytouchconsumer.databinding.ActivityPostpaidBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidRecentTransactionActivity
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceiptActivity
+import com.shreefintech.paytouchconsumer.transactions.BillPaymentStatusActivity
+import com.shreefintech.paytouchconsumer.transactions.model.BillPaymentStatusItem
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionReportActivity
 import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidTransactionStatusActivity
 import com.shreefintech.paytouchconsumer.postpaid.viewmodel.PostpaidViewModel
@@ -34,10 +36,10 @@ import com.shreefintech.paytouchconsumer.operator.OperatorSelectionActivity
 import com.shreefintech.paytouchconsumer.operator.model.OperatorSelectionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidFetchBillDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.postpaid.PostpaidOperatorItem
+import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
-import androidx.core.net.toUri
 import android.widget.LinearLayout
 import com.shreefintech.paytouchconsumer.utill.TabAnimationHelper
 
@@ -53,6 +55,7 @@ class PostpaidActivity : BaseActivity() {
 
     private val showProgressFetch = ObservableBoolean(false)
     private var fetchedBillItem: PostpaidFetchBillDataItem? = null
+    private var paymentMade = false
     private var isBillFetched = false
 
     private val operatorSelectionLauncher = registerForActivityResult(
@@ -164,7 +167,7 @@ class PostpaidActivity : BaseActivity() {
         spannable.setSpan(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Constant.URL_PLATFORM_TERMS.toUri()))
+                    Utility.openUrl(mActivity, Constant.URL_PLATFORM_TERMS)
                 }
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
@@ -211,9 +214,18 @@ class PostpaidActivity : BaseActivity() {
             fee = fee,
             total = total,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { _ ->
+            onSuccess = { body ->
                 showProgressPay.set(false)
-                PostpaidSmsReceiptActivity.start(mActivity, true)
+                paymentMade = true
+                BillPaymentStatusActivity.start(
+                    mActivity,
+                    BillPaymentStatusItem(
+                        transactionId = body.data?.transactionId ?: body.data?.reqId ?: "--",
+                        amount = total.toString(),
+                        status = body.paymentStatus ?: body.data?.status ?: "",
+                        category = BillPaymentStatusActivity.CATEGORY_POSTPAID
+                    )
+                )
             },
             onError = { msg ->
                 showProgressPay.set(false)
@@ -253,9 +265,9 @@ class PostpaidActivity : BaseActivity() {
 
     private fun showBillDetails() {
         val bill = fetchedBillItem ?: return
-        binding.tvBillCustomerName.text = bill.customerName ?: "-"
-        binding.tvBillDueDate.text = bill.dueDate ?: "-"
-        binding.tvBillDate.text = bill.billDate ?: "-"
+        binding.tvBillCustomerName.text = bill.userName ?: "-"
+        binding.tvBillDueDate.text = Utility.formatDate(bill.dueDate, "dd/MM/yyyy")
+        binding.tvBillDate.text = Utility.formatDate(bill.billDate, "dd/MM/yyyy")
         binding.tvBillAmount.text = Utility.formatAmount(bill.billAmount)
         binding.tvBillMobileNo.text = binding.etMobileNumber.text?.toString()?.trim() ?: "-"
         binding.tvBillOperator.text = selectedOperatorName ?: "-"
@@ -274,6 +286,11 @@ class PostpaidActivity : BaseActivity() {
         if (connectionNumber.isEmpty()) {
             binding.etMobileNumber.requestFocus()
             ToastUtil.showDelete(mActivity, getString(R.string.msgMobileNumberEmpty))
+            return
+        }
+        if (connectionNumber.length != 10) {
+            binding.etMobileNumber.requestFocus()
+            ToastUtil.showDelete(mActivity, getString(R.string.msgMobileNumberInvalid))
             return
         }
         Utility.hideKeyboard(mActivity)
@@ -350,6 +367,7 @@ class PostpaidActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (paymentMade) { paymentMade = false; onReset() }
         tabHelper.resetAll()
         tabHelper.selectPayBill()
     }
@@ -408,7 +426,8 @@ class PostpaidActivity : BaseActivity() {
                 binding.llProceed -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
-                    onProceedToPay()
+                    if (paymentMade) return@OnClickListener
+                    BankDetailsDialogHelper.runIfBankAdded(mActivity) { onProceedToPay() }
                 }
                 binding.llReset -> {
                     if (Utility.stopClick()) return@OnClickListener

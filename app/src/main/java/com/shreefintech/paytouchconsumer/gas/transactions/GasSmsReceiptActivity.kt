@@ -29,6 +29,7 @@ import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.retrofit.model.gas.GasVerifyPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
 import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
+import com.shreefintech.paytouchconsumer.utill.InAppReviewHelper
 import com.shreefintech.paytouchconsumer.utill.ReceiptHelper
 import com.shreefintech.paytouchconsumer.utill.ToastType
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
@@ -73,10 +74,11 @@ class GasSmsReceiptActivity : BaseActivity() {
             )
         }
 
-        fun start(context: Context, transactionId: String) {
+        fun start(context: Context, transactionId: String, fromPayment: Boolean = false) {
             context.startActivity(
                 Intent(context, GasSmsReceiptActivity::class.java).apply {
                     putExtra(EXTRA_TRANSACTION_ID, transactionId)
+                    putExtra(EXTRA_FROM_PAYMENT, fromPayment)
                 }
             )
         }
@@ -169,7 +171,7 @@ class GasSmsReceiptActivity : BaseActivity() {
     // ── Populate ──────────────────────────────────────────────
 
     private fun populateReceiptFromApi(item: GasVerifyPaymentDataItem) {
-        val amount = Utility.formatAmount(item.totalPayable)
+        val amount = Utility.formatAmount(item.billAmount ?: item.totalPayable)
         val consumerNo = item.connectionNumber ?: "--"
         val txnId = item.transactionId ?: "--"
         val date = Utility.formatDate(item.createdAt)
@@ -186,6 +188,7 @@ class GasSmsReceiptActivity : BaseActivity() {
         binding.tvCcf.text = Utility.formatAmount(item.ccf ?: item.platformFee)
         binding.tvReceiptStatus.text = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
+        if (isFromPayment) InAppReviewHelper.onPaymentReceiptShown(this, item.transactionId, status)
 
         val smsBodyText = getString(R.string.msgGasSmsBody, amount, consumerNo)
         val spannable = SpannableString(smsBodyText)
@@ -218,6 +221,7 @@ class GasSmsReceiptActivity : BaseActivity() {
         binding.tvCcf.text             = Utility.formatAmount(item.platformFee)
         binding.tvReceiptStatus.text   = getString(R.string.labelStatusBullet, status)
         ReceiptHelper.applyStatusStyle(mActivity, binding.cvReceiptStatusBadge, binding.tvReceiptStatus, status)
+        if (isFromPayment) InAppReviewHelper.onPaymentReceiptShown(this, item.transactionId, status)
 
         val smsBodyText = getString(R.string.msgGasSmsBody, amount, identifier)
         val spannable   = SpannableString(smsBodyText)

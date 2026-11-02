@@ -98,7 +98,7 @@ class LoanTransactionReportViewModel(application: Application) : AndroidViewMode
             transactionId    = item.transactionId ?: "--",
             amount           = Utility.formatAmount(item.billAmount ?: item.totalPayable),
             status           = item.status ?: "--",
-            categoryIconRes  = R.drawable.ic_loan,
+            categoryIconRes  = R.drawable.img_loan,
             username         = item.customerName ?: item.connectionNumber ?: "--",
             date             = item.createdAt ?: "--",
             platformFee      = Utility.formatAmount(item.platformFee),

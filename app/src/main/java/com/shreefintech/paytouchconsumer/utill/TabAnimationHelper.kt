@@ -1,13 +1,11 @@
 package com.shreefintech.paytouchconsumer.utill
 
 import android.content.Context
-import android.content.res.ColorStateList
-import android.util.TypedValue
 import android.widget.LinearLayout
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
+import com.google.android.material.card.MaterialCardView
 import com.shreefintech.paytouchconsumer.R
 
 class TabAnimationHelper(
@@ -20,15 +18,11 @@ class TabAnimationHelper(
     private val allTabs get() = listOf(llPayBill, llReport, llStatus, llSmsReceipt)
 
     fun resetAll() {
-        val selectableBg = TypedValue().also {
-            context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true)
-        }.resourceId
-        val primaryColor = ContextCompat.getColor(context, R.color.primary)
-        val blackColor = ContextCompat.getColor(context, R.color.black)
+        val white = ContextCompat.getColor(context, R.color.white)
+        val black = ContextCompat.getColor(context, R.color.black)
         allTabs.forEach { tab ->
-            tab.setBackgroundResource(selectableBg)
-            tab.children.filterIsInstance<AppCompatImageView>().firstOrNull()?.imageTintList = ColorStateList.valueOf(primaryColor)
-            tab.children.filterIsInstance<AppCompatTextView>().firstOrNull()?.setTextColor(blackColor)
+            innerCard(tab)?.setCardBackgroundColor(white)
+            innerText(tab)?.setTextColor(black)
         }
     }
 
@@ -41,10 +35,15 @@ class TabAnimationHelper(
     }
 
     private fun selectTab(tab: LinearLayout) {
-        tab.background = ContextCompat.getDrawable(context, R.drawable.bg_toggle_selected)?.mutate()
-        tab.children.filterIsInstance<AppCompatImageView>().firstOrNull()?.imageTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
-        tab.children.filterIsInstance<AppCompatTextView>().firstOrNull()?.setTextColor(
-            ContextCompat.getColor(context, R.color.white))
+        innerCard(tab)?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.primary_light))
+        innerText(tab)?.setTextColor(ContextCompat.getColor(context, R.color.primary))
     }
+
+    private fun innerCard(tab: LinearLayout): MaterialCardView? =
+        tab.children.filterIsInstance<MaterialCardView>().firstOrNull()
+
+    private fun innerText(tab: LinearLayout): AppCompatTextView? =
+        innerCard(tab)
+            ?.children?.filterIsInstance<LinearLayout>()?.firstOrNull()
+            ?.children?.filterIsInstance<AppCompatTextView>()?.firstOrNull()
 }
