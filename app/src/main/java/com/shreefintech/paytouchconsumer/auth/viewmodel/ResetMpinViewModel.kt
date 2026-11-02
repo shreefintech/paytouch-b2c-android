@@ -2,8 +2,9 @@ package com.shreefintech.paytouchconsumer.auth.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
@@ -31,7 +32,7 @@ class ResetMpinViewModel(application: Application) : AndroidViewModel(applicatio
             return
         }
         onLoading()
-        ApiClient.apiService.resetCredential(ResetCredentialRequest(resetToken, "mpin", newMpin))
+        ApiAuthClient.apiService.resetCredential(ResetCredentialRequest(resetToken, Constant.CREDENTIAL_TYPE_MPIN, newMpin))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     if (response.isSuccessful && response.body()?.success == true) {
@@ -59,7 +60,7 @@ class ResetMpinViewModel(application: Application) : AndroidViewModel(applicatio
             return
         }
         onLoading()
-        ApiClient.apiService.createMpin(bearerToken(), CreateMpinRequest(mpin, mpin))
+        ApiAuthClient.apiService.createMpin(bearerToken(), CreateMpinRequest(mpin, mpin))
             .enqueue(object : Callback<General<MeDataItem>> {
                 override fun onResponse(call: Call<General<MeDataItem>>, response: Response<General<MeDataItem>>) {
                     if (response.isSuccessful) {

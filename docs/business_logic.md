@@ -13,42 +13,53 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - Mobile number must be exactly 10 digits
 - Password must be at least 8 characters
 - Email must pass standard email format validation
-- Both password and MPIN login share the same `/api/login` endpoint; the payload differs
-- On login, the server response includes two boolean flags that drive routing:
-  - `requires_kyc = true` → send to `KycActivity`
-  - `requires_mpin = true` → send to `ResetMpinActivity` (create-mode, via `buildCreateIntent()`)
-  - Both false → send to `HomeActivity`
+- Auth + onboarding endpoints live on a **separate backend**: `Constant.BASE_URL_AUTH` (`https://backend-b2c.paytouch.in/api/`) + `mobile/`, declared in `ApiAuthService` and called via `ApiAuthClient.apiService`. Every other module stays on `ApiService` / `ApiClient` (`https://www.paytouch.in/` + `api/`).
+- Both password and MPIN login share `mobile/auth/login`; `type` is `Constant.CREDENTIAL_TYPE_PASSWORD` or `Constant.CREDENTIAL_TYPE_MPIN`
+- All auth responses use the `General<T>` envelope (`{success, message, data}`) — check `isSuccessful && body?.data != null`
+- Routing after login / Splash / MPIN creation goes through **`NextStepRouter.intentFor(context, next_step, mpin_required)`** — never route inline:
+  - `next_step` in `kyc_required`, `aadhaar_required`, `kyc_resubmit_required`, `pending_approval`, `registration_rejected` (`NextStep.isKycStep`) → `KycActivity`
+  - else `mpin_required = true` → `ResetMpinActivity` (create-mode, via `buildCreateIntent()`)
+  - else (`bank_details_required`, `complete`, null or unknown value) → `HomeActivity`. Unknown values fall through to Home **deliberately**.
+  - `bank_details_required` also forces `KEY_BANK_DETAILS_ADDED = false` (see `saveOnboardingFlags()`), so the Add Bank Details popup shows before the first money action.
   - **Note:** `requires_virtual_account` is permanently retired. Virtual account creation is now handled server-side after KYC approval. Do not add routing for this flag.
 
-### API Endpoints
+### API Endpoints (`ApiAuthService`, prefix `mobile/`)
 | Method | Path | Purpose |
 |---|---|---|
-| POST | `api/login` | Login with mobile + password or MPIN |
-| POST | `api/register` | Create new account |
-| GET | `api/user` | Fetch current user profile and onboarding flags |
-| POST | `api/logout` | Invalidate session on server |
+| POST | `auth/login` | Login with mobile + password or MPIN → `General<LoginDataItem>` |
+| POST | `auth/register` | Create new account → `General<LoginDataItem>` |
+| POST | `auth/register/individual` | V2 multipart registration (Aadhaar + address) → `MessageItem` |
+| GET | `auth/me` | Current user + onboarding state → `General<MeDataItem>` (Splash session check, Home Aadhaar check) |
+| POST | `auth/logout` | Invalidate session on server |
+| POST | `device-token`, `location` | FCM token / user location |
+| GET | `address/states`, `address/states/{state_id}/cities` | Registration address pickers |
+| POST | `kyc/aadhaar` | Aadhaar re-upload after rejection |
+| POST | `v2/bank-details`, `v2/pan` | Bank / PAN onboarding dialogs |
 
-### Request Fields (Login)
+### Request Fields (Login — `LoginRequest`, JSON)
 - `mobile` (String, required)
-- `password` (String, required when using password mode)
-- `mpin` (String, required when using MPIN mode)
+- `credential` (String, required — password or MPIN)
+- `type` (String, required — `password` | `mpin`)
 
-### Request Fields (Register)
+### Request Fields (Register — `RegisterRequest`, JSON)
+- `name` (String, required)
 - `mobile` (String, required, 10 digits)
 - `email` (String, required, valid format)
 - `password` (String, required, min 8 chars)
 - `password_confirmation` (String, required, must match password)
 - `referral_code` (String, optional)
+- `platform` (String — `Constant.FCM_PLATFORM_ANDROID`)
 
-### Response Fields (Login / Register)
+### Response Fields (Login / Register — `data`)
 - `token` (String) — Bearer token
 - `token_type` (String) — always "Bearer"
-- `user.id` (Int)
-- `user.mobile` (String)
-- `user.email` (String)
-- `user.wallet_balance` (Decimal)
-- `user.requires_kyc` (Boolean)
-- `user.requires_mpin` (Boolean)
+- `next_step` (String) — see routing above
+- `mpin_required` (Boolean)
+- `bank_details_added` (Boolean)
+- `user` (`AuthUserItem`): `id`, `name`, `mobile`, `email`, `referral_code`, `wallet_balance`, `total_spent`, `kyc_completed`, `referred_by`, `referral_earnings`, `aadhaar_rejected`
+
+### Response Fields (`auth/me` and `auth/mpin` — `data`, `MeDataItem`)
+- `user` (`AuthUserItem`), `next_step`, `mpin_required`, `bank_details_added`, `aadhaar_added`, `pan_added`
 
 ### State Transitions
 ```
@@ -126,22 +137,22 @@ A 4-digit PIN used as an alternative to password login. Created during onboardin
 ### Rules and Constraints
 - MPIN must be exactly 4 digits (numeric only)
 - MPIN and confirmation must match before submission
-- After successful creation, route to `HomeActivity`
+- After successful creation, route again via `NextStepRouter` using the response's `next_step` (the response has the `auth/me` shape, with `mpin_required = false`)
 - MPIN is never stored locally — only a boolean flag (`mpin_created`) is stored
 
-### Reset Flow
-1. Request OTP to registered mobile
-2. User enters OTP → OTP verified by server
-3. User sets new 4-digit MPIN → submitted to server
+### Reset Flow (shared with password — see §5)
+1. `auth/forgot-credential` with `type = mpin` → OTP sent
+2. `auth/forgot-credential/verify-otp` → server returns `data.reset_token`
+3. `OtpVerificationActivity` passes the token to `ResetMpinActivity` as `Constant.EXTRA_RESET_TOKEN` (the mobile number is **not** passed on)
+4. `auth/forgot-credential/reset` with `reset_token`, `type = mpin`, `credential` = new MPIN
 
-### API Endpoints
+### API Endpoints (`ApiAuthService`, prefix `mobile/`)
 | Method | Path | Purpose |
 |---|---|---|
-| POST | `api/mpin/create` | Create new MPIN during onboarding |
-| POST | `api/mpin/verify` | Verify MPIN during login |
-| POST | `api/mpin/send-otp` | Send OTP to begin MPIN reset |
-| POST | `api/mpin/verify-otp` | Verify reset OTP |
-| POST | `api/mpin/reset` | Set new MPIN after OTP verified |
+| POST | `auth/mpin` | Create new MPIN during onboarding → `General<MeDataItem>`; 422 if already set |
+| POST | `auth/forgot-credential` | Send reset OTP (`mobile`, `type`) → `MessageItem` |
+| POST | `auth/forgot-credential/verify-otp` | Verify OTP (`mobile`, `otp`) → `General<ResetTokenDataItem>` |
+| POST | `auth/forgot-credential/reset` | Set new credential (`reset_token`, `type`, `credential`) → `MessageItem` |
 
 ---
 
@@ -156,15 +167,11 @@ A 4-digit PIN used as an alternative to password login. Created during onboardin
 ### Reset Flow
 1. User taps "Forgot Password" on Login screen
 2. Enter registered mobile → request OTP
-3. Enter OTP → verify
-4. Set new password
+3. Enter OTP → verify → server returns `reset_token`
+4. Set new password (sent with `reset_token`, received via `Constant.EXTRA_RESET_TOKEN`)
 
 ### API Endpoints
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `api/password/send-otp` | Send OTP to registered mobile |
-| POST | `api/password/verify-otp` | Verify OTP |
-| POST | `api/password/reset` | Set new password |
+Same unified `auth/forgot-credential` endpoints as MPIN reset (§3), with `type = password`.
 
 ### Rules
 - New password and confirmation must match
@@ -201,7 +208,7 @@ The main menu of the app. Displays category tiles that navigate to each payment 
 |---|---|---|
 | GET | `api/shreefintech-token` | Fetch dynamic payment token |
 | GET | `api/wallet/balance` | Fetch current wallet balance |
-| POST | `api/logout` | Log out user |
+| POST | `mobile/auth/logout` (`ApiAuthService`) | Log out user |
 
 ---
 
@@ -345,7 +352,7 @@ amount > 40000           → fee = ₹30
 - `Load Wallet` opens `LoadWalletActivity` which routes to the HDFC payment WebView
 - Earning Wallet lock: minimum `Constant.EARNING_MIN_LOCK_AMOUNT` (₹100), maximum = main wallet balance. Below-minimum is rejected on tap of Lock (toast), not shown live while typing; over-balance shows an inline error and disables the button.
 - Earning Wallet lock requires PAN: when `KEY_PAN_ADDED` is false (or unset), tapping Lock Money shows the PAN dialog first — for opted-in users too. Submitting PAN continues to the opt-in or lock sheet; closing the dialog opens nothing.
-- Bank/PAN onboarding flags (`KEY_BANK_DETAILS_ADDED`, `KEY_PAN_ADDED`) are set only from `/api/user` (Splash + Home), never from login, and read with default `false` — if `/api/user` hasn't answered yet, the bank/PAN dialog is shown rather than skipped.
+- Bank/PAN onboarding flags (`KEY_BANK_DETAILS_ADDED`, `KEY_PAN_ADDED`) are set via `saveOnboardingFlags()` from `auth/login` (bank only), `auth/me` (Splash + Home) and `auth/mpin`, and read with default `false` — if none has answered yet, the bank/PAN dialog is shown rather than skipped. `next_step = bank_details_required` forces the bank flag to `false`.
 
 ### API Endpoints
 | Method | Path | Purpose |

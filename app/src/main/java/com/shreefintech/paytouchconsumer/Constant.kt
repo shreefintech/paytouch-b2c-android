@@ -7,10 +7,11 @@ object Constant {
     // swap BASE_URL to LOCAL_URL for local testing only — never commit that swap
     const val LOCAL_URL = "https://tablet-frying-shy.ngrok-free.dev/"
 
-    const val LIVE_URL = "https://backend-b2c.paytouch.in/api/"
+    const val LIVE_URL = "https://www.paytouch.in/"
     const val BASE_URL = LIVE_URL
+    // Auth + onboarding backend (ApiAuthClient)
+    const val BASE_URL_AUTH = "https://backend-b2c.paytouch.in/api/"
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
-
 
     // AUTH store keys
     const val KEY_TOKEN = "TOKEN"
@@ -87,6 +88,10 @@ object Constant {
     const val FLOW_RESET_PASSWORD = "RESET_PASSWORD"
     const val FLOW_RESET_MPIN = "RESET_MPIN"
 
+    // `type` field for auth/login and auth/forgot-credential/*
+    const val CREDENTIAL_TYPE_PASSWORD = "password"
+    const val CREDENTIAL_TYPE_MPIN = "mpin"
+
     // Load Wallet / Payment status extras
     const val EXTRA_FROM_PAYMENT = "from_payment"
 
@@ -119,7 +124,7 @@ object Constant {
     const val DIR_RECEIPTS = "receipts"
 
     // B2C onboarding flags — cleared on logout via clearSharedPreference()
-    // Set from /api/user only (Splash + Home), never from login; read with default false when unset (fail closed)
+    // Set from auth/login, auth/me (Splash + Home) and auth/mpin; read with default false when unset (fail closed)
     const val KEY_BANK_DETAILS_ADDED = "BANK_DETAILS_ADDED"
     const val KEY_PAN_ADDED = "PAN_ADDED"
 

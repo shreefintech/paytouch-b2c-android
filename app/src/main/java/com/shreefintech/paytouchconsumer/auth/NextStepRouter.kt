@@ -6,7 +6,10 @@ import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.kyc.KycActivity
 
-/** Single place that turns the server's `next_step` + `mpin_required` into the next screen (Splash, Login, MPIN setup). */
+/**
+ * Single place that turns the server's `next_step` + `mpin_required` into the next screen (Splash, Login, MPIN setup).
+ * Deliberate: a null or unrecognised `next_step` falls through to Home.
+ */
 object NextStepRouter {
 
     fun intentFor(context: Context, nextStep: String?, mpinRequired: Boolean?): Intent = when {

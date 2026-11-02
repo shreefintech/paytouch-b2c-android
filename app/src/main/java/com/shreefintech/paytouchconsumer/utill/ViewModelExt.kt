@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.enums.NextStep
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.CityItem
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -43,7 +43,7 @@ fun AndroidViewModel.loadAddressStates(
         return
     }
     onLoading()
-    ApiClient.apiService.getAddressStates().enqueue(object : Callback<General<List<StateItem>>> {
+    ApiAuthClient.apiService.getAddressStates().enqueue(object : Callback<General<List<StateItem>>> {
         override fun onResponse(
             call: Call<General<List<StateItem>>>,
             response: Response<General<List<StateItem>>>
@@ -73,7 +73,7 @@ fun AndroidViewModel.loadAddressCities(
         return
     }
     onLoading()
-    ApiClient.apiService.getAddressCities(stateId).enqueue(object : Callback<General<List<CityItem>>> {
+    ApiAuthClient.apiService.getAddressCities(stateId).enqueue(object : Callback<General<List<CityItem>>> {
         override fun onResponse(
             call: Call<General<List<CityItem>>>,
             response: Response<General<List<CityItem>>>

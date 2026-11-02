@@ -43,6 +43,12 @@ class ResetMpinActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Reset mode is only reachable from OTP verification, which always passes the token
+        if (!isCreateMode && resetToken.isBlank()) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
+            finish()
+            return
+        }
         binding = ActivityResetMpinBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

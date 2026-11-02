@@ -4,12 +4,14 @@ import android.app.Application
 import com.shreefintech.paytouchconsumer.applock.AppLockHelper
 import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.retrofit.ApiAdminClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 
 class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
         ApiClient.init(this)
+        ApiAuthClient.init()
         ApiAdminClient.init(this)
         NotificationHelper.createChannel(this)
         AppLockHelper.init(this)

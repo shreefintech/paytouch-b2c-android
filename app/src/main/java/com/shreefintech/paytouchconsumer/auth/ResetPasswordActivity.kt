@@ -32,6 +32,12 @@ class ResetPasswordActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Only reachable from OTP verification, which always passes the token
+        if (resetToken.isBlank()) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
+            finish()
+            return
+        }
         binding = ActivityResetPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

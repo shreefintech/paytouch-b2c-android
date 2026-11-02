@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
@@ -34,20 +34,20 @@ class CreateAccountViewModel : ViewModel() {
             return
         }
         onLoading()
-        ApiClient.apiService.register(
+        ApiAuthClient.apiService.register(
             RegisterRequest(name, mobile, email, password, passwordConfirmation, referralCode, Constant.FCM_PLATFORM_ANDROID)
         ).enqueue(object : Callback<General<LoginDataItem>> {
             override fun onResponse(
                 call: Call<General<LoginDataItem>>,
                 response: Response<General<LoginDataItem>>
             ) {
-                if (response.isSuccessful && response.body()?.data != null) {
-                    val data = response.body()!!.data!!
+                val data = response.body()?.data
+                if (response.isSuccessful && data != null) {
                     SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_TOKEN, data.token ?: "")
                     SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_TOKEN_TYPE, data.tokenType ?: "")
-                    SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_WALLET_BALANCE, "0.00")
                     data.user?.let { user ->
                         SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_USER_ID, user.id?.toString() ?: "")
+                        SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_WALLET_BALANCE, user.walletBalance ?: "0.00")
                         SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_MOBILE, user.mobile ?: "")
                         SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_EMAIL, user.email ?: "")
                         SharedPreferenceHelper.setSharedPreferenceString(context, Constant.KEY_REFERRAL_CODE, user.referralCode ?: "")

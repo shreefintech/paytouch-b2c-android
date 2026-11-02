@@ -8,7 +8,7 @@ import com.shreefintech.paytouchconsumer.applock.AppLockHelper
 import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.retrofit.ApiAdminClient
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
@@ -35,16 +35,16 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         onLoading()
-        val type = if (mode == LoginMode.PASSWORD) "password" else "mpin"
-        ApiClient.apiService.login(LoginRequest(mobile, credential, type))
+        val type = if (mode == LoginMode.PASSWORD) Constant.CREDENTIAL_TYPE_PASSWORD else Constant.CREDENTIAL_TYPE_MPIN
+        ApiAuthClient.apiService.login(LoginRequest(mobile, credential, type))
             .enqueue(object : Callback<General<LoginDataItem>> {
                 override fun onResponse(
                     call: Call<General<LoginDataItem>>,
                     response: Response<General<LoginDataItem>>
                 ) {
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        val data = response.body()!!.data
-                        data?.let { saveSession(it) }
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        saveSession(data)
                         onSuccess(data)
                     } else {
                         val msg = ApiHelper.parseErrorMessage(
@@ -72,12 +72,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         SharedPreferenceHelper.setSharedPreferenceString(
             getApplication(), Constant.KEY_TOKEN_TYPE, data.tokenType ?: ""
         )
-        SharedPreferenceHelper.setSharedPreferenceString(
-            getApplication(), Constant.KEY_WALLET_BALANCE, "0.00"
-        )
         data.user?.let { user ->
             SharedPreferenceHelper.setSharedPreferenceString(
                 getApplication(), Constant.KEY_USER_ID, user.id?.toString() ?: ""
+            )
+            SharedPreferenceHelper.setSharedPreferenceString(
+                getApplication(), Constant.KEY_WALLET_BALANCE, user.walletBalance ?: "0.00"
             )
             SharedPreferenceHelper.setSharedPreferenceString(
                 getApplication(), Constant.KEY_MOBILE, user.mobile ?: ""

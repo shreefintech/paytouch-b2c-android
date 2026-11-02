@@ -192,18 +192,17 @@ com.shreefintech.paytouchconsumer/
 ## App Launch Flow
 
 ```
-SplashActivity  (2s logo -> GET /api/user)
+SplashActivity  (2s logo -> GET mobile/auth/me)
     |
     +-- Not logged in ----------------------------------------> LoginActivity
     +-- No internet (session exists) -------------------------> LoginActivity
     |
     \-- Logged in + internet
             |
-            +-- requires_kyc = true -------------------------> KycActivity
-            \-- all flags clear -----------------------------> HomeActivity
+            \-- NextStepRouter (next_step + mpin_required) --> KycActivity / ResetMpinActivity (create) / HomeActivity
 ```
 
-> `requires_mpin = true` routes to `ResetMpinActivity` as a placeholder. A dedicated CreateMpinActivity should replace this once built.
+> `mpin_required = true` routes to `ResetMpinActivity` in create mode. An unknown `next_step` falls through to `HomeActivity` deliberately.
 
 **On every fresh `HomeActivity` launch** (skipped on config change / process restore):
 
@@ -221,16 +220,16 @@ HomeActivity.onCreate()
 
 ## Mandatory Onboarding Sequence
 
-Server-driven via flags on the login/session response. Users cannot skip any step.
+Server-driven via `next_step` + `mpin_required` on the login / `auth/me` / `auth/mpin` response, routed only through `NextStepRouter`. Users cannot skip any step.
 
 ```
 Register / Login
     |
-    +-- requires_kyc = true   --> KycActivity --> KycStatusActivity (pending/approved/rejected)
+    +-- KYC next_step         --> KycActivity --> KycStatusActivity (pending/approved/rejected)
     |                                                       |
     |                                         approved --> ResetMpinActivity (create mode)
-    +-- requires_mpin = true  --> ResetMpinActivity
-    \-- all clear             --> HomeActivity
+    +-- mpin_required = true  --> ResetMpinActivity
+    \-- otherwise             --> HomeActivity
 ```
 
 ---
@@ -300,10 +299,14 @@ Lazy singleton. OkHttp chain (in order):
 
 1. Header interceptor — adds `Accept: application/json`
 2. **SessionInterceptor** — on 401: clears SharedPreferences, relaunches `LoginActivity` (clear back stack)
-3. `HttpLoggingInterceptor` — DEBUG builds only
-4. `CurlInterceptor` — DEBUG builds only (Logcat tag: `CURL`). **Gitignored (`.gitignore:27`) — not present in a fresh clone.** `ApiClient` references it directly, so create `retrofit/CurlInterceptor.kt` locally before building a fresh clone.
+3. `HttpLoggingInterceptor` — DEBUG builds only; `Authorization` header redacted
+4. `CurlInterceptor` — DEBUG builds only (Logcat tag: `CURL`). Masks `Authorization`; never logs bodies of `/auth/` calls or multipart uploads.
 
 Timeouts: 30s connect / read / write.
+
+### ApiAuthClient — `backend-b2c.paytouch.in/api/`
+
+Auth + onboarding endpoints (`ApiAuthService`, prefix `mobile/`): `auth/*`, `device-token`, `location`, `address/*`, `kyc/aadhaar`, `v2/bank-details`, `v2/pan`. Built with `ApiClient.buildRetrofit(Constant.BASE_URL_AUTH)`, so it gets the same interceptor chain and timeouts as `ApiClient`. Initialised in `MyApp` after `ApiClient.init()`.
 
 ### ApiAdminClient — `admin.paytouch.in`
 
@@ -313,8 +316,8 @@ Separate singleton. Used for VPS user registration (fire-and-forget after login 
 
 | Method | Endpoint | Body | Caller |
 |---|---|---|---|
-| `POST` | `/api/device-token` | `DeviceTokenRequest` (`fcm_token`, `platform`, `device_id`) | `NotificationHelper.syncToken()` |
-| `POST` | `/api/location` | `UserLocationRequest` (`latitude`, `longitude`, `accuracy`) | `HomeViewModel.sendLocation()` (fire-and-forget) |
+| `POST` | `mobile/device-token` (`ApiAuthService`) | `DeviceTokenRequest` (`fcm_token`, `platform`, `device_id`) | `NotificationHelper.syncToken()` |
+| `POST` | `mobile/location` (`ApiAuthService`) | `UserLocationRequest` (`latitude`, `longitude`, `accuracy`) | `HomeViewModel.sendLocation()` (fire-and-forget) |
 
 ### Endpoint Pattern
 

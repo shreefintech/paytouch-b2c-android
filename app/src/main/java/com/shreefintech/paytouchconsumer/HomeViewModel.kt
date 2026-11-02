@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -47,7 +48,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             longitude = location.longitude,
             accuracy = if (location.hasAccuracy()) location.accuracy.toDouble() else null
         )
-        ApiClient.apiService.sendLocation(bearerToken(), body)
+        ApiAuthClient.apiService.sendLocation(bearerToken(), body)
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     if (!response.isSuccessful) {
@@ -104,7 +105,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun checkAadhaarRejected(onRejected: () -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) return
         aadhaarCheckCall?.cancel()
-        aadhaarCheckCall = ApiClient.apiService.getMe(bearerToken()).also {
+        aadhaarCheckCall = ApiAuthClient.apiService.getMe(bearerToken()).also {
             it.enqueue(object : Callback<General<MeDataItem>> {
                 override fun onResponse(call: Call<General<MeDataItem>>, response: Response<General<MeDataItem>>) {
                     if (aadhaarCheckCall === call) aadhaarCheckCall = null
@@ -157,7 +158,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 return@launch
             }
 
-            ApiClient.apiService.reuploadAadhaar(
+            ApiAuthClient.apiService.reuploadAadhaar(
                 bearerToken(),
                 aadhaarNumber.toRequestBody("text/plain".toMediaTypeOrNull()),
                 photoPart
@@ -187,7 +188,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val fcmToken = SharedPreferenceHelper.getSharedPreferenceString(
             getApplication(), Constant.KEY_FCM_TOKEN, ""
         )?.ifEmpty { null }
-        ApiClient.apiService.logout(bearerToken(), LogoutRequest(fcmToken))
+        ApiAuthClient.apiService.logout(bearerToken(), LogoutRequest(fcmToken))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     // /logout response body only ever contains "message" (no "success" key),

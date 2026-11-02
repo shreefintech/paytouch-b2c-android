@@ -82,7 +82,7 @@ class HomeActivity : BaseActivity() {
     // True when the location flow ended while Home was not in front — asked again in onResume()
     private var isNotificationPermissionPending = false
 
-    // ── Aadhaar re-upload dialog (blocking — shown while /api/user says aadhaar_rejected) ──
+    // ── Aadhaar re-upload dialog (blocking — shown while auth/me says user.aadhaar_rejected) ──
     private val showProgressAadhaar = ObservableBoolean(false)
     private var aadhaarDialog: Dialog? = null
     private var aadhaarBinding: DialogReuploadAadhaarBinding? = null

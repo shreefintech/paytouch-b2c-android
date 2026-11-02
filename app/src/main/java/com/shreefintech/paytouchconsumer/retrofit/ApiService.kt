@@ -2,17 +2,7 @@ package com.shreefintech.paytouchconsumer.retrofit
 
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.ForgotCredentialRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetCredentialRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetTokenDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.VerifyOtpRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPaymentItem
@@ -95,14 +85,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileReq
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
-import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
-import com.shreefintech.paytouchconsumer.retrofit.model.CityItem
-import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Item
-import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Request
-import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Item
-import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletActionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletAmountRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
@@ -111,7 +94,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -127,121 +109,56 @@ import retrofit2.http.Query
 interface ApiService {
 
     companion object {
-        const val CHANNEL = "mobile/"
+        const val AUTH = "api/"
     }
-
-    // ── Session ───────────────────────────────────────────────────────────────
-
-    @GET("${CHANNEL}auth/me")
-    fun getMe(
-        @Header("Authorization") authorization: String
-    ): Call<General<MeDataItem>>
-
-    @POST("${CHANNEL}auth/logout")
-    fun logout(
-        @Header("Authorization") authorization: String,
-        @Body body: LogoutRequest
-    ): Call<MessageItem>
-
-    // ── Push Notifications ────────────────────────────────────────────────────
-
-    @POST("${CHANNEL}device-token")
-    fun registerDeviceToken(
-        @Header("Authorization") authorization: String?,
-        @Body body: DeviceTokenRequest
-    ): Call<MessageItem>
-
-    // ── Location ──────────────────────────────────────────────────────────────
-
-    @POST("${CHANNEL}location")
-    fun sendLocation(
-        @Header("Authorization") authorization: String,
-        @Body body: UserLocationRequest
-    ): Call<MessageItem>
-
-    // ── Authentication ────────────────────────────────────────────────────────
-
-    @POST("${CHANNEL}auth/login")
-    fun login(
-        @Body request: LoginRequest
-    ): Call<General<LoginDataItem>>
-
-    @POST("${CHANNEL}auth/register")
-    fun register(
-        @Body request: RegisterRequest
-    ): Call<General<LoginDataItem>>
-
-    // ── Forgot Credential (unified OTP flow) ──────────────────────────────────
-
-    @POST("${CHANNEL}auth/forgot-credential")
-    fun sendForgotCredentialOtp(
-        @Body request: ForgotCredentialRequest
-    ): Call<MessageItem>
-
-    @POST("${CHANNEL}auth/forgot-credential/verify-otp")
-    fun verifyForgotCredentialOtp(
-        @Body request: VerifyOtpRequest
-    ): Call<General<ResetTokenDataItem>>
-
-    @POST("${CHANNEL}auth/forgot-credential/reset")
-    fun resetCredential(
-        @Body request: ResetCredentialRequest
-    ): Call<MessageItem>
-
-    // Same response shape as auth/me; 422 if an MPIN is already set
-    @POST("${CHANNEL}auth/mpin")
-    fun createMpin(
-        @Header("Authorization") token: String,
-        @Body body: CreateMpinRequest
-    ): Call<General<MeDataItem>>
 
     // ── Wallet ────────────────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}bonus-wallet")
+    @GET("${AUTH}bonus-wallet")
     fun getBonusWallet(
         @Header("Authorization") authorization: String
     ): Call<General<BonusWalletItem?>>
 
-    @GET("${CHANNEL}earning-wallet")
+    @GET("${AUTH}earning-wallet")
     fun getEarningWallet(
         @Header("Authorization") authorization: String
     ): Call<General<EarningWalletItem?>>
 
-    @GET("${CHANNEL}level")
+    @GET("${AUTH}level")
     fun getRewardsLevel(
         @Header("Authorization") authorization: String
     ): Call<General<RewardsLevelItem?>>
 
-    @GET("${CHANNEL}wallet/user-data")
+    @GET("${AUTH}wallet/user-data")
     fun getUserWalletData(
         @Header("Authorization") authorization: String
     ): Call<General<WalletDataItem>>
 
-    @GET("${CHANNEL}wallet/combined-wallet-history")
+    @GET("${AUTH}wallet/combined-wallet-history")
     fun getWalletHistory(
         @Header("Authorization") authorization: String,
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Call<General<WalletHistoryPageItem>>
 
-    @POST("${CHANNEL}wallet/withdraw")
+    @POST("${AUTH}wallet/withdraw")
     fun withdrawWallet(
         @Header("Authorization") authorization: String,
         @Body request: WithdrawRequest
     ): Call<General<WithdrawDataItem>>
 
-    @POST("${CHANNEL}earning-wallet/opt-in")
+    @POST("${AUTH}earning-wallet/opt-in")
     fun postEarningWalletOptIn(
         @Header("Authorization") authorization: String
     ): Call<General<EarningWalletActionDataItem>>
 
-    @POST("${CHANNEL}earning-wallet/lock")
+    @POST("${AUTH}earning-wallet/lock")
     fun postEarningWalletLock(
         @Header("Authorization") authorization: String,
         @Body request: EarningWalletAmountRequest
     ): Call<General<EarningWalletActionDataItem>>
 
-    @POST("${CHANNEL}earning-wallet/withdraw")
+    @POST("${AUTH}earning-wallet/withdraw")
     fun postEarningWalletWithdraw(
         @Header("Authorization") authorization: String,
         @Body request: EarningWalletAmountRequest
@@ -249,7 +166,7 @@ interface ApiService {
 
     // ── Transaction Detail ────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}utility-bill/transaction/{id}")
+    @GET("${AUTH}utility-bill/transaction/{id}")
     fun getTransactionHistoryDetail(
         @Header("Authorization") authorization: String,
         @Path("id") transactionId: String
@@ -257,212 +174,212 @@ interface ApiService {
 
     // ── Electricity ───────────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}electricity/operators")
+    @GET("${AUTH}electricity/operators")
     fun getElectricityOperators(
         @Header("Authorization") authorization: String
     ): Call<General<List<ElectricityOperatorItem>>>
 
-    @POST("${CHANNEL}electricity/fetch-bill")
+    @POST("${AUTH}electricity/fetch-bill")
     fun fetchElectricityBill(
         @Header("Authorization") authorization: String,
         @Body request: ElectricityFetchBillRequest
     ): Call<ElectricityFetchBillResponseItem>
 
-    @POST("${CHANNEL}electricity/process-payment")
+    @POST("${AUTH}electricity/process-payment")
     fun processElectricityPayment(
         @Header("Authorization") authorization: String,
         @Body request: ElectricityProcessPaymentRequest
     ): Call<ElectricityPaymentItem>
 
-    @POST("${CHANNEL}electricity/payment-report")
+    @POST("${AUTH}electricity/payment-report")
     fun getElectricityPaymentReport(
         @Header("Authorization") authorization: String,
         @Body request: ElectricityTransactionReportRequest
     ): Call<General<List<ElectricityTransactionReportDataItem>>>
 
-    @POST("${CHANNEL}electricity/transaction-status")
+    @POST("${AUTH}electricity/transaction-status")
     fun getElectricityTransactionStatus(
         @Header("Authorization") authorization: String,
         @Body request: ElectricityTransactionStatusRequest
     ): Call<General<List<ElectricityTransactionReportDataItem>>>
 
-    @GET("${CHANNEL}electricity/latest-payment")
+    @GET("${AUTH}electricity/latest-payment")
     fun getElectricityLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<ElectricityVerifyPaymentDataItem>>
 
     // ── Gas ───────────────────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}gas/operators")
+    @GET("${AUTH}gas/operators")
     fun getGasOperators(
         @Header("Authorization") authorization: String
     ): Call<General<List<GasOperatorItem>>>
 
-    @POST("${CHANNEL}gas/fetch-bill")
+    @POST("${AUTH}gas/fetch-bill")
     fun fetchGasBill(
         @Header("Authorization") authorization: String,
         @Body request: GasFetchBillRequest
     ): Call<General<GasBillItem>>
 
-    @POST("${CHANNEL}gas/process-payment")
+    @POST("${AUTH}gas/process-payment")
     fun processGasPayment(
         @Header("Authorization") authorization: String,
         @Body request: GasProcessPaymentRequest
     ): Call<GasPaymentItem>
 
-    @POST("${CHANNEL}gas/transaction-status")
+    @POST("${AUTH}gas/transaction-status")
     fun getGasTransactionStatus(
         @Header("Authorization") authorization: String,
         @Body request: GasTransactionStatusRequest
     ): Call<General<List<GasTransactionReportDataItem>>>
 
-    @POST("${CHANNEL}gas/payment-report")
+    @POST("${AUTH}gas/payment-report")
     fun getGasPaymentReport(
         @Header("Authorization") authorization: String,
         @Body request: GasTransactionReportRequest
     ): Call<General<List<GasTransactionReportDataItem>>>
 
-    @GET("${CHANNEL}gas/latest-payment")
+    @GET("${AUTH}gas/latest-payment")
     fun getGasLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<GasVerifyPaymentDataItem>>
 
     // ── General ───────────────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}states")
+    @GET("${AUTH}states")
     fun getStates(
         @Header("Authorization") authorization: String
     ): Call<General<List<StateItem>>>
 
     // ── Mobile Prepaid ────────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}recharge/operators")
+    @GET("${AUTH}recharge/operators")
     fun getPrepaidOperators(
         @Header("Authorization") authorization: String
     ): Call<General<List<PrepaidOperatorItem>>>
 
-    @GET("${CHANNEL}recharge/plans/{operatorId}/{circleId}")
+    @GET("${AUTH}recharge/plans/{operatorId}/{circleId}")
     fun getPrepaidPlans(
         @Header("Authorization") authorization: String,
         @Path("operatorId") operatorId: String,
         @Path("circleId") circleId: String
     ): Call<PrepaidPlansListItem>
 
-    @POST("${CHANNEL}recharge/process-direct")
+    @POST("${AUTH}recharge/process-direct")
     fun processPrepaidPayment(
         @Header("Authorization") authorization: String,
         @Body request: PrepaidProcessDirectRequest
     ): Call<PrepaidPaymentItem>
 
-    @POST("${CHANNEL}mobile-recharge/transaction-status")
+    @POST("${AUTH}mobile-recharge/transaction-status")
     fun getPrepaidTransactionStatus(
         @Header("Authorization") authorization: String,
         @Body request: PrepaidTransactionStatusRequest
     ): Call<General<List<PrepaidTransactionDataItem>>>
 
-    @POST("${CHANNEL}utility/payment-report")
+    @POST("${AUTH}utility/payment-report")
     fun getPrepaidPaymentReport(
         @Header("Authorization") authorization: String,
         @Body request: PrepaidTransactionReportRequest
     ): Call<General<List<PrepaidTransactionDataItem>>>
 
-    @GET("${CHANNEL}recharge/latest-payment")
+    @GET("${AUTH}recharge/latest-payment")
     fun getPrepaidLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<PrepaidVerifyPaymentDataItem>>
 
     // ── Mobile Postpaid ───────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}mobile-postpaid/operators")
+    @GET("${AUTH}mobile-postpaid/operators")
     fun getPostpaidOperators(
         @Header("Authorization") authorization: String
     ): Call<General<List<PostpaidOperatorItem>>>
 
-    @POST("${CHANNEL}mobile-postpaid/fetch-bill")
+    @POST("${AUTH}mobile-postpaid/fetch-bill")
     fun fetchPostpaidBill(
         @Header("Authorization") authorization: String,
         @Body request: PostpaidFetchBillRequest
     ): Call<PostpaidFetchBillResponseItem>
 
-    @POST("${CHANNEL}mobile-postpaid/process-payment")
+    @POST("${AUTH}mobile-postpaid/process-payment")
     fun processPostpaidPayment(
         @Header("Authorization") authorization: String,
         @Body request: PostpaidProcessPaymentRequest
     ): Call<PostpaidPaymentItem>
 
-    @POST("${CHANNEL}mobile-postpaid/transaction-status")
+    @POST("${AUTH}mobile-postpaid/transaction-status")
     fun getPostpaidTransactionStatus(
         @Header("Authorization") authorization: String,
         @Body request: PostpaidTransactionStatusRequest
     ): Call<General<List<PostpaidTransactionReportDataItem>>>
 
-    @POST("${CHANNEL}mobile-postpaid/payment-report")
+    @POST("${AUTH}mobile-postpaid/payment-report")
     fun getPostpaidPaymentReport(
         @Header("Authorization") authorization: String,
         @Body request: PostpaidTransactionReportRequest
     ): Call<General<List<PostpaidTransactionReportDataItem>>>
 
-    @GET("${CHANNEL}mobile-postpaid/latest-payment")
+    @GET("${AUTH}mobile-postpaid/latest-payment")
     fun getPostpaidLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<PostpaidLatestPaymentDataItem>>
 
     // ── DTH ───────────────────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}dth/operators")
+    @GET("${AUTH}dth/operators")
     fun getDthOperators(
         @Header("Authorization") authorization: String
     ): Call<General<List<DthOperatorItem>>>
 
-    @GET("${CHANNEL}dth/plans/{operatorId}")
+    @GET("${AUTH}dth/plans/{operatorId}")
     fun getDthPlans(
         @Header("Authorization") authorization: String,
         @Path("operatorId") operatorId: String
     ): Call<DthPlansListItem>
 
-    @POST("${CHANNEL}dth/process-direct")
+    @POST("${AUTH}dth/process-direct")
     fun processDthPayment(
         @Header("Authorization") authorization: String,
         @Body request: DthProcessPaymentRequest
     ): Call<DthPaymentItem>
 
-    @POST("${CHANNEL}dth/transaction/status")
+    @POST("${AUTH}dth/transaction/status")
     fun getDthTransactionStatus(
         @Header("Authorization") authorization: String,
         @Body request: DthTransactionStatusRequest
     ): Call<General<List<DthTransactionReportDataItem>>>
 
-    @POST("${CHANNEL}dth/payment-report")
+    @POST("${AUTH}dth/payment-report")
     fun getDthPaymentReport(
         @Header("Authorization") authorization: String,
         @Body request: DthTransactionReportRequest
     ): Call<General<List<DthTransactionReportDataItem>>>
 
-    @GET("${CHANNEL}dth/latest-payment")
+    @GET("${AUTH}dth/latest-payment")
     fun getDthLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<DthLatestPaymentDataItem>>
 
     // ── FASTag ────────────────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}fastag/operators")
+    @GET("${AUTH}fastag/operators")
     fun getFastagOperators(
         @Header("Authorization") authorization: String
     ): Call<General<List<FastagOperatorItem>>>
 
-    @POST("${CHANNEL}fastag")
+    @POST("${AUTH}fastag")
     fun processFastagPayment(
         @Header("Authorization") authorization: String,
         @Body request: FastagProcessPaymentRequest
     ): Call<FastagPaymentItem>
 
-    @POST("${CHANNEL}fastag/transaction/status")
+    @POST("${AUTH}fastag/transaction/status")
     fun getFastagTransactionStatus(
         @Header("Authorization") authorization: String,
         @Body request: FastagTransactionStatusRequest
     ): Call<General<List<FastagTransactionReportDataItem>>>
 
-    @GET("${CHANNEL}fastag")
+    @GET("${AUTH}fastag")
     fun getFastagPaymentReport(
         @Header("Authorization") authorization: String,
         @Query("from_date") fromDate: String?,
@@ -473,85 +390,85 @@ interface ApiService {
         @Query("per_page") perPage: Int
     ): Call<General<FastagTransactionPageItem>>
 
-    @GET("${CHANNEL}fastag/latest-payment")
+    @GET("${AUTH}fastag/latest-payment")
     fun getFastagLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<FastagLatestPaymentDataItem>>
 
     // ── Loan ──────────────────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}loanrepayment/operators")
+    @GET("${AUTH}loanrepayment/operators")
     fun getLoanOperators(
         @Header("Authorization") authorization: String
     ): Call<General<LoanOperatorsDataItem>>
 
-    @POST("${CHANNEL}loanrepayment/fetch-bill")
+    @POST("${AUTH}loanrepayment/fetch-bill")
     fun fetchLoanBill(
         @Header("Authorization") authorization: String,
         @Body request: LoanFetchBillRequest
     ): Call<General<List<LoanBillItem>>>
 
-    @POST("${CHANNEL}loanrepayment/process-payment")
+    @POST("${AUTH}loanrepayment/process-payment")
     fun processLoanPayment(
         @Header("Authorization") authorization: String,
         @Body request: LoanProcessPaymentRequest
     ): Call<LoanPaymentItem>
 
-    @POST("${CHANNEL}loanrepayment/transaction-status")
+    @POST("${AUTH}loanrepayment/transaction-status")
     fun getLoanTransactionStatus(
         @Header("Authorization") authorization: String,
         @Body request: LoanTransactionStatusRequest
     ): Call<General<List<LoanTransactionReportDataItem>>>
 
-    @POST("${CHANNEL}loanrepayment/payment-report")
+    @POST("${AUTH}loanrepayment/payment-report")
     fun getLoanPaymentReport(
         @Header("Authorization") authorization: String,
         @Body request: LoanTransactionReportRequest
     ): Call<General<List<LoanTransactionReportDataItem>>>
 
-    @GET("${CHANNEL}loanrepayment/latest-payment")
+    @GET("${AUTH}loanrepayment/latest-payment")
     fun getLoanLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<LoanLatestPaymentDataItem>>
 
     // ── Municipal Tax ─────────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}municipal-taxes/operators")
+    @GET("${AUTH}municipal-taxes/operators")
     fun getMunicipalTaxOperators(
         @Header("Authorization") authorization: String
     ): Call<General<List<MunicipalTaxOperatorItem>>>
 
-    @POST("${CHANNEL}municipal-taxes/fetch-bill")
+    @POST("${AUTH}municipal-taxes/fetch-bill")
     fun fetchMunicipalTaxBill(
         @Header("Authorization") authorization: String,
         @Body request: MunicipalTaxFetchBillRequest
     ): Call<General<List<MunicipalTaxFetchBillDataItem>>>
 
-    @POST("${CHANNEL}municipal-taxes/process-payment")
+    @POST("${AUTH}municipal-taxes/process-payment")
     fun processMunicipalTaxPayment(
         @Header("Authorization") authorization: String,
         @Body request: MunicipalTaxProcessPaymentRequest
     ): Call<MunicipalTaxPaymentItem>
 
     // Confirmed backend quirk: municipal tax transaction-status routes through mobile-recharge endpoint
-    @POST("${CHANNEL}mobile-recharge/transaction-status")
+    @POST("${AUTH}mobile-recharge/transaction-status")
     fun getMunicipalTaxTransactionStatus(
         @Header("Authorization") authorization: String,
         @Body request: MunicipalTaxTransactionStatusRequest
     ): Call<General<List<MunicipalTaxTransactionReportDataItem>>>
 
-    @POST("${CHANNEL}municipal-taxes/payment-report")
+    @POST("${AUTH}municipal-taxes/payment-report")
     fun getMunicipalTaxPaymentReport(
         @Header("Authorization") authorization: String,
         @Body request: MunicipalTaxTransactionReportRequest
     ): Call<General<List<MunicipalTaxTransactionReportDataItem>>>
 
-    @GET("${CHANNEL}municipal-taxes/latest-payment")
+    @GET("${AUTH}municipal-taxes/latest-payment")
     fun getMunicipalTaxLatestPayment(
         @Header("Authorization") authorization: String
     ): Call<General<MunicipalTaxLatestPaymentDataItem>>
 
-    @GET("${CHANNEL}municipal-taxes/recent-transactions")
+    @GET("${AUTH}municipal-taxes/recent-transactions")
     fun getMunicipalTaxRecentTransactions(
         @Header("Authorization") authorization: String,
         @Query("page") page: Int,
@@ -560,18 +477,18 @@ interface ApiService {
 
     // ── My Account ───────────────────────────────────────────────────────────
 
-    @GET("${CHANNEL}dashboard-kyc/account-overview")
+    @GET("${AUTH}dashboard-kyc/account-overview")
     fun getAccountOverview(
         @Header("Authorization") authorization: String
     ): Call<AccountInfoItem>
 
-    @POST("${CHANNEL}profile")
+    @POST("${AUTH}profile")
     fun updateProfile(
         @Header("Authorization") authorization: String,
         @Body request: EditProfileRequest
     ): Call<General<EditProfileDataItem>>
 
-    @GET("${CHANNEL}referral-info")
+    @GET("${AUTH}referral-info")
     fun getReferralInfo(
         @Header("Authorization") authorization: String
     ): Call<ReferralInfoItem>
@@ -579,26 +496,26 @@ interface ApiService {
     // ── Dashboard KYC ─────────────────────────────────────────────────────────
 
     @Multipart
-    @POST("${CHANNEL}dashboard-kyc/initiate")
+    @POST("${AUTH}dashboard-kyc/initiate")
     fun initiateKyc(
         @Header("Authorization") authorization: String,
         @Part("entity_type") entityType: RequestBody
     ): Call<General<KycSubmissionDataItem>>
 
-    @GET("${CHANNEL}dashboard-kyc/status")
+    @GET("${AUTH}dashboard-kyc/status")
     fun getKycStatus(
         @Header("Authorization") authorization: String
     ): Call<KycStatusItem>
 
     @Multipart
-    @POST("${CHANNEL}dashboard-kyc/sections/a")
+    @POST("${AUTH}dashboard-kyc/sections/a")
     fun submitKycSectionA(
         @Header("Authorization") authorization: String,
         @Part("has_gst") hasGst: RequestBody
     ): Call<General<KycSubmissionDataItem>>
 
     @Multipart
-    @POST("${CHANNEL}dashboard-kyc/sections/b/signatory")
+    @POST("${AUTH}dashboard-kyc/sections/b/signatory")
     fun submitKycSectionB(
         @Header("Authorization") authorization: String,
         @Part("email") email: RequestBody,
@@ -612,25 +529,25 @@ interface ApiService {
     ): Call<General<KycSignatoryDataItem>>
 
     @Multipart
-    @POST("${CHANNEL}dashboard-kyc/sections/c")
+    @POST("${AUTH}dashboard-kyc/sections/c")
     fun submitKycSectionC(
         @Header("Authorization") authorization: String,
         @Part parts: List<MultipartBody.Part>
     ): Call<General<KycSubmissionDataItem>>
 
-    @POST("${CHANNEL}dashboard-kyc/agree")
+    @POST("${AUTH}dashboard-kyc/agree")
     fun agreeKyc(
         @Header("Authorization") authorization: String,
         @Body body: RequestBody
     ): Call<General<KycAgreeDataItem>>
 
-    @GET("${CHANNEL}dashboard-kyc/my-account")
+    @GET("${AUTH}dashboard-kyc/my-account")
     fun getKycMyAccount(
         @Header("Authorization") authorization: String
     ): Call<KycMyAccountItem>
 
     @Multipart
-    @POST("${CHANNEL}dashboard-kyc/bank-account")
+    @POST("${AUTH}dashboard-kyc/bank-account")
     fun editBankAccount(
         @Header("Authorization") authorization: String,
         @Part parts: List<MultipartBody.Part>
@@ -638,13 +555,13 @@ interface ApiService {
 
     // ── HDFC Payment Gateway ──────────────────────────────────────────────────
 
-    @POST("${CHANNEL}hdfc/orders")
+    @POST("${AUTH}hdfc/orders")
     fun createHdfcOrder(
         @Header("Authorization") authorization: String,
         @Body request: HdfcCreateOrderRequest
     ): Call<General<HdfcOrderItem>>
 
-    @GET("${CHANNEL}hdfc/orders/{order_id}/status")
+    @GET("${AUTH}hdfc/orders/{order_id}/status")
     fun getHdfcOrderStatus(
         @Header("Authorization") authorization: String,
         @Path("order_id") orderId: String
@@ -652,58 +569,11 @@ interface ApiService {
 
     // ── Unified Transactions ──────────────────────────────────────────────────
 
-    @GET("${CHANNEL}transactions")
+    @GET("${AUTH}transactions")
     fun getTransactions(
         @Header("Authorization") authorization: String,
         @Query("type") type: String,
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Call<General<List<UnifiedTransactionItem>>>
-
-    // ── B2C V2 Registration & Onboarding ─────────────────────────────────────
-
-    @Multipart
-    @POST("${CHANNEL}auth/register/individual")
-    fun registerV2(
-        @Part("name") name: RequestBody,
-        @Part("mobile") mobile: RequestBody,
-        @Part("email") email: RequestBody,
-        @Part("password") password: RequestBody,
-        @Part("password_confirmation") passwordConfirmation: RequestBody,
-        @Part("aadhaar_number") aadhaarNumber: RequestBody,
-        @Part aadhaarPhoto: MultipartBody.Part,
-        @Part("state_id") stateId: RequestBody,
-        @Part("city_id") cityId: RequestBody,
-        @Part("referral_code") referralCode: RequestBody,
-        @Part("platform") platform: RequestBody
-    ): Call<MessageItem>
-
-    // Re-upload after KYC rejection — triggered by `aadhaar_rejected` on /api/user
-    @Multipart
-    @POST("${CHANNEL}kyc/aadhaar")
-    fun reuploadAadhaar(
-        @Header("Authorization") authorization: String,
-        @Part("aadhaar_number") aadhaarNumber: RequestBody,
-        @Part aadhaarPhoto: MultipartBody.Part
-    ): Call<MessageItem>
-
-    @GET("${CHANNEL}address/states")
-    fun getAddressStates(): Call<General<List<StateItem>>>
-
-    @GET("${CHANNEL}address/states/{state_id}/cities")
-    fun getAddressCities(
-        @Path("state_id") stateId: String
-    ): Call<General<List<CityItem>>>
-
-    @POST("${CHANNEL}v2/bank-details")
-    fun addBankDetails(
-        @Header("Authorization") authorization: String,
-        @Body body: BankDetailsV2Request
-    ): Call<BankDetailsV2Item>
-
-    @POST("${CHANNEL}v2/pan")
-    fun addPan(
-        @Header("Authorization") authorization: String,
-        @Body body: PanV2Request
-    ): Call<PanV2Item>
 }
