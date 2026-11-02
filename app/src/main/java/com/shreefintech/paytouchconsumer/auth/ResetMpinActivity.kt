@@ -70,8 +70,8 @@ class ResetMpinActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.showProgress    = showProgress
 
-        // TODO(B2C-194): seasonal Navratri — revert after festival
-        Glide.with(this).load(R.drawable.img_garba_couple).into(binding.ivWalletIllustration)
+        // TODO(B2C-262): seasonal Diwali — revert after festival
+        Glide.with(this).load(R.drawable.img_login_top).into(binding.ivWalletIllustration)
 
         if (isCreateMode) applyCreateModeLabels()
         setupMpinBoxes()
