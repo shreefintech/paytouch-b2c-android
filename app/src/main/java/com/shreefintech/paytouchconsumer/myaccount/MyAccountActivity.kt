@@ -23,15 +23,19 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityMyAccountBinding
 import com.shreefintech.paytouchconsumer.databinding.DialogEditProfileBinding
+import com.shreefintech.paytouchconsumer.databinding.DialogMpinBinding
 import com.shreefintech.paytouchconsumer.myaccount.viewmodel.MyAccountViewModel
 import com.shreefintech.paytouchconsumer.retrofit.model.CityItem
 import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.AuthUserItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
+import com.shreefintech.paytouchconsumer.utill.clearMpin
+import com.shreefintech.paytouchconsumer.utill.getMpin
+import com.shreefintech.paytouchconsumer.utill.setupMpinBoxes
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.getThemeColor
 import com.shreefintech.paytouchconsumer.utill.loadAddressCities
@@ -50,16 +54,17 @@ class MyAccountActivity : BaseActivity() {
     private var currentTab = TAB_ACCOUNT_INFO
 
     // ── Edit Profile dialog state ──
-    private val showProgressUpdate = ObservableBoolean(false)
-    private var accountInfo: AccountInfoItem? = null
+    private var accountInfo: AuthUserItem? = null
     private var editProfileDialog: Dialog? = null
     private var editProfileBinding: DialogEditProfileBinding? = null
+    private val showProgressMpin = ObservableBoolean(false)
+    private var mpinDialog: Dialog? = null
     private var isStatesLoading = false
     private var stateList = listOf<StateItem>()
     private var cityList = listOf<CityItem>()
     // State whose cities are in cityList — reused across dialog opens instead of refetching
     private var cityListStateId: String? = null
-    // Pre-selected in the Edit Profile dialog — sourced from account-overview `address`
+    // Pre-selected in the Edit Profile dialog — sourced from auth/me `user.state` / `user.city`
     private var savedState: StateItem? = null
     private var savedCity: CityItem? = null
     private var selectedState: StateItem? = null
@@ -113,7 +118,8 @@ class MyAccountActivity : BaseActivity() {
     }
 
     private fun loadAccountInfo() {
-        viewModel.getAccountInfo(
+        loadWalletBalance()
+        viewModel.getProfile(
             onLoading = {
                 isAccountInfoLoading = true
                 binding.llAccountInfoContent.visibility = View.GONE
@@ -123,7 +129,7 @@ class MyAccountActivity : BaseActivity() {
                     binding.shimmerAccountInfo.startShimmer()
                 }
             },
-            onSuccess = { data: AccountInfoItem ->
+            onSuccess = { data: AuthUserItem ->
                 isAccountInfoLoading = false
                 binding.shimmerAccountInfo.stopShimmer()
                 binding.shimmerAccountInfo.visibility = View.GONE
@@ -137,6 +143,21 @@ class MyAccountActivity : BaseActivity() {
                 binding.shimmerAccountInfo.visibility = View.GONE
                 binding.llAccountInfoContent.visibility =
                     if (currentTab == TAB_ACCOUNT_INFO) View.VISIBLE else View.GONE
+                if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
+    // auth/me has no wallet balance — read the main wallet bucket separately
+    private fun loadWalletBalance() {
+        viewModel.getWalletBalance(
+            onSuccess = onSuccess@{ data ->
+                if (isDestroyed) return@onSuccess
+                binding.tvBalance.text = if (data.mainWallet != null) Utility.formatAmount(data.mainWallet) else "--"
+            },
+            onError = onError@{ msg ->
+                if (isDestroyed) return@onError
+                binding.tvBalance.text = "--"
                 if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
             }
         )
@@ -174,21 +195,22 @@ class MyAccountActivity : BaseActivity() {
 
     // ── Populate ──────────────────────────────────────────────
 
-    private fun populateAccountInfo(data: AccountInfoItem) {
+    private fun populateAccountInfo(data: AuthUserItem) {
         // Hidden tab is animated by selectTab() when the user switches back to it
         if (currentTab == TAB_ACCOUNT_INFO) AnimationHelper.animateChildren(binding.llAccountInfoContent)
         accountInfo = data
         binding.tvMemberName.text = data.name ?: "--"
-        binding.tvStatus.text = data.member?.status ?: "--"
-        binding.tvMemberCode.text = data.member?.memberCode ?: "--"
-        binding.tvMobileNo.text = data.contact?.mobile ?: "--"
-        binding.tvEmail.text = data.contact?.email ?: "--"
-        binding.tvHomeAddress.text = data.homeAddress ?: "--"
-        savedState = data.address?.state?.takeIf { it.id != null }
-        savedCity = data.address?.city?.takeIf { it.id != null }
-        binding.tvRegistrationDate.text = Utility.formatDate(data.membership?.registeredOn, "dd-MM-yyyy")
-        binding.tvActivationDate.text = Utility.formatDate(data.membership?.activatedOn, "dd-MM-yyyy")
-        binding.tvBalance.text = if (data.walletBalance != null) Utility.formatAmount(data.walletBalance) else "--"
+        binding.tvStatus.text = data.status?.replaceFirstChar { it.uppercase() } ?: "--"
+        // auth/me has no member code or street address
+        binding.tvMemberCode.text = "--"
+        binding.tvMobileNo.text = data.mobile ?: "--"
+        binding.tvEmail.text = data.email ?: "--"
+        binding.tvHomeAddress.text = listOfNotNull(data.city, data.state).joinToString(", ").ifEmpty { "--" }
+        // Names only — ids are matched from the dropdown lists when Edit Profile opens
+        savedState = data.state?.let { StateItem(id = null, name = it) }
+        savedCity = data.city?.let { CityItem(id = null, name = it) }
+        binding.tvRegistrationDate.text = Utility.formatDate(data.createdAt, "dd-MM-yyyy")
+        binding.tvActivationDate.text = Utility.formatDate(data.activatedAt, "dd-MM-yyyy")
     }
 
     private fun populateReferralInfo(data: ReferralDataItem) {
@@ -334,11 +356,10 @@ class MyAccountActivity : BaseActivity() {
     private fun showEditProfileDialog() {
         if (editProfileDialog?.isShowing == true) return
         val dialogBinding = DialogEditProfileBinding.inflate(layoutInflater)
-        dialogBinding.showProgress = showProgressUpdate
         dialogBinding.onClickListener = editProfileClickListener(dialogBinding)
 
         dialogBinding.etName.setText(accountInfo?.name.orEmpty())
-        dialogBinding.etEmail.setText(accountInfo?.contact?.email.orEmpty())
+        dialogBinding.etEmail.setText(accountInfo?.email.orEmpty())
         selectedState = savedState
         selectedCity = savedCity
         setDropdownValue(dialogBinding.tvState, selectedState?.name, R.string.hintSelectState)
@@ -364,6 +385,7 @@ class MyAccountActivity : BaseActivity() {
         when {
             isStatesLoading -> setFieldLoading(dialogBinding.pbStateLoading, dialogBinding.ivStateArrow, dialogBinding.flStateAnchor, true)
             stateList.isEmpty() -> loadStates()
+            else -> resolveSelectedState()
         }
         val stateId = selectedState?.id
         if (stateId != cityListStateId) {
@@ -371,6 +393,8 @@ class MyAccountActivity : BaseActivity() {
             cityList = emptyList()
             cityListStateId = null
             stateId?.let { loadCities(it) }
+        } else {
+            resolveSelectedCity()
         }
     }
 
@@ -391,7 +415,6 @@ class MyAccountActivity : BaseActivity() {
                 }
                 dialogBinding.cardSubmit -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (showProgressUpdate.get()) return@OnClickListener
                     onUpdateProfile(dialogBinding)
                 }
             }
@@ -459,6 +482,8 @@ class MyAccountActivity : BaseActivity() {
                 if (isDestroyed) return@onSuccess
                 stateList = states
                 editProfileBinding?.let { setFieldLoading(it.pbStateLoading, it.ivStateArrow, it.flStateAnchor, false) }
+                resolveSelectedState()
+                selectedState?.id?.takeIf { it != cityListStateId }?.let { loadCities(it) }
             },
             onError = onError@{ msg ->
                 isStatesLoading = false
@@ -481,6 +506,7 @@ class MyAccountActivity : BaseActivity() {
                 if (isDestroyed || stateId != selectedState?.id) return@onSuccess
                 cityList = cities
                 cityListStateId = stateId
+                resolveSelectedCity()
                 editProfileBinding?.let { setFieldLoading(it.pbCityLoading, it.ivCityArrow, it.flCityAnchor, false) }
             },
             onError = onError@{ msg ->
@@ -513,30 +539,96 @@ class MyAccountActivity : BaseActivity() {
             return
         }
 
-        // Dismiss only this dialog — a late response must not close one reopened after a manual dismiss
-        val dialog = editProfileDialog
-        viewModel.updateProfile(
-            request = EditProfileRequest(name, email, stateId, cityId),
-            onLoading = { showProgressUpdate.set(true) },
-            onSuccess = onSuccess@{ data, message ->
-                showProgressUpdate.set(false)
-                if (isDestroyed) return@onSuccess
-                savedState = data.state ?: selectedState
-                savedCity = data.city ?: selectedCity
-                data.email?.let {
-                    SharedPreferenceHelper.setSharedPreferenceString(mActivity, Constant.KEY_EMAIL, it)
+        // PUT auth/me needs the user's MPIN on every change — collect it before calling the API
+        showMpinDialog { mpin -> EditProfileRequest(name, email, stateId, cityId, mpin) }
+    }
+
+    private fun showMpinDialog(buildRequest: (String) -> EditProfileRequest) {
+        if (mpinDialog?.isShowing == true) return
+        val dialogBinding = DialogMpinBinding.inflate(layoutInflater)
+        showProgressMpin.set(false)
+        dialogBinding.showProgress = showProgressMpin
+        dialogBinding.tvSubtitle.setText(R.string.msgEnterMpinProfileSubtitle)
+        dialogBinding.setupMpinBoxes()
+        dialogBinding.onClickListener = View.OnClickListener { view ->
+            when (view) {
+                dialogBinding.cardClose -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressMpin.get()) return@OnClickListener
+                    mpinDialog?.dismiss()
                 }
-                dialog?.dismiss()
+                dialogBinding.cardSubmit -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressMpin.get()) return@OnClickListener
+                    onSubmitMpin(dialogBinding, buildRequest)
+                }
+            }
+        }
+
+        val dialog = Dialog(mActivity)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.88).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.setCancelable(false)
+        dialog.setOnDismissListener { mpinDialog = null }
+        mpinDialog = dialog
+        dialog.show()
+    }
+
+    private fun onSubmitMpin(dialogBinding: DialogMpinBinding, buildRequest: (String) -> EditProfileRequest) {
+        Utility.hideKeyboard(dialogBinding.root)
+        val mpin = dialogBinding.getMpin()
+        val msg = when {
+            mpin.isEmpty() -> getString(R.string.msgMpinEmpty)
+            mpin.length != 4 -> getString(R.string.msgMpinInvalid)
+            else -> null
+        }
+        if (msg != null) {
+            ToastUtil.showDelete(mActivity, msg)
+            return
+        }
+
+        val request = buildRequest(mpin)
+        // Dismiss only these dialogs — a late response must not close ones reopened after a manual dismiss
+        val profileDialog = editProfileDialog
+        val pinDialog = mpinDialog
+        viewModel.updateProfile(
+            request = request,
+            onLoading = { showProgressMpin.set(true) },
+            onSuccess = onSuccess@{ data, message ->
+                showProgressMpin.set(false)
+                if (isDestroyed) return@onSuccess
+                savedState = data?.state ?: selectedState
+                savedCity = data?.city ?: selectedCity
+                SharedPreferenceHelper.setSharedPreferenceString(mActivity, Constant.KEY_EMAIL, data?.email ?: request.email)
+                pinDialog?.dismiss()
+                profileDialog?.dismiss()
                 ToastUtil.showSuccess(mActivity, message)
-                // Home address is derived server-side from state/city — refetch instead of patching fields
+                // Refetch auth/me instead of patching fields
                 loadAccountInfo()
             },
             onError = onError@{ errMsg ->
-                showProgressUpdate.set(false)
+                showProgressMpin.set(false)
                 if (isDestroyed) return@onError
+                dialogBinding.clearMpin()
                 ToastUtil.showDelete(mActivity, errMsg)
             }
         )
+    }
+
+    // Saved state is a name only (auth/me) — swap in the list entry so cities and the update get its id
+    private fun resolveSelectedState() {
+        val saved = selectedState?.takeIf { it.id == null } ?: return
+        stateList.find { it.name.equals(saved.name, ignoreCase = true) }?.let { selectedState = it }
+    }
+
+    private fun resolveSelectedCity() {
+        val saved = selectedCity?.takeIf { it.id == null } ?: return
+        cityList.find { it.name.equals(saved.name, ignoreCase = true) }?.let { selectedCity = it }
     }
 
     private fun setDropdownValue(textView: TextView, value: String?, @StringRes hintRes: Int) {
@@ -555,7 +647,8 @@ class MyAccountActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        // Dismiss here so the dialog window doesn't leak past the Activity
+        // Dismiss here so the dialog windows don't leak past the Activity
+        mpinDialog?.dismiss()
         editProfileDialog?.dismiss()
         super.onDestroy()
     }

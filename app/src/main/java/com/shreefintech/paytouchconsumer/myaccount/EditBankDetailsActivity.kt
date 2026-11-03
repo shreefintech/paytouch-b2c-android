@@ -25,6 +25,8 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityEditBankDetailsBinding
 import com.shreefintech.paytouchconsumer.databinding.DialogMpinBinding
+import com.shreefintech.paytouchconsumer.utill.getMpin
+import com.shreefintech.paytouchconsumer.utill.setupMpinBoxes
 import com.shreefintech.paytouchconsumer.kyc.bank.model.EditBankPassItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountRequest
 import com.shreefintech.paytouchconsumer.utill.FilePickerUtil
@@ -381,6 +383,7 @@ class EditBankDetailsActivity : BaseActivity() {
         val dialogBinding = DialogMpinBinding.inflate(layoutInflater)
         showProgressMpin.set(false)
         dialogBinding.showProgress = showProgressMpin
+        dialogBinding.setupMpinBoxes()
         dialogBinding.onClickListener = View.OnClickListener { view ->
             when (view) {
                 dialogBinding.cardClose -> {
@@ -412,7 +415,7 @@ class EditBankDetailsActivity : BaseActivity() {
 
     private fun onSubmitMpin(dialogBinding: DialogMpinBinding) {
         Utility.hideKeyboard(dialogBinding.root)
-        val mpin = dialogBinding.etMpin.text?.toString()?.trim().orEmpty()
+        val mpin = dialogBinding.getMpin()
         val msg = when {
             mpin.isEmpty() -> getString(R.string.msgMpinEmpty)
             mpin.length != 4 -> getString(R.string.msgMpinInvalid)

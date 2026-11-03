@@ -83,26 +83,133 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
 
-        <!-- MPIN input -->
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/etMpin"
+        <!-- MPIN boxes -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clMpinBoxes"
             android:layout_width="0dp"
-            android:layout_height="@dimen/input_height"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_small"
-            android:background="@drawable/bg_input_field"
-            android:fontFamily="@font/proza_libre_medium"
-            android:hint="@string/hint_mpin"
-            android:inputType="numberPassword"
-            android:maxLength="4"
-            android:maxLines="1"
-            android:paddingHorizontal="@dimen/margin_small"
-            android:singleLine="true"
-            android:textColor="@color/black"
-            android:textColorHint="?attr/colorTextHint"
-            android:textSize="@dimen/text_size_13"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvMpinLabel" />
+            app:layout_constraintTop_toBottomOf="@id/tvMpinLabel">
+
+            <FrameLayout
+                android:id="@+id/flMpin1"
+                android:layout_width="@dimen/input_height"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/bg_otp_box"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintEnd_toStartOf="@id/flMpin2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etMpin1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:cursorVisible="true"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:gravity="center"
+                    android:hint="*"
+                    android:imeOptions="actionNext"
+                    android:includeFontPadding="false"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_15" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/flMpin2"
+                android:layout_width="@dimen/input_height"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/bg_otp_box"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/flMpin3"
+                app:layout_constraintStart_toEndOf="@id/flMpin1"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etMpin2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:cursorVisible="true"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:gravity="center"
+                    android:hint="*"
+                    android:imeOptions="actionNext"
+                    android:includeFontPadding="false"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_15" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/flMpin3"
+                android:layout_width="@dimen/input_height"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/bg_otp_box"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/flMpin4"
+                app:layout_constraintStart_toEndOf="@id/flMpin2"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etMpin3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:cursorVisible="true"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:gravity="center"
+                    android:hint="*"
+                    android:imeOptions="actionNext"
+                    android:includeFontPadding="false"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_15" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/flMpin4"
+                android:layout_width="@dimen/input_height"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/bg_otp_box"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/flMpin3"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etMpin4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:cursorVisible="true"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:gravity="center"
+                    android:hint="*"
+                    android:imeOptions="actionDone"
+                    android:includeFontPadding="false"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_15" />
+            </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Submit button -->
         <com.google.android.material.card.MaterialCardView
@@ -116,7 +223,7 @@
             app:cardElevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/etMpin"
+            app:layout_constraintTop_toBottomOf="@id/clMpinBoxes"
             app:strokeWidth="0dp">
 
             <LinearLayout

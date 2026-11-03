@@ -159,7 +159,7 @@ com.shreefintech.paytouchconsumer/
 |   |   +-- loan/                   Loan request/response DTOs
 |   |   +-- municipaltax/           Municipal tax request/response DTOs
 |   |   +-- kyc/                    KYC request/response DTOs (15+ files)
-|   |   +-- myaccount/              AccountInfoItem, ReferralInfoItem
+|   |   +-- myaccount/              ReferralRewardsItem, EditProfileRequest
 |   |   +-- hdfc/                   HdfcCreateOrderRequest, HdfcOrderItem, etc.
 |   |   +-- wallet/                 WalletHistoryItem, WalletHistoryPageItem
 |   |   +-- notification/           DeviceTokenRequest

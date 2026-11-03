@@ -21,6 +21,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Item
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Request
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Item
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthLatestPaymentDataItem
@@ -99,10 +100,9 @@ import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransacti
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralRewardsItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
@@ -136,6 +136,13 @@ interface ApiService {
     }
 
     // ── Session ───────────────────────────────────────────────────────────────
+
+    // Edit Profile — mpin required on every change
+    @PUT("${MOBILE}auth/me")
+    fun updateMe(
+        @Header("Authorization") authorization: String,
+        @Body request: EditProfileRequest
+    ): Call<General<EditProfileDataItem>>
 
     @GET("${MOBILE}auth/me")
     fun getMe(
@@ -627,21 +634,15 @@ interface ApiService {
 
     // ── My Account ───────────────────────────────────────────────────────────
 
-    @GET("${AUTH}dashboard-kyc/account-overview")
-    fun getAccountOverview(
+    @GET("${MOBILE}rewards/referral")
+    fun getReferralRewards(
         @Header("Authorization") authorization: String
-    ): Call<AccountInfoItem>
+    ): Call<ReferralRewardsItem>
 
-    @POST("${AUTH}profile")
-    fun updateProfile(
-        @Header("Authorization") authorization: String,
-        @Body request: EditProfileRequest
-    ): Call<General<EditProfileDataItem>>
-
-    @GET("${AUTH}referral-info")
-    fun getReferralInfo(
+    @GET("${MOBILE}wallet/balance")
+    fun getWalletBalance(
         @Header("Authorization") authorization: String
-    ): Call<ReferralInfoItem>
+    ): Call<General<WalletBalanceItem>>
 
     // ── Dashboard KYC ─────────────────────────────────────────────────────────
 

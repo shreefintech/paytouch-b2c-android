@@ -3,13 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="android.view.View" />
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
-        <variable
-            name="showProgress"
-            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -312,15 +308,7 @@
                     android:fontFamily="@font/proza_libre_medium"
                     android:text="@string/btnUpdateProfile"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_16"
-                    android:visibility="@{showProgress ? View.GONE : View.VISIBLE}" />
-
-                <ProgressBar
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:indeterminateTint="@color/white"
-                    android:visibility="@{showProgress ? View.VISIBLE : View.GONE}" />
+                    android:textSize="@dimen/text_size_16" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
