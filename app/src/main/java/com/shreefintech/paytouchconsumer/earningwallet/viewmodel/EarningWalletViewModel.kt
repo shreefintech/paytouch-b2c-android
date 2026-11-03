@@ -133,7 +133,8 @@ class EarningWalletViewModel(application: Application) : AndroidViewModel(applic
                 onPending(getString(R.string.msgMoneyRequestPending))
                 return
             }
-            moneyRequestId.clear()
+            // Only lock / withdraw own the request_id — opt-in must not drop a pending one
+            if (onPending != null) moneyRequestId.clear()
             if (response.isSuccessful && body?.success == true) {
                 onSuccess(body.message ?: "")
             } else {

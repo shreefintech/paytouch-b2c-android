@@ -9,7 +9,6 @@ import android.text.InputFilter
 import android.text.InputType
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -26,6 +25,7 @@ import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityEditBankDetailsBinding
 import com.shreefintech.paytouchconsumer.databinding.DialogMpinBinding
+import com.shreefintech.paytouchconsumer.utill.createDialog
 import com.shreefintech.paytouchconsumer.utill.getMpin
 import com.shreefintech.paytouchconsumer.utill.setupMpinBoxes
 import com.shreefintech.paytouchconsumer.kyc.bank.model.EditBankPassItem
@@ -400,17 +400,7 @@ class EditBankDetailsActivity : BaseActivity() {
             }
         }
 
-        val dialog = Dialog(mActivity)
-        dialog.setContentView(dialogBinding.root)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.88).toInt(),
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        // requestFocus() alone doesn't raise the keyboard inside a Dialog
-        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        dialog.setCancelable(false)
+        val dialog = dialogBinding.createDialog(mActivity)
         dialog.setOnDismissListener { mpinDialog = null }
         mpinDialog = dialog
         dialog.show()

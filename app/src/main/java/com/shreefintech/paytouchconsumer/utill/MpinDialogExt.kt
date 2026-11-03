@@ -1,12 +1,17 @@
 package com.shreefintech.paytouchconsumer.utill
 
+import android.app.Activity
+import android.app.Dialog
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.EditText
+import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.DialogMpinBinding
 
-// 4-box MPIN entry in dialog_mpin.xml — shared by Edit Profile and Edit Bank Details
+// 4-box MPIN entry in dialog_mpin.xml — shared by Edit Profile, Edit Bank Details, Load Wallet and Earning Wallet
 
 private val DialogMpinBinding.mpinBoxes
     get() = listOf(etMpin1, etMpin2, etMpin3, etMpin4)
@@ -14,6 +19,20 @@ private val DialogMpinBinding.mpinBoxes
 fun DialogMpinBinding.setupMpinBoxes() {
     mpinBoxes.setupPinBoxes()
     etMpin1.requestFocus()
+}
+
+// Non-cancelable MPIN popup window; the caller sets its dismiss listener and shows it
+fun DialogMpinBinding.createDialog(activity: Activity): Dialog = Dialog(activity).apply {
+    setContentView(root)
+    window?.setBackgroundDrawableResource(android.R.color.transparent)
+    window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
+    window?.setLayout(
+        (activity.resources.displayMetrics.widthPixels * 0.88).toInt(),
+        ViewGroup.LayoutParams.WRAP_CONTENT
+    )
+    // requestFocus() alone doesn't raise the keyboard inside a Dialog
+    window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+    setCancelable(false)
 }
 
 fun DialogMpinBinding.getMpin(): String =

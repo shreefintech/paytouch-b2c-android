@@ -120,8 +120,7 @@ object Constant {
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
-    // Wallet top-up (POST wallet/topups) — flow value and final status values (compared case-insensitively);
-    // initiated / pending / crediting / on_hold all show as processing
+    // Wallet top-up (POST wallet/topups) `flow` value
     const val TOPUP_FLOW_PAYMENT_PAGE = "payment_page"
     // GET wallet/statement `wallet` filter (main, referral, bonus, earning) — My Wallet lists show main
     const val WALLET_STATEMENT_MAIN = "main"
@@ -131,6 +130,7 @@ object Constant {
     const val TOPUP_FEE_METHOD_UPI = "UPI"
     const val TOPUP_FEE_METHOD_CARD = "CARD"
     const val TOPUP_FEE_METHOD_NB = "NB"
+    // Top-up final status values (compared case-insensitively); initiated / pending / crediting / on_hold show as processing
     const val TOPUP_STATUS_SUCCESS = "SUCCESS"
     const val TOPUP_STATUS_FAILED = "FAILED"
 

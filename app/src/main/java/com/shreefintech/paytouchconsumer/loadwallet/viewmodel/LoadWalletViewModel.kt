@@ -36,12 +36,13 @@ import retrofit2.Response
 class LoadWalletViewModel(application: Application) : AndroidViewModel(application) {
 
     private val pollHandler = Handler(Looper.getMainLooper())
-    private val withdrawRequestId = MoneyRequestId()
+    private val withdrawIdempotencyKey = MoneyRequestId()
 
     companion object {
-        // TODO(B2C-298): G6 — backend gave no polling interval/timeout; ~12 s total, then the status screen shows pending
-        private const val TOPUP_POLL_INTERVAL_MS = 3000L
-        private const val TOPUP_POLL_MAX_ATTEMPTS = 5
+        // TODO(B2C-298): G6 — backend gave no polling interval/timeout for top-ups or withdrawals; ~12 s total,
+        //  then the status shows pending
+        private const val STATUS_POLL_INTERVAL_MS = 3000L
+        private const val STATUS_POLL_MAX_ATTEMPTS = 5
         private const val REFERRAL_PER_PAGE = 50
     }
 
@@ -176,34 +177,40 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     // Polls GET wallet/topups/{client_reference} until is_final or the attempt cap — null when no status could be read
-    fun pollTopupStatus(
-        clientReference: String,
-        onResult: (WalletTopupItem?) -> Unit,
+    fun pollTopupStatus(clientReference: String, onResult: (WalletTopupItem?) -> Unit) {
+        pollStatus(
+            request = { ApiClient.apiService.getWalletTopup(bearerToken(), clientReference) },
+            isFinal = { it.isFinal == true },
+            onResult = onResult
+        )
+    }
+
+    // Shared by the top-up and withdrawal status polls — a fresh Call per attempt (a Call can't be re-enqueued)
+    private fun <T> pollStatus(
+        request: () -> Call<General<T>>,
+        isFinal: (T) -> Boolean,
+        onResult: (T?) -> Unit,
         attempt: Int = 1
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onResult(null); return }
-        ApiClient.apiService.getWalletTopup(bearerToken(), clientReference)
-            .enqueue(object : Callback<General<WalletTopupItem>> {
-                override fun onResponse(
-                    call: Call<General<WalletTopupItem>>,
-                    response: Response<General<WalletTopupItem>>
-                ) {
-                    val data = if (response.isSuccessful) response.body()?.data else null
-                    if (data != null && data.isFinal != true && attempt < TOPUP_POLL_MAX_ATTEMPTS) {
-                        pollHandler.postDelayed(
-                            { pollTopupStatus(clientReference, onResult, attempt + 1) },
-                            TOPUP_POLL_INTERVAL_MS
-                        )
-                    } else {
-                        onResult(data)
-                    }
+        request().enqueue(object : Callback<General<T>> {
+            override fun onResponse(call: Call<General<T>>, response: Response<General<T>>) {
+                val data = if (response.isSuccessful) response.body()?.data else null
+                if (data != null && !isFinal(data) && attempt < STATUS_POLL_MAX_ATTEMPTS) {
+                    pollHandler.postDelayed(
+                        { pollStatus(request, isFinal, onResult, attempt + 1) },
+                        STATUS_POLL_INTERVAL_MS
+                    )
+                } else {
+                    onResult(data)
                 }
+            }
 
-                override fun onFailure(call: Call<General<WalletTopupItem>>, t: Throwable) {
-                    t.printStackTrace()
-                    onResult(null)
-                }
-            })
+            override fun onFailure(call: Call<General<T>>, t: Throwable) {
+                t.printStackTrace()
+                onResult(null)
+            }
+        })
     }
 
     // Fee previews are display-only — null on any failure, the server still applies the real fee
@@ -245,35 +252,12 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     // Polls GET wallet/withdrawals/{client_reference} until is_final or the attempt cap — null when no status could be read
-    // TODO(B2C-298): no polling interval/timeout given for withdrawals — reuses the top-up cadence (~12 s)
-    fun pollWithdrawalStatus(
-        clientReference: String,
-        onResult: (WalletWithdrawalItem?) -> Unit,
-        attempt: Int = 1
-    ) {
-        if (!Utility.isInternetAvailable(getApplication())) { onResult(null); return }
-        ApiClient.apiService.getWalletWithdrawal(bearerToken(), clientReference)
-            .enqueue(object : Callback<General<WalletWithdrawalItem>> {
-                override fun onResponse(
-                    call: Call<General<WalletWithdrawalItem>>,
-                    response: Response<General<WalletWithdrawalItem>>
-                ) {
-                    val data = if (response.isSuccessful) response.body()?.data else null
-                    if (data != null && data.isFinal != true && attempt < TOPUP_POLL_MAX_ATTEMPTS) {
-                        pollHandler.postDelayed(
-                            { pollWithdrawalStatus(clientReference, onResult, attempt + 1) },
-                            TOPUP_POLL_INTERVAL_MS
-                        )
-                    } else {
-                        onResult(data)
-                    }
-                }
-
-                override fun onFailure(call: Call<General<WalletWithdrawalItem>>, t: Throwable) {
-                    t.printStackTrace()
-                    onResult(null)
-                }
-            })
+    fun pollWithdrawalStatus(clientReference: String, onResult: (WalletWithdrawalItem?) -> Unit) {
+        pollStatus(
+            request = { ApiClient.apiService.getWalletWithdrawal(bearerToken(), clientReference) },
+            isFinal = { it.isFinal == true },
+            onResult = onResult
+        )
     }
 
     fun fetchRecentHistory(
@@ -428,7 +412,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             request = WalletWithdrawalRequest(
                 amount = amount,
                 mpin = mpin,
-                requestId = withdrawRequestId.forAttempt(amount.toString())
+                requestId = withdrawIdempotencyKey.forAttempt(amount.toString())
             )
         ).enqueue(object : Callback<General<WalletWithdrawalItem>> {
             override fun onResponse(
@@ -439,7 +423,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     onPending(getString(R.string.msgMoneyRequestPending))
                     return
                 }
-                withdrawRequestId.clear()
+                withdrawIdempotencyKey.clear()
                 val body = response.body()
                 val data = body?.data
                 if (response.isSuccessful && data != null) {

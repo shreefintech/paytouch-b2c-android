@@ -78,11 +78,12 @@
 
         </LinearLayout>
 
-        <!-- Payment Mode -->
+        <!-- Payment Mode — hidden: POST wallet/withdrawals takes no mode yet (always IMPS) — TODO(B2C-298) G28 -->
         <LinearLayout
             android:id="@+id/llPaymentMode"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_marginTop="@dimen/margin_medium"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="@id/dummyView"
@@ -160,11 +161,12 @@
 
         </LinearLayout>
 
-        <!-- Narration -->
+        <!-- Narration — hidden: POST wallet/withdrawals takes no narration yet — TODO(B2C-298) G28 -->
         <LinearLayout
             android:id="@+id/llNarration"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_marginTop="@dimen/margin_medium"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="@id/dummyView"

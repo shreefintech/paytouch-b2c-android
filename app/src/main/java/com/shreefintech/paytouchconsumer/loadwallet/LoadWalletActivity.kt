@@ -17,7 +17,6 @@ import androidx.core.widget.TextViewCompat
 import androidx.databinding.ObservableBoolean
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -60,6 +59,7 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
 import com.shreefintech.paytouchconsumer.utill.clearMpin
+import com.shreefintech.paytouchconsumer.utill.createDialog
 import com.shreefintech.paytouchconsumer.utill.getMpin
 import com.shreefintech.paytouchconsumer.utill.setupMpinBoxes
 
@@ -96,7 +96,8 @@ class LoadWalletActivity : BaseActivity() {
     private var withdrawConfirmDialogBinding: DialogConfirmWithdrawBinding? = null
     private var pendingWithdrawAmount: Double = 0.0
     private var pendingWithdrawMode: String = MODE_IMPS
-    private val showProgressWithdraw = ObservableBoolean(false)
+    // amount + fee from the fee preview; null until it loads (or when the fee isn't synced) — the server still checks
+    private var pendingWithdrawTotal: Double? = null
 
     // The withdrawal API call runs from the MPIN dialog's submit button
     private var mpinDialog: Dialog? = null
@@ -225,6 +226,8 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
+        confirmDialog?.dismiss()
+        withdrawConfirmDialog?.dismiss()
         mpinDialog?.dismiss()
         withdrawSuccessDialog?.dismiss()
         withdrawSoundPlayer.release()
@@ -346,7 +349,8 @@ class LoadWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errInsufficientBalance))
             return
         }
-        // TODO(B2C-298): G28 — POST wallet/withdrawals takes no payment mode or narration — both stay visible but are not sent
+        // TODO(B2C-298): G28 — POST wallet/withdrawals takes no payment mode or narration; both are hidden in
+        //  sheet_withdraw.xml and the mode stays IMPS — show them again once the API accepts them
         hideWithdrawSheet()
         showWithdrawConfirmDialog(amount, selectedPaymentMode)
     }
@@ -354,12 +358,11 @@ class LoadWalletActivity : BaseActivity() {
     private fun showWithdrawConfirmDialog(amount: Double, mode: String) {
         pendingWithdrawAmount = amount
         pendingWithdrawMode = mode
-        showProgressWithdraw.set(false)
+        pendingWithdrawTotal = null
 
         val dialogBinding = DialogConfirmWithdrawBinding.inflate(layoutInflater)
         withdrawConfirmDialogBinding = dialogBinding
         dialogBinding.onClickListener = onClickListener()
-        dialogBinding.showProgressWithdraw = showProgressWithdraw
 
         val dialog = Dialog(mActivity)
         withdrawConfirmDialog = dialog
@@ -395,6 +398,7 @@ class LoadWalletActivity : BaseActivity() {
             }
             b.tvFee.text = fee?.fee?.let { Utility.formatAmount(it) } ?: "--"
             b.tvTotal.text = fee?.total?.let { Utility.formatAmount(it) } ?: "--"
+            pendingWithdrawTotal = fee?.total?.toDoubleOrNull()
         }
     }
 
@@ -408,17 +412,7 @@ class LoadWalletActivity : BaseActivity() {
         dialogBinding.setupMpinBoxes()
         dialogBinding.onClickListener = onClickListener()
 
-        val dialog = Dialog(mActivity)
-        dialog.setContentView(dialogBinding.root)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.88).toInt(),
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        // requestFocus() alone doesn't raise the keyboard inside a Dialog
-        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        dialog.setCancelable(false)
+        val dialog = dialogBinding.createDialog(mActivity)
         dialog.setOnDismissListener {
             mpinDialog = null
             mpinDialogBinding = null
@@ -614,15 +608,15 @@ class LoadWalletActivity : BaseActivity() {
         fetchRewardsLevel()
     }
 
-    // Bonus balance comes from wallet/balance (populateWalletBalance); this loads the referral rows only
+    // Bonus balance comes from wallet/balance (populateWalletBalance); this loads the referral rows only.
+    // No toast on error — fetchVirtualAccount() already reports a failing load; the list shows its empty state
     private fun fetchReferralHistory() {
         viewModel.fetchReferralHistory(
             onSuccess = { rows ->
                 referralAdp.updateList(rows.take(2))
                 if (currentRecentTab == RecentTab.REFERRAL) updateEmptyState()
             },
-            onError = { msg ->
-                ToastUtil.showDelete(mActivity, msg)
+            onError = {
                 referralAdp.updateList(emptyList())
                 if (currentRecentTab == RecentTab.REFERRAL) updateEmptyState()
             }
@@ -878,14 +872,14 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet)
     }
 
+    // No toast on error — fetchVirtualAccount() already reports a failing load; the list shows its empty state
     private fun fetchRecentHistory() {
         viewModel.fetchRecentHistory(
             onSuccess = { list ->
                 transactionAdp.updateList(list)
                 if (currentRecentTab == RecentTab.WALLET) updateEmptyState()
             },
-            onError = { msg ->
-                ToastUtil.showDelete(mActivity, msg)
+            onError = {
                 if (currentRecentTab == RecentTab.WALLET) updateEmptyState()
             }
         )
@@ -1098,6 +1092,12 @@ class LoadWalletActivity : BaseActivity() {
 
                 withdrawConfirmDialogBinding?.cardWithdrawSecurely -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // Amount alone passed the sheet check — amount + fee must fit too
+                    val total = pendingWithdrawTotal
+                    if (total != null && total > (currentWalletBalance?.toDoubleOrNull() ?: 0.0)) {
+                        ToastUtil.showDelete(mActivity, getString(R.string.errInsufficientBalance), inWindow = false)
+                        return@OnClickListener
+                    }
                     showWithdrawMpinDialog()
                 }
 
