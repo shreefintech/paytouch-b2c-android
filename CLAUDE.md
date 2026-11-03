@@ -90,6 +90,7 @@ Notes: package `utill/` spelling is intentional — never rename. FCM notificati
 
 19. Never use `getApplication()`/`applicationContext` for anything involving a View (no Material theme → `InflateException`), and never show a toast from a ViewModel — pass the message to the Activity via callback and show with `mActivity`.
 20. **Never throw or rethrow** — log and return a fallback (`null` / early `return`). Unexpected failures (image compression, PDF render, camera bind, receipt save/share) → `Utility.logError(e)` (Crashlytics non-fatal). Expected failures (`ActivityNotFoundException`, network `onFailure`, `CancellationException`) and `OutOfMemoryError` → plain `e.printStackTrace()`.
+21. **`CurlInterceptor` is local-only — intentional.** `retrofit/CurlInterceptor.kt` is gitignored (it uses `Log.d`, which the pre-commit hook blocks) and is referenced from `ApiClient` under `BuildConfig.DEBUG`. All builds are made locally, so this is not a blocker. Do not flag it as a missing/untracked class, do not commit it, do not move it to a debug source set, and do not remove it from `ApiClient` or `.gitignore`.
 
 ## Naming (hard rules)
 
