@@ -211,14 +211,14 @@
 - App launch (already onboarded)
 
 **Exit points:**
-- Category tile tap → respective category screen (all implemented modules are wired; Cable TV tile is a TODO placeholder)
+- Bill tile tap → `BillPayActivity` for that `CategoryType` (FASTag → "Coming soon" toast, no route yet)
 - "Load Wallet" tap → `LoadWalletActivity`
 - "My Account" tile → `MyAccountActivity`
 
 **Key UI elements:**
 - Toolbar with PayTouch logo and back button
 - White card with "Categories" title
-- 3×3 grid of category tiles (Electricity, Gas, Prepaid, TV Cable, DTH, Fastag, Loan, My Account, Tax)
+- Category tiles from `GET billpay/categories` (only categories with billers), re-flowed in rows of three; My Account always shown; a Retry row replaces the bill tiles when the first load fails
 - Load Wallet button at the bottom of the card
 - **Aadhaar dialog (blocking):** on every create, `GET mobile/auth/me` is checked. When `kyc_rejection.items` contains both `aadhaar_number` and `aadhaar_photo` (`MeDataItem.canResubmitAadhaar`), a non-cancelable dialog asks for the Aadhaar number + document and submits to `POST mobile/kyc/individual/resubmit`. When `next_step` is `aadhaar_required`, the same dialog opens in add mode with State + City dropdowns and submits to `POST mobile/kyc/individual/aadhaar`. Only a successful submit dismisses it, then `auth/me` is re-checked. If `auth/me` fails, Home stays usable and the check repeats on the next launch.
 
@@ -230,123 +230,30 @@
 
 ---
 
-### ✅ Electricity Module
+### ✅ Bill Pay (all bill categories — one shared flow)
 
-Full module implemented. See Electricity as the canonical reference for all other modules.
-
-| Screen | Class | Package |
-|---|---|---|
-| Pay Bill | `ElectricityActivity` | `electricity/` |
-| Recent Transactions | `RecentTransactionActivity` | `electricity/transactions/` |
-| Transaction Report | `TransactionReportActivity` | `electricity/transactions/` |
-| Transaction Status | `ElectricityTransactionStatusActivity` | `electricity/transactions/` |
-| SMS Receipt | `SmsReceiptActivity` | `electricity/transactions/` |
-
----
-
-### ✅ Gas Module
-
-Full module implemented. Mirrors Electricity exactly.
+Every bill category opens the same screens with its `CategoryType` (`extra_category` = `CategoryType.value`).
+Flow and APIs: `docs/business_logic.md` §7.
 
 | Screen | Class | Package |
 |---|---|---|
-| Pay Bill | `GasActivity` | `gas/` |
-| Recent Transactions | `GasRecentTransactionActivity` | `gas/transactions/` |
-| Transaction Report | `GasTransactionReportActivity` | `gas/transactions/` |
-| Transaction Status | `GasTransactionStatusActivity` | `gas/transactions/` |
-| SMS Receipt | `GasSmsReceiptActivity` | `gas/transactions/` |
+| Pay Bill (form: company, circle, account fields, fetch bill / browse plan, fee, MPIN) | `BillPayActivity` | `billpay/` |
+| Plan selection (Prepaid, DTH) | `BillPayPlanSelectionActivity` | `billpay/` |
+| Payment result (polls status) | `BillPaymentStatusActivity` | `transactions/` |
+| Recent Transactions | `RecentTransactionActivity` | `billpay/transactions/` |
+| Transaction Report | `TransactionReportActivity` | `billpay/transactions/` |
+| Transaction Status (All / Success / Failed / Pending tabs) | `TransactionStatusActivity` | `billpay/transactions/` |
+| SMS Receipt | `SmsReceiptActivity` | `billpay/transactions/` |
 
----
-
-### ✅ DTH Module
-
-Full module implemented. DTH is a **plan-selection** module (`isMobileCategory = true`) — no fetch-bill step; user selects a plan before paying.
-
-| Screen | Class | Package |
-|---|---|---|
-| Pay Bill | `DthActivity` | `dth/` |
-| Plan Selection | `DthPlanSelectionActivity` | `dth/` |
-| Recent Transactions | `DthRecentTransactionActivity` | `dth/transactions/` |
-| Transaction Report | `DthTransactionReportActivity` | `dth/transactions/` |
-| Transaction Status | `DthTransactionStatusActivity` | `dth/transactions/` |
-| SMS Receipt | `DthSmsReceiptActivity` | `dth/transactions/` |
-
----
-
-### ✅ Mobile Prepaid Module
-
-Full module implemented. Prepaid is also a **plan-selection** module (`isMobileCategory = true`). Circle selection is required in addition to operator. No fetch-bill step.
-
-| Screen | Class | Package |
-|---|---|---|
-| Pay / Recharge | `PrepaidActivity` | `prepaid/` |
-| Plan Selection | `PrepaidPlanSelectionActivity` | `prepaid/` |
-| Recent Transactions | `PrepaidRecentTransactionActivity` | `prepaid/transactions/` |
-| Transaction Report | `PrepaidTransactionReportActivity` | `prepaid/transactions/` |
-| Transaction Status | `PrepaidTransactionStatusActivity` | `prepaid/transactions/` |
-| SMS Receipt | `PrepaidSmsReceiptActivity` | `prepaid/transactions/` |
-
----
-
-### ✅ Mobile Postpaid Module
-
-Full module implemented. Standard bill-payment flow (`isMobileCategory = true`): fetch bill → confirm → pay.
-
-| Screen | Class | Package |
-|---|---|---|
-| Pay Bill | `PostpaidActivity` | `postpaid/` |
-| Recent Transactions | `PostpaidRecentTransactionActivity` | `postpaid/transactions/` |
-| Transaction Report | `PostpaidTransactionReportActivity` | `postpaid/transactions/` |
-| Transaction Status | `PostpaidTransactionStatusActivity` | `postpaid/transactions/` |
-| SMS Receipt | `PostpaidSmsReceiptActivity` | `postpaid/transactions/` |
+Categories: Electricity, Gas, Postpaid, Loan, Municipal Tax (fetch bill) · Prepaid (circle + plans) · DTH (plans).
+FASTag tile shows "Coming soon" (matches iOS).
 
 ---
 
 ### ✅ Shared Transaction Detail
 
-`TransactionDetailActivity` (`transactions/TransactionDetailActivity.kt`) — shared by all modules. Never duplicated per module.
-
----
-
-### ✅ FASTag Module
-
-No bill-fetch step — user enters vehicle number and amount directly. Platform fee calculated in real time.
-
-| Screen | Class | Package |
-|---|---|---|
-| Recharge | `FastagActivity` | `fastag/` |
-| Recent Transactions | `FastagRecentTransactionActivity` | `fastag/transactions/` |
-| Transaction Report | `FastagTransactionReportActivity` | `fastag/transactions/` |
-| Transaction Status | `FastagTransactionStatusActivity` | `fastag/transactions/` |
-| SMS Receipt | `FastagSmsReceiptActivity` | `fastag/transactions/` |
-
----
-
-### ✅ Loan Repayment Module
-
-Bill-fetch pattern (mirrors Gas). `circleId = "0"` hardcoded. Flat payment response (no `ccf` field).
-
-| Screen | Class | Package |
-|---|---|---|
-| Pay Bill | `LoanActivity` | `loan/` |
-| Recent Transactions | `LoanRecentTransactionActivity` | `loan/transactions/` |
-| Transaction Report | `LoanTransactionReportActivity` | `loan/transactions/` |
-| Transaction Status | `LoanTransactionStatusActivity` | `loan/transactions/` |
-| SMS Receipt | `LoanSmsReceiptActivity` | `loan/transactions/` |
-
----
-
-### ✅ Municipal Tax Module
-
-Bill-fetch pattern. Transaction-status endpoint intentionally routes via `mobile-recharge/transaction-status` (backend-side routing — do not change the URL).
-
-| Screen | Class | Package |
-|---|---|---|
-| Pay Bill | `MunicipalTaxActivity` | `municipaltax/` |
-| Recent Transactions | `MunicipalTaxRecentTransactionActivity` | `municipaltax/transactions/` |
-| Transaction Report | `MunicipalTaxTransactionReportActivity` | `municipaltax/transactions/` |
-| Transaction Status | `MunicipalTaxTransactionStatusActivity` | `municipaltax/transactions/` |
-| SMS Receipt | `MunicipalTaxSmsReceiptActivity` | `municipaltax/transactions/` |
+`TransactionDetailActivity` (`transactions/TransactionDetailActivity.kt`) — shared by all categories. Never duplicated.
+View Receipt → `SmsReceiptActivity` with the row's `client_reference`.
 
 ---
 
@@ -488,28 +395,19 @@ Session check (read SharedPreferences)
                                                                                            ▼
                                                                                     HomeActivity ✅
                                                                                           │
-                           ┌──────────────────────────────┬──────────────────────────────┤
-                           ▼                              ▼                               ▼
-               ElectricityActivity ✅           GasActivity ✅                  DthActivity ✅
-                           │                              │                               │
-               ┌───────────┤               ┌─────────────┤               ┌───────────────┤
-              Pay  Recent Report Status   Pay  Recent Report Status      Pay  Plans Recent Report Status
-              Bill  Txns        Receipt  Bill  Txns        Receipt      Bill  Sel   Txns        Receipt
-               ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅    ✅   ✅    ✅    ✅   ✅
+                                                                                          │
+                     Bill tiles from billpay/categories (Electricity, Gas, Prepaid, Postpaid, DTH, Loan, Municipal Tax)
+                                                                                          │
+                                                                              BillPayActivity ✅ (one screen, CategoryType)
+                                                                                          │
+                     ┌──────────────┬──────────────┬───────────────┬──────────────┬───────┴────────────┐
+               Browse Plan    Report tab      Status tab      Receipt tab     Recent Txns       Pay (MPIN)
+               (Prepaid/DTH)       │               │               │               │                 │
+     BillPayPlanSelectionActivity ✅  TransactionReport  TransactionStatus  SmsReceipt  RecentTransaction  BillPaymentStatusActivity ✅
+                                    Activity ✅      Activity ✅       Activity ✅  Activity ✅         (polls) → SmsReceiptActivity ✅
 
-                           │                              │
-               PrepaidActivity ✅              PostpaidActivity ✅       FastagActivity ✅
-                           │                              │                    │
-               Plans  Recent Report Status   Recent Report Status    Recent Report Status Receipt
-                Sel    Txns        Receipt    Txns        Receipt      Txns
-                ✅      ✅    ✅    ✅   ✅     ✅    ✅    ✅    ✅         ✅    ✅    ✅    ✅
-
-                           │                              │
-               LoanActivity ✅             MunicipalTaxActivity ✅    MyAccountActivity ✅
-                           │                              │                    │
-               Recent Report Status Receipt  Recent Report Status Receipt   Account Info + Refer & Earn
-                Txns                          Txns                           KycDetailsActivity ✅
-                ✅    ✅    ✅    ✅             ✅    ✅    ✅    ✅
+               FASTag tile → "Coming soon" toast
+               MyAccountActivity ✅ (tile, always shown) → Account Info + Refer & Earn, KycDetailsActivity ✅
 
                LoadWalletActivity ✅ ("Load Wallet" button)
                     │
@@ -522,7 +420,7 @@ Session check (read SharedPreferences)
 
                ... (Cable TV 📋)
 
-All detail taps → TransactionDetailActivity ✅ (shared by all modules)
+All detail taps → TransactionDetailActivity ✅ (shared by all categories)
 
 [401 at any point]
      └──────────────────────────────────────────────────────► LoginActivity (stack cleared)
@@ -547,9 +445,11 @@ All object passing between activities uses `Gson().toJson(item)` into a single `
 
 | From | To | Extra Key | Type | Purpose |
 |---|---|---|---|---|
-| `DthActivity` | `DthPlanSelectionActivity` | `extra_operator_id` | String | Operator ID to fetch plans for |
-| `DthPlanSelectionActivity` | `DthActivity` (ActivityResult) | `extra_selected_plan` | String (JSON `DthPlanItem`) | Selected plan returned to caller |
-| `{Category}Activity` | `{Category}SmsReceiptActivity` | `extra_from_payment` | Boolean | `true` = after payment (hides title/tabs); `false` = from tab bar |
+| `HomeActivity` / `BillPayActivity` | `BillPayActivity` and every `billpay/transactions/` screen | `extra_category` | String (`CategoryType.value`) | Which bill category the screen serves |
+| `BillPayActivity` | `BillPayPlanSelectionActivity` | `extra_biller_id` / `extra_circle_code` | String / String? | Plans for the biller (circle prepaid only) |
+| `BillPayPlanSelectionActivity` | `BillPayActivity` (ActivityResult) | `extra_selected_plan` | String (JSON `BillPayPlanItem`) | Selected plan returned to caller |
+| `BillPayActivity` | `BillPaymentStatusActivity` | `extra_item` | String (JSON `BillPaymentStatusItem`) | client_reference, amount, status, is_final, category from billpay/pay |
+| `BillPaymentStatusActivity` / `TransactionDetailActivity` | `SmsReceiptActivity` | `extra_client_reference` + `extra_from_payment` | String + Boolean | Receipt for one payment; `fromPayment` hides title/tabs |
 | Any module | `TransactionDetailActivity` | `extra_item` | String (JSON `TransactionItem`) | Full transaction detail to display |
 | `LoadWalletActivity` | `PaymentStatusActivity` | `extra_item` | String (JSON `PaymentStatusItem`) | Order ID, amount, status to display |
 | `KycDetailsActivity` / `KycDocumentAdp` | `DocPreviewActivity` | `extra_file_url` | String | File URL to preview (PDF or image) |

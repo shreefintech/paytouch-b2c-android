@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/img_screen_bg"
-            tools:context=".electricity.transactions.TransactionReportActivity">
+            tools:context=".billpay.transactions.TransactionReportActivity">
 
             <!-- Toolbar -->
             <include

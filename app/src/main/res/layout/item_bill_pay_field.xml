@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One Bill Pay account field, inflated per biller input_param into BillPayActivity.llInputFields -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvFieldLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:ellipsize="end"
+        android:fontFamily="@font/proza_libre_medium"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_12" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_form_field"
+        android:fontFamily="@font/proza_libre_medium"
+        android:inputType="text"
+        android:padding="@dimen/margin_small_medium"
+        android:textColor="@color/black"
+        android:textColorHint="?attr/colorTextHint"
+        android:textSize="@dimen/text_size_13" />
+</LinearLayout>

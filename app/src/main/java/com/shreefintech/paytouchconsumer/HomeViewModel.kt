@@ -1,7 +1,6 @@
 package com.shreefintech.paytouchconsumer
 
 import android.app.Application
-import android.location.Location
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +12,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
-import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.billpay.BillPayCategoryItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -40,24 +39,33 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         callLogout(onComplete, onError)
     }
 
-    /** Fire-and-forget — used for payment risk checks; failures are not shown to the user. */
-    fun sendLocation(location: Location) {
-        if (!Utility.isInternetAvailable(getApplication())) return
-        val body = UserLocationRequest(
-            latitude = location.latitude,
-            longitude = location.longitude,
-            accuracy = if (location.hasAccuracy()) location.accuracy.toDouble() else null
-        )
-        ApiClient.apiService.sendLocation(bearerToken(), body)
-            .enqueue(object : Callback<MessageItem> {
-                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
-                    if (!response.isSuccessful) {
-                        IllegalStateException("sendLocation failed: HTTP ${response.code()}").printStackTrace()
+    /** GET billpay/categories — only categories with at least one active biller. */
+    fun loadBillPayCategories(
+        onLoading: () -> Unit,
+        onSuccess: (List<BillPayCategoryItem>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        onLoading()
+        ApiClient.apiService.getBillPayCategories(bearerToken())
+            .enqueue(object : Callback<General<List<BillPayCategoryItem>>> {
+                override fun onResponse(
+                    call: Call<General<List<BillPayCategoryItem>>>,
+                    response: Response<General<List<BillPayCategoryItem>>>
+                ) {
+                    val categories = response.body()?.data
+                    if (response.isSuccessful && categories != null) {
+                        onSuccess(categories)
+                    } else {
+                        onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                     }
                 }
 
-                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
-                    t.printStackTrace()
+                override fun onFailure(call: Call<General<List<BillPayCategoryItem>>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }

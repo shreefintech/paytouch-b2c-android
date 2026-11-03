@@ -49,7 +49,7 @@ Read these in order — each one builds on the previous:
 | 2 | `docs/dos_and_donts.md` | Hard constraints you must not violate — read before touching any code |
 | 3 | This file (root `README.md`) | Architecture, module map, and all cross-cutting rules |
 | 4 | `CLAUDE.md` | Strict code-generation rules (naming, patterns, API conventions) — repeat violators become review blockers |
-| 5 | `electricity/README.md` | Canonical bill-payment module — read before touching any payment flow |
+| 5 | `docs/business_logic.md` §7 | Bill Pay — the one shared flow for every bill category; read before touching any payment flow |
 | 6 | The README for the module you're working on | Module-specific flows, gotchas, and API models |
 
 ---
@@ -86,35 +86,10 @@ com.shreefintech.paytouchconsumer/
 |   |                   via LivenessChallengeHelper, auto-capture)
 |   \-- bank/
 |
-+-- electricity/        Electricity bill payment + transaction history (canonical module template)
++-- billpay/            Bill Pay -- ONE flow for every bill category (CategoryType)
+|   +-- BillPayActivity / BillPayPlanSelectionActivity
+|   +-- viewmodel/      BillPayViewModel, BillPayTransactionsViewModel, BillPayStatusViewModel, BillPayPlanSelectionViewModel
 |   \-- transactions/   RecentTransaction, TransactionReport, TransactionStatus, SmsReceipt
-|
-+-- gas/                Gas bill payment + transaction history (mirrors electricity/ exactly)
-|   \-- transactions/
-|
-+-- prepaid/            Mobile prepaid recharge -- operator + circle + plan selection, no bill fetch
-|   +-- viewmodel/
-|   \-- transactions/
-|
-+-- postpaid/           Mobile postpaid bill payment -- bill-fetch + circle selection
-|   +-- viewmodel/
-|   \-- transactions/
-|
-+-- dth/                DTH recharge -- operator + plan selection (mirrors Prepaid flow)
-|   +-- viewmodel/
-|   \-- transactions/
-|
-+-- fastag/             FASTag recharge -- no bill-fetch, vehicle number + amount, real-time fee
-|   +-- viewmodel/
-|   \-- transactions/
-|
-+-- loan/               Loan repayment -- bill-fetch pattern; circleId = "0"
-|   +-- viewmodel/
-|   \-- transactions/
-|
-+-- municipaltax/       Municipal tax -- bill-fetch; transaction-status routes via mobile-recharge endpoint
-|   +-- viewmodel/
-|   \-- transactions/
 |
 +-- myaccount/          My Account -- two-tab profile viewer (Account Info + Refer & Earn)
 |   \-- viewmodel/
@@ -150,14 +125,7 @@ com.shreefintech.paytouchconsumer/
 +-- retrofit/           All networking
 |   +-- model/
 |   |   +-- General.kt              Universal response wrapper { data, success, meta, message }
-|   |   +-- electricity/            Electricity request/response DTOs
-|   |   +-- gas/                    Gas request/response DTOs
-|   |   +-- prepaid/                Prepaid request/response DTOs
-|   |   +-- postpaid/               Postpaid request/response DTOs
-|   |   +-- dth/                    DTH request/response DTOs
-|   |   +-- fastag/                 FASTag request/response DTOs
-|   |   +-- loan/                   Loan request/response DTOs
-|   |   +-- municipaltax/           Municipal tax request/response DTOs
+|   |   +-- billpay/                Bill Pay DTOs (billers, plans, fetch bill, fee preview, pay, status, transactions)
 |   |   +-- kyc/                    KYC request/response DTOs (15+ files)
 |   |   +-- myaccount/              ReferralRewardsItem, EditProfileRequest
 |   |   +-- hdfc/                   HdfcCreateOrderRequest, HdfcOrderItem, etc.
@@ -181,7 +149,6 @@ com.shreefintech.paytouchconsumer/
 |                       (TransactionFilterHelper, ReceiptHelper, ToastUtil, Utility, SharedPreferenceHelper)
 |
 +-- BaseActivity.kt        All Activities extend this -- never AppCompatActivity
-+-- BaseBillViewModel.kt   Shared VPS/wallet balance-check logic -- every bill-payment ViewModel extends this
 +-- HomeActivity.kt        Main dashboard (will move to home/ package)
 +-- HomeViewModel.kt       Logout (removes FCM token first) + fire-and-forget location upload
 \-- Constant.kt            All URLs, SharedPrefs keys, and intent extra names
@@ -241,14 +208,8 @@ Register / Login
 | Auth | `SplashActivity` → `LoginActivity` | — | 6 | Complete |
 | KYC (Onboarding) | `KycActivity` | — | 5 + 4 fragments | Complete |
 | Home | `HomeActivity` | — | 1 | Complete |
-| Electricity | `ElectricityActivity` | Bill-fetch | 5 | Complete |
-| Gas | `GasActivity` | Bill-fetch | 5 | Complete |
-| Mobile Prepaid | `PrepaidActivity` | Plan-select | 6 | Complete |
-| Mobile Postpaid | `PostpaidActivity` | Bill-fetch | 5 | Complete |
-| DTH | `DthActivity` | Plan-select | 6 | Complete |
-| FASTag | `FastagActivity` | Amount-entry | 5 | Complete |
-| Loan Repayment | `LoanActivity` | Bill-fetch | 5 | Complete |
-| Municipal Tax | `MunicipalTaxActivity` | Bill-fetch | 5 | Complete |
+| Bill Pay (Electricity, Gas, Prepaid, Postpaid, DTH, Loan, Municipal Tax) | `BillPayActivity` (one screen, `CategoryType`) | Fetch bill / plan-select | 7 | API wired — pay not completable on staging yet |
+| FASTag | — ("Coming soon" toast, same as iOS) | — | — | No route yet |
 | My Account | `MyAccountActivity` | Profile | 3 | Complete |
 | Load Wallet | `LoadWalletActivity` | HDFC gateway | 4 | Complete |
 | Push Notifications | `MyFirebaseMessagingService` | FCM | — | Complete (deep links pending backend payload) |
@@ -256,13 +217,7 @@ Register / Login
 | TV Cable | — | — | — | Not started |
 | Broadband | — | — | — | Not started |
 
-**Bill-fetch pattern:** operator → consumer/account number → server fetches bill → show amount → pay (Electricity, Gas, Postpaid, Loan, Municipal Tax). Loan also shows the optional `additionalDetails` rows (agreement no., bill no., customer name) — the section is hidden when all are empty.
-
-**Proceed button (all 8 bill modules):** disabled (alpha 0.5) until the amount field holds a value > 0 — see `updateProceedButton()` in each Activity.
-
-**Plan-select pattern:** operator → select plan → amount auto-filled → pay (Prepaid, DTH)
-
-**Amount-entry pattern:** operator → vehicle number → user enters amount → real-time fee → pay (FASTag)
+**Bill Pay:** one flow for every bill category (iOS doc) — company → account fields from `input_params` → fetch bill (bill categories) or circle + plan (Prepaid / DTH) → `fee-preview` → MPIN → `billpay/pay` → poll `billpay/status` → receipt. Details: `docs/business_logic.md` §7.
 
 ---
 
@@ -280,7 +235,7 @@ Register / Login
 | No Context in ViewModel field | Pass context as a lambda parameter — never store it as a field |
 | No network in Adapters | All API calls belong in a ViewModel |
 | `Utility.stopClick()` guard | Every click that triggers navigation, API call, or form submit must call this first |
-| Extend `BaseBillViewModel` | Every main bill-payment ViewModel extends this; transaction/receipt ViewModels extend `AndroidViewModel` directly |
+| Bill Pay ViewModels extend `AndroidViewModel` | One shared flow — no per-category ViewModels, no client balance check (the server decides on `billpay/pay`) |
 | Reuse `transactions/` package | `TransactionItem`, `TransactionDetailActivity`, `TransactionAdp`, `RecentTransactionAdp` are shared by every module — never fork per module |
 | `Utility.maskNumber()` | Always mask the account/mobile number in list rows |
 | `Utility.formatAmount()` | Always use this for currency — never `"₹%.2f".format(value)` |
@@ -308,7 +263,7 @@ Auth + onboarding endpoints are in `ApiService` under the `MOBILE` prefix (`api/
 
 ### ApiAdminClient — `admin.paytouch.in`
 
-Separate singleton. Used for VPS user registration (fire-and-forget after login success) and VPS balance checks (`BaseBillViewModel.checkVpsBalance()`). Adds `SessionInterceptor` only (updates `LAST_INTERACTION` + global 401 handling) — no header, logging, or curl interceptors. Timeouts: 30s connect / read / write.
+Separate singleton. Used for VPS user registration (fire-and-forget after login success). Adds `SessionInterceptor` only (updates `LAST_INTERACTION` + global 401 handling) — no header, logging, or curl interceptors. Timeouts: 30s connect / read / write.
 
 ### Device Endpoints (bearer token required, `MessageItem` response)
 
@@ -418,7 +373,7 @@ binding.flFetchBill.attach(binding.clRoot as ViewGroup)
 
 | Thing | Pattern | Example |
 |---|---|---|
-| Activity | PascalCase + `Activity` | `ElectricityActivity` |
+| Activity | PascalCase + `Activity` | `BillPayActivity` |
 | Adapter | PascalCase + `Adp` — never `Adapter` | `TransactionAdp` |
 | Model / DTO | PascalCase + `Item` — never `Response`, `Model`, `Dto` | `TransactionItem` |
 | ViewModel | PascalCase + `ViewModel` | `LoginViewModel` |
@@ -463,10 +418,7 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 
 | Location | Apparent anomaly | Confirmed behaviour |
 |---|---|---|
-| `getMunicipalTaxTransactionStatus` in `ApiService.kt` | Uses `@POST("mobile-recharge/transaction-status")` (not `municipal-taxes/...`) | Backend-side intentional routing. Do not change this URL. |
-| `MunicipalTaxLatestPaymentDataItem.subService` | `@field:SerializedName("subservice")` has no underscore | Backend sends `subservice`, not `sub_service`. Do not rename. |
 | `KycViewModel.callInitiate()` — HTTP 422 from `initiateKyc` | 422 treated the same as success | 422 means KYC was already initiated. Proceed as if initiation succeeded. |
-| Gas `circleId` | Hardcoded `"0"` | Gas uses `"0"`, Electricity uses `"00"`. Both are correct per their server contracts. |
 
 ---
 
@@ -503,14 +455,6 @@ Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)`
 |---|---|
 | Auth | `app/src/main/java/.../auth/README.md` |
 | KYC (Onboarding) | `app/src/main/java/.../kyc/README.md` |
-| Electricity | `app/src/main/java/.../electricity/README.md` — **canonical bill-payment template** |
-| Gas | `app/src/main/java/.../gas/README.md` (mirrors Electricity) |
-| Mobile Prepaid | `app/src/main/java/.../prepaid/README.md` |
-| Mobile Postpaid | `app/src/main/java/.../postpaid/README.md` |
-| DTH | `app/src/main/java/.../dth/README.md` |
-| FASTag | `app/src/main/java/.../fastag/README.md` |
-| Loan Repayment | `app/src/main/java/.../loan/README.md` |
-| Municipal Tax | `app/src/main/java/.../municipaltax/README.md` |
 | My Account | `app/src/main/java/.../myaccount/README.md` |
 | Load Wallet | `app/src/main/java/.../loadwallet/README.md` |
 | Push Notifications (FCM) | `app/src/main/java/.../fcm/README.md` |

@@ -208,168 +208,129 @@ Same unified `auth/forgot-credential` endpoints as MPIN reset (§3), with `type 
 **Screen:** `HomeActivity`
 
 ### What It Does
-The main menu of the app. Displays category tiles that navigate to each payment flow.
+The main menu. Bill tiles come from `GET api/mobile/billpay/categories` — a tile shows only when its category is listed
+(only categories with at least one active biller are listed). My Account and Load Wallet always show.
 
-### Categories Displayed
-1. Electricity → `ElectricityActivity`
-2. Gas → `GasActivity`
-3. Prepaid (Mobile) → `PrepaidActivity`
-4. TV Cable → 📋 Planned
-5. DTH → `DthActivity`
-6. FASTag → `FastagActivity`
-7. Loan → `LoanActivity`
-8. My Account → `MyAccountActivity`
-9. Municipal Tax → `MunicipalTaxActivity`
-10. Load Wallet (bottom action) → `LoadWalletActivity`
+### Tiles → `CategoryType` (`enums/CategoryType.kt`, `value` = backend `category`)
+| Tile | `category` | Opens |
+|---|---|---|
+| Electricity | `electricity` | `BillPayActivity` (fetch bill) |
+| Gas | `gas` | `BillPayActivity` (fetch bill) |
+| Prepaid | `prepaid` | `BillPayActivity` (plans, with circle) |
+| Postpaid | `mobile_postpaid` | `BillPayActivity` (fetch bill) |
+| DTH | `dth` | `BillPayActivity` (plans, no circle) |
+| FASTag | `fastag` | "Coming soon" toast — no route yet (same as iOS) |
+| Loan | `loan_repayment` | `BillPayActivity` (fetch bill) |
+| Municipal Tax | `municipal_taxes` | `BillPayActivity` (fetch bill) |
+| My Account | — | `MyAccountActivity` (always shown) |
 
 ### Rules
-- On Home load, fetch dynamic Shreefintech token from server → store in `Constant.TOKEN` or SharedPreferences
-- Fetch and display current wallet balance
-- Logout calls the logout API, clears SharedPreferences, returns to `LoginActivity` with cleared stack
+- Listed categories with no tile (`broadband_postpaid`, `water`, `insurance`, …) are ignored.
+- Visible tiles are re-flowed into rows of three (`HomeActivity.layoutCategoryTiles()`), in the layout's order.
+- Bill tiles stay hidden until the first response. If the first load fails, a Retry row replaces them. The error toast
+  shows only on the first load and on Retry; the silent refresh on every `onResume()` keeps the last good tiles.
+- `POST api/mobile/location` is sent on Home open (`LocationPermissionHelper` → `sendLocation()` in `ViewModelExt.kt`).
+- Logout calls the logout API, clears SharedPreferences, returns to `LoginActivity` with cleared stack.
 
 ### API Endpoints
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `api/shreefintech-token` | Fetch dynamic payment token |
-| GET | `api/wallet/balance` | Fetch current wallet balance |
+| GET | `api/mobile/billpay/categories` | Which bill tiles to show — `General<List<BillPayCategoryItem>>` |
+| POST | `api/mobile/location` | Location for payment risk checks (required before pay) |
 | POST | `api/mobile/auth/logout` | Log out user |
 
 ---
 
-## 7. Standard Bill Payment Flow
+## 7. Bill Pay (every bill category — one shared flow)
 
-This flow applies to: Electricity, Gas, Mobile Postpaid, Cable TV, Broadband, FASTag, Loan, Municipal Tax.
+Source: the iOS "Bill Pay Module — Dashboard to Receipt" doc. Every category uses **one screen** (`billpay/BillPayActivity`,
+`activity_bill_pay.xml`) and the same APIs; the only branch is how the amount is found:
+**bill categories fetch a bill, prepaid and DTH pick a plan** (`CategoryType.isPlanBased`, `needsCircle`).
+
+All routes are on `backend-b2c.paytouch.in/api/mobile/` (`ApiService`, `MOBILE` prefix), with `Authorization: Bearer`.
+Envelope `{success, message, meta, data}` → `General<T>`, success = `isSuccessful && data != null`
+(except `transactions`, see below). Models: `retrofit/model/billpay/`.
 
 ### Steps
-1. User selects operator from dropdown (fetched from API)
-2. User enters consumer/account number
-3. App calls `fetch-bill` API → displays outstanding amount, due date, consumer name
-4. User confirms and taps Pay
-5. Platform fee is calculated and shown
-6. Payment processed via `process-payment` API
-7. App calls `transaction-status` to get final result
-8. Success/failure sound plays
-9. Receipt is displayed
+1. **Company** — `GET billpay/utility-billers?category=X` → `List<BillPayBillerItem>`. Picked via `OperatorSelectionActivity`.
+   `id` is sent later as `biller_id` (as a string).
+2. **Account fields** — one field per `input_params` entry, keyed by `param_name` (else `name` / `key`), labelled by its
+   `label` (else `CategoryType.fieldLabelRes`). `input_params: []` → one field keyed by `CategoryType.defaultParamName`
+   (`consumer_number` electricity/gas; `mobile_number` prepaid/postpaid/DTH). No default (loan, municipal tax, FASTag)
+   → "This company's details couldn't be loaded" and the biller can't be paid. `mobile_number` = 10 digits.
+3. **Amount**
+   - Bill categories: `POST billpay/fetch-bill` `{biller_id, input_params}` → `BillPayBillItem`. `has_bill: false` →
+     "No bill found", no bill card. Found → bill card (customer_name, due_date, bill_date, amount) and the Amount field.
+     `enquiry_ref` is not shown. Editing an account field clears the fetched bill.
+   - Prepaid: `GET billpay/circles` → `List<BillPayCircleItem>`; `code` is the 2-digit `circle_code`.
+   - Prepaid / DTH: `GET billpay/utility-billers/{id}/plans?circle_code=05` (circle_code left out for DTH) →
+     `List<BillPayPlanItem>` in `BillPayPlanSelectionActivity`. Picking a plan fills the Amount field.
+4. **Fee** — `GET billpay/fee-preview?amount=500` → `BillPayFeePreviewItem`. Platform Fee row = `fee + gst_amount`,
+   Total Payable row = `total`. Re-fetched (400 ms debounce) when the amount changes, kept only for the amount it was
+   asked for. Proceed is blocked until the preview matches the current amount. No client-side fee table.
+5. **Pay** — Proceed checks bank details (`BankDetailsDialogHelper.runIfBankAdded`), terms, then the MPIN popup
+   (`dialog_mpin.xml`, `MpinDialogExt.kt`). Submit → `POST billpay/pay` (HTTP 201):
+   `{biller_id, input_params (+ circle_code for prepaid), amount (string), mpin, request_id}`. No separate MPIN verify,
+   no client wallet/VPS balance check — the server decides.
+   - `request_id` is an idempotency key (`MoneyRequestId`), new per attempt, reused while the same attempt
+     (biller + params + amount) is retried after an unknown outcome. It is **not** a transaction id.
+   - Response = same shape as `billpay/status` → read `client_reference` and open `BillPaymentStatusActivity`.
+6. **Status** — `BillPaymentStatusActivity` polls `GET billpay/status/{client_reference}` every 2.5 s
+   (`Constant.BILLPAY_POLL_INTERVAL_MS`) until `is_final`, capped at `BILLPAY_POLL_MAX_ATTEMPTS` (~60 s, then it stays on
+   "Payment Processing"). 5 s after a final status it opens the receipt.
 
-> Transaction ID is generated and returned by the backend in the `process-payment` response — never generate it client-side.
-
-### Platform Fee Calculation
-```
-amount < 1000            → fee = ₹4
-1000 ≤ amount ≤ 5000     → fee = ₹8
-5001 ≤ amount ≤ 40000    → fee = ₹20
-amount > 40000           → fee = ₹30
-```
-
-### Electricity API Endpoints (same pattern, replace `electricity` with other category names)
-| Method | Path | Purpose |
+| `status` | Final? | Result screen |
 |---|---|---|
-| GET | `api/electricity/operators` | Get operator list |
-| POST | `api/electricity/fetch-bill` | Fetch outstanding bill |
-| POST | `api/electricity/process-payment` | Process payment |
-| POST | `api/electricity/verify` | Verify payment result |
-| POST | `api/electricity/transaction-status` | Check transaction status by ID |
-| GET | `api/electricity/payment-reports` | Filtered payment reports |
-| GET | `api/electricity/latest-payment` | Most recent payment |
-| GET | `api/electricity/payment-history` | Full payment history |
+| `success` | Yes | Payment Successful → receipt |
+| `failed`, `expired` | Yes | Payment Failed, with `failure_reason` when sent |
+| `pending`, `processing`, `unconfirmed` | No | Keep polling; "Payment Processing" if it stays open |
 
-### Key Request Fields (Fetch Bill)
-- `operator` (String, required)
-- `consumer_number` (String, required)
+### Status / transaction row fields (`BillPayTransactionItem`)
+Read: `client_reference`, `status`, `is_final`, `amount`, `charge + gst_amount` (platform fee), `biller_name`,
+`input_params` (account = first value other than `circle_code`), `identifier_label` (account label; `null` for imported
+old payments), `provider_ref`, `txn_reference` (reference fallback), `failure_reason`, `created_at`.
+Not read yet: `payment_breakdown`, `level`, `tds`. No customer name and no numeric id in this shape.
 
-### Key Request Fields (Process Payment)
-- `operator` (String, required)
-- `consumer_number` (String, required)
-- `amount` (Decimal, required)
-### Edge Cases
-- If `fetch-bill` fails, the Pay button stays disabled
-- If `process-payment` returns pending status, show "processing" state and allow re-check
+### Receipt, Recent, Transaction Status, Report — `GET transactions`
+`GET transactions?category=X&page=1&per_page=20` (optional `status`; `per_page` 1–50). Bills and recharges only,
+newest first. Flat body → `BillPayTransactionPageItem` (`success`, `data` rows, `meta.current_page / last_page`).
+Shared VM: `BillPayTransactionsViewModel` (paging + `mapToTransactionItem()` / `mapToDisplayItem()`).
+
+| Screen (`billpay/transactions/`) | Calls | Notes |
+|---|---|---|
+| `SmsReceiptActivity` (form tab, no ref) | `transactions?category=X&per_page=1` → first row's `client_reference` → `billpay/status/{ref}` | Latest payment |
+| `SmsReceiptActivity` (row / result) | `billpay/status/{client_reference}` | Reference row = `provider_ref`, else `client_reference` |
+| `RecentTransactionActivity` | `transactions?category=X` | Paged by `meta.current_page < last_page` |
+| `TransactionStatusActivity` | `transactions?category=X` | Tabs All / Success / Failed / Pending: success / failed sent as `status`; pending (pending, processing, unconfirmed) filtered in the app |
+| `TransactionReportActivity` | `transactions?category=X` | Success / Failed sent as `status`; Pending, date range and account number filtered in the app |
+
+`GET transactions/pending` exists on the backend but no screen uses it yet.
+
+### Errors
+403 has a top-level `error_code`; 422 has messages under `data.<field>` (`ApiHelper.parseErrorMessage()` shows the
+first one). `ApiHelper.parseErrorCode()` reads `error_code`.
+
+| Error | When | What the app does |
+|---|---|---|
+| 403 `BANK_DETAILS_REQUIRED` | Pay with no bank details | Clears `KEY_BANK_DETAILS_ADDED`, opens the Add Bank Details popup; Save retries Proceed to Pay |
+| 403 `LOCATION_REQUIRED` | Pay with no location this login | Toast, resends location (`LocationPermissionHelper`); the user taps Pay again |
+| 403 `AADHAAR_REQUIRED` / `KYC_RESUBMIT_REQUIRED` | KYC missing / rejected | `ApiHelper` opens the KYC step via `NextStepRouter` |
+| 403 `USER_BLOCKED` | Account blocked | `ApiHelper` signs out to Login |
+| 401 | Session expired | `SessionInterceptor` signs out to Login |
+| 422 | Bad input (amount, params, MPIN) | Toast with the message; form and MPIN popup stay |
+| Timeout / 5xx on pay | Outcome unknown | "Not confirmed" toast pointing to Recent Transactions, form resets; never shown as failed |
+| No internet | Before sending | No-internet toast or screen; nothing sent |
+
+### Open backend questions (from the iOS doc, 2026-11-03)
+- `billpay/pay` doesn't complete on staging yet; staging electricity billers (BESCOM 33, PGVCL 34) send `input_params: []`.
+- Gas, prepaid, postpaid, DTH, loan and municipal tax have no staging billers yet → their tiles are hidden.
+- No real `billpay/status` sample after a completed payment yet (with `payment_breakdown`, `level`). Sample values in
+  the iOS doc are illustrative.
+- Live API (`www.paytouch.in/api/mobile/`) answers 404 today.
 
 ---
 
-## 8. Mobile Prepaid Recharge
-
-### How It Differs from Standard Bill Payment
-- **No `fetch-bill` step** — user enters amount directly (or selects a plan)
-- Circle (telecom zone) must also be selected
-- Plan selection is available (fetches from API after operator + circle selected)
-
-### API Endpoints
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `api/states` | Get circle (telecom zone) list — fetched on screen open |
-| GET | `api/recharge/operators` | Get prepaid operators |
-| GET | `api/recharge/plans/{operatorId}/{circleId}` | Get plans for selected operator + circle |
-| POST | `api/recharge/process-direct` | Process recharge |
-
-> Prepaid transaction screens (recent transactions, report, status, SMS receipt) are fully implemented.
-
-### Response Fields (States/Circles — `General<T>` wrapped)
-- `data[].id` (String), `data[].name` (String)
-
-### Response Fields (Operators — `General<T>` wrapped)
-- `data[].id` (String), `data[].name` (String), `data[].code` (String)
-
-### Response Fields (Plans — flat)
-- `success` (Boolean)
-- `plans[].plan_type` (Int), `plans[].amount` (Int), `plans[].description` (String), `plans[].validity` (String), `plans[].data` (String)
-- `operator_id` (String), `circle_id` (String)
-
-### Request Fields (Process Recharge)
-- `mobile_no` (String, required)
-- `operator_code` (String, required)
-- `circle_code` (String, required) — `id` from the `api/states` response (server-fetched, not a hardcoded list)
-- `amount` (Decimal, required)
-- `platform_fee` (Decimal, required)
-- `total_payable` (Decimal, required)
-
-### Response Fields (Process Recharge — flat)
-- `success` (Boolean), `message` (String), `req_id` (String), `amount` (Decimal), `platform_fee` (Decimal), `total_payable` (Decimal), `status` (String), `transaction_id` (String)
-
----
-
-## 9. DTH Recharge
-
-### How It Differs
-- Has explicit plan selection after operator is chosen
-- Uses `process-direct` endpoint (not `process-payment`)
-
-### API Endpoints
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `api/dth/operators` | Get DTH operators |
-| GET | `api/dth/plans` | Get plans for selected operator |
-| POST | `api/dth/process-direct` | Process recharge |
-| POST | `api/dth/transaction-status` | Check status |
-
----
-
-## 10. FASTag Recharge
-
-### How It Differs
-- **No `fetch-bill` step** — user enters vehicle number, operator, and amount directly (same style as Prepaid/DTH)
-- Uses `api/fastag` (not `process-payment`) to process the recharge
-
-### API Endpoints
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `api/fastag/operators` | Get FASTag operators |
-| POST | `api/fastag` | Process recharge |
-
-> FASTag transaction screens (recent transactions, report, status, SMS receipt) are fully implemented.
-
-### Request Fields (Process Recharge)
-- `vehicle_number` (String, required)
-- `operator` (String, required), `operator_name` (String, required)
-- `circle` (String, required)
-- `amount` (Decimal, required), `platform_fee` (Decimal, required), `total_payable` (Decimal, required)
-
-### Response Fields (Process Recharge — flat)
-- `success` (Boolean), `message` (String), `req_id` (String), `status` (String), `transaction_id` (String)
-
----
-
-## 11. Wallet
+## 8. Wallet
 
 ### Rules
 - Balance is fetched fresh from the API on every Home/dashboard load
@@ -393,7 +354,7 @@ amount > 40000           → fee = ₹30
 
 ---
 
-## 11a. Load Wallet (HDFC Gateway Flow)
+## 8a. Load Wallet (HDFC Gateway Flow)
 
 ### What It Does
 User enters a top-up amount, the app creates an HDFC payment order, then opens `HdfcWebViewActivity` with the payment URL. On payment completion, HDFC redirects to a return URL which the WebView intercepts — routing to `PaymentStatusActivity`.
@@ -414,25 +375,27 @@ User enters a top-up amount, the app creates an HDFC payment order, then opens `
 
 ---
 
-## 12. Transaction History & Reporting
+## 9. Transaction History & Reporting
 
 ### Rules
 - Transaction history is fetched from the API — no local database is used
-- Each module has its own paginated report endpoint (`api/{category}/payment-reports`)
-- Recent transactions use `api/{category}/payment-history` (most recent records)
-- Search can be done by transaction ID or consumer number
-- Report filtering: category, consumer number, status (Success/Failed/Processing), from-date, to-date
-- `TransactionDetailActivity` is shared across all modules; detail is passed via `Gson().toJson(TransactionItem)`
+- Bill payments: one endpoint for every category — `GET api/mobile/transactions?category=` (see §7)
+- `TransactionDetailActivity` is shared across all categories; detail is passed via `Gson().toJson(TransactionItem)`;
+  its View Receipt opens `billpay/transactions/SmsReceiptActivity` with the row's `client_reference`
+- Wallet history (`TransactionHistoryDetailActivity`) is separate — see §8 / §8a
 
 ---
 
-## 13. Transaction ID
+## 10. Transaction ID / client_reference
 
-Backend-generated, returned in the `process-payment` / `process-direct` response; read it from there for status lookups and receipts. Never generated client-side, never sent in a request DTO (`Utility.generateTransactionId()` was removed — do not recreate). Format `PYTCH…` is server-set; treat as an opaque string.
+Bill payments are identified by the server's `client_reference`, returned by `billpay/pay` and used for
+`billpay/status/{client_reference}` and receipts. Never generated client-side (`Utility.generateTransactionId()` was
+removed — do not recreate). The only client-made id is `request_id` — an idempotency key (`MoneyRequestId`), not a
+transaction id. Treat every server id as an opaque string.
 
 ---
 
-## 14. Session Management
+## 11. Session Management
 
 ### SharedPreferences Store Map
 | Store | Key | Type | Purpose |
@@ -461,7 +424,7 @@ Backend-generated, returned in the `process-payment` / `process-direct` response
 
 ---
 
-## 15. VPS Backend Synchronization
+## 12. VPS Backend Synchronization
 
 ### What Gets Synced
 | Event | VPS Action |
@@ -479,13 +442,13 @@ Backend-generated, returned in the `process-payment` / `process-direct` response
 
 ---
 
-## 16. Internet Connectivity
+## 13. Internet Connectivity
 
 `Utility.isInternetAvailable(context)` before every API request; offline → `ToastUtil` message, no call. Full offline UX: `docs/no_internet_handling.md`.
 
 ---
 
-## 17. Payment Sound Feedback
+## 14. Payment Sound Feedback
 
 ### Rules
 - `payment_success.mp3` plays on successful payment

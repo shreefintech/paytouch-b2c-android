@@ -99,7 +99,9 @@ class RecentTransactionAdp(
                 item.isMobileCategory  -> R.string.labelDetailMobileNo
                 else                   -> R.string.labelDetailConsumerNo
             }
-            tvDetailAccountNumber.text = context.getString(accountLabelRes, item.accountNumber)
+            tvDetailAccountNumber.text = item.identifierLabel
+                ?.let { context.getString(R.string.labelDetailIdentifierFmt, it, item.accountNumber) }
+                ?: context.getString(accountLabelRes, item.accountNumber)
             tvDetailReference.text = context.getString(R.string.labelDetailReference, item.reference)
         }
         bindExpandState(binding, item, animate = false)
