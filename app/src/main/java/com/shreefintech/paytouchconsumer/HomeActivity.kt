@@ -45,6 +45,11 @@ import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
+import com.shreefintech.paytouchconsumer.retrofit.model.CityItem
+import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
+import com.shreefintech.paytouchconsumer.utill.loadAddressCities
+import com.shreefintech.paytouchconsumer.utill.loadAddressStates
+import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 // import com.shreefintech.paytouchconsumer.rewards.LevelUpActivity  // TODO(B2C-147): restore with checkLevelUp
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
@@ -83,11 +88,16 @@ class HomeActivity : BaseActivity() {
     // True when the location flow ended while Home was not in front — asked again in onResume()
     private var isNotificationPermissionPending = false
 
-    // ── Aadhaar dialog (blocking — shown while auth/me returns kyc_rejection or an Aadhaar next_step) ──
+    // ── Aadhaar dialog (blocking — resubmit when both Aadhaar items are rejected, add when next_step is aadhaar_required) ──
     private val showProgressAadhaar = ObservableBoolean(false)
     private var aadhaarDialog: Dialog? = null
     private var aadhaarBinding: DialogReuploadAadhaarBinding? = null
     private var aadhaarUri: Uri? = null
+    // Add mode only — kyc/individual/aadhaar also takes state_id + city_id
+    private var stateList = listOf<StateItem>()
+    private var cityList = listOf<CityItem>()
+    private var selectedStateId = ""
+    private var selectedCityId = ""
     private val aadhaarDir by lazy { File(filesDir, Constant.KYC_AADHAAR_REUPLOAD_DIR) }
     private lateinit var filePickerUtil: FilePickerUtil
 
@@ -139,7 +149,7 @@ class HomeActivity : BaseActivity() {
 
     private fun checkKycStep() {
         viewModel.checkAadhaarRejected(
-            onRejected = { if (!isFinishing && !isDestroyed) showReuploadAadhaarDialog() },
+            onAadhaarDialog = { isAddMode -> if (!isFinishing && !isDestroyed) showReuploadAadhaarDialog(isAddMode) },
             onRedirect = { nextStep ->
                 if (isFinishing || isDestroyed) return@checkAadhaarRejected
                 startActivity(NextStepRouter.intentFor(mActivity, nextStep, null).apply {
@@ -266,11 +276,15 @@ class HomeActivity : BaseActivity() {
         }
     }
 
-    private fun showReuploadAadhaarDialog() {
+    private fun showReuploadAadhaarDialog(isAddMode: Boolean) {
         if (aadhaarDialog?.isShowing == true) return
         val dialogBinding = DialogReuploadAadhaarBinding.inflate(layoutInflater)
         showProgressAadhaar.set(false)
         aadhaarUri = null
+        selectedStateId = ""
+        selectedCityId = ""
+        cityList = emptyList()
+        dialogBinding.isAddMode = isAddMode
         dialogBinding.showProgress = showProgressAadhaar
         dialogBinding.onClickListener = aadhaarClickListener(dialogBinding)
         dialogBinding.etAadhaarNumber.filters = arrayOf(
@@ -308,6 +322,94 @@ class HomeActivity : BaseActivity() {
                 tintColor = ContextCompat.getColor(mActivity, R.color.filter_bg)
             )
         }
+        if (isAddMode && stateList.isEmpty()) loadStates(dialogBinding)
+    }
+
+    private fun loadStates(dialogBinding: DialogReuploadAadhaarBinding) {
+        viewModel.loadAddressStates(
+            onLoading = { setDropdownLoading(dialogBinding.pbStateLoading, dialogBinding.ivStateArrow, dialogBinding.flStateAnchor, true) },
+            onSuccess = onSuccess@{ states ->
+                if (isDestroyed) return@onSuccess
+                setDropdownLoading(dialogBinding.pbStateLoading, dialogBinding.ivStateArrow, dialogBinding.flStateAnchor, false)
+                stateList = states
+            },
+            onError = onError@{ msg ->
+                if (isDestroyed) return@onError
+                setDropdownLoading(dialogBinding.pbStateLoading, dialogBinding.ivStateArrow, dialogBinding.flStateAnchor, false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
+    private fun loadCities(dialogBinding: DialogReuploadAadhaarBinding, stateId: String) {
+        viewModel.loadAddressCities(
+            stateId = stateId,
+            onLoading = { setDropdownLoading(dialogBinding.pbCityLoading, dialogBinding.ivCityArrow, dialogBinding.flCityAnchor, true) },
+            onSuccess = onSuccess@{ cities ->
+                if (isDestroyed) return@onSuccess
+                setDropdownLoading(dialogBinding.pbCityLoading, dialogBinding.ivCityArrow, dialogBinding.flCityAnchor, false)
+                // State changed while this was loading — keep only the latest state's cities
+                if (stateId == selectedStateId) cityList = cities
+            },
+            onError = onError@{ msg ->
+                if (isDestroyed) return@onError
+                setDropdownLoading(dialogBinding.pbCityLoading, dialogBinding.ivCityArrow, dialogBinding.flCityAnchor, false)
+                ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
+    // Small spinner replaces the arrow in the field slot
+    private fun setDropdownLoading(progress: View, arrow: View, anchor: View, loading: Boolean) {
+        progress.visibility = if (loading) View.VISIBLE else View.GONE
+        arrow.visibility = if (loading) View.GONE else View.VISIBLE
+        anchor.isClickable = !loading
+        anchor.isFocusable = !loading
+    }
+
+    private fun showStateDropdown(dialogBinding: DialogReuploadAadhaarBinding) {
+        if (stateList.isEmpty()) {
+            loadStates(dialogBinding)
+            return
+        }
+        CustomDropdown.showDropdown(
+            activity = mActivity,
+            anchorView = dialogBinding.flStateAnchor,
+            arrowView = dialogBinding.ivStateArrow,
+            textView = dialogBinding.tvState,
+            items = stateList.map { it.name.orEmpty() }
+        ) { _, index ->
+            val state = stateList.getOrNull(index) ?: return@showDropdown
+            selectedStateId = state.id.orEmpty()
+            dialogBinding.tvState.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
+            selectedCityId = ""
+            cityList = emptyList()
+            dialogBinding.tvCity.text = getString(R.string.hintSelectCity)
+            dialogBinding.tvCity.setTextColor(ContextCompat.getColor(mActivity, android.R.color.darker_gray))
+            if (selectedStateId.isNotEmpty()) loadCities(dialogBinding, selectedStateId)
+        }
+    }
+
+    private fun showCityDropdown(dialogBinding: DialogReuploadAadhaarBinding) {
+        if (selectedStateId.isEmpty()) {
+            ToastUtil.showDelete(mActivity, getString(R.string.msgStateEmpty))
+            return
+        }
+        if (cityList.isEmpty()) {
+            loadCities(dialogBinding, selectedStateId)
+            return
+        }
+        CustomDropdown.showDropdown(
+            activity = mActivity,
+            anchorView = dialogBinding.flCityAnchor,
+            arrowView = dialogBinding.ivCityArrow,
+            textView = dialogBinding.tvCity,
+            items = cityList.map { it.name.orEmpty() }
+        ) { _, index ->
+            val city = cityList.getOrNull(index) ?: return@showDropdown
+            selectedCityId = city.id.orEmpty()
+            dialogBinding.tvCity.setTextColor(ContextCompat.getColor(mActivity, R.color.black))
+        }
     }
 
     private fun aadhaarClickListener(dialogBinding: DialogReuploadAadhaarBinding): View.OnClickListener {
@@ -322,6 +424,18 @@ class HomeActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressAadhaar.get()) return@OnClickListener
                     clearAadhaarSlot(dialogBinding)
+                }
+                dialogBinding.flStateAnchor -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressAadhaar.get()) return@OnClickListener
+                    Utility.hideKeyboard(dialogBinding.root)
+                    showStateDropdown(dialogBinding)
+                }
+                dialogBinding.flCityAnchor -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressAadhaar.get()) return@OnClickListener
+                    Utility.hideKeyboard(dialogBinding.root)
+                    showCityDropdown(dialogBinding)
                 }
                 dialogBinding.cardSubmit -> {
                     if (Utility.stopClick()) return@OnClickListener
@@ -373,9 +487,12 @@ class HomeActivity : BaseActivity() {
         Utility.hideKeyboard(dialogBinding.root)
         val aadhaar = dialogBinding.etAadhaarNumber.text?.toString()?.trim().orEmpty()
         val uri = aadhaarUri
+        val isAddMode = dialogBinding.isAddMode
         val msg = when {
             aadhaar.isEmpty() -> { dialogBinding.etAadhaarNumber.requestFocus(); getString(R.string.msgAadharEmpty) }
             aadhaar.length != 12 -> { dialogBinding.etAadhaarNumber.requestFocus(); getString(R.string.msgAadharInvalid) }
+            isAddMode && selectedStateId.isEmpty() -> getString(R.string.msgStateEmpty)
+            isAddMode && selectedCityId.isEmpty() -> getString(R.string.msgCityEmpty)
             uri == null -> getString(R.string.msgAadhaarPhotoRequired)
             else -> null
         }
@@ -387,6 +504,8 @@ class HomeActivity : BaseActivity() {
         viewModel.reuploadAadhaar(
             aadhaarNumber = aadhaar,
             aadhaarUri = uri,
+            stateId = selectedStateId.takeIf { isAddMode },
+            cityId = selectedCityId.takeIf { isAddMode },
             onLoading = { showProgressAadhaar.set(true) },
             onSuccess = onSuccess@{ message ->
                 showProgressAadhaar.set(false)
@@ -395,7 +514,8 @@ class HomeActivity : BaseActivity() {
                 aadhaarUri = null
                 Utility.deleteKycDirs(mActivity, Constant.KYC_AADHAAR_REUPLOAD_DIR)
                 ToastUtil.showSuccess(mActivity, message)
-                // auth/me is the source of truth after every submit — usually moves on to pending_approval
+                // auth/me is the source of truth after every submit — resubmit usually moves on to pending_approval,
+                // add moves on to bank_details_required (Add Bank Details popup before the first money action)
                 checkKycStep()
             },
             onError = onError@{ errMsg ->
