@@ -9,6 +9,7 @@ import android.text.InputFilter
 import android.text.InputType
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -407,6 +408,8 @@ class EditBankDetailsActivity : BaseActivity() {
             (resources.displayMetrics.widthPixels * 0.88).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        // requestFocus() alone doesn't raise the keyboard inside a Dialog
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         dialog.setCancelable(false)
         dialog.setOnDismissListener { mpinDialog = null }
         mpinDialog = dialog

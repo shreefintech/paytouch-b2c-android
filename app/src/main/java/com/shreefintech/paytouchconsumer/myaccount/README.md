@@ -115,14 +115,14 @@ Displays referral code and link with copy and share actions. Shows a shimmer pla
 |---|---|---|---|---|
 | GET | `api/mobile/auth/me` | `getMe()` | `getProfile()` | `General<MeDataItem>` |
 | GET | `api/mobile/wallet/balance` | `getWalletBalance()` | `getWalletBalance()` | `General<WalletBalanceItem>` |
-| GET | `api/mobile/rewards/referral` | `getReferralRewards()` | `getReferralInfo()` | `ReferralRewardsItem` |
-| PUT | `api/mobile/auth/me` | `updateMe()` | `updateProfile()` | `General<EditProfileDataItem>` |
+| GET | `api/mobile/rewards/referral` | `getReferralRewards()` | `getReferralRewards()` | `ReferralRewardsItem` |
+| PUT | `api/mobile/auth/me` | `updateMe()` | `updateProfile()` | `MessageItem` |
 
-**Success check:** `General<…>` calls — `isSuccessful && body?.data != null` (`updateMe`: `success == true`, `data` optional); referral — `isSuccessful && success == true`
+**Success check:** `General<…>` calls — `isSuccessful && body?.data != null`; flat `MessageItem` (`updateMe`) and referral — `isSuccessful && success == true`
 
 **Parameters:**
 - `getProfile` / `getWalletBalance` — `Authorization: Bearer <token>` header only
-- `getReferralInfo` — `Authorization: Bearer <token>` header only
+- `getReferralRewards` — `Authorization: Bearer <token>` header only
 
 **ViewModel base class:** `AndroidViewModel` — My Account has no bill-payment flow, so `BaseBillViewModel` is not used here.
 

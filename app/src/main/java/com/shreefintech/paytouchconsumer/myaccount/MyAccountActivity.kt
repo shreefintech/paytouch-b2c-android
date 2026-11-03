@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -114,11 +115,12 @@ class MyAccountActivity : BaseActivity() {
         }
         hideNoInternet()
         loadAccountInfo()
+        // Not part of loadAccountInfo() — a profile update doesn't change the balance
+        loadWalletBalance()
         loadReferralInfo()
     }
 
     private fun loadAccountInfo() {
-        loadWalletBalance()
         viewModel.getProfile(
             onLoading = {
                 isAccountInfoLoading = true
@@ -164,7 +166,7 @@ class MyAccountActivity : BaseActivity() {
     }
 
     private fun loadReferralInfo() {
-        viewModel.getReferralInfo(
+        viewModel.getReferralRewards(
             onLoading = {
                 isReferEarnLoading = true
                 // shimmer only shown if Refer & Earn tab is active when loading starts
@@ -202,6 +204,7 @@ class MyAccountActivity : BaseActivity() {
         binding.tvMemberName.text = data.name ?: "--"
         binding.tvStatus.text = data.status?.replaceFirstChar { it.uppercase() } ?: "--"
         // auth/me has no member code or street address
+        // TODO(B2C-296): show member code once the B2C backend exposes it
         binding.tvMemberCode.text = "--"
         binding.tvMobileNo.text = data.mobile ?: "--"
         binding.tvEmail.text = data.email ?: "--"
@@ -481,7 +484,9 @@ class MyAccountActivity : BaseActivity() {
                 isStatesLoading = false
                 if (isDestroyed) return@onSuccess
                 stateList = states
-                editProfileBinding?.let { setFieldLoading(it.pbStateLoading, it.ivStateArrow, it.flStateAnchor, false) }
+                // Dialog dismissed while loading — the list is cached, nothing to resolve or load
+                val dialogBinding = editProfileBinding ?: return@onSuccess
+                setFieldLoading(dialogBinding.pbStateLoading, dialogBinding.ivStateArrow, dialogBinding.flStateAnchor, false)
                 resolveSelectedState()
                 selectedState?.id?.takeIf { it != cityListStateId }?.let { loadCities(it) }
             },
@@ -573,6 +578,8 @@ class MyAccountActivity : BaseActivity() {
             (resources.displayMetrics.widthPixels * 0.88).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        // requestFocus() alone doesn't raise the keyboard inside a Dialog
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         dialog.setCancelable(false)
         dialog.setOnDismissListener { mpinDialog = null }
         mpinDialog = dialog
@@ -599,12 +606,12 @@ class MyAccountActivity : BaseActivity() {
         viewModel.updateProfile(
             request = request,
             onLoading = { showProgressMpin.set(true) },
-            onSuccess = onSuccess@{ data, message ->
+            onSuccess = onSuccess@{ message ->
                 showProgressMpin.set(false)
                 if (isDestroyed) return@onSuccess
-                savedState = data?.state ?: selectedState
-                savedCity = data?.city ?: selectedCity
-                SharedPreferenceHelper.setSharedPreferenceString(mActivity, Constant.KEY_EMAIL, data?.email ?: request.email)
+                savedState = selectedState
+                savedCity = selectedCity
+                SharedPreferenceHelper.setSharedPreferenceString(mActivity, Constant.KEY_EMAIL, request.email)
                 pinDialog?.dismiss()
                 profileDialog?.dismiss()
                 ToastUtil.showSuccess(mActivity, message)
@@ -621,14 +628,24 @@ class MyAccountActivity : BaseActivity() {
     }
 
     // Saved state is a name only (auth/me) — swap in the list entry so cities and the update get its id
+    // No match → clear back to the hint, otherwise the field shows a name that submit rejects as empty
     private fun resolveSelectedState() {
         val saved = selectedState?.takeIf { it.id == null } ?: return
-        stateList.find { it.name.equals(saved.name, ignoreCase = true) }?.let { selectedState = it }
+        selectedState = stateList.find { it.name.equals(saved.name?.trim(), ignoreCase = true) }
+        if (selectedState != null) return
+        selectedCity = null
+        editProfileBinding?.let {
+            setDropdownValue(it.tvState, null, R.string.hintSelectState)
+            setDropdownValue(it.tvCity, null, R.string.hintSelectCity)
+        }
     }
 
     private fun resolveSelectedCity() {
+        // cityListStateId is set only once a city list has loaded — before that there is nothing to match against
+        if (cityListStateId == null) return
         val saved = selectedCity?.takeIf { it.id == null } ?: return
-        cityList.find { it.name.equals(saved.name, ignoreCase = true) }?.let { selectedCity = it }
+        selectedCity = cityList.find { it.name.equals(saved.name?.trim(), ignoreCase = true) }
+        if (selectedCity == null) editProfileBinding?.let { setDropdownValue(it.tvCity, null, R.string.hintSelectCity) }
     }
 
     private fun setDropdownValue(textView: TextView, value: String?, @StringRes hintRes: Int) {

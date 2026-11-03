@@ -8,7 +8,7 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.AuthUserItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralRewardsItem
@@ -92,7 +92,7 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
             })
     }
 
-    fun getReferralInfo(
+    fun getReferralRewards(
         onLoading: () -> Unit,
         onSuccess: (ReferralDataItem) -> Unit,
         onError: (String) -> Unit
@@ -133,7 +133,7 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
     fun updateProfile(
         request: EditProfileRequest,
         onLoading: () -> Unit,
-        onSuccess: (EditProfileDataItem?, String) -> Unit,
+        onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -142,15 +142,15 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
         }
         onLoading()
         ApiClient.apiService.updateMe(bearerToken(), request)
-            .enqueue(object : Callback<General<EditProfileDataItem>> {
+            .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(
-                    call: Call<General<EditProfileDataItem>>,
-                    response: Response<General<EditProfileDataItem>>
+                    call: Call<MessageItem>,
+                    response: Response<MessageItem>
                 ) {
                     val body = response.body()
-                    // Response `data` shape is undocumented — success flag decides, the screen refetches auth/me
+                    // Success flag decides — the screen refetches auth/me for the updated fields
                     if (response.isSuccessful && body?.success == true) {
-                        onSuccess(body.data, body.message ?: getString(R.string.msgProfileUpdated))
+                        onSuccess(body.message ?: getString(R.string.msgProfileUpdated))
                     } else if (response.isSuccessful) {
                         // HTTP 200 with success:false — errorBody() is null, the reason is in body.message
                         onError(body?.message ?: getString(R.string.errGeneric))
@@ -163,7 +163,7 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
                     }
                 }
 
-                override fun onFailure(call: Call<General<EditProfileDataItem>>, t: Throwable) {
+                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })

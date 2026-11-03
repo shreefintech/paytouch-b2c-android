@@ -100,7 +100,6 @@ import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransacti
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionReportRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidTransactionStatusRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.prepaid.PrepaidVerifyPaymentDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralRewardsItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
@@ -137,12 +136,13 @@ interface ApiService {
 
     // ── Session ───────────────────────────────────────────────────────────────
 
-    // Edit Profile — mpin required on every change
+    // Edit Profile — mpin required on every change. Flat: `data` is unused (screen refetches auth/me), and typing
+    // it would fail the whole parse if its shape differs (auth/me sends state/city as plain names)
     @PUT("${MOBILE}auth/me")
     fun updateMe(
         @Header("Authorization") authorization: String,
         @Body request: EditProfileRequest
-    ): Call<General<EditProfileDataItem>>
+    ): Call<MessageItem>
 
     @GET("${MOBILE}auth/me")
     fun getMe(

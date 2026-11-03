@@ -32,7 +32,10 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 | POST | `auth/login` | Login with mobile + password or MPIN → `General<LoginDataItem>` |
 | POST | `auth/register` | Create new account → `General<LoginDataItem>` |
 | POST | `auth/register/individual` | V2 multipart registration (Aadhaar + address) → `MessageItem` |
-| GET | `auth/me` | Current user + onboarding state → `General<MeDataItem>` (Splash session check, Home Aadhaar check) |
+| GET | `auth/me` | Current user + onboarding state → `General<MeDataItem>` (Splash session check, Home Aadhaar check, My Account profile) |
+| PUT | `auth/me` | Edit Profile (My Account) — `EditProfileRequest`, MPIN required → `MessageItem` (`isSuccessful && success == true`) |
+| GET | `wallet/balance` | All wallet buckets → `General<WalletBalanceItem>`; My Account shows `main_wallet` |
+| GET | `rewards/referral` | Referral history (`data`, not shown yet) + totals in `meta.summary` (`ReferralDataItem`) → flat `ReferralRewardsItem` (`isSuccessful && success == true`) |
 | POST | `auth/logout` | Invalidate session on server |
 | POST | `device-token`, `location` | FCM token / user location |
 | GET | `address/states`, `address/states/{state_id}/cities` | Registration address pickers |
@@ -64,6 +67,21 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 
 ### Response Fields (`auth/me` and `auth/mpin` — `data`, `MeDataItem`)
 - `user` (`AuthUserItem`), `next_step`, `mpin_required`, `bank_details_added`, `aadhaar_added`, `pan_added`, `kyc_rejection` (`{ items: [String], reason }`, kept untyped as `Any?` and read via `MeDataItem.kycRejectedItems`; items are `aadhaar_number` / `aadhaar_photo` / `bank_details` → Home Aadhaar re-upload dialog when either Aadhaar item is rejected — `MeDataItem.isAadhaarRejected`)
+
+- `GET auth/me` only, on `user`: `status`, `created_at`, `activated_at`, `state`, `city` — `state`/`city` are plain names (not `{id, name}`), so Edit Profile matches them by name (case-insensitive) against the `address/states` / `cities` lists to get ids; no match → the field resets to its hint
+
+### Request Fields (Edit Profile — `PUT auth/me`, `EditProfileRequest`, JSON)
+- `name` (String, required — letters and spaces only)
+- `email` (String, required, valid format)
+- `state_id` (Int, required), `city_id` (Int, required)
+- `mpin` (String, required, 4 digits — collected in `dialog_mpin` on every update; never stored)
+- Response `data` is ignored (typed as flat `MessageItem`); on success the screen refetches `auth/me` and stores `email` in `KEY_EMAIL`
+
+### Response Fields (`wallet/balance` — `data`, `WalletBalanceItem`)
+- `has_wallet`, `main_wallet`, `qr_load_wallet`, `upi_intent_wallet`, `lock_wallet`, `upi_settlement_wallet`, `aeps_wallet`, `referral_wallet`, `bonus_wallet`, `earning_wallet_principal`, `earning_wallet_interest_accrued`, `updated_at`, `live_balance` (amounts as String)
+
+### Response Fields (`rewards/referral` — `meta.summary`, `ReferralDataItem`)
+- `referral_code`, `referral_link`, `total_earnings`, `referral_count`, `earning_potential`
 
 ### State Transitions
 ```
