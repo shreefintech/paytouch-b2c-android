@@ -120,6 +120,12 @@ object Constant {
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
+    // Wallet top-up (POST wallet/topups) — flow value and status values (compared case-insensitively)
+    // TODO(B2C-298): G5 — status values are not documented; SUCCESS / FAILED assumed (same as withdrawals)
+    const val TOPUP_FLOW_PAYMENT_PAGE = "payment_page"
+    const val TOPUP_STATUS_SUCCESS = "SUCCESS"
+    const val TOPUP_STATUS_FAILED = "FAILED"
+
     // Transaction type values returned by /api/transactions/{id}
     const val TRANSACTION_TYPE_HDFC = "hdfc_smartgateway"
 

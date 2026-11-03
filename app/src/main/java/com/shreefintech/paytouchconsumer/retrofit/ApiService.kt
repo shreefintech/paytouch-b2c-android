@@ -24,6 +24,10 @@ import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPaymentItem
@@ -643,6 +647,26 @@ interface ApiService {
     fun getWalletBalance(
         @Header("Authorization") authorization: String
     ): Call<General<WalletBalanceItem>>
+
+    // Load Wallet top-up — replaces hdfc/orders + hdfc/orders/{order_id}/status
+    @POST("${MOBILE}wallet/topups")
+    fun createWalletTopup(
+        @Header("Authorization") authorization: String,
+        @Body request: WalletTopupRequest
+    ): Call<General<WalletTopupItem>>
+
+    @GET("${MOBILE}wallet/topups/{client_reference}")
+    fun getWalletTopup(
+        @Header("Authorization") authorization: String,
+        @Path("client_reference") clientReference: String
+    ): Call<General<WalletTopupItem>>
+
+    // Wallet withdrawal — replaces wallet/withdraw
+    @POST("${MOBILE}wallet/withdrawals")
+    fun createWalletWithdrawal(
+        @Header("Authorization") authorization: String,
+        @Body request: WalletWithdrawalRequest
+    ): Call<General<WalletWithdrawalItem>>
 
     // ── Dashboard KYC ─────────────────────────────────────────────────────────
 

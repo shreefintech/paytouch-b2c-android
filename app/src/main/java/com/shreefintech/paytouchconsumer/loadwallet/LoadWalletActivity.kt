@@ -16,6 +16,7 @@ import androidx.core.widget.TextViewCompat
 import androidx.databinding.ObservableBoolean
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -28,6 +29,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmPaymentBinding
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmWithdrawBinding
+import com.shreefintech.paytouchconsumer.databinding.DialogMpinBinding
 import com.shreefintech.paytouchconsumer.databinding.DialogWithdrawSuccessBinding
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
@@ -46,7 +48,8 @@ import com.shreefintech.paytouchconsumer.rewards.RewardsExplainerActivity
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletHistoryItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WithdrawDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalItem
 import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
@@ -55,6 +58,9 @@ import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
+import com.shreefintech.paytouchconsumer.utill.clearMpin
+import com.shreefintech.paytouchconsumer.utill.getMpin
+import com.shreefintech.paytouchconsumer.utill.setupMpinBoxes
 
 class LoadWalletActivity : BaseActivity() {
 
@@ -83,15 +89,18 @@ class LoadWalletActivity : BaseActivity() {
     private var confirmDialog: Dialog? = null
     private var confirmDialogBinding: DialogConfirmPaymentBinding? = null
     private var pendingPayAmount: Double = 0.0
-    private var pendingPayDescription: String = ""
     private val showProgressPay = ObservableBoolean(false)
 
     private var withdrawConfirmDialog: Dialog? = null
     private var withdrawConfirmDialogBinding: DialogConfirmWithdrawBinding? = null
     private var pendingWithdrawAmount: Double = 0.0
     private var pendingWithdrawMode: String = MODE_IMPS
-    private var pendingWithdrawNarration: String = ""
     private val showProgressWithdraw = ObservableBoolean(false)
+
+    // The withdrawal API call runs from the MPIN dialog's submit button
+    private var mpinDialog: Dialog? = null
+    private var mpinDialogBinding: DialogMpinBinding? = null
+    private val showProgressMpin = ObservableBoolean(false)
 
     private var withdrawSuccessDialog: Dialog? = null
     private var withdrawSuccessDialogBinding: DialogWithdrawSuccessBinding? = null
@@ -188,36 +197,33 @@ class LoadWalletActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        val orderId = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_PENDING_ORDER_ID, null)
+        // KEY_PENDING_ORDER_ID now holds the top-up's client_reference
+        val clientReference = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_PENDING_ORDER_ID, null)
             ?.takeIf { it.isNotEmpty() } ?: return
-        val amount  = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_PENDING_AMOUNT, null) ?: ""
+        val amount = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_PENDING_AMOUNT, null) ?: ""
         HdfcPaymentHelper.clearPendingState(mActivity)
         hideNoInternet()
         showLoading()
-        viewModel.checkOrderStatus(
-            orderId   = orderId,
-            onSuccess = { data ->
+        viewModel.pollTopupStatus(
+            clientReference = clientReference,
+            onResult = onResult@{ data ->
+                if (isFinishing || isDestroyed) return@onResult
                 hideLoading()
+                // Not final after polling (or unreadable) → status screen shows pending
                 PaymentStatusActivity.start(
                     mActivity,
                     PaymentStatusItem(
-                        orderId = data.orderId ?: orderId,
-                        amount  = data.amount ?: amount,
-                        status  = data.status ?: Constant.HDFC_STATUS_NEW
+                        orderId = data?.clientReference ?: clientReference,
+                        amount  = data?.amount ?: amount,
+                        status  = data?.status ?: Constant.HDFC_STATUS_NEW
                     )
-                )
-            },
-            onError = {
-                hideLoading()
-                PaymentStatusActivity.start(
-                    mActivity,
-                    PaymentStatusItem(orderId = orderId, amount = amount, status = Constant.HDFC_STATUS_NEW)
                 )
             }
         )
     }
 
     override fun onDestroy() {
+        mpinDialog?.dismiss()
         withdrawSuccessDialog?.dismiss()
         withdrawSoundPlayer.release()
         levelProgressAnimator?.cancel()
@@ -338,15 +344,14 @@ class LoadWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errInsufficientBalance))
             return
         }
-        val narration = withdrawSheetBinding.etNarration.text?.toString()?.trim() ?: ""
+        // TODO(B2C-298): G28 — POST wallet/withdrawals takes no payment mode or narration — both stay visible but are not sent
         hideWithdrawSheet()
-        showWithdrawConfirmDialog(amount, selectedPaymentMode, narration)
+        showWithdrawConfirmDialog(amount, selectedPaymentMode)
     }
 
-    private fun showWithdrawConfirmDialog(amount: Double, mode: String, narration: String) {
+    private fun showWithdrawConfirmDialog(amount: Double, mode: String) {
         pendingWithdrawAmount = amount
         pendingWithdrawMode = mode
-        pendingWithdrawNarration = narration
         showProgressWithdraw.set(false)
 
         val dialogBinding = DialogConfirmWithdrawBinding.inflate(layoutInflater)
@@ -376,29 +381,76 @@ class LoadWalletActivity : BaseActivity() {
         dialog.show()
     }
 
-    private fun startWithdraw() {
-        viewModel.withdrawWallet(
+    // Same MPIN popup as EditBankDetailsActivity — opens over the confirm dialog, which stays until the withdrawal succeeds
+    private fun showWithdrawMpinDialog() {
+        if (mpinDialog?.isShowing == true) return
+        val dialogBinding = DialogMpinBinding.inflate(layoutInflater)
+        mpinDialogBinding = dialogBinding
+        showProgressMpin.set(false)
+        dialogBinding.showProgress = showProgressMpin
+        dialogBinding.setupMpinBoxes()
+        dialogBinding.onClickListener = onClickListener()
+
+        val dialog = Dialog(mActivity)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setWindowAnimations(R.style.DialogScaleFadeAnimation)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.88).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        // requestFocus() alone doesn't raise the keyboard inside a Dialog
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        dialog.setCancelable(false)
+        dialog.setOnDismissListener {
+            mpinDialog = null
+            mpinDialogBinding = null
+        }
+        mpinDialog = dialog
+        dialog.show()
+    }
+
+    private fun submitWithdrawMpin(dialogBinding: DialogMpinBinding) {
+        Utility.hideKeyboard(dialogBinding.root)
+        val mpin = dialogBinding.getMpin()
+        val msg = when {
+            mpin.isEmpty() -> getString(R.string.msgMpinEmpty)
+            mpin.length != 4 -> getString(R.string.msgMpinInvalid)
+            else -> null
+        }
+        if (msg != null) {
+            ToastUtil.showDelete(mActivity, msg, inWindow = false)
+            return
+        }
+        startWithdraw(mpin)
+    }
+
+    private fun startWithdraw(mpin: String) {
+        viewModel.withdraw(
             amount = pendingWithdrawAmount,
-            paymentMode = pendingWithdrawMode,
-            narration = pendingWithdrawNarration,
-            onLoading = { showProgressWithdraw.set(true) },
-            onSuccess = { data ->
-                showProgressWithdraw.set(false)
+            mpin = mpin,
+            onLoading = { showProgressMpin.set(true) },
+            onSuccess = onSuccess@{ data ->
+                showProgressMpin.set(false)
+                if (isFinishing || isDestroyed) return@onSuccess
+                mpinDialog?.dismiss()
                 withdrawConfirmDialog?.dismiss()
                 showWithdrawSuccessDialog(data)
                 fetchWalletData()
             },
-            onError = { msg ->
-                showProgressWithdraw.set(false)
+            onError = onError@{ msg ->
+                showProgressMpin.set(false)
+                if (isFinishing || isDestroyed) return@onError
+                mpinDialogBinding?.clearMpin()
                 ToastUtil.showDelete(mActivity, msg, inWindow = false)
             }
         )
     }
 
-    private fun showWithdrawSuccessDialog(data: WithdrawDataItem) {
+    private fun showWithdrawSuccessDialog(data: WalletWithdrawalItem) {
         if (isFinishing || isDestroyed) return
         withdrawSuccessDialog?.dismiss()
-        withdrawRequestId = data.requestId
+        withdrawRequestId = data.clientReference
 
         val dialogBinding = DialogWithdrawSuccessBinding.inflate(layoutInflater)
         withdrawSuccessDialogBinding = dialogBinding
@@ -431,38 +483,39 @@ class LoadWalletActivity : BaseActivity() {
         dialog.show()
     }
 
-    private fun bindWithdrawDetails(dialogBinding: DialogWithdrawSuccessBinding, data: WithdrawDataItem) {
+    private fun bindWithdrawDetails(dialogBinding: DialogWithdrawSuccessBinding, data: WalletWithdrawalItem) {
         val status = resolveWithdrawStatus(data.status)
         Glide.with(this@LoadWalletActivity).asGif().load(status.gifRes).into(dialogBinding.ivStatusGif)
 
         dialogBinding.tvTitle.setText(status.titleRes)
-        dialogBinding.tvSubtitle.text = data.statusMessage?.takeIf { it.isNotBlank() }
+        dialogBinding.tvSubtitle.text = data.failureReason?.takeIf { it.isNotBlank() }
             ?: getString(status.subtitleRes)
         dialogBinding.tvAmount.text = Utility.formatAmount(data.amount)
-        dialogBinding.tvStatus.text = data.statusLabel?.takeIf { it.isNotBlank() }
-            ?: data.status?.takeIf { it.isNotBlank() }
+        dialogBinding.tvStatus.text = data.status?.takeIf { it.isNotBlank() }
+            ?.replaceFirstChar { it.uppercaseChar() }
             ?: getString(R.string.labelProcessing)
         dialogBinding.tvStatus.setBackgroundResource(status.chipBgRes)
         val chipTextColor = ContextCompat.getColor(mActivity, status.chipTextColorRes)
         dialogBinding.tvStatus.setTextColor(chipTextColor)
         TextViewCompat.setCompoundDrawableTintList(dialogBinding.tvStatus, ColorStateList.valueOf(chipTextColor))
 
-        val accountLast4 = data.accountNumberMasked?.takeLast(4).orEmpty()
+        val bankName = data.bank?.bankName
+        val accountLast4 = data.bank?.accountMasked?.takeLast(4).orEmpty()
         dialogBinding.tvToBank.text = when {
-            data.bankName.isNullOrBlank() -> accountLast4.ifEmpty { "--" }
-            accountLast4.isEmpty() -> data.bankName
-            else -> getString(R.string.labelBankAccountMasked, data.bankName, accountLast4)
+            bankName.isNullOrBlank() -> accountLast4.ifEmpty { "--" }
+            accountLast4.isEmpty() -> bankName
+            else -> getString(R.string.labelBankAccountMasked, bankName, accountLast4)
         }
 
-        val transferMode = data.transferMode?.takeIf { it.isNotBlank() } ?: pendingWithdrawMode
-        dialogBinding.tvTransferMode.text = transferMode
+        // Response has no transfer mode — show what the user picked
+        dialogBinding.tvTransferMode.text = pendingWithdrawMode
         dialogBinding.tvInstantBadge.visibility =
-            if (transferMode.equals(MODE_IMPS, ignoreCase = true)) View.VISIBLE else View.GONE
+            if (pendingWithdrawMode.equals(MODE_IMPS, ignoreCase = true)) View.VISIBLE else View.GONE
 
-        dialogBinding.tvRequestId.text = data.requestId?.takeIf { it.isNotBlank() } ?: "--"
+        dialogBinding.tvRequestId.text = data.clientReference?.takeIf { it.isNotBlank() } ?: "--"
         dialogBinding.ivCopyRequestId.visibility =
-            if (data.requestId.isNullOrBlank()) View.GONE else View.VISIBLE
-        dialogBinding.tvDateTime.text = data.requestedAtDisplay?.takeIf { it.isNotBlank() } ?: "--"
+            if (data.clientReference.isNullOrBlank()) View.GONE else View.VISIBLE
+        dialogBinding.tvDateTime.text = Utility.formatDate(data.createdAt)
     }
 
     private data class WithdrawStatusDisplay(
@@ -608,8 +661,8 @@ class LoadWalletActivity : BaseActivity() {
             return
         }
 
+        // TODO(B2C-298): G28 — POST wallet/topups takes no description — field stays visible but is not sent
         val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
-        val description = sheetBinding.etDescription.text?.toString()?.trim() ?: ""
         if (amountStr.isEmpty()) {
             ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
             return
@@ -619,13 +672,13 @@ class LoadWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
             return
         }
+        // TODO(B2C-298): G2 — HDFC min/max not shared; server's 422 message covers out-of-range amounts
         hidePaymentSheet()
-        showConfirmDialog(amount, description)
+        showConfirmDialog(amount)
     }
 
-    private fun showConfirmDialog(amount: Double, description: String) {
+    private fun showConfirmDialog(amount: Double) {
         pendingPayAmount = amount
-        pendingPayDescription = description
         showProgressPay.set(false)
 
         val dialogBinding = DialogConfirmPaymentBinding.inflate(layoutInflater)
@@ -654,39 +707,41 @@ class LoadWalletActivity : BaseActivity() {
         dialog.show()
     }
 
-    private fun startHdfcFlow() {
-        viewModel.createHdfcOrder(
+    private fun startTopup() {
+        viewModel.createTopup(
             amount = pendingPayAmount,
-            description = pendingPayDescription,
             onLoading = { showProgressPay.set(true) },
-            onSuccess = { data ->
+            onSuccess = onSuccess@{ data ->
                 showProgressPay.set(false)
-                val status = data.status?.uppercase().orEmpty()
-                if (HdfcPaymentHelper.isFailedStatus(status)) {
+                if (isFinishing || isDestroyed) return@onSuccess
+                val clientReference = data.clientReference.orEmpty()
+                val amount = data.amount ?: pendingPayAmount.toString()
+                if (HdfcPaymentHelper.isFailedStatus(data.status.orEmpty())) {
                     confirmDialog?.dismiss()
                     PaymentStatusActivity.start(
                         mActivity,
                         PaymentStatusItem(
-                            orderId = data.orderId ?: "",
-                            amount  = data.amount ?: "",
+                            orderId = clientReference,
+                            amount  = amount,
                             status  = data.status ?: Constant.HDFC_STATUS_NEW
                         )
                     )
-                    return@createHdfcOrder
+                    return@onSuccess
                 }
-                val payUrl = data.paymentLinks?.web.orEmpty()
-                if (payUrl.isEmpty()) {
+                // TODO(B2C-298): G1 — response shape unverified; without a reference or link the payment can't be opened or tracked
+                val payUrl = data.paymentLink.orEmpty()
+                if (clientReference.isEmpty() || payUrl.isEmpty()) {
                     ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
-                    return@createHdfcOrder
+                    return@onSuccess
                 }
                 Utility.hideKeyboard(mActivity)
                 confirmDialog?.dismiss()
                 HdfcPaymentHelper.launchPayment(
                     context   = mActivity,
-                    orderId   = data.orderId ?: "",
-                    amount    = data.amount ?: "",
+                    orderId   = clientReference,
+                    amount    = amount,
                     payUrl    = payUrl,
-                    returnUrl = data.returnUrl ?: ""
+                    returnUrl = data.returnUrl.orEmpty()
                 )
             },
             onError = { msg ->
@@ -710,7 +765,9 @@ class LoadWalletActivity : BaseActivity() {
 
     private fun isPaymentSheetVisible() = sheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
 
+    // Balance comes from wallet/balance; the VA card still uses wallet/user-data (no new VA endpoint yet)
     private fun fetchWalletData() {
+        fetchWalletBalance()
         viewModel.fetchUserWalletData(
             onLoading = { showLoading() },
             onSuccess = { data ->
@@ -723,6 +780,26 @@ class LoadWalletActivity : BaseActivity() {
                 ToastUtil.showDelete(mActivity, msg)
             }
         )
+    }
+
+    // No toast on error — fetchUserWalletData() already reports a failing wallet load
+    private fun fetchWalletBalance() {
+        viewModel.fetchWalletBalance(
+            onSuccess = { data ->
+                if (isFinishing || isDestroyed) return@fetchWalletBalance
+                populateWalletBalance(data)
+            },
+            onError = {
+                currentWalletBalance = null
+                binding.tvWalletBalance.text = "--"
+            }
+        )
+    }
+
+    private fun populateWalletBalance(data: WalletBalanceItem) {
+        // TODO(B2C-298): G10 — main_wallet assumed to be the user-facing balance; G14 — has_wallet=false shape unknown, shown as 0
+        currentWalletBalance = if (data.hasWallet == false) "0" else data.mainWallet
+        binding.tvWalletBalance.text = Utility.formatAmount(currentWalletBalance)
     }
 
     private fun fetchRecentHistory() {
@@ -766,8 +843,6 @@ class LoadWalletActivity : BaseActivity() {
     private fun populateWalletData(data: WalletDataItem) {
         hasWalletData = true
         playWalletEntranceIfNeeded()
-        currentWalletBalance = data.walletBalance
-        binding.tvWalletBalance.text = Utility.formatAmount(data.walletBalance)
         binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
         binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
         binding.tvAccountHolder.text = data.name ?: "--"
@@ -932,7 +1007,7 @@ class LoadWalletActivity : BaseActivity() {
                 confirmDialogBinding?.cardPaySecurely -> {
                     if (Utility.stopClick()) return@OnClickListener
                     if (showProgressPay.get()) return@OnClickListener
-                    startHdfcFlow()
+                    startTopup()
                 }
 
                 withdrawConfirmDialogBinding?.cardClose -> {
@@ -941,8 +1016,19 @@ class LoadWalletActivity : BaseActivity() {
 
                 withdrawConfirmDialogBinding?.cardWithdrawSecurely -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (showProgressWithdraw.get()) return@OnClickListener
-                    startWithdraw()
+                    showWithdrawMpinDialog()
+                }
+
+                mpinDialogBinding?.cardClose -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressMpin.get()) return@OnClickListener
+                    mpinDialog?.dismiss()
+                }
+
+                mpinDialogBinding?.cardSubmit -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressMpin.get()) return@OnClickListener
+                    mpinDialogBinding?.let { submitWithdrawMpin(it) }
                 }
 
                 withdrawSuccessDialogBinding?.ivCopyRequestId -> {

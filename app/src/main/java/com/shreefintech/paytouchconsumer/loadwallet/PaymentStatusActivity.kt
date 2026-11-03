@@ -110,7 +110,7 @@ class PaymentStatusActivity : BaseActivity() {
 
     private fun resolveStatus(status: String): StatusDisplay {
         return when (status.uppercase()) {
-            Constant.HDFC_STATUS_CHARGED, Constant.HDFC_STATUS_AUTHORIZED -> StatusDisplay(
+            Constant.HDFC_STATUS_CHARGED, Constant.HDFC_STATUS_AUTHORIZED, Constant.TOPUP_STATUS_SUCCESS -> StatusDisplay(
                 label = getString(R.string.msgPaymentSuccessful),
                 description = getString(R.string.msgPaymentSuccessDescription),
                 amountLabel = getString(R.string.labelAmountPaid),
@@ -137,7 +137,7 @@ class PaymentStatusActivity : BaseActivity() {
                 soundRes = R.raw.pending_sound
             )
 
-            Constant.HDFC_STATUS_JUSPAY_DECLINED, Constant.HDFC_STATUS_AUTHENTICATION_FAILED, Constant.HDFC_STATUS_AUTHORIZATION_FAILED -> StatusDisplay(
+            Constant.HDFC_STATUS_JUSPAY_DECLINED, Constant.HDFC_STATUS_AUTHENTICATION_FAILED, Constant.HDFC_STATUS_AUTHORIZATION_FAILED, Constant.TOPUP_STATUS_FAILED -> StatusDisplay(
                 label = getString(R.string.msgPaymentFailed),
                 description = getString(R.string.msgPaymentFailedDescription),
                 amountLabel = getString(R.string.labelAmountFailed),

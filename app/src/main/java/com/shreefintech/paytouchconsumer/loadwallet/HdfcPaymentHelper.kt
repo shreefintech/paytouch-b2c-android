@@ -11,7 +11,8 @@ object HdfcPaymentHelper {
         Constant.HDFC_STATUS_JUSPAY_DECLINED,
         Constant.HDFC_STATUS_AUTHENTICATION_FAILED,
         Constant.HDFC_STATUS_AUTHORIZATION_FAILED,
-        Constant.HDFC_STATUS_AUTO_REFUNDED
+        Constant.HDFC_STATUS_AUTO_REFUNDED,
+        Constant.TOPUP_STATUS_FAILED
     )
 
     fun isFailedStatus(status: String) = status.uppercase() in failedStatuses

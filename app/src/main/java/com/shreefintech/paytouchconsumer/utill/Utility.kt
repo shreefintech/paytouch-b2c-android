@@ -54,9 +54,17 @@ object Utility {
 
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
-        val cleaned = createdAt.substringBefore(".").substringBefore("+")
         val utc = TimeZone.getTimeZone("UTC")
         val ist = TimeZone.getTimeZone("Asia/Kolkata")
+        val output = SimpleDateFormat(format, Locale.getDefault()).apply { timeZone = ist }
+        // Explicit offset (e.g. "2026-10-31T12:00:00+05:30") — honour it; the fallback below strips it and assumes UTC
+        try {
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
+                .parse(createdAt.replace(Regex("\\.\\d+"), ""))
+                ?.let { return output.format(it) }
+        } catch (_: Exception) {
+        }
+        val cleaned = createdAt.substringBefore(".").substringBefore("+")
         val inputFormats = listOf(
             "yyyy-MM-dd'T'HH:mm:ss",
             "dd/MM/yyyy hh:mm a",
@@ -64,7 +72,6 @@ object Utility {
             "dd/MM/yyyy",
             "yyyy-MM-dd"
         )
-        val output = SimpleDateFormat(format, Locale.getDefault()).apply { timeZone = ist }
         for (pattern in inputFormats) {
             try {
                 val parser = SimpleDateFormat(pattern, Locale.getDefault()).apply {
