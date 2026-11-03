@@ -132,7 +132,7 @@ class KycStatusActivity : BaseActivity() {
         })
     }
 
-    // Home's auth/me check opens the Aadhaar dialog for registration_rejected
+    // Home's auth/me check opens the re-upload dialog when kyc_rejection names both Aadhaar items
     private fun onRetry() {
         navigateTo(Intent(mActivity, HomeActivity::class.java))
     }

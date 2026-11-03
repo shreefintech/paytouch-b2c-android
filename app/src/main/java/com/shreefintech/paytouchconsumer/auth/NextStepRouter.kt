@@ -9,7 +9,8 @@ import com.shreefintech.paytouchconsumer.kyc.KycStatusActivity
 
 /**
  * Single place that turns the server's `next_step` + `mpin_required` into the next screen (Splash, Login, MPIN setup, Home, 403).
- * `kyc_required` opens the full [KycActivity] flow; Aadhaar steps open Home, whose auth/me check shows the Aadhaar dialog;
+ * `kyc_required` opens the full [KycActivity] flow; Aadhaar steps open Home, whose auth/me check shows the Aadhaar dialog
+ * (add mode for `aadhaar_required`, resubmit only when both Aadhaar items are rejected);
  * review states open [KycStatusActivity].
  * Deliberate: a null or unrecognised `next_step` falls through to Home.
  */

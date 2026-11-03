@@ -19,7 +19,8 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - Routing after login / Splash / MPIN creation goes through **`NextStepRouter.intentFor(context, next_step, mpin_required)`** — never route inline:
   - `kyc_required` → `KycActivity` (full KYC flow). Home's `auth/me` check also redirects here if it sees this step.
   - `pending_approval`, `registration_rejected` → `KycStatusActivity`
-  - `aadhaar_required`, `kyc_resubmit_required` → `HomeActivity`, whose `auth/me` check shows the blocking Aadhaar re-upload dialog
+  - `aadhaar_required` → `HomeActivity`, whose `auth/me` check shows the blocking Aadhaar dialog in **add mode** (Aadhaar number + photo + state + city → `kyc/individual/aadhaar`; afterwards `next_step` is `bank_details_required`)
+  - `kyc_resubmit_required` → `HomeActivity`; the dialog opens in **resubmit mode** (`kyc/individual/resubmit`) only when `kyc_rejection.items` has both `aadhaar_number` and `aadhaar_photo` (`MeDataItem.canResubmitAadhaar`). Resubmit 409s with no open rejection and 422s on a field that was not rejected.
   - A 403 whose `error_code` is one of these steps (`NextStep.isKycStep`) is routed the same way by `ApiHelper.onForbidden()`
   - else `mpin_required = true` → `ResetMpinActivity` (create-mode, via `buildCreateIntent()`)
   - else (`bank_details_required`, `complete`, null or unknown value) → `HomeActivity`. Unknown values fall through to Home **deliberately**.
@@ -40,6 +41,7 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 | POST | `device-token`, `location` | FCM token / user location |
 | GET | `address/states`, `address/states/{state_id}/cities` | Registration address pickers |
 | POST | `kyc/individual/resubmit` | Aadhaar re-upload after rejection (rejected items only) |
+| POST | `kyc/individual/aadhaar` | `aadhaar_required` only — multipart `aadhaar_number`, `aadhaar_photo`, `state_id`, `city_id` → `MessageItem`. 409 Aadhaar already on file / KYC approved; 422 not linked to Dashboard or Aadhaar used by another account; 429 double tap |
 | POST | `kyc/individual/bank-details`, `kyc/individual/pan` | Bank / PAN onboarding dialogs |
 
 ### Request Fields (Login — `LoginRequest`, JSON)
@@ -63,10 +65,10 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - `mpin_required` (Boolean)
 - `bank_details_added` (Boolean)
 - `pan_added` (Boolean)
-- `user` (`AuthUserItem`): `id`, `name`, `mobile`, `email`, `referral_code`, `wallet_balance`, `total_spent`, `kyc_completed`, `referred_by`, `referral_earnings`, `aadhaar_masked` (short-signup users only)
+- `user` (`AuthUserItem`): `id`, `name`, `mobile`, `email`, `referral_code`, `wallet_balance`, `aadhaar_masked` (short-signup users only)
 
 ### Response Fields (`auth/me` and `auth/mpin` — `data`, `MeDataItem`)
-- `user` (`AuthUserItem`), `next_step`, `mpin_required`, `bank_details_added`, `aadhaar_added`, `pan_added`, `kyc_rejection` (`{ items: [String], reason }`, kept untyped as `Any?` and read via `MeDataItem.kycRejectedItems`; items are `aadhaar_number` / `aadhaar_photo` / `bank_details` → Home Aadhaar re-upload dialog when either Aadhaar item is rejected — `MeDataItem.isAadhaarRejected`)
+- `user` (`AuthUserItem`), `next_step`, `mpin_required`, `bank_details_added`, `aadhaar_added`, `pan_added`, `kyc_rejection` (`{ items: [String], reason }`, kept untyped as `Any?` and read via `MeDataItem.kycRejectedItems`; items are `aadhaar_number` / `aadhaar_photo` / `bank_details` → Home Aadhaar re-upload dialog only when both Aadhaar items are rejected — `MeDataItem.canResubmitAadhaar`; `isAadhaarRejected` (either item) only drives the KYC Details badge)
 
 - `GET auth/me` only, on `user`: `status`, `created_at`, `activated_at`, `state`, `city` — `state`/`city` are plain names (not `{id, name}`), so Edit Profile matches them by name (case-insensitive) against the `address/states` / `cities` lists to get ids; no match → the field resets to its hint
 

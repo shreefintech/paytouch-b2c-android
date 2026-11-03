@@ -102,7 +102,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
      * Silent — Home stays usable if mobile/auth/me fails; the flag is re-checked on the next Home launch.
      * Also the post-login source of the bank/PAN onboarding flags (see [saveOnboardingFlags]) — keep this call.
      */
-    fun checkAadhaarRejected(onRejected: () -> Unit, onRedirect: (String?) -> Unit) {
+    fun checkAadhaarRejected(onAadhaarDialog: (isAddMode: Boolean) -> Unit, onRedirect: (String?) -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) return
         aadhaarCheckCall?.cancel()
         aadhaarCheckCall = ApiClient.apiService.getMe(bearerToken()).also {
@@ -119,7 +119,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     if (!response.isSuccessful || data == null) return
                     val step = NextStep.from(data.nextStep)
                     when {
-                        data.isAadhaarRejected || step?.needsAadhaar == true -> onRejected()
+                        // Resubmit only fixes an open rejection naming both Aadhaar items (409 / 422 otherwise)
+                        data.canResubmitAadhaar -> onAadhaarDialog(false)
+                        // No Aadhaar on file yet — kyc/individual/aadhaar, which also takes state + city
+                        step == NextStep.AADHAAR_REQUIRED -> onAadhaarDialog(true)
                         // Steps that leave Home — NextStepRouter picks KycActivity / KycStatusActivity
                         step == NextStep.KYC_REQUIRED || step == NextStep.PENDING_APPROVAL -> onRedirect(data.nextStep)
                     }
@@ -139,9 +142,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         aadhaarCheckCall = null
     }
 
+    /** [stateId] + [cityId] non-null → kyc/individual/aadhaar (aadhaar_required); else kyc/individual/resubmit. */
     fun reuploadAadhaar(
         aadhaarNumber: String,
         aadhaarUri: Uri,
+        stateId: String?,
+        cityId: String?,
         onLoading: () -> Unit,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
@@ -163,11 +169,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 return@launch
             }
 
-            ApiClient.apiService.reuploadAadhaar(
-                bearerToken(),
-                aadhaarNumber.toRequestBody("text/plain".toMediaTypeOrNull()),
-                photoPart
-            ).enqueue(object : Callback<MessageItem> {
+            val textType = "text/plain".toMediaTypeOrNull()
+            val numberPart = aadhaarNumber.toRequestBody(textType)
+            val call = if (stateId != null && cityId != null) {
+                ApiClient.apiService.addAadhaar(
+                    bearerToken(), numberPart, photoPart, stateId.toRequestBody(textType), cityId.toRequestBody(textType)
+                )
+            } else {
+                ApiClient.apiService.reuploadAadhaar(bearerToken(), numberPart, photoPart)
+            }
+            call.enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     isAadhaarUploading = false
                     val body = response.body()

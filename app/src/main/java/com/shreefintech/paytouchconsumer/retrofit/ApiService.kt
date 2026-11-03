@@ -238,6 +238,18 @@ interface ApiService {
         @Part aadhaarPhoto: MultipartBody.Part
     ): Call<MessageItem>
 
+    // aadhaar_required — existing account with no Aadhaar on file; afterwards next_step is bank_details_required.
+    // 409 = Aadhaar already on file / KYC approved; 422 = not linked to Dashboard or Aadhaar used by another account
+    @Multipart
+    @POST("${MOBILE}kyc/individual/aadhaar")
+    fun addAadhaar(
+        @Header("Authorization") authorization: String,
+        @Part("aadhaar_number") aadhaarNumber: RequestBody,
+        @Part aadhaarPhoto: MultipartBody.Part,
+        @Part("state_id") stateId: RequestBody,
+        @Part("city_id") cityId: RequestBody
+    ): Call<MessageItem>
+
     @GET("${MOBILE}address/states")
     fun getAddressStates(): Call<General<List<StateItem>>>
 
