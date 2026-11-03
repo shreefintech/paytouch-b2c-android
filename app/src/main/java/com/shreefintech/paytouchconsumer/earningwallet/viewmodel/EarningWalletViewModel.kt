@@ -6,11 +6,11 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletActionDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletAmountRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningAmountRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -22,37 +22,38 @@ class EarningWalletViewModel(application: Application) : AndroidViewModel(applic
 
     fun fetchEarningWallet(
         onLoading: () -> Unit,
-        onSuccess: (EarningWalletItem) -> Unit,
+        onSuccess: (WalletEarningItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         onLoading()
-        ApiClient.apiService.getEarningWallet(bearerToken())
-            .enqueue(object : Callback<General<EarningWalletItem?>> {
-                override fun onResponse(call: Call<General<EarningWalletItem?>>, response: Response<General<EarningWalletItem?>>) {
+        ApiClient.apiService.getWalletEarning(bearerToken())
+            .enqueue(object : Callback<General<WalletEarningItem>> {
+                override fun onResponse(call: Call<General<WalletEarningItem>>, response: Response<General<WalletEarningItem>>) {
                     val data = response.body()?.data
                     if (response.isSuccessful && data != null) onSuccess(data)
                     else onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                 }
-                override fun onFailure(call: Call<General<EarningWalletItem?>>, t: Throwable) {
+                override fun onFailure(call: Call<General<WalletEarningItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
 
-    fun fetchWalletData(
-        onSuccess: (WalletDataItem) -> Unit,
+    // Main wallet balance — the amount available to lock
+    fun fetchWalletBalance(
+        onSuccess: (WalletBalanceItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
-        ApiClient.apiService.getUserWalletData(bearerToken())
-            .enqueue(object : Callback<General<WalletDataItem>> {
-                override fun onResponse(call: Call<General<WalletDataItem>>, response: Response<General<WalletDataItem>>) {
+        ApiClient.apiService.getWalletBalance(bearerToken())
+            .enqueue(object : Callback<General<WalletBalanceItem>> {
+                override fun onResponse(call: Call<General<WalletBalanceItem>>, response: Response<General<WalletBalanceItem>>) {
                     val data = response.body()?.data
                     if (response.isSuccessful && data != null) onSuccess(data)
                     else onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                 }
-                override fun onFailure(call: Call<General<WalletDataItem>>, t: Throwable) {
+                override fun onFailure(call: Call<General<WalletBalanceItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
@@ -63,7 +64,7 @@ class EarningWalletViewModel(application: Application) : AndroidViewModel(applic
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
-        ApiClient.apiService.getRewardsLevel(bearerToken())
+        ApiClient.apiService.getCustomerLevel(bearerToken())
             .enqueue(object : Callback<General<RewardsLevelItem?>> {
                 override fun onResponse(call: Call<General<RewardsLevelItem?>>, response: Response<General<RewardsLevelItem?>>) {
                     val data = response.body()?.data
@@ -83,67 +84,49 @@ class EarningWalletViewModel(application: Application) : AndroidViewModel(applic
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         onLoading()
-        ApiClient.apiService.postEarningWalletOptIn(bearerToken())
-            .enqueue(object : Callback<General<EarningWalletActionDataItem>> {
-                override fun onResponse(call: Call<General<EarningWalletActionDataItem>>, response: Response<General<EarningWalletActionDataItem>>) {
-                    val body = response.body()
-                    if (response.isSuccessful && body?.success == true) {
-                        onSuccess(body.message ?: "")
-                    } else {
-                        onError(body?.message ?: ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
-                    }
-                }
-                override fun onFailure(call: Call<General<EarningWalletActionDataItem>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
-                }
-            })
+        ApiClient.apiService.postWalletEarningOptIn(bearerToken()).enqueue(actionCallback(onSuccess, onError))
     }
 
     fun postLock(
         amount: Double,
+        mpin: String,
         onLoading: () -> Unit,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         onLoading()
-        ApiClient.apiService.postEarningWalletLock(bearerToken(), EarningWalletAmountRequest(amount))
-            .enqueue(object : Callback<General<EarningWalletActionDataItem>> {
-                override fun onResponse(call: Call<General<EarningWalletActionDataItem>>, response: Response<General<EarningWalletActionDataItem>>) {
-                    val body = response.body()
-                    if (response.isSuccessful && body?.success == true) {
-                        onSuccess(body.message ?: "")
-                    } else {
-                        onError(body?.message ?: ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
-                    }
-                }
-                override fun onFailure(call: Call<General<EarningWalletActionDataItem>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
-                }
-            })
+        ApiClient.apiService.postWalletEarningLock(bearerToken(), WalletEarningAmountRequest(amount, mpin))
+            .enqueue(actionCallback(onSuccess, onError))
     }
 
     fun postWithdraw(
         amount: Double,
+        mpin: String,
         onLoading: () -> Unit,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         onLoading()
-        ApiClient.apiService.postEarningWalletWithdraw(bearerToken(), EarningWalletAmountRequest(amount))
-            .enqueue(object : Callback<General<EarningWalletActionDataItem>> {
-                override fun onResponse(call: Call<General<EarningWalletActionDataItem>>, response: Response<General<EarningWalletActionDataItem>>) {
-                    val body = response.body()
-                    if (response.isSuccessful && body?.success == true) {
-                        onSuccess(body.message ?: "")
-                    } else {
-                        onError(body?.message ?: ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
-                    }
-                }
-                override fun onFailure(call: Call<General<EarningWalletActionDataItem>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
-                }
-            })
+        ApiClient.apiService.postWalletEarningWithdraw(bearerToken(), WalletEarningAmountRequest(amount, mpin))
+            .enqueue(actionCallback(onSuccess, onError))
     }
+
+    // opt-in / lock / withdraw all answer { success, message } — server message is shown either way
+    // TODO(B2C-298): no error samples (wrong MPIN, 403 LOCATION_REQUIRED / BANK_DETAILS_REQUIRED) — server message shown as-is
+    private fun actionCallback(onSuccess: (String) -> Unit, onError: (String) -> Unit) =
+        object : Callback<MessageItem> {
+            override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+                val body = response.body()
+                if (response.isSuccessful && body?.success == true) {
+                    onSuccess(body.message ?: "")
+                } else {
+                    onError(body?.message ?: ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+                }
+            }
+            override fun onFailure(call: Call<MessageItem>, t: Throwable) {
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
+            }
+        }
 }

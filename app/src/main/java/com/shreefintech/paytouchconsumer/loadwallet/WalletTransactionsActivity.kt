@@ -156,10 +156,10 @@ class WalletTransactionsActivity : BaseActivity() {
         if (!Utility.isInternetAvailable(mActivity)) { showNoInternet(); return }
         hideNoInternet()
         showShimmer(true)
-        loadWalletVm.fetchBonusWallet(
-            onSuccess = { data ->
+        loadWalletVm.fetchReferralHistory(
+            onSuccess = { rows ->
                 showShimmer(false)
-                referralAdp.updateList((data.history ?: emptyList()).filter { it.isReferral })
+                referralAdp.updateList(rows)
                 updateEmptyState()
             },
             onError = { msg ->

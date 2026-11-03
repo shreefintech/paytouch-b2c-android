@@ -123,6 +123,8 @@ object Constant {
     // Wallet top-up (POST wallet/topups) — flow value and status values (compared case-insensitively)
     // TODO(B2C-298): G5 — status values are not documented; SUCCESS / FAILED assumed (same as withdrawals)
     const val TOPUP_FLOW_PAYMENT_PAGE = "payment_page"
+    // TODO(B2C-298): user picks UPI / NB / CARD on HDFC's page after the preview — UPI fee shown as the estimate
+    const val TOPUP_FEE_METHOD_UPI = "UPI"
     const val TOPUP_STATUS_SUCCESS = "SUCCESS"
     const val TOPUP_STATUS_FAILED = "FAILED"
 

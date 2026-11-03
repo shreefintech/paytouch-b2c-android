@@ -10,11 +10,15 @@ import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusRewardItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletHistoryItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.VirtualAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupFeeItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalFeeItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupRequest
@@ -36,6 +40,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
         // TODO(B2C-298): G6 — backend gave no polling interval/timeout; ~12 s total, then the status screen shows pending
         private const val TOPUP_POLL_INTERVAL_MS = 3000L
         private const val TOPUP_POLL_MAX_ATTEMPTS = 5
+        private const val BONUS_PER_PAGE = 50
     }
 
     override fun onCleared() {
@@ -43,9 +48,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
         super.onCleared()
     }
 
-    fun fetchUserWalletData(
+    fun fetchVirtualAccount(
         onLoading: () -> Unit,
-        onSuccess: (WalletDataItem) -> Unit,
+        onSuccess: (VirtualAccountItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -53,11 +58,11 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             return
         }
         onLoading()
-        ApiClient.apiService.getUserWalletData(bearerToken())
-            .enqueue(object : Callback<General<WalletDataItem>> {
+        ApiClient.apiService.getVirtualAccount(bearerToken())
+            .enqueue(object : Callback<General<VirtualAccountItem>> {
                 override fun onResponse(
-                    call: Call<General<WalletDataItem>>,
-                    response: Response<General<WalletDataItem>>
+                    call: Call<General<VirtualAccountItem>>,
+                    response: Response<General<VirtualAccountItem>>
                 ) {
                     val data = response.body()?.data
                     if (response.isSuccessful && data != null) {
@@ -71,13 +76,32 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     }
                 }
 
-                override fun onFailure(call: Call<General<WalletDataItem>>, t: Throwable) {
+                override fun onFailure(call: Call<General<VirtualAccountItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
 
-    // Balance shown on Load Wallet — the VA card still comes from fetchUserWalletData()
+    // virtual-account has no holder name — read it from auth/me; silent on failure (card keeps "--")
+    fun fetchAccountHolderName(onSuccess: (String) -> Unit) {
+        if (!Utility.isInternetAvailable(getApplication())) return
+        ApiClient.apiService.getMe(bearerToken())
+            .enqueue(object : Callback<General<MeDataItem>> {
+                override fun onResponse(
+                    call: Call<General<MeDataItem>>,
+                    response: Response<General<MeDataItem>>
+                ) {
+                    val name = if (response.isSuccessful) response.body()?.data?.user?.name else null
+                    if (!name.isNullOrBlank()) onSuccess(name)
+                }
+
+                override fun onFailure(call: Call<General<MeDataItem>>, t: Throwable) {
+                    t.printStackTrace()
+                }
+            })
+    }
+
+    // Every wallet bucket (main, bonus, ...) shown on Load Wallet
     fun fetchWalletBalance(
         onSuccess: (WalletBalanceItem) -> Unit,
         onError: (String) -> Unit
@@ -180,6 +204,75 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             })
     }
 
+    // Fee previews are display-only — null on any failure, the server still applies the real fee
+    fun fetchTopupFee(amount: Double, onResult: (WalletTopupFeeItem?) -> Unit) {
+        if (!Utility.isInternetAvailable(getApplication())) { onResult(null); return }
+        ApiClient.apiService.getTopupFeePreview(bearerToken(), amount, Constant.TOPUP_FEE_METHOD_UPI)
+            .enqueue(object : Callback<General<WalletTopupFeeItem>> {
+                override fun onResponse(
+                    call: Call<General<WalletTopupFeeItem>>,
+                    response: Response<General<WalletTopupFeeItem>>
+                ) {
+                    onResult(if (response.isSuccessful) response.body()?.data else null)
+                }
+
+                override fun onFailure(call: Call<General<WalletTopupFeeItem>>, t: Throwable) {
+                    t.printStackTrace()
+                    onResult(null)
+                }
+            })
+    }
+
+    fun fetchWithdrawalFee(amount: Double, onResult: (WalletWithdrawalFeeItem?) -> Unit) {
+        if (!Utility.isInternetAvailable(getApplication())) { onResult(null); return }
+        ApiClient.apiService.getWithdrawalFeePreview(bearerToken(), amount)
+            .enqueue(object : Callback<General<WalletWithdrawalFeeItem>> {
+                override fun onResponse(
+                    call: Call<General<WalletWithdrawalFeeItem>>,
+                    response: Response<General<WalletWithdrawalFeeItem>>
+                ) {
+                    onResult(if (response.isSuccessful) response.body()?.data else null)
+                }
+
+                override fun onFailure(call: Call<General<WalletWithdrawalFeeItem>>, t: Throwable) {
+                    t.printStackTrace()
+                    onResult(null)
+                }
+            })
+    }
+
+    // Polls GET wallet/withdrawals/{client_reference} until is_final or the attempt cap — null when no status could be read
+    // TODO(B2C-298): no polling interval/timeout given for withdrawals — reuses the top-up cadence (~12 s)
+    fun pollWithdrawalStatus(
+        clientReference: String,
+        onResult: (WalletWithdrawalItem?) -> Unit,
+        attempt: Int = 1
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) { onResult(null); return }
+        ApiClient.apiService.getWalletWithdrawal(bearerToken(), clientReference)
+            .enqueue(object : Callback<General<WalletWithdrawalItem>> {
+                override fun onResponse(
+                    call: Call<General<WalletWithdrawalItem>>,
+                    response: Response<General<WalletWithdrawalItem>>
+                ) {
+                    val data = if (response.isSuccessful) response.body()?.data else null
+                    if (data != null && data.isFinal != true && attempt < TOPUP_POLL_MAX_ATTEMPTS) {
+                        pollHandler.postDelayed(
+                            { pollWithdrawalStatus(clientReference, onResult, attempt + 1) },
+                            TOPUP_POLL_INTERVAL_MS
+                        )
+                    } else {
+                        onResult(data)
+                    }
+                }
+
+                override fun onFailure(call: Call<General<WalletWithdrawalItem>>, t: Throwable) {
+                    t.printStackTrace()
+                    onResult(null)
+                }
+            })
+    }
+
     fun fetchRecentHistory(
         onSuccess: (ArrayList<WalletTransactionItem>) -> Unit,
         onError: (String) -> Unit
@@ -215,23 +308,26 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             })
     }
 
-    fun fetchBonusWallet(
-        onSuccess: (BonusWalletItem) -> Unit,
+    // Referral rows of rewards/bonus, mapped to the row shape ReferralHistoryAdp renders
+    fun fetchReferralHistory(
+        onSuccess: (List<BonusWalletHistoryItem>) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
             onError(getString(R.string.msgNoInternet))
             return
         }
-        ApiClient.apiService.getBonusWallet(bearerToken())
-            .enqueue(object : Callback<General<BonusWalletItem?>> {
+        // ponytail: first page only — add paging when users hold more than BONUS_PER_PAGE bonus rows
+        ApiClient.apiService.getBonusRewards(bearerToken(), page = 1, perPage = BONUS_PER_PAGE)
+            .enqueue(object : Callback<General<List<BonusRewardItem>>> {
                 override fun onResponse(
-                    call: Call<General<BonusWalletItem?>>,
-                    response: Response<General<BonusWalletItem?>>
+                    call: Call<General<List<BonusRewardItem>>>,
+                    response: Response<General<List<BonusRewardItem>>>
                 ) {
                     val data = response.body()?.data
                     if (response.isSuccessful && data != null) {
-                        onSuccess(data)
+                        // TODO(B2C-298): referral history may move to rewards/referral once its row shape is shared
+                        onSuccess(data.map { it.toHistoryItem() }.filter { it.isReferral })
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(
@@ -241,25 +337,25 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     }
                 }
 
-                override fun onFailure(call: Call<General<BonusWalletItem?>>, t: Throwable) {
+                override fun onFailure(call: Call<General<List<BonusRewardItem>>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
 
     fun fetchEarningWallet(
-        onSuccess: (EarningWalletItem) -> Unit,
+        onSuccess: (WalletEarningItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
             onError(getString(R.string.msgNoInternet))
             return
         }
-        ApiClient.apiService.getEarningWallet(bearerToken())
-            .enqueue(object : Callback<General<EarningWalletItem?>> {
+        ApiClient.apiService.getWalletEarning(bearerToken())
+            .enqueue(object : Callback<General<WalletEarningItem>> {
                 override fun onResponse(
-                    call: Call<General<EarningWalletItem?>>,
-                    response: Response<General<EarningWalletItem?>>
+                    call: Call<General<WalletEarningItem>>,
+                    response: Response<General<WalletEarningItem>>
                 ) {
                     val data = response.body()?.data
                     if (response.isSuccessful && data != null) {
@@ -273,7 +369,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     }
                 }
 
-                override fun onFailure(call: Call<General<EarningWalletItem?>>, t: Throwable) {
+                override fun onFailure(call: Call<General<WalletEarningItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
@@ -287,7 +383,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             onError(getString(R.string.msgNoInternet))
             return
         }
-        ApiClient.apiService.getRewardsLevel(bearerToken())
+        ApiClient.apiService.getCustomerLevel(bearerToken())
             .enqueue(object : Callback<General<RewardsLevelItem?>> {
                 override fun onResponse(
                     call: Call<General<RewardsLevelItem?>>,

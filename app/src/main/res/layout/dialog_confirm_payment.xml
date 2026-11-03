@@ -144,6 +144,56 @@
             app:layout_constraintBaseline_toBaselineOf="@id/tvAvailableBalanceLabel"
             tools:text="₹303.00" />
 
+        <!-- Fee label (GET wallet/topups/fee-preview) -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvFeeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/proza_libre_medium"
+            android:text="@string/labelFee"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvAvailableBalanceLabel" />
+
+        <!-- Fee value -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvFee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvFeeLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="₹5.00" />
+
+        <!-- Credit to Wallet label -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCreditAmountLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/proza_libre_medium"
+            android:text="@string/labelCreditToWallet"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvFeeLabel" />
+
+        <!-- Credit to Wallet value -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCreditAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvCreditAmountLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="₹995.00" />
+
         <!-- Lock icon + Secure Payment text -->
         <LinearLayout
             android:id="@+id/llSecurePayment"
@@ -154,7 +204,7 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvAvailableBalanceLabel">
+            app:layout_constraintTop_toBottomOf="@id/tvCreditAmountLabel">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivLock"

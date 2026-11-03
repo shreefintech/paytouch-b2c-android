@@ -3,6 +3,8 @@ package com.shreefintech.paytouchconsumer.retrofit.model.wallet
 import com.google.gson.annotations.SerializedName
 
 // Response of POST wallet/withdrawals and GET wallet/withdrawals/{client_reference}
+// TODO(B2C-298): temporary shape — no response sample shared; fields come from the API guide (status: pending, success,
+//  failed, reversed; transfer_mode always IMPS; status_message per status), verify against a real response
 data class WalletWithdrawalItem(
     @field:SerializedName("client_reference") val clientReference: String?,
     @field:SerializedName("amount")           val amount: String?,
@@ -13,6 +15,8 @@ data class WalletWithdrawalItem(
     @field:SerializedName("bank")             val bank: WalletWithdrawalBankItem?,
     @field:SerializedName("utr")              val utr: String?,
     @field:SerializedName("failure_reason")   val failureReason: String?,
+    @field:SerializedName("transfer_mode")    val transferMode: String?,
+    @field:SerializedName("status_message")   val statusMessage: String?,
     @field:SerializedName("created_at")       val createdAt: String?,
     @field:SerializedName("completed_at")     val completedAt: String?
 )

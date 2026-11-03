@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.animation.DecelerateInterpolator
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.RawRes
 import androidx.annotation.StringRes
 import androidx.core.widget.TextViewCompat
 import androidx.databinding.ObservableBoolean
@@ -42,12 +43,12 @@ import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
-import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
 import com.shreefintech.paytouchconsumer.earningwallet.EarningWalletActivity
 import com.shreefintech.paytouchconsumer.rewards.RewardsExplainerActivity
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletHistoryItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.VirtualAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalItem
 import com.shreefintech.paytouchconsumer.transactions.TransactionHistoryDetailActivity
@@ -377,8 +378,16 @@ class LoadWalletActivity : BaseActivity() {
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvPaymentMode.text = mode
         dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
+        dialogBinding.tvFee.text = "--"
+        dialogBinding.tvTotal.text = "--"
 
         dialog.show()
+
+        viewModel.fetchWithdrawalFee(amount) { fee ->
+            val b = withdrawConfirmDialogBinding?.takeIf { it === dialogBinding } ?: return@fetchWithdrawalFee
+            b.tvFee.text = fee?.fee?.let { Utility.formatAmount(it) } ?: "--"
+            b.tvTotal.text = fee?.total?.let { Utility.formatAmount(it) } ?: "--"
+        }
     }
 
     // Same MPIN popup as EditBankDetailsActivity — opens over the confirm dialog, which stays until the withdrawal succeeds
@@ -474,13 +483,27 @@ class LoadWalletActivity : BaseActivity() {
         }
 
         bindWithdrawDetails(dialogBinding, data)
-        val soundRes = when (data.status?.uppercase()) {
-            Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED -> R.raw.success_sound
-            Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> R.raw.failed_sound
-            else -> R.raw.pending_sound
-        }
-        withdrawSoundPlayer.play(mActivity, soundRes)
+        withdrawSoundPlayer.play(mActivity, withdrawSoundRes(data.status))
         dialog.show()
+
+        val clientReference = data.clientReference?.takeIf { it.isNotBlank() } ?: return
+        if (data.isFinal == true) return
+        // Popup opens as pending; re-bind once GET wallet/withdrawals/{client_reference} reports a new status
+        viewModel.pollWithdrawalStatus(clientReference, onResult = onResult@{ latest ->
+            if (isFinishing || isDestroyed || latest == null) return@onResult
+            val b = withdrawSuccessDialogBinding?.takeIf { withdrawRequestId == clientReference } ?: return@onResult
+            if (latest.status.equals(data.status, ignoreCase = true)) return@onResult
+            bindWithdrawDetails(b, latest)
+            withdrawSoundPlayer.play(mActivity, withdrawSoundRes(latest.status))
+            fetchWalletData()
+        })
+    }
+
+    @RawRes
+    private fun withdrawSoundRes(status: String?): Int = when (status?.uppercase()) {
+        Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED -> R.raw.success_sound
+        Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> R.raw.failed_sound
+        else -> R.raw.pending_sound
     }
 
     private fun bindWithdrawDetails(dialogBinding: DialogWithdrawSuccessBinding, data: WalletWithdrawalItem) {
@@ -489,6 +512,7 @@ class LoadWalletActivity : BaseActivity() {
 
         dialogBinding.tvTitle.setText(status.titleRes)
         dialogBinding.tvSubtitle.text = data.failureReason?.takeIf { it.isNotBlank() }
+            ?: data.statusMessage?.takeIf { it.isNotBlank() }
             ?: getString(status.subtitleRes)
         dialogBinding.tvAmount.text = Utility.formatAmount(data.amount)
         dialogBinding.tvStatus.text = data.status?.takeIf { it.isNotBlank() }
@@ -507,10 +531,11 @@ class LoadWalletActivity : BaseActivity() {
             else -> getString(R.string.labelBankAccountMasked, bankName, accountLast4)
         }
 
-        // Response has no transfer mode — show what the user picked
-        dialogBinding.tvTransferMode.text = pendingWithdrawMode
+        // Server's transfer_mode (always IMPS per the guide); falls back to what the user picked
+        val transferMode = data.transferMode?.takeIf { it.isNotBlank() } ?: pendingWithdrawMode
+        dialogBinding.tvTransferMode.text = transferMode
         dialogBinding.tvInstantBadge.visibility =
-            if (pendingWithdrawMode.equals(MODE_IMPS, ignoreCase = true)) View.VISIBLE else View.GONE
+            if (transferMode.equals(MODE_IMPS, ignoreCase = true)) View.VISIBLE else View.GONE
 
         dialogBinding.tvRequestId.text = data.clientReference?.takeIf { it.isNotBlank() } ?: "--"
         dialogBinding.ivCopyRequestId.visibility =
@@ -569,24 +594,19 @@ class LoadWalletActivity : BaseActivity() {
         hideNoInternet()
         fetchWalletData()
         fetchRecentHistory()
-        fetchBonusWallet()
+        fetchReferralHistory()
         fetchEarningWallet()
         fetchRewardsLevel()
     }
 
-    private fun fetchBonusWallet() {
-        showProgressBonus.set(true)
-        viewModel.fetchBonusWallet(
-            onSuccess = { data ->
-                showProgressBonus.set(false)
-                binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet)
-                val referralRows = (data.history ?: emptyList()).filter { it.isReferral }.take(2)
-                referralAdp.updateList(referralRows)
+    // Bonus balance comes from wallet/balance (populateWalletBalance); this loads the referral rows only
+    private fun fetchReferralHistory() {
+        viewModel.fetchReferralHistory(
+            onSuccess = { rows ->
+                referralAdp.updateList(rows.take(2))
                 if (currentRecentTab == RecentTab.REFERRAL) updateEmptyState()
             },
             onError = { msg ->
-                showProgressBonus.set(false)
-                binding.tvBonusBalance.text = "--"
                 ToastUtil.showDelete(mActivity, msg)
                 referralAdp.updateList(emptyList())
                 if (currentRecentTab == RecentTab.REFERRAL) updateEmptyState()
@@ -703,8 +723,16 @@ class LoadWalletActivity : BaseActivity() {
 
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
+        dialogBinding.tvFee.text = "--"
+        dialogBinding.tvCreditAmount.text = "--"
 
         dialog.show()
+
+        viewModel.fetchTopupFee(amount) { fee ->
+            val b = confirmDialogBinding?.takeIf { it === dialogBinding } ?: return@fetchTopupFee
+            b.tvFee.text = fee?.fee?.let { Utility.formatAmount(it) } ?: "--"
+            b.tvCreditAmount.text = fee?.creditAmount?.let { Utility.formatAmount(it) } ?: "--"
+        }
     }
 
     private fun startTopup() {
@@ -765,13 +793,13 @@ class LoadWalletActivity : BaseActivity() {
 
     private fun isPaymentSheetVisible() = sheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
 
-    // Balance comes from wallet/balance; the VA card still uses wallet/user-data (no new VA endpoint yet)
+    // Balances come from wallet/balance; the VA card from virtual-account (+ holder name from auth/me)
     private fun fetchWalletData() {
         fetchWalletBalance()
-        viewModel.fetchUserWalletData(
+        viewModel.fetchVirtualAccount(
             onLoading = { showLoading() },
             onSuccess = { data ->
-                if (isFinishing || isDestroyed) return@fetchUserWalletData
+                if (isFinishing || isDestroyed) return@fetchVirtualAccount
                 hideLoading()
                 populateWalletData(data)
             },
@@ -780,18 +808,26 @@ class LoadWalletActivity : BaseActivity() {
                 ToastUtil.showDelete(mActivity, msg)
             }
         )
+        viewModel.fetchAccountHolderName { name ->
+            if (!isFinishing && !isDestroyed) binding.tvAccountHolder.text = name
+        }
     }
 
-    // No toast on error — fetchUserWalletData() already reports a failing wallet load
+    // No toast on error — fetchVirtualAccount() already reports a failing wallet load
     private fun fetchWalletBalance() {
+        showProgressBonus.set(true)
         viewModel.fetchWalletBalance(
             onSuccess = { data ->
+                showProgressBonus.set(false)
                 if (isFinishing || isDestroyed) return@fetchWalletBalance
                 populateWalletBalance(data)
             },
             onError = {
+                showProgressBonus.set(false)
                 currentWalletBalance = null
                 binding.tvWalletBalance.text = "--"
+                binding.tvVaWalletBalance.text = "--"
+                binding.tvBonusBalance.text = "--"
             }
         )
     }
@@ -800,6 +836,8 @@ class LoadWalletActivity : BaseActivity() {
         // TODO(B2C-298): G10 — main_wallet assumed to be the user-facing balance; G14 — has_wallet=false shape unknown, shown as 0
         currentWalletBalance = if (data.hasWallet == false) "0" else data.mainWallet
         binding.tvWalletBalance.text = Utility.formatAmount(currentWalletBalance)
+        binding.tvVaWalletBalance.text = Utility.formatAmount(currentWalletBalance)
+        binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet)
     }
 
     private fun fetchRecentHistory() {
@@ -840,23 +878,21 @@ class LoadWalletActivity : BaseActivity() {
         AnimationHelper.animateChildren(binding.llTotalBalanceContent)
     }
 
-    private fun populateWalletData(data: WalletDataItem) {
+    // VA wallet balance and holder name are set by populateWalletBalance() / fetchAccountHolderName()
+    private fun populateWalletData(data: VirtualAccountItem) {
         hasWalletData = true
         playWalletEntranceIfNeeded()
-        binding.tvVirtualAccountNumber.text = data.virtualAccountNumber ?: "--"
-        binding.tvVaWalletBalance.text = Utility.formatAmount(data.wallet?.balance)
-        binding.tvAccountHolder.text = data.name ?: "--"
-        binding.tvIfscCode.text = data.ifsc ?: "--"
-        binding.tvBankName.text = data.bankName ?: "--"
+        binding.tvVirtualAccountNumber.text = data.bankAcc?.takeIf { it.isNotBlank() } ?: "--"
+        binding.tvIfscCode.text = data.ifsc?.takeIf { it.isNotBlank() } ?: "--"
+        binding.tvBankName.text = data.bankName?.takeIf { it.isNotBlank() } ?: "--"
         Glide.with(mActivity as Context)
             .load(data.qrCodeUrl)
             .placeholder(R.drawable.ic_qr)
             .error(R.drawable.ic_qr)
             .into(binding.ivQrCode)
-        val status = data.wallet?.status
-        if (!status.isNullOrEmpty()) {
-            binding.tvActiveStatus.text = status.replaceFirstChar { it.uppercaseChar() }
-        }
+        binding.tvActiveStatus.setText(
+            if (data.isActive == false) R.string.labelInactiveStatus else R.string.labelActiveStatus
+        )
     }
 
     private fun setupRecyclerView() {

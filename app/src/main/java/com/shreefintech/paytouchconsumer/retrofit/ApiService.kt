@@ -21,7 +21,13 @@ import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Item
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Request
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Item
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusRewardItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.VirtualAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningAmountRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupFeeItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalFeeItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupItem
@@ -672,6 +678,71 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Path("client_reference") clientReference: String
     ): Call<General<WalletTopupItem>>
+
+    @GET("${MOBILE}wallet/topups/fee-preview")
+    fun getTopupFeePreview(
+        @Header("Authorization") authorization: String,
+        @Query("amount") amount: Double,
+        @Query("payment_method_type") paymentMethodType: String
+    ): Call<General<WalletTopupFeeItem>>
+
+    @GET("${MOBILE}wallet/withdrawals/fee-preview")
+    fun getWithdrawalFeePreview(
+        @Header("Authorization") authorization: String,
+        @Query("amount") amount: Double
+    ): Call<General<WalletWithdrawalFeeItem>>
+
+    @GET("${MOBILE}wallet/withdrawals/{client_reference}")
+    fun getWalletWithdrawal(
+        @Header("Authorization") authorization: String,
+        @Path("client_reference") clientReference: String
+    ): Call<General<WalletWithdrawalItem>>
+
+    // Load Wallet VA card — replaces wallet/user-data
+    @GET("${MOBILE}virtual-account")
+    fun getVirtualAccount(
+        @Header("Authorization") authorization: String
+    ): Call<General<VirtualAccountItem>>
+
+    // Replaces earning-wallet (old route still used by EarningWalletViewModel)
+    @GET("${MOBILE}wallet/earning")
+    fun getWalletEarning(
+        @Header("Authorization") authorization: String
+    ): Call<General<WalletEarningItem>>
+
+    // Earning wallet actions — replace earning-wallet/opt-in · lock · withdraw. Only success/message are read,
+    // so the action's `data` shape (not shared yet) can't break the parse
+    @POST("${MOBILE}wallet/earning/opt-in")
+    fun postWalletEarningOptIn(
+        @Header("Authorization") authorization: String
+    ): Call<MessageItem>
+
+    @POST("${MOBILE}wallet/earning/lock")
+    fun postWalletEarningLock(
+        @Header("Authorization") authorization: String,
+        @Body request: WalletEarningAmountRequest
+    ): Call<MessageItem>
+
+    @POST("${MOBILE}wallet/earning/withdraw")
+    fun postWalletEarningWithdraw(
+        @Header("Authorization") authorization: String,
+        @Body request: WalletEarningAmountRequest
+    ): Call<MessageItem>
+
+    // Replaces bonus-wallet history — Laravel paginated list in `data`
+    @GET("${MOBILE}rewards/bonus")
+    fun getBonusRewards(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): Call<General<List<BonusRewardItem>>>
+
+    // Replaces level (old route still used by Home / Rewards / Earning Wallet)
+    // TODO(B2C-298): no response sample (502 on staging) — assumed to keep the old level shape; verify once Dashboard sends levels
+    @GET("${MOBILE}rewards/level")
+    fun getCustomerLevel(
+        @Header("Authorization") authorization: String
+    ): Call<General<RewardsLevelItem?>>
 
     // Wallet withdrawal — replaces wallet/withdraw
     @POST("${MOBILE}wallet/withdrawals")
