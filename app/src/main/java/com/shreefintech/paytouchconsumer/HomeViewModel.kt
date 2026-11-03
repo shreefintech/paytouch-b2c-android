@@ -102,7 +102,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
      * Silent — Home stays usable if mobile/auth/me fails; the flag is re-checked on the next Home launch.
      * Also the post-login source of the bank/PAN onboarding flags (see [saveOnboardingFlags]) — keep this call.
      */
-    fun checkAadhaarRejected(onRejected: () -> Unit, onPendingApproval: (String?) -> Unit) {
+    fun checkAadhaarRejected(onRejected: () -> Unit, onRedirect: (String?) -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) return
         aadhaarCheckCall?.cancel()
         aadhaarCheckCall = ApiClient.apiService.getMe(bearerToken()).also {
@@ -120,7 +120,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     val step = NextStep.from(data.nextStep)
                     when {
                         data.isAadhaarRejected || step?.needsAadhaar == true -> onRejected()
-                        step == NextStep.PENDING_APPROVAL -> onPendingApproval(data.nextStep)
+                        // Steps that leave Home — NextStepRouter picks KycActivity / KycStatusActivity
+                        step == NextStep.KYC_REQUIRED || step == NextStep.PENDING_APPROVAL -> onRedirect(data.nextStep)
                     }
                 }
 

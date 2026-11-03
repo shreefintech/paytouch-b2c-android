@@ -32,11 +32,11 @@ import com.bumptech.glide.request.target.Target
 import com.shreefintech.paytouchconsumer.databinding.DialogConfirmLogoutBinding
 import com.shreefintech.paytouchconsumer.databinding.DialogReuploadAadhaarBinding
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
+import com.shreefintech.paytouchconsumer.auth.NextStepRouter
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
 import com.shreefintech.paytouchconsumer.dth.DthActivity
 import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
 import com.shreefintech.paytouchconsumer.gas.GasActivity
-import com.shreefintech.paytouchconsumer.kyc.KycStatusActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.LoadWalletActivity
 import com.shreefintech.paytouchconsumer.location.LocationPermissionHelper
@@ -140,9 +140,9 @@ class HomeActivity : BaseActivity() {
     private fun checkKycStep() {
         viewModel.checkAadhaarRejected(
             onRejected = { if (!isFinishing && !isDestroyed) showReuploadAadhaarDialog() },
-            onPendingApproval = { nextStep ->
+            onRedirect = { nextStep ->
                 if (isFinishing || isDestroyed) return@checkAadhaarRejected
-                startActivity(KycStatusActivity.buildIntent(mActivity, nextStep).apply {
+                startActivity(NextStepRouter.intentFor(mActivity, nextStep, null).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 })
             }

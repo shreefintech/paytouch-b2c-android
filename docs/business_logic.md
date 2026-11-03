@@ -17,7 +17,10 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - Both password and MPIN login share `mobile/auth/login`; `type` is `Constant.CREDENTIAL_TYPE_PASSWORD` or `Constant.CREDENTIAL_TYPE_MPIN`
 - All auth responses use the `General<T>` envelope (`{success, message, data}`) — check `isSuccessful && body?.data != null`
 - Routing after login / Splash / MPIN creation goes through **`NextStepRouter.intentFor(context, next_step, mpin_required)`** — never route inline:
-  - `next_step` in `kyc_required`, `aadhaar_required`, `kyc_resubmit_required`, `pending_approval`, `registration_rejected` (`NextStep.isKycStep`) → `KycActivity`
+  - `kyc_required` → `KycActivity` (full KYC flow). Home's `auth/me` check also redirects here if it sees this step.
+  - `pending_approval`, `registration_rejected` → `KycStatusActivity`
+  - `aadhaar_required`, `kyc_resubmit_required` → `HomeActivity`, whose `auth/me` check shows the blocking Aadhaar re-upload dialog
+  - A 403 whose `error_code` is one of these steps (`NextStep.isKycStep`) is routed the same way by `ApiHelper.onForbidden()`
   - else `mpin_required = true` → `ResetMpinActivity` (create-mode, via `buildCreateIntent()`)
   - else (`bank_details_required`, `complete`, null or unknown value) → `HomeActivity`. Unknown values fall through to Home **deliberately**.
   - `bank_details_required` also forces `KEY_BANK_DETAILS_ADDED = false` (see `saveOnboardingFlags()`), so the Add Bank Details popup shows before the first money action.
