@@ -1,8 +1,10 @@
 package com.shreefintech.paytouchconsumer.loadwallet.model
 
 import androidx.annotation.DrawableRes
+import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletStatementEntryItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 
 data class WalletTransactionItem(
@@ -21,6 +23,18 @@ data class WalletTransactionItem(
             isCredit        = item.type?.uppercase() == "CREDIT",
             transactionId   = item.transactionId ?: "",
             categoryIconRes = sourceToIcon(item.serviceName)
+        )
+
+        // GET wallet/statement row
+        fun from(item: WalletStatementEntryItem) = WalletTransactionItem(
+            title           = item.description?.takeIf { it.isNotBlank() } ?: item.type ?: "--",
+            date            = Utility.formatDate(item.createdAt, "dd MMM yyyy"),
+            amount          = Utility.formatAmount(item.amount),
+            isCredit        = item.direction.equals(Constant.WALLET_DIRECTION_CREDIT, ignoreCase = true),
+            // TODO(B2C-298): row tap — open the detail call by `type` (wallet/topups, wallet/withdrawals, billpay/status
+            //  with client_reference); empty until then, so WalletTransactionAdp ignores the tap
+            transactionId   = "",
+            categoryIconRes = sourceToIcon(item.description ?: item.type)
         )
         @DrawableRes
         private fun sourceToIcon(source: String?): Int {

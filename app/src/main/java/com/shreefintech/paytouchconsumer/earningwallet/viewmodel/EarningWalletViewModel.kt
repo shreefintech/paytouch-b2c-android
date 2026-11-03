@@ -11,6 +11,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningAmountRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningItem
+import com.shreefintech.paytouchconsumer.utill.MoneyRequestId
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -19,6 +20,8 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class EarningWalletViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val moneyRequestId = MoneyRequestId()
 
     fun fetchEarningWallet(
         onLoading: () -> Unit,
@@ -87,17 +90,20 @@ class EarningWalletViewModel(application: Application) : AndroidViewModel(applic
         ApiClient.apiService.postWalletEarningOptIn(bearerToken()).enqueue(actionCallback(onSuccess, onError))
     }
 
+    // onPending: timeout / 5xx — outcome unknown, so a retry of the same amount reuses the request_id
     fun postLock(
         amount: Double,
         mpin: String,
         onLoading: () -> Unit,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        onPending: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         onLoading()
-        ApiClient.apiService.postWalletEarningLock(bearerToken(), WalletEarningAmountRequest(amount, mpin))
-            .enqueue(actionCallback(onSuccess, onError))
+        val requestId = moneyRequestId.forAttempt("lock:$amount")
+        ApiClient.apiService.postWalletEarningLock(bearerToken(), WalletEarningAmountRequest(amount, mpin, requestId))
+            .enqueue(actionCallback(onSuccess, onError, onPending))
     }
 
     fun postWithdraw(
@@ -105,28 +111,39 @@ class EarningWalletViewModel(application: Application) : AndroidViewModel(applic
         mpin: String,
         onLoading: () -> Unit,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        onPending: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         onLoading()
-        ApiClient.apiService.postWalletEarningWithdraw(bearerToken(), WalletEarningAmountRequest(amount, mpin))
-            .enqueue(actionCallback(onSuccess, onError))
+        val requestId = moneyRequestId.forAttempt("withdraw:$amount")
+        ApiClient.apiService.postWalletEarningWithdraw(bearerToken(), WalletEarningAmountRequest(amount, mpin, requestId))
+            .enqueue(actionCallback(onSuccess, onError, onPending))
     }
 
     // opt-in / lock / withdraw all answer { success, message } — server message is shown either way
-    // TODO(B2C-298): no error samples (wrong MPIN, 403 LOCATION_REQUIRED / BANK_DETAILS_REQUIRED) — server message shown as-is
-    private fun actionCallback(onSuccess: (String) -> Unit, onError: (String) -> Unit) =
-        object : Callback<MessageItem> {
-            override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
-                val body = response.body()
-                if (response.isSuccessful && body?.success == true) {
-                    onSuccess(body.message ?: "")
-                } else {
-                    onError(body?.message ?: ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
-                }
+    private fun actionCallback(
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+        onPending: ((String) -> Unit)? = null
+    ) = object : Callback<MessageItem> {
+        override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+            val body = response.body()
+            if (onPending != null && response.code() >= 500) {
+                onPending(getString(R.string.msgMoneyRequestPending))
+                return
             }
-            override fun onFailure(call: Call<MessageItem>, t: Throwable) {
-                onError(t.localizedMessage ?: getString(R.string.errGeneric))
+            moneyRequestId.clear()
+            if (response.isSuccessful && body?.success == true) {
+                onSuccess(body.message ?: "")
+            } else {
+                onError(body?.message ?: ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
             }
         }
+        override fun onFailure(call: Call<MessageItem>, t: Throwable) {
+            t.printStackTrace()
+            if (onPending != null) onPending(getString(R.string.msgMoneyRequestPending))
+            else onError(t.localizedMessage ?: getString(R.string.errGeneric))
+        }
+    }
 }

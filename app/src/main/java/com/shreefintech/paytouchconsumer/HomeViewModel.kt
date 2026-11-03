@@ -63,14 +63,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Silently checks /api/level on every Dashboard appear.
+     * Silently checks /api/mobile/rewards/level on every Dashboard appear.
      * Saves the level first so each level shows exactly once. With no saved level
      * (fresh install / re-login) the current level is celebrated once.
      * No toast on failure — matches iOS "the level check is silent" spec.
      */
     fun checkLevelUp(onLevelUp: (RewardsLevelItem) -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) return
-        ApiClient.apiService.getRewardsLevel(bearerToken())
+        ApiClient.apiService.getCustomerLevel(bearerToken())
             .enqueue(object : Callback<General<RewardsLevelItem?>> {
                 override fun onResponse(
                     call: Call<General<RewardsLevelItem?>>,

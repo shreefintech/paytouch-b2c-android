@@ -10,7 +10,7 @@ object Constant {
     const val LIVE_URL = "https://www.paytouch.in/"
     // B2C backend — staging url
     const val B2C_URL = "https://backend-b2c.paytouch.in/"
-    const val BASE_URL = LIVE_URL
+    const val BASE_URL = B2C_URL
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
 
     // AUTH store keys
@@ -120,11 +120,17 @@ object Constant {
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
-    // Wallet top-up (POST wallet/topups) — flow value and status values (compared case-insensitively)
-    // TODO(B2C-298): G5 — status values are not documented; SUCCESS / FAILED assumed (same as withdrawals)
+    // Wallet top-up (POST wallet/topups) — flow value and final status values (compared case-insensitively);
+    // initiated / pending / crediting / on_hold all show as processing
     const val TOPUP_FLOW_PAYMENT_PAGE = "payment_page"
-    // TODO(B2C-298): user picks UPI / NB / CARD on HDFC's page after the preview — UPI fee shown as the estimate
+    // GET wallet/statement `wallet` filter (main, referral, bonus, earning) — My Wallet lists show main
+    const val WALLET_STATEMENT_MAIN = "main"
+    const val WALLET_DIRECTION_CREDIT = "credit"
+
+    // Fee preview payment_method_type values — the user picks the method on HDFC's page
     const val TOPUP_FEE_METHOD_UPI = "UPI"
+    const val TOPUP_FEE_METHOD_CARD = "CARD"
+    const val TOPUP_FEE_METHOD_NB = "NB"
     const val TOPUP_STATUS_SUCCESS = "SUCCESS"
     const val TOPUP_STATUS_FAILED = "FAILED"
 

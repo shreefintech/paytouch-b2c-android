@@ -64,9 +64,6 @@ class EarningWalletActivity : BaseActivity() {
     private var interestAccrued = 0.0
     private var resultCode = 0
     private var isDataLoaded = false
-    // Server minimums from wallet/earning (min_lock / min_withdraw); the guide says 100 until they arrive
-    private var minLockAmount = Constant.EARNING_MIN_LOCK_AMOUNT
-    private var minWithdrawAmount = Constant.EARNING_MIN_LOCK_AMOUNT
 
     // Lock and withdraw need the MPIN — the API call runs from the MPIN dialog's submit button
     private enum class MpinAction { LOCK, WITHDRAW }
@@ -233,10 +230,7 @@ class EarningWalletActivity : BaseActivity() {
         isOptedIn = item.optedIn == true
         lockedBalance = item.principal?.toDoubleOrNull() ?: 0.0
         interestAccrued = item.interestAccrued?.toDoubleOrNull() ?: 0.0
-        val pendingAmt = item.pendingWithdrawalAmount
-        item.minLock?.toDoubleOrNull()?.toInt()?.let { minLockAmount = it }
-        item.minWithdraw?.toDoubleOrNull()?.toInt()?.let { minWithdrawAmount = it }
-        lockSheet.tvLockInfo.text = getString(R.string.msgLockInfo, minLockAmount)
+        val pendingAmt = item.pendingWithdrawalAmount?.toDoubleOrNull() ?: 0.0
         // Server is the source of truth for PAN — keeps the cached flag in step for the lock gate
         if (item.panAdded == true) {
             SharedPreferenceHelper.setSharedPreferenceBoolean(mActivity, Constant.KEY_PAN_ADDED, true)
@@ -261,8 +255,7 @@ class EarningWalletActivity : BaseActivity() {
 
         if (pendingAmt > 0.0) {
             binding.llPendingPill.visible()
-            // TODO(B2C-298): available date assumed inside pending_withdrawal — not in the B2C-253 field list
-            val dateStr = Utility.formatDate(item.pendingWithdrawalAvailableAt, "dd MMM")
+            val dateStr = Utility.formatDate(item.withdrawalAvailableAt, "dd MMM")
             binding.tvPendingPill.text = getString(R.string.msgPendingWithdrawal, Utility.formatAmount(pendingAmt.toString()), dateStr)
             binding.btnWithdraw.isEnabled = false
             binding.btnWithdraw.alpha = 0.45f
@@ -422,8 +415,8 @@ class EarningWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errMinAmount))
             return
         }
-        if (amount < minLockAmount) {
-            ToastUtil.showDelete(mActivity, getString(R.string.errMinLockAmount, minLockAmount))
+        if (amount < Constant.EARNING_MIN_LOCK_AMOUNT) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errMinLockAmount, Constant.EARNING_MIN_LOCK_AMOUNT))
             return
         }
         if (amount > walletBalance) {
@@ -441,8 +434,9 @@ class EarningWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errMinAmount))
             return
         }
-        if (amount < minWithdrawAmount) {
-            ToastUtil.showDelete(mActivity, getString(R.string.errMinEarningWithdrawAmount, minWithdrawAmount))
+        // TODO(B2C-298): the API doc gives no earning-withdraw minimum — lock's ₹100 assumed
+        if (amount < Constant.EARNING_MIN_LOCK_AMOUNT) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errMinEarningWithdrawAmount, Constant.EARNING_MIN_LOCK_AMOUNT))
             return
         }
         if (amount > lockedBalance) {
@@ -515,10 +509,17 @@ class EarningWalletActivity : BaseActivity() {
             mpinDialogBinding?.clearMpin()
             ToastUtil.showDelete(mActivity, errorMsg, inWindow = false)
         }
+        // Outcome unknown — dialog stays so a retry goes out with the same request_id
+        val onPending: (String) -> Unit = onPending@{ pendingMsg ->
+            showProgressMpin.set(false)
+            if (isFinishing || isDestroyed) return@onPending
+            mpinDialogBinding?.clearMpin()
+            ToastUtil.showWarning(mActivity, pendingMsg, inWindow = false)
+        }
         if (pendingAction == MpinAction.LOCK) {
-            viewModel.postLock(pendingAmount, mpin, { showProgressMpin.set(true) }, onSuccess, onError)
+            viewModel.postLock(pendingAmount, mpin, { showProgressMpin.set(true) }, onSuccess, onError, onPending)
         } else {
-            viewModel.postWithdraw(pendingAmount, mpin, { showProgressMpin.set(true) }, onSuccess, onError)
+            viewModel.postWithdraw(pendingAmount, mpin, { showProgressMpin.set(true) }, onSuccess, onError, onPending)
         }
     }
 

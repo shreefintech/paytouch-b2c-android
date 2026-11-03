@@ -21,7 +21,7 @@ class RewardsViewModel(application: Application) : AndroidViewModel(application)
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
-        ApiClient.apiService.getRewardsLevel(bearerToken())
+        ApiClient.apiService.getCustomerLevel(bearerToken())
             .enqueue(object : Callback<General<RewardsLevelItem?>> {
                 override fun onResponse(
                     call: Call<General<RewardsLevelItem?>>,

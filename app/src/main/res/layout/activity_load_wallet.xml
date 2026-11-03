@@ -708,10 +708,11 @@
                             </LinearLayout>
                             <!-- Active badge -->
                             <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/cardActiveStatus"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="@dimen/margin_extra_small"
-                                app:cardBackgroundColor="#E8F5E9"
+                                app:cardBackgroundColor="@color/wallet_success_bg"
                                 app:cardCornerRadius="20dp"
                                 app:cardElevation="0dp"
                                 app:strokeWidth="0dp">
@@ -727,7 +728,7 @@
                                     android:paddingEnd="10dp"
                                     android:paddingBottom="3dp"
                                     android:text="@string/labelActiveStatus"
-                                    android:textColor="#2E7D32"
+                                    android:textColor="@color/wallet_success_stroke"
                                     android:textSize="@dimen/text_size_11" />
                             </com.google.android.material.card.MaterialCardView>
 
@@ -885,6 +886,31 @@
                                         </LinearLayout>
 
                                     </LinearLayout>
+
+                                    <!-- Row 3 — UPI ID (vpa) -->
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/margin_small_medium"
+                                        android:fontFamily="@font/proza_libre_regular"
+                                        android:textColor="@color/hint_color"
+                                        android:includeFontPadding="false"
+                                        android:maxLines="1"
+                                        android:ellipsize="end"
+                                        android:text="@string/labelUpiId"
+                                        android:textSize="@dimen/text_size_10" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tvVpa"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_semi_bold"
+                                        android:includeFontPadding="false"
+                                        android:maxLines="1"
+                                        android:ellipsize="end"
+                                        tools:text="paytouch.123456@hdfcbank"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_12" />
 
                                     <!-- Powered by footer -->
                                     <androidx.appcompat.widget.AppCompatTextView

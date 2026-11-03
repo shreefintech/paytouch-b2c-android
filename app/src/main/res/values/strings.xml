@@ -502,7 +502,15 @@
     <string name="labelInactiveStatus">Inactive</string>
     <string name="labelFee">Fee</string>
     <string name="labelTotalDebit">Total Debit</string>
-    <string name="labelCreditToWallet">Credit to Wallet</string>
+    <string name="labelConfirmedAtPayout">Confirmed at payout</string>
+    <string name="labelChargesByPaymentMethod">Charges by payment method</string>
+    <string name="labelPaymentMethodUpi">UPI</string>
+    <string name="labelPaymentMethodCard">Card</string>
+    <string name="labelPaymentMethodNetBanking">Net Banking</string>
+    <string name="labelConfirmedAtPayment">Confirmed at payment</string>
+    <string name="errFeePreviewFailed">Couldn\'t load charges. You\'ll see them on the payment page.</string>
+    <string name="msgMoneyRequestPending">Your request is still processing. Check your wallet before trying again — retrying won\'t charge you twice.</string>
+    <string name="labelUpiId">UPI ID</string>
     <string name="labelAccountHolder">Account Holder</string>
     <string name="labelPoweredByPartners">Powered by • Bharat Connect • Indusind • PayTouch • ICICI</string>
     <string name="btnMakePayment">Make Payment</string>

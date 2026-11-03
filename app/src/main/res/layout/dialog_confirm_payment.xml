@@ -144,55 +144,108 @@
             app:layout_constraintBaseline_toBaselineOf="@id/tvAvailableBalanceLabel"
             tools:text="₹303.00" />
 
-        <!-- Fee label (GET wallet/topups/fee-preview) -->
+        <!-- Charges by payment method (GET wallet/topups/fee-preview, one call per method) -->
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvFeeLabel"
+            android:id="@+id/tvFeeTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/proza_libre_medium"
-            android:text="@string/labelFee"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:text="@string/labelChargesByPaymentMethod"
             android:textColor="@color/sub_text_color"
             android:textSize="@dimen/text_size_14"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvAvailableBalanceLabel" />
 
-        <!-- Fee value -->
+        <!-- UPI fee -->
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvFee"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/proza_libre_semi_bold"
-            android:textColor="@color/sub_text_color"
-            android:textSize="@dimen/text_size_14"
-            app:layout_constraintBaseline_toBaselineOf="@id/tvFeeLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="₹5.00" />
-
-        <!-- Credit to Wallet label -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvCreditAmountLabel"
+            android:id="@+id/tvFeeUpiLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/proza_libre_medium"
-            android:text="@string/labelCreditToWallet"
+            android:text="@string/labelPaymentMethodUpi"
             android:textColor="@color/sub_text_color"
             android:textSize="@dimen/text_size_14"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvFeeLabel" />
+            app:layout_constraintTop_toBottomOf="@id/tvFeeTitle" />
 
-        <!-- Credit to Wallet value -->
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvCreditAmount"
+            android:id="@+id/tvFeeUpi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/proza_libre_semi_bold"
             android:textColor="@color/sub_text_color"
             android:textSize="@dimen/text_size_14"
-            app:layout_constraintBaseline_toBaselineOf="@id/tvCreditAmountLabel"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvFeeUpiLabel"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="₹995.00" />
+            tools:text="₹15.00" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/groupFeeUpi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="tvFeeUpiLabel,tvFeeUpi" />
+
+        <!-- Card fee -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvFeeCardLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/proza_libre_medium"
+            android:text="@string/labelPaymentMethodCard"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvFeeUpiLabel" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvFeeCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvFeeCardLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="₹20.00" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/groupFeeCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="tvFeeCardLabel,tvFeeCard" />
+
+        <!-- Net Banking fee -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvFeeNbLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/proza_libre_medium"
+            android:text="@string/labelPaymentMethodNetBanking"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvFeeCardLabel" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvFeeNb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proza_libre_semi_bold"
+            android:textColor="@color/sub_text_color"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvFeeNbLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="₹10.00" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/groupFeeNb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="tvFeeNbLabel,tvFeeNb" />
 
         <!-- Lock icon + Secure Payment text -->
         <LinearLayout
@@ -204,7 +257,7 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvCreditAmountLabel">
+            app:layout_constraintTop_toBottomOf="@id/tvFeeNbLabel">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivLock"

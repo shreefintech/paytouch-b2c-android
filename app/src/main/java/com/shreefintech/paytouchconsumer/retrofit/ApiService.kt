@@ -26,6 +26,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.wallet.VirtualAccountIte
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningAmountRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletStatementItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupFeeItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalFeeItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountItem
@@ -303,6 +304,7 @@ interface ApiService {
         @Header("Authorization") authorization: String
     ): Call<General<EarningWalletItem?>>
 
+    // Old route — replaced by getCustomerLevel (mobile/rewards/level); no callers left
     @GET("${AUTH}level")
     fun getRewardsLevel(
         @Header("Authorization") authorization: String
@@ -313,6 +315,7 @@ interface ApiService {
         @Header("Authorization") authorization: String
     ): Call<General<WalletDataItem>>
 
+    // Old route — replaced by getWalletStatement (Load Wallet recent list + Wallet Transactions)
     @GET("${AUTH}wallet/combined-wallet-history")
     fun getWalletHistory(
         @Header("Authorization") authorization: String,
@@ -698,6 +701,15 @@ interface ApiService {
         @Path("client_reference") clientReference: String
     ): Call<General<WalletWithdrawalItem>>
 
+    // Wallet ledger — replaces combined-wallet-history; cursor omitted on the first page
+    @GET("${MOBILE}wallet/statement")
+    fun getWalletStatement(
+        @Header("Authorization") authorization: String,
+        @Query("wallet") wallet: String,
+        @Query("per_page") perPage: Int,
+        @Query("cursor") cursor: String?
+    ): Call<WalletStatementItem>
+
     // Load Wallet VA card — replaces wallet/user-data
     @GET("${MOBILE}virtual-account")
     fun getVirtualAccount(
@@ -737,8 +749,17 @@ interface ApiService {
         @Query("per_page") perPage: Int
     ): Call<General<List<BonusRewardItem>>>
 
-    // Replaces level (old route still used by Home / Rewards / Earning Wallet)
-    // TODO(B2C-298): no response sample (502 on staging) — assumed to keep the old level shape; verify once Dashboard sends levels
+    // Referral History rows — same route as getReferralRewards (My Account, reads meta.summary only); this one reads `data`
+    @GET("${MOBILE}rewards/referral")
+    fun getReferralHistory(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): Call<General<List<BonusRewardItem>>>
+
+    // Customer level — Home (level-up check), Rewards, Load Wallet, Earning Wallet; replaces api/level
+    // TODO(B2C-298): no response sample (502 "Your level is unavailable" on staging, 2026-11-03) — keeps the old
+    //  RewardsLevelItem shape; verify once Dashboard sends levels
     @GET("${MOBILE}rewards/level")
     fun getCustomerLevel(
         @Header("Authorization") authorization: String

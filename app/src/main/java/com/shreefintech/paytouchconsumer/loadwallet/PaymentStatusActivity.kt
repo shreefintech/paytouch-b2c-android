@@ -91,7 +91,9 @@ class PaymentStatusActivity : BaseActivity() {
         val statusColor = ContextCompat.getColor(mActivity, display.statusColorRes)
         binding.tvStatusLabel.text = display.label
         binding.tvStatusLabel.setTextColor(statusColor)
-        binding.tvStatusDescription.text = display.description
+        binding.tvStatusDescription.text = passItem?.failureReason
+            ?.takeIf { it.isNotBlank() && HdfcPaymentHelper.isFailedStatus(status) }
+            ?: display.description
         binding.tvAmountLabel.text = display.amountLabel
         binding.tvOrderId.text = orderId
         binding.tvAmount.text = Utility.formatAmount(amount)

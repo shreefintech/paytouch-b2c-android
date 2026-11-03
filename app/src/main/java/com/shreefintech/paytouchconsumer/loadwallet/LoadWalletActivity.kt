@@ -216,7 +216,8 @@ class LoadWalletActivity : BaseActivity() {
                     PaymentStatusItem(
                         orderId = data?.clientReference ?: clientReference,
                         amount  = data?.amount ?: amount,
-                        status  = data?.status ?: Constant.HDFC_STATUS_NEW
+                        status  = data?.status ?: Constant.HDFC_STATUS_NEW,
+                        failureReason = data?.failureReason
                     )
                 )
             }
@@ -385,6 +386,13 @@ class LoadWalletActivity : BaseActivity() {
 
         viewModel.fetchWithdrawalFee(amount) { fee ->
             val b = withdrawConfirmDialogBinding?.takeIf { it === dialogBinding } ?: return@fetchWithdrawalFee
+            // settings_synced false: Dashboard's fee hasn't arrived (fee reads 0) — say so and hide the total
+            if (fee?.settingsSynced == false) {
+                b.tvFee.setText(R.string.labelConfirmedAtPayout)
+                b.tvTotalLabel.gone()
+                b.tvTotal.gone()
+                return@fetchWithdrawalFee
+            }
             b.tvFee.text = fee?.fee?.let { Utility.formatAmount(it) } ?: "--"
             b.tvTotal.text = fee?.total?.let { Utility.formatAmount(it) } ?: "--"
         }
@@ -452,6 +460,13 @@ class LoadWalletActivity : BaseActivity() {
                 if (isFinishing || isDestroyed) return@onError
                 mpinDialogBinding?.clearMpin()
                 ToastUtil.showDelete(mActivity, msg, inWindow = false)
+            },
+            // Outcome unknown — dialogs stay so a retry goes out with the same request_id
+            onPending = onPending@{ msg ->
+                showProgressMpin.set(false)
+                if (isFinishing || isDestroyed) return@onPending
+                mpinDialogBinding?.clearMpin()
+                ToastUtil.showWarning(mActivity, msg, inWindow = false)
             }
         )
     }
@@ -723,15 +738,37 @@ class LoadWalletActivity : BaseActivity() {
 
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
-        dialogBinding.tvFee.text = "--"
-        dialogBinding.tvCreditAmount.text = "--"
 
         dialog.show()
+        bindTopupFees(dialogBinding, amount)
+    }
 
-        viewModel.fetchTopupFee(amount) { fee ->
-            val b = confirmDialogBinding?.takeIf { it === dialogBinding } ?: return@fetchTopupFee
-            b.tvFee.text = fee?.fee?.let { Utility.formatAmount(it) } ?: "--"
-            b.tvCreditAmount.text = fee?.creditAmount?.let { Utility.formatAmount(it) } ?: "--"
+    // "Charges by payment method" — one fee-preview call per method; a method that fails is left out,
+    // the error toasts only when all of them fail
+    private fun bindTopupFees(dialogBinding: DialogConfirmPaymentBinding, amount: Double) {
+        val rows = listOf(
+            Triple(Constant.TOPUP_FEE_METHOD_UPI, dialogBinding.tvFeeUpi, dialogBinding.groupFeeUpi),
+            Triple(Constant.TOPUP_FEE_METHOD_CARD, dialogBinding.tvFeeCard, dialogBinding.groupFeeCard),
+            Triple(Constant.TOPUP_FEE_METHOD_NB, dialogBinding.tvFeeNb, dialogBinding.groupFeeNb)
+        )
+        var remaining = rows.size
+        var failed = 0
+        rows.forEach { (method, tvFee, group) ->
+            tvFee.text = "--"
+            viewModel.fetchTopupFee(amount, method) { fee ->
+                if (confirmDialogBinding !== dialogBinding) return@fetchTopupFee
+                when {
+                    fee == null -> { group.gone(); failed++ }
+                    // rules_synced false: Dashboard's fee rules haven't arrived (fee reads 0)
+                    fee.rulesSynced == false -> tvFee.setText(R.string.labelConfirmedAtPayment)
+                    else -> tvFee.text = Utility.formatAmount(fee.fee)
+                }
+                remaining--
+                if (remaining == 0 && failed == rows.size) {
+                    dialogBinding.tvFeeTitle.gone()
+                    ToastUtil.showDelete(mActivity, getString(R.string.errFeePreviewFailed), inWindow = false)
+                }
+            }
         }
     }
 
@@ -751,12 +788,13 @@ class LoadWalletActivity : BaseActivity() {
                         PaymentStatusItem(
                             orderId = clientReference,
                             amount  = amount,
-                            status  = data.status ?: Constant.HDFC_STATUS_NEW
+                            status  = data.status ?: Constant.HDFC_STATUS_NEW,
+                            failureReason = data.failureReason
                         )
                     )
                     return@onSuccess
                 }
-                // TODO(B2C-298): G1 — response shape unverified; without a reference or link the payment can't be opened or tracked
+                // Without a reference or link the payment can't be opened or tracked
                 val payUrl = data.paymentLink.orEmpty()
                 if (clientReference.isEmpty() || payUrl.isEmpty()) {
                     ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
@@ -833,8 +871,8 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun populateWalletBalance(data: WalletBalanceItem) {
-        // TODO(B2C-298): G10 — main_wallet assumed to be the user-facing balance; G14 — has_wallet=false shape unknown, shown as 0
-        currentWalletBalance = if (data.hasWallet == false) "0" else data.mainWallet
+        // live_balance when sent, else main_wallet; every bucket is null until the user has a wallet → shown as 0
+        currentWalletBalance = if (data.hasWallet == false) "0" else data.liveBalance ?: data.mainWallet
         binding.tvWalletBalance.text = Utility.formatAmount(currentWalletBalance)
         binding.tvVaWalletBalance.text = Utility.formatAmount(currentWalletBalance)
         binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet)
@@ -885,13 +923,21 @@ class LoadWalletActivity : BaseActivity() {
         binding.tvVirtualAccountNumber.text = data.bankAcc?.takeIf { it.isNotBlank() } ?: "--"
         binding.tvIfscCode.text = data.ifsc?.takeIf { it.isNotBlank() } ?: "--"
         binding.tvBankName.text = data.bankName?.takeIf { it.isNotBlank() } ?: "--"
+        binding.tvVpa.text = data.vpa?.takeIf { it.isNotBlank() } ?: "--"
+        // TODO(B2C-298): draw the UPI QR from vpa when qr_code_url is null — needs a QR library decision
         Glide.with(mActivity as Context)
             .load(data.qrCodeUrl)
             .placeholder(R.drawable.ic_qr)
             .error(R.drawable.ic_qr)
             .into(binding.ivQrCode)
-        binding.tvActiveStatus.setText(
-            if (data.isActive == false) R.string.labelInactiveStatus else R.string.labelActiveStatus
+        // is_active is null until Dashboard creates the account — only an explicit true reads as active
+        val isActive = data.isActive == true
+        binding.tvActiveStatus.setText(if (isActive) R.string.labelActiveStatus else R.string.labelInactiveStatus)
+        binding.tvActiveStatus.setTextColor(
+            ContextCompat.getColor(mActivity, if (isActive) R.color.wallet_success_stroke else R.color.wallet_pending_stroke)
+        )
+        binding.cardActiveStatus.setCardBackgroundColor(
+            ContextCompat.getColor(mActivity, if (isActive) R.color.wallet_success_bg else R.color.wallet_pending_bg)
         )
     }
 

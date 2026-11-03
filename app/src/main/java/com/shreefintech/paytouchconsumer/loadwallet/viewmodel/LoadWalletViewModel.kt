@@ -19,11 +19,12 @@ import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupFeeItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalFeeItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletHistoryPageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletStatementItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalRequest
+import com.shreefintech.paytouchconsumer.utill.MoneyRequestId
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -35,12 +36,13 @@ import retrofit2.Response
 class LoadWalletViewModel(application: Application) : AndroidViewModel(application) {
 
     private val pollHandler = Handler(Looper.getMainLooper())
+    private val withdrawRequestId = MoneyRequestId()
 
     companion object {
         // TODO(B2C-298): G6 — backend gave no polling interval/timeout; ~12 s total, then the status screen shows pending
         private const val TOPUP_POLL_INTERVAL_MS = 3000L
         private const val TOPUP_POLL_MAX_ATTEMPTS = 5
-        private const val BONUS_PER_PAGE = 50
+        private const val REFERRAL_PER_PAGE = 50
     }
 
     override fun onCleared() {
@@ -205,9 +207,10 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     // Fee previews are display-only — null on any failure, the server still applies the real fee
-    fun fetchTopupFee(amount: Double, onResult: (WalletTopupFeeItem?) -> Unit) {
+    // One call per payment method (UPI / CARD / NB) — the user picks the method on HDFC's page
+    fun fetchTopupFee(amount: Double, paymentMethodType: String, onResult: (WalletTopupFeeItem?) -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) { onResult(null); return }
-        ApiClient.apiService.getTopupFeePreview(bearerToken(), amount, Constant.TOPUP_FEE_METHOD_UPI)
+        ApiClient.apiService.getTopupFeePreview(bearerToken(), amount, paymentMethodType)
             .enqueue(object : Callback<General<WalletTopupFeeItem>> {
                 override fun onResponse(
                     call: Call<General<WalletTopupFeeItem>>,
@@ -281,17 +284,17 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             onError(getString(R.string.msgNoInternet))
             return
         }
-        ApiClient.apiService.getWalletHistory(bearerToken(), page = 1, perPage = 2)
-            .enqueue(object : Callback<General<WalletHistoryPageItem>> {
+        // Recent list: first 2 rows of the main-wallet statement
+        ApiClient.apiService.getWalletStatement(bearerToken(), Constant.WALLET_STATEMENT_MAIN, perPage = 2, cursor = null)
+            .enqueue(object : Callback<WalletStatementItem> {
                 override fun onResponse(
-                    call: Call<General<WalletHistoryPageItem>>,
-                    response: Response<General<WalletHistoryPageItem>>
+                    call: Call<WalletStatementItem>,
+                    response: Response<WalletStatementItem>
                 ) {
-                    val page = response.body()?.data
-                    if (response.isSuccessful && page != null) {
-                        val rawList = page.data ?: emptyList()
+                    val body = response.body()
+                    if (response.isSuccessful && body?.success == true) {
                         val list = ArrayList<WalletTransactionItem>()
-                        rawList.forEach { list.add(WalletTransactionItem.from(it)) }
+                        body.data?.forEach { list.add(WalletTransactionItem.from(it)) }
                         onSuccess(list)
                     } else {
                         onError(
@@ -302,13 +305,13 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                     }
                 }
 
-                override fun onFailure(call: Call<General<WalletHistoryPageItem>>, t: Throwable) {
+                override fun onFailure(call: Call<WalletStatementItem>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
 
-    // Referral rows of rewards/bonus, mapped to the row shape ReferralHistoryAdp renders
+    // GET rewards/referral rows, mapped to the row shape ReferralHistoryAdp renders
     fun fetchReferralHistory(
         onSuccess: (List<BonusWalletHistoryItem>) -> Unit,
         onError: (String) -> Unit
@@ -317,8 +320,8 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             onError(getString(R.string.msgNoInternet))
             return
         }
-        // ponytail: first page only — add paging when users hold more than BONUS_PER_PAGE bonus rows
-        ApiClient.apiService.getBonusRewards(bearerToken(), page = 1, perPage = BONUS_PER_PAGE)
+        // ponytail: first page only — add paging when users hold more than REFERRAL_PER_PAGE referral rows
+        ApiClient.apiService.getReferralHistory(bearerToken(), page = 1, perPage = REFERRAL_PER_PAGE)
             .enqueue(object : Callback<General<List<BonusRewardItem>>> {
                 override fun onResponse(
                     call: Call<General<List<BonusRewardItem>>>,
@@ -326,8 +329,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 ) {
                     val data = response.body()?.data
                     if (response.isSuccessful && data != null) {
-                        // TODO(B2C-298): referral history may move to rewards/referral once its row shape is shared
-                        onSuccess(data.map { it.toHistoryItem() }.filter { it.isReferral })
+                        onSuccess(data.map { it.toHistoryItem() })
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(
@@ -407,12 +409,14 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             })
     }
 
+    // onPending: timeout / 5xx — outcome unknown, so a retry of the same amount reuses the request_id
     fun withdraw(
         amount: Double,
         mpin: String,
         onLoading: () -> Unit,
         onSuccess: (WalletWithdrawalItem) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        onPending: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
             onError(getString(R.string.msgNoInternet))
@@ -421,12 +425,21 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
         onLoading()
         ApiClient.apiService.createWalletWithdrawal(
             authorization = bearerToken(),
-            request = WalletWithdrawalRequest(amount = amount, mpin = mpin)
+            request = WalletWithdrawalRequest(
+                amount = amount,
+                mpin = mpin,
+                requestId = withdrawRequestId.forAttempt(amount.toString())
+            )
         ).enqueue(object : Callback<General<WalletWithdrawalItem>> {
             override fun onResponse(
                 call: Call<General<WalletWithdrawalItem>>,
                 response: Response<General<WalletWithdrawalItem>>
             ) {
+                if (response.code() >= 500) {
+                    onPending(getString(R.string.msgMoneyRequestPending))
+                    return
+                }
+                withdrawRequestId.clear()
                 val body = response.body()
                 val data = body?.data
                 if (response.isSuccessful && data != null) {
@@ -442,7 +455,8 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             }
 
             override fun onFailure(call: Call<General<WalletWithdrawalItem>>, t: Throwable) {
-                onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                t.printStackTrace()
+                onPending(getString(R.string.msgMoneyRequestPending))
             }
         })
     }
