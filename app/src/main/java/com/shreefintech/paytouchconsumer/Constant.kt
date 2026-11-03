@@ -61,6 +61,9 @@ object Constant {
     const val BILLPAY_PARAM_CONSUMER_NUMBER = "consumer_number"
     const val BILLPAY_PARAM_MOBILE_NUMBER = "mobile_number"
     const val BILLPAY_PARAM_CIRCLE_CODE = "circle_code"
+    // Imported old payments (transactions rows): input_params = {source: "old_b2c", identifier: "<account>"}
+    const val BILLPAY_PARAM_IDENTIFIER = "identifier"
+    const val BILLPAY_PARAM_SOURCE = "source"
     // Bill Pay status values — final: success / failed / expired; open: pending / processing / unconfirmed
     const val BILLPAY_STATUS_SUCCESS = "success"
     const val BILLPAY_STATUS_FAILED = "failed"

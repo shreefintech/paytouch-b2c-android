@@ -129,11 +129,20 @@ class BillPayTransactionsViewModel(application: Application) : AndroidViewModel(
         )
     }
 
-    // The account the bill was paid for — first input_params value other than circle_code
-    fun accountNumber(item: BillPayTransactionItem): String =
-        item.inputParams.orEmpty()
-            .filterKeys { it != Constant.BILLPAY_PARAM_CIRCLE_CODE }
-            .values.firstOrNull { it.isNotBlank() } ?: "--"
+    /**
+     * The account the bill was paid for. Imported old payments send {source: "old_b2c", identifier: "…"};
+     * new ones send the biller's own key ({mobile_number: "…"}). Order: identifier → the category's default key →
+     * any other value except circle_code and source.
+     */
+    fun accountNumber(item: BillPayTransactionItem): String {
+        val params = item.inputParams.orEmpty()
+        val category = CategoryType.from(item.category)
+        return listOfNotNull(Constant.BILLPAY_PARAM_IDENTIFIER, category.defaultParamName)
+            .firstNotNullOfOrNull { key -> params[key]?.takeIf { it.isNotBlank() } }
+            ?: params.filterKeys { it != Constant.BILLPAY_PARAM_CIRCLE_CODE && it != Constant.BILLPAY_PARAM_SOURCE }
+                .values.firstOrNull { it.isNotBlank() }
+            ?: "--"
+    }
 
     // Reference row: provider_ref, else txn_reference, else client_reference
     fun referenceOf(item: BillPayTransactionItem): String =

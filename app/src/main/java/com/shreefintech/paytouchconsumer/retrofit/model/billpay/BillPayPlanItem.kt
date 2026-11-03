@@ -2,11 +2,13 @@ package com.shreefintech.paytouchconsumer.retrofit.model.billpay
 
 import com.google.gson.annotations.SerializedName
 
-// Plan objects are provider-defined and passed through — only these keys are read
+/**
+ * GET billpay/utility-billers/{id}/plans — provider plan objects (camelCase keys, passed through by the backend).
+ * Only these keys are read; the rest (id, planName, planTab, planDetailItemList, planBenefitItemList, …) is ignored.
+ */
 data class BillPayPlanItem(
-    @field:SerializedName("plan_type")   val planType: String? = null,
-    @field:SerializedName("amount")      val amount: Double? = null,
-    @field:SerializedName("validity")    val validity: String? = null,
-    @field:SerializedName("data")        val data: String? = null,
-    @field:SerializedName("description") val description: String? = null
+    @field:SerializedName("amount")          val amount: Double? = null,
+    @field:SerializedName("validity")        val validity: String? = null,
+    @field:SerializedName("dataBenefit")     val data: String? = null,
+    @field:SerializedName("planDescription") val description: String? = null
 )
