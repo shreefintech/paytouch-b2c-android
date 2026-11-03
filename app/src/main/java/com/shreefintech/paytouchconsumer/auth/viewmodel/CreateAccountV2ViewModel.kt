@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -52,7 +52,7 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
                 return@launch
             }
 
-            ApiAuthClient.apiService.registerV2(
+            ApiClient.apiService.registerV2(
                 name.toTextBody(),
                 mobile.toTextBody(),
                 email.toTextBody(),

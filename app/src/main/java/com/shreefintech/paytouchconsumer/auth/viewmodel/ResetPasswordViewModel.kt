@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.ResetCredentialRequest
@@ -28,7 +28,7 @@ class ResetPasswordViewModel : ViewModel() {
             return
         }
         onLoading()
-        ApiAuthClient.apiService.resetCredential(ResetCredentialRequest(resetToken, Constant.CREDENTIAL_TYPE_PASSWORD, newPassword))
+        ApiClient.apiService.resetCredential(ResetCredentialRequest(resetToken, Constant.CREDENTIAL_TYPE_PASSWORD, newPassword))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     if (response.isSuccessful && response.body()?.success == true) {

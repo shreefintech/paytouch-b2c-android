@@ -8,9 +8,7 @@ object Constant {
     const val LOCAL_URL = "https://tablet-frying-shy.ngrok-free.dev/"
 
     const val LIVE_URL = "https://www.paytouch.in/"
-    const val BASE_URL = LIVE_URL
-    // Auth + onboarding backend (ApiAuthClient)
-    const val BASE_URL_AUTH = "https://backend-b2c.paytouch.in/api/"
+    const val BASE_URL = "https://backend-b2c.paytouch.in/"
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
 
     // AUTH store keys

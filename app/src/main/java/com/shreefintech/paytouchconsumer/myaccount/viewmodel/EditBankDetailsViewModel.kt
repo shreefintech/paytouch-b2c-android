@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -34,7 +33,7 @@ class EditBankDetailsViewModel(application: Application) : AndroidViewModel(appl
             onError(getString(R.string.msgNoInternet))
             return
         }
-        ApiAuthClient.apiService.saveWalletBankAccount(bearerToken(), request)
+        ApiClient.apiService.saveWalletBankAccount(bearerToken(), request)
             .enqueue(object : Callback<General<WalletBankAccountItem>> {
                 override fun onResponse(
                     call: Call<General<WalletBankAccountItem>>,

@@ -3,7 +3,6 @@ package com.shreefintech.paytouchconsumer.kyc
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
@@ -30,7 +29,7 @@ class KycStatusViewModel(application: Application) : AndroidViewModel(applicatio
             return
         }
         onLoading()
-        ApiAuthClient.apiService.getMe(bearerToken())
+        ApiClient.apiService.getMe(bearerToken())
             .enqueue(object : Callback<General<MeDataItem>> {
                 override fun onResponse(call: Call<General<MeDataItem>>, response: Response<General<MeDataItem>>) {
                     val data = response.body()?.data

@@ -3,7 +3,7 @@ package com.shreefintech.paytouchconsumer.myaccount
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
@@ -31,7 +31,7 @@ class KycDetailsViewModel(application: Application) : AndroidViewModel(applicati
             return
         }
         onLoading()
-        ApiAuthClient.apiService.getMe(bearerToken())
+        ApiClient.apiService.getMe(bearerToken())
             .enqueue(object : Callback<General<MeDataItem>> {
                 override fun onResponse(call: Call<General<MeDataItem>>, response: Response<General<MeDataItem>>) {
                     val me = response.body()?.data
@@ -49,7 +49,7 @@ class KycDetailsViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun fetchBank(onDone: (WalletBankAccountItem?) -> Unit) {
-        ApiAuthClient.apiService.getWalletBankAccount(bearerToken())
+        ApiClient.apiService.getWalletBankAccount(bearerToken())
             .enqueue(object : Callback<General<WalletBankAccountItem>> {
                 override fun onResponse(
                     call: Call<General<WalletBankAccountItem>>,

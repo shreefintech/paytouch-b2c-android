@@ -7,7 +7,7 @@ import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.DialogBankDetailsBinding
-import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Item
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Request
@@ -86,7 +86,7 @@ object BankDetailsDialogHelper {
         }
 
         showProgress.set(true)
-        ApiAuthClient.apiService.addBankDetails(authorization, BankDetailsV2Request(accountNumber, ifsc, branch))
+        ApiClient.apiService.addBankDetails(authorization, BankDetailsV2Request(accountNumber, ifsc, branch))
             .enqueue(object : Callback<BankDetailsV2Item> {
                 override fun onResponse(call: Call<BankDetailsV2Item>, response: Response<BankDetailsV2Item>) {
                     showProgress.set(false)

@@ -13,7 +13,7 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - Mobile number must be exactly 10 digits
 - Password must be at least 8 characters
 - Email must pass standard email format validation
-- Auth + onboarding endpoints live on a **separate backend**: `Constant.BASE_URL_AUTH` (`https://backend-b2c.paytouch.in/api/`) + `mobile/`, declared in `ApiAuthService` and called via `ApiAuthClient.apiService`. Every other module stays on `ApiService` / `ApiClient` (`https://www.paytouch.in/` + `api/`).
+- Auth + onboarding endpoints are declared in `ApiService` with the `MOBILE` prefix (`https://www.paytouch.in/api/mobile/`) and called via `ApiClient.apiService`. Other modules still use the old `api/` prefix — pending migration to new routes.
 - Both password and MPIN login share `mobile/auth/login`; `type` is `Constant.CREDENTIAL_TYPE_PASSWORD` or `Constant.CREDENTIAL_TYPE_MPIN`
 - All auth responses use the `General<T>` envelope (`{success, message, data}`) — check `isSuccessful && body?.data != null`
 - Routing after login / Splash / MPIN creation goes through **`NextStepRouter.intentFor(context, next_step, mpin_required)`** — never route inline:
@@ -23,7 +23,7 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
   - `bank_details_required` also forces `KEY_BANK_DETAILS_ADDED = false` (see `saveOnboardingFlags()`), so the Add Bank Details popup shows before the first money action.
   - **Note:** `requires_virtual_account` is permanently retired. Virtual account creation is now handled server-side after KYC approval. Do not add routing for this flag.
 
-### API Endpoints (`ApiAuthService`, prefix `mobile/`)
+### API Endpoints (`ApiService`, prefix `api/mobile/`)
 | Method | Path | Purpose |
 |---|---|---|
 | POST | `auth/login` | Login with mobile + password or MPIN → `General<LoginDataItem>` |
@@ -147,7 +147,7 @@ A 4-digit PIN used as an alternative to password login. Created during onboardin
 3. `OtpVerificationActivity` passes the token to `ResetMpinActivity` as `Constant.EXTRA_RESET_TOKEN` (the mobile number is **not** passed on)
 4. `auth/forgot-credential/reset` with `reset_token`, `type = mpin`, `credential` = new MPIN
 
-### API Endpoints (`ApiAuthService`, prefix `mobile/`)
+### API Endpoints (`ApiService`, prefix `api/mobile/`)
 | Method | Path | Purpose |
 |---|---|---|
 | POST | `auth/mpin` | Create new MPIN during onboarding → `General<MeDataItem>`; 422 if already set |
@@ -209,7 +209,7 @@ The main menu of the app. Displays category tiles that navigate to each payment 
 |---|---|---|
 | GET | `api/shreefintech-token` | Fetch dynamic payment token |
 | GET | `api/wallet/balance` | Fetch current wallet balance |
-| POST | `mobile/auth/logout` (`ApiAuthService`) | Log out user |
+| POST | `api/mobile/auth/logout` | Log out user |
 
 ---
 

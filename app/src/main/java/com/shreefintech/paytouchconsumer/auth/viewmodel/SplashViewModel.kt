@@ -3,7 +3,7 @@ package com.shreefintech.paytouchconsumer.auth.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
@@ -24,7 +24,7 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
             onError(getApplication<Application>().getString(R.string.msgNoInternet))
             return
         }
-        ApiAuthClient.apiService.getMe(authorization)
+        ApiClient.apiService.getMe(authorization)
             .enqueue(object : Callback<General<MeDataItem>> {
                 override fun onResponse(
                     call: Call<General<MeDataItem>>,

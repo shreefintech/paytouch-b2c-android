@@ -8,7 +8,7 @@ import com.shreefintech.paytouchconsumer.applock.AppLockHelper
 import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
 import com.shreefintech.paytouchconsumer.retrofit.ApiAdminClient
-import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
@@ -36,7 +36,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
         onLoading()
         val type = if (mode == LoginMode.PASSWORD) Constant.CREDENTIAL_TYPE_PASSWORD else Constant.CREDENTIAL_TYPE_MPIN
-        ApiAuthClient.apiService.login(LoginRequest(mobile, credential, type))
+        ApiClient.apiService.login(LoginRequest(mobile, credential, type))
             .enqueue(object : Callback<General<LoginDataItem>> {
                 override fun onResponse(
                     call: Call<General<LoginDataItem>>,

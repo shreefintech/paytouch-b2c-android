@@ -304,9 +304,7 @@ Lazy singleton. OkHttp chain (in order):
 
 Timeouts: 30s connect / read / write.
 
-### ApiAuthClient — `backend-b2c.paytouch.in/api/`
-
-Auth + onboarding endpoints (`ApiAuthService`, prefix `mobile/`): `auth/*`, `device-token`, `location`, `address/*`, `kyc/individual/resubmit`, `kyc/individual/bank-details`, `kyc/individual/pan`. Built with `ApiClient.buildRetrofit(Constant.BASE_URL_AUTH)`, so it gets the same interceptor chain and timeouts as `ApiClient`. Initialised in `MyApp` after `ApiClient.init()`.
+Auth + onboarding endpoints are in `ApiService` under the `MOBILE` prefix (`api/mobile/`): `auth/*`, `device-token`, `location`, `address/*`, `kyc/individual/resubmit`, `kyc/individual/bank-details`, `kyc/individual/pan`, `wallet/bank-account`.
 
 ### ApiAdminClient — `admin.paytouch.in`
 
@@ -316,8 +314,8 @@ Separate singleton. Used for VPS user registration (fire-and-forget after login 
 
 | Method | Endpoint | Body | Caller |
 |---|---|---|---|
-| `POST` | `mobile/device-token` (`ApiAuthService`) | `DeviceTokenRequest` (`fcm_token`, `platform`, `device_id`) | `NotificationHelper.syncToken()` |
-| `POST` | `mobile/location` (`ApiAuthService`) | `UserLocationRequest` (`latitude`, `longitude`, `accuracy`) | `HomeViewModel.sendLocation()` (fire-and-forget) |
+| `POST` | `api/mobile/device-token` | `DeviceTokenRequest` (`fcm_token`, `platform`, `device_id`) | `NotificationHelper.syncToken()` |
+| `POST` | `api/mobile/location` | `UserLocationRequest` (`latitude`, `longitude`, `accuracy`) | `HomeViewModel.sendLocation()` (fire-and-forget) |
 
 ### Endpoint Pattern
 
