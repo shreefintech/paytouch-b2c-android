@@ -13,17 +13,21 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - Mobile number must be exactly 10 digits
 - Password must be at least 8 characters
 - Email must pass standard email format validation
-- Auth + onboarding endpoints live on a **separate backend**: `Constant.BASE_URL_AUTH` (`https://backend-b2c.paytouch.in/api/`) + `mobile/`, declared in `ApiAuthService` and called via `ApiAuthClient.apiService`. Every other module stays on `ApiService` / `ApiClient` (`https://www.paytouch.in/` + `api/`).
+- Auth + onboarding endpoints are declared in `ApiService` with the `MOBILE` prefix (`https://backend-b2c.paytouch.in/api/mobile/`) and called via `ApiClient.apiService`. Other modules still use the old `api/` prefix — pending migration to new routes.
 - Both password and MPIN login share `mobile/auth/login`; `type` is `Constant.CREDENTIAL_TYPE_PASSWORD` or `Constant.CREDENTIAL_TYPE_MPIN`
 - All auth responses use the `General<T>` envelope (`{success, message, data}`) — check `isSuccessful && body?.data != null`
 - Routing after login / Splash / MPIN creation goes through **`NextStepRouter.intentFor(context, next_step, mpin_required)`** — never route inline:
-  - `next_step` in `kyc_required`, `aadhaar_required`, `kyc_resubmit_required`, `pending_approval`, `registration_rejected` (`NextStep.isKycStep`) → `KycActivity`
+  - `kyc_required` → `KycActivity` (full KYC flow). Home's `auth/me` check also redirects here if it sees this step.
+  - `pending_approval`, `registration_rejected` → `KycStatusActivity`
+  - `aadhaar_required` → `HomeActivity`, whose `auth/me` check shows the blocking Aadhaar dialog in **add mode** (Aadhaar number + photo + state + city → `kyc/individual/aadhaar`; afterwards `next_step` is `bank_details_required`)
+  - `kyc_resubmit_required` → `HomeActivity`; the dialog opens in **resubmit mode** (`kyc/individual/resubmit`) only when `kyc_rejection.items` has both `aadhaar_number` and `aadhaar_photo` (`MeDataItem.canResubmitAadhaar`). Resubmit 409s with no open rejection and 422s on a field that was not rejected.
+  - A 403 whose `error_code` is one of these steps (`NextStep.isKycStep`) is routed the same way by `ApiHelper.onForbidden()`
   - else `mpin_required = true` → `ResetMpinActivity` (create-mode, via `buildCreateIntent()`)
   - else (`bank_details_required`, `complete`, null or unknown value) → `HomeActivity`. Unknown values fall through to Home **deliberately**.
   - `bank_details_required` also forces `KEY_BANK_DETAILS_ADDED = false` (see `saveOnboardingFlags()`), so the Add Bank Details popup shows before the first money action.
   - **Note:** `requires_virtual_account` is permanently retired. Virtual account creation is now handled server-side after KYC approval. Do not add routing for this flag.
 
-### API Endpoints (`ApiAuthService`, prefix `mobile/`)
+### API Endpoints (`ApiService`, prefix `api/mobile/`)
 | Method | Path | Purpose |
 |---|---|---|
 | POST | `auth/login` | Login with mobile + password or MPIN → `General<LoginDataItem>` |
@@ -34,6 +38,7 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 | POST | `device-token`, `location` | FCM token / user location |
 | GET | `address/states`, `address/states/{state_id}/cities` | Registration address pickers |
 | POST | `kyc/individual/resubmit` | Aadhaar re-upload after rejection (rejected items only) |
+| POST | `kyc/individual/aadhaar` | `aadhaar_required` only — multipart `aadhaar_number`, `aadhaar_photo`, `state_id`, `city_id` → `MessageItem`. 409 Aadhaar already on file / KYC approved; 422 not linked to Dashboard or Aadhaar used by another account; 429 double tap |
 | POST | `kyc/individual/bank-details`, `kyc/individual/pan` | Bank / PAN onboarding dialogs |
 
 ### Request Fields (Login — `LoginRequest`, JSON)
@@ -57,10 +62,10 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - `mpin_required` (Boolean)
 - `bank_details_added` (Boolean)
 - `pan_added` (Boolean)
-- `user` (`AuthUserItem`): `id`, `name`, `mobile`, `email`, `referral_code`
+- `user` (`AuthUserItem`): `id`, `name`, `mobile`, `email`, `referral_code`, `wallet_balance`, `aadhaar_masked` (short-signup users only)
 
 ### Response Fields (`auth/me` and `auth/mpin` — `data`, `MeDataItem`)
-- `user` (`AuthUserItem`), `next_step`, `mpin_required`, `bank_details_added`, `aadhaar_added`, `pan_added`, `kyc_rejection` (`KycRejectionItem` `{ items: [String], reason }`, non-null only while `next_step` is `kyc_resubmit_required`; items are `aadhaar_number` / `aadhaar_photo` / `bank_details` → Home Aadhaar re-upload dialog only when both Aadhaar items are rejected)
+- `user` (`AuthUserItem`), `next_step`, `mpin_required`, `bank_details_added`, `aadhaar_added`, `pan_added`, `kyc_rejection` (`{ items: [String], reason }`, kept untyped as `Any?` and read via `MeDataItem.kycRejectedItems`; items are `aadhaar_number` / `aadhaar_photo` / `bank_details` → Home Aadhaar re-upload dialog only when both Aadhaar items are rejected — `MeDataItem.canResubmitAadhaar`; `isAadhaarRejected` (either item) only drives the KYC Details badge)
 
 ### State Transitions
 ```
@@ -147,7 +152,7 @@ A 4-digit PIN used as an alternative to password login. Created during onboardin
 3. `OtpVerificationActivity` passes the token to `ResetMpinActivity` as `Constant.EXTRA_RESET_TOKEN` (the mobile number is **not** passed on)
 4. `auth/forgot-credential/reset` with `reset_token`, `type = mpin`, `credential` = new MPIN
 
-### API Endpoints (`ApiAuthService`, prefix `mobile/`)
+### API Endpoints (`ApiService`, prefix `api/mobile/`)
 | Method | Path | Purpose |
 |---|---|---|
 | POST | `auth/mpin` | Create new MPIN during onboarding → `General<MeDataItem>`; 422 if already set |
@@ -209,7 +214,7 @@ The main menu of the app. Displays category tiles that navigate to each payment 
 |---|---|---|
 | GET | `api/shreefintech-token` | Fetch dynamic payment token |
 | GET | `api/wallet/balance` | Fetch current wallet balance |
-| POST | `mobile/auth/logout` (`ApiAuthService`) | Log out user |
+| POST | `api/mobile/auth/logout` | Log out user |
 
 ---
 

@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.retrofit
 
 import android.content.Context
+import com.shreefintech.paytouchconsumer.BuildConfig
 import com.shreefintech.paytouchconsumer.Constant
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -27,6 +28,8 @@ object ApiAdminClient {
             .writeTimeout(30, TimeUnit.SECONDS)
 
         appContext?.let { clientBuilder.addInterceptor(SessionInterceptor(it)) }
+
+        if (BuildConfig.DEBUG) clientBuilder.addInterceptor(CurlInterceptor())
 
         return Retrofit.Builder()
             .baseUrl(Constant.BASE_URL_ADMIN)

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
@@ -34,7 +34,7 @@ class CreateAccountViewModel : ViewModel() {
             return
         }
         onLoading()
-        ApiAuthClient.apiService.register(
+        ApiClient.apiService.register(
             RegisterRequest(name, mobile, email, password, passwordConfirmation, referralCode, Constant.FCM_PLATFORM_ANDROID)
         ).enqueue(object : Callback<General<LoginDataItem>> {
             override fun onResponse(

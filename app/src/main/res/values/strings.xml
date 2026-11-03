@@ -669,6 +669,11 @@
     <string name="labelVerified">Verified</string>
     <string name="labelPending">Pending</string>
     <string name="labelRejected">Rejected</string>
+    <string name="labelSubmitted">Submitted</string>
+    <string name="titleEnterMpin">Enter MPIN</string>
+    <string name="msgEnterMpinBankSubtitle">Enter your 4-digit MPIN to save this bank account</string>
+    <string name="msgBankAccountSaved">Bank account saved.</string>
+    <string name="msgBankDetailsLoadFailed">Couldn\'t load bank details. Please try again later.</string>
     <string name="btnPreview">Preview</string>
     <string name="msgNoKycDocuments">No documents uploaded</string>
     <string name="msgDocumentNotAvailable">Document not available for preview</string>
@@ -972,5 +977,7 @@
     <string name="titleReuploadAadhaar">Re-upload Aadhaar</string>
     <string name="msgReuploadAadhaarSubtitle">Your Aadhaar details were rejected. Please re-enter your Aadhaar number and upload a clear photo to continue.</string>
     <string name="msgAadhaarReuploaded">Aadhaar submitted successfully</string>
+    <string name="titleAddAadhaar">Add Aadhaar</string>
+    <string name="msgAddAadhaarSubtitle">Your account has no Aadhaar on file. Please enter your Aadhaar number, select your state and city, and upload a clear photo to continue.</string>
 
 </resources>

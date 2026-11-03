@@ -71,7 +71,7 @@ Notes: package `utill/` spelling is intentional — never rename. FCM notificati
 7. Network errors parsed via **ApiHelper.parseErrorMessage()**.
 8. Adapters contain no business logic or network calls.
 9. ViewModels must not store Activity/Context references.
-10. All endpoints declared in **`ApiService`** (`paytouch.in`, via `ApiClient`), **`ApiAuthService`** (auth + onboarding on `backend-b2c.paytouch.in`, via `ApiAuthClient`) or **`ApiAdminService`** (`admin.paytouch.in`, via `ApiAdminClient`) — never construct `OkHttpClient`/`Retrofit` in a ViewModel or Activity. One client per backend URL.
+10. All endpoints declared in **`ApiService`** (`backend-b2c.paytouch.in` = `Constant.BASE_URL`, via `ApiClient` — auth/onboarding under `api/mobile/`, legacy routes under `api/`) or **`ApiAdminService`** (`admin.paytouch.in`, via `ApiAdminClient`) — never construct `OkHttpClient`/`Retrofit` in a ViewModel or Activity. One client per backend URL.
 11. `mapToTransactionItem()` uses `item.id?.toString() ?: "--"` for `userId` — never a loop index (duplicates on paginated appends, loses server identity).
 12. **Never generate `transaction_id` client-side** — no `Utility.generateTransactionId()`, no `transaction_id` in payment request DTOs. Read it from the server response.
 13. **ViewModel base class by role:** main payment `{Category}ViewModel` → `BaseBillViewModel` (balance checks). RecentTransaction / TransactionReport / TransactionStatus / SmsReceipt ViewModels → `AndroidViewModel` (use `bearerToken()` / `getString()` from `ViewModelExt.kt`). Do not flag these for extending `AndroidViewModel`.
@@ -90,7 +90,7 @@ Notes: package `utill/` spelling is intentional — never rename. FCM notificati
 
 19. Never use `getApplication()`/`applicationContext` for anything involving a View (no Material theme → `InflateException`), and never show a toast from a ViewModel — pass the message to the Activity via callback and show with `mActivity`.
 20. **Never throw or rethrow** — log and return a fallback (`null` / early `return`). Unexpected failures (image compression, PDF render, camera bind, receipt save/share) → `Utility.logError(e)` (Crashlytics non-fatal). Expected failures (`ActivityNotFoundException`, network `onFailure`, `CancellationException`) and `OutOfMemoryError` → plain `e.printStackTrace()`.
-21. **`CurlInterceptor` is local-only — intentional.** `retrofit/CurlInterceptor.kt` is gitignored (it uses `Log.d`, which the pre-commit hook blocks) and is referenced from `ApiClient` under `BuildConfig.DEBUG`. All builds are made locally, so this is not a blocker. Do not flag it as a missing/untracked class, do not commit it, do not move it to a debug source set, and do not remove it from `ApiClient` or `.gitignore`.
+21. **`CurlInterceptor` is local-only — intentional.** `retrofit/CurlInterceptor.kt` is gitignored (it uses `Log.d`, which the pre-commit hook blocks) and is referenced from `ApiClient` and `ApiAdminClient` under `BuildConfig.DEBUG`. All builds are made locally, so this is not a blocker. Do not flag it as a missing/untracked class, do not commit it, do not move it to a debug source set, and do not remove it from `ApiClient` / `ApiAdminClient` or `.gitignore`.
 
 ## Naming (hard rules)
 
@@ -124,7 +124,7 @@ ApiClient.apiService.someEndpoint(body).enqueue(object : Callback<SomeItem> {
 - Match the real API — **never guess `General<T>`**.
   - Envelope `{data, success, meta, message}` → `Call<General<YourItem?>>`, check `response.isSuccessful && body?.data != null`.
   - Flat → `Call<YourItem>`, check `isSuccessful && body?.success == true` if it has `success`, else `isSuccessful`.
-- Auth + onboarding endpoints are on **`ApiAuthService`** (`backend-b2c.paytouch.in/api/mobile/`, via `ApiAuthClient`) and use the envelope: `GET auth/me` → `General<MeDataItem>`; `POST auth/login` / `auth/register` → `General<LoginDataItem>`; `POST auth/mpin` → `General<MeDataItem>`; `POST auth/forgot-credential/verify-otp` → `General<ResetTokenDataItem>` (all: `isSuccessful && body?.data != null`). `POST auth/forgot-credential` / `auth/forgot-credential/reset` → `MessageItem` (`isSuccessful && success == true`). Route post-auth screens only via `NextStepRouter`.
+- Auth + onboarding endpoints are in **`ApiService`** under `MOBILE` (`backend-b2c.paytouch.in/api/mobile/`, via `ApiClient`) and use the envelope: `GET auth/me` → `General<MeDataItem>`; `POST auth/login` / `auth/register` → `General<LoginDataItem>`; `POST auth/mpin` → `General<MeDataItem>`; `POST auth/forgot-credential/verify-otp` → `General<ResetTokenDataItem>` (all: `isSuccessful && body?.data != null`). `POST auth/forgot-credential` / `auth/forgot-credential/reset` → `MessageItem` (`isSuccessful && success == true`). Route post-auth screens only via `NextStepRouter`.
 - **API response DTOs:** every field nullable (incl. `Int?`/`Double?`/`Long?`), every field `@field:SerializedName("key")`; apply `?:` fallbacks at call site.
 - **Local activity-to-activity DTOs:** nullable only if genuinely optional; no `@SerializedName` needed.
 

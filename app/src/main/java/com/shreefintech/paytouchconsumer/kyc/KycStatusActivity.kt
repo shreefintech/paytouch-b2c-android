@@ -15,13 +15,12 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
+import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.auth.ResetMpinActivity
+import com.shreefintech.paytouchconsumer.auth.NextStepRouter
 import com.shreefintech.paytouchconsumer.databinding.ActivityKycStatusBinding
-import com.shreefintech.paytouchconsumer.enums.KycSubmissionStatus
-import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycStatusItem
+import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
@@ -29,23 +28,17 @@ import com.shreefintech.paytouchconsumer.utill.Utility.gone
 class KycStatusActivity : BaseActivity() {
 
     companion object {
-        private const val EXTRA_STATUS = "extra_status"
+        private const val EXTRA_NEXT_STEP = "extra_next_step"
 
-        fun start(context: Context, status: KycStatusItem) {
-            context.startActivity(
-                Intent(context, KycStatusActivity::class.java).apply {
-                    putExtra(EXTRA_STATUS, Gson().toJson(status))
-                }
-            )
-        }
+        /** [nextStep] is `pending_approval` or `registration_rejected`; null shows pending until a refresh. */
+        fun buildIntent(context: Context, nextStep: String?): Intent =
+            Intent(context, KycStatusActivity::class.java).putExtra(EXTRA_NEXT_STEP, nextStep)
     }
 
     private lateinit var binding: ActivityKycStatusBinding
     private val viewModel: KycStatusViewModel by viewModels()
 
-    private val statusItem: KycStatusItem? by lazy {
-        intent.getStringExtra(EXTRA_STATUS)?.let { Gson().fromJson(it, KycStatusItem::class.java) }
-    }
+    private val nextStep: String? by lazy { intent.getStringExtra(EXTRA_NEXT_STEP) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +58,7 @@ class KycStatusActivity : BaseActivity() {
         binding.lytToolbar.ivBack.gone()
         binding.onClickListener = onClickListener()
 
-        statusItem?.let { renderStatus(it) }
+        renderStatus(nextStep, null)
     }
 
     private fun refreshStatus() {
@@ -74,7 +67,7 @@ class KycStatusActivity : BaseActivity() {
             onReady = { item ->
                 if (isFinishing || isDestroyed) return@fetchStatus
                 binding.swipeRefresh.isRefreshing = false
-                renderStatus(item)
+                renderStatus(item.nextStep, item.mpinRequired)
             },
             onError = { msg ->
                 binding.swipeRefresh.isRefreshing = false
@@ -83,16 +76,17 @@ class KycStatusActivity : BaseActivity() {
         )
     }
 
-    private fun renderStatus(item: KycStatusItem) {
-        when (KycSubmissionStatus.from(item.submission?.status)) {
-            KycSubmissionStatus.KYC_APPROVED  -> navigateToMpin()
-            KycSubmissionStatus.KYC_REJECTED  -> showRejected()
-            KycSubmissionStatus.KYC_SUBMITTED -> showPending()
-            KycSubmissionStatus.PENDING_KYC   -> {
-                KycActivity.start(mActivity)
-                finish()
-            }
-            null -> showPending()
+    private fun renderStatus(nextStep: String?, mpinRequired: Boolean?) {
+        // Missing step = nothing known yet; an unrecognised one goes to the router (Home), never a stuck pending screen
+        if (nextStep == null) {
+            showPending()
+            return
+        }
+        when (NextStep.from(nextStep)) {
+            NextStep.PENDING_APPROVAL      -> showPending()
+            NextStep.REGISTRATION_REJECTED -> showRejected()
+            // Any other step has moved on (complete, MPIN, bank, Aadhaar) — the router decides where
+            else -> navigateTo(NextStepRouter.intentFor(mActivity, nextStep, mpinRequired))
         }
     }
 
@@ -132,15 +126,15 @@ class KycStatusActivity : BaseActivity() {
             .into(binding.iv1)
     }
 
-    private fun navigateToMpin() {
-        startActivity(ResetMpinActivity.buildCreateIntent(mActivity).apply {
+    private fun navigateTo(target: Intent) {
+        startActivity(target.apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
     }
 
+    // Home's auth/me check opens the re-upload dialog when kyc_rejection names both Aadhaar items
     private fun onRetry() {
-        KycActivity.start(mActivity)
-        finish()
+        navigateTo(Intent(mActivity, HomeActivity::class.java))
     }
 
     private fun onClickListener(): View.OnClickListener {

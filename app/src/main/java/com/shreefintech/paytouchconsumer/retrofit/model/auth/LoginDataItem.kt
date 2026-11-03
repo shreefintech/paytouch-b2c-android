@@ -18,5 +18,7 @@ data class AuthUserItem(
     @field:SerializedName("mobile")            val mobile: String?,
     @field:SerializedName("email")             val email: String?,
     @field:SerializedName("referral_code")     val referralCode: String?,
-    @field:SerializedName("wallet_balance")    val walletBalance: String?
+    @field:SerializedName("wallet_balance")    val walletBalance: String?,
+    // B2C-286 — short-signup users only
+    @field:SerializedName("aadhaar_masked")    val aadhaarMasked: String?
 )

@@ -32,7 +32,7 @@ class SplashActivity : BaseActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private var sessionValid = false
+    private var isSessionValid = false
     private var meData: MeDataItem? = null
     private var apiFinished = false
     private var timerFinished = false
@@ -132,7 +132,7 @@ class SplashActivity : BaseActivity() {
     private fun startFlow() {
         apiFinished = false
         timerFinished = false
-        sessionValid = false
+        isSessionValid = false
         meData = null
         handler.removeCallbacks(timerRunnable)
         handler.postDelayed(timerRunnable, 5000L)
@@ -158,8 +158,8 @@ class SplashActivity : BaseActivity() {
         )
     }
 
-    private fun onApiDone(valid: Boolean, data: MeDataItem?) {
-        sessionValid = valid
+    private fun onApiDone(isValid: Boolean, data: MeDataItem?) {
+        isSessionValid = isValid
         meData = data
         apiFinished = true
         if (timerFinished) redirect()
@@ -167,7 +167,7 @@ class SplashActivity : BaseActivity() {
 
     private fun redirect() {
         NotificationHelper.syncToken(mActivity)
-        val intent = if (sessionValid) {
+        val intent = if (isSessionValid) {
             NextStepRouter.intentFor(mActivity, meData?.nextStep, meData?.mpinRequired)
         } else {
             Intent(mActivity, LoginActivity::class.java)

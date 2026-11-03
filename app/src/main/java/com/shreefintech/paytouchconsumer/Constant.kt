@@ -8,9 +8,9 @@ object Constant {
     const val LOCAL_URL = "https://tablet-frying-shy.ngrok-free.dev/"
 
     const val LIVE_URL = "https://www.paytouch.in/"
+    // B2C backend — staging url
+    const val B2C_URL = "https://backend-b2c.paytouch.in/"
     const val BASE_URL = LIVE_URL
-    // Auth + onboarding backend (ApiAuthClient)
-    const val BASE_URL_AUTH = "https://backend-b2c.paytouch.in/api/"
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
 
     // AUTH store keys
@@ -33,6 +33,9 @@ object Constant {
     const val KEY_FCM_TOKEN_AUTHED = "fcm_token_authed"
     const val FCM_PLATFORM_ANDROID = "android"
     const val FCM_LANGUAGE_DEFAULT = "en"
+
+    // Top-level `error_code` on a 403 from money calls (pay, top-up, withdraw)
+    const val ERROR_CODE_USER_BLOCKED = "USER_BLOCKED"
 
     // Location — true once the system location permission popup has been shown at least once.
     // Distinguishes "never asked" from "permanently denied" (both report no rationale).

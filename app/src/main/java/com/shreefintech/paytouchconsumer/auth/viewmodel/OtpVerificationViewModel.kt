@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.ForgotCredentialRequest
@@ -32,7 +32,7 @@ class OtpVerificationViewModel : ViewModel() {
         }
         onLoading()
         val type = if (flowType == Constant.FLOW_RESET_MPIN) Constant.CREDENTIAL_TYPE_MPIN else Constant.CREDENTIAL_TYPE_PASSWORD
-        ApiAuthClient.apiService.sendForgotCredentialOtp(ForgotCredentialRequest(mobile, type))
+        ApiClient.apiService.sendForgotCredentialOtp(ForgotCredentialRequest(mobile, type))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     if (response.isSuccessful && response.body()?.success == true) {
@@ -61,7 +61,7 @@ class OtpVerificationViewModel : ViewModel() {
             return
         }
         onLoading()
-        ApiAuthClient.apiService.verifyForgotCredentialOtp(VerifyOtpRequest(mobile, otp))
+        ApiClient.apiService.verifyForgotCredentialOtp(VerifyOtpRequest(mobile, otp))
             .enqueue(object : Callback<General<ResetTokenDataItem>> {
                 override fun onResponse(
                     call: Call<General<ResetTokenDataItem>>,

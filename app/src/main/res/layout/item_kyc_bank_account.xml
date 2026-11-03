@@ -163,6 +163,7 @@
 
     <!-- Branch name -->
     <LinearLayout
+        android:id="@+id/llBranchName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_small_medium"
