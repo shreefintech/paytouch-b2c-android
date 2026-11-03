@@ -2,14 +2,7 @@ package com.shreefintech.paytouchconsumer.retrofit
 
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
-import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.CreateMpinRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.MpinItem
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthLatestPaymentDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthOperatorItem
 import com.shreefintech.paytouchconsumer.retrofit.model.dth.DthPaymentItem
@@ -92,14 +85,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileReq
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcCreateOrderRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.hdfc.HdfcOrderItem
-import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
-import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
-import com.shreefintech.paytouchconsumer.retrofit.model.CityItem
-import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Item
-import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Request
-import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Item
-import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletActionDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletAmountRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
@@ -112,8 +98,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -127,115 +111,6 @@ interface ApiService {
     companion object {
         const val AUTH = "api/"
     }
-
-    // ── Session ───────────────────────────────────────────────────────────────
-
-    @GET("${AUTH}user")
-    fun getUser(
-        @Header("Authorization") authorization: String
-    ): Call<UserProfileItem>
-
-    @POST("${AUTH}logout")
-    fun logout(
-        @Header("Authorization") authorization: String,
-        @Body body: LogoutRequest
-    ): Call<MessageItem>
-
-    // ── Push Notifications ────────────────────────────────────────────────────
-
-    @POST("${AUTH}device-token")
-    fun registerDeviceToken(
-        @Header("Authorization") authorization: String?,
-        @Body body: DeviceTokenRequest
-    ): Call<MessageItem>
-
-    // ── Location ──────────────────────────────────────────────────────────────
-
-    @POST("${AUTH}location")
-    fun sendLocation(
-        @Header("Authorization") authorization: String,
-        @Body body: UserLocationRequest
-    ): Call<MessageItem>
-
-    // ── Authentication ────────────────────────────────────────────────────────
-
-    @FormUrlEncoded
-    @POST("${AUTH}login")
-    fun loginWithPassword(
-        @Field("mobile") mobile: String,
-        @Field("password") password: String
-    ): Call<LoginItem>
-
-    @FormUrlEncoded
-    @POST("${AUTH}login")
-    fun loginWithMpin(
-        @Field("mobile") mobile: String,
-        @Field("mpin") mpin: String
-    ): Call<LoginItem>
-
-    @FormUrlEncoded
-    @POST("${AUTH}register")
-    fun register(
-        @Field("name") name: String,
-        @Field("mobile") mobile: String,
-        @Field("email") email: String,
-        @Field("password") password: String,
-        @Field("password_confirmation") passwordConfirmation: String,
-        @Field("referral_code") referralCode: String,
-        @Field("platform") platform: String
-    ): Call<RegisterItem>
-
-    // ── Forgot Password OTP flow ──────────────────────────────────────────────
-
-    @FormUrlEncoded
-    @POST("${AUTH}password/send-otp")
-    fun sendPasswordOtp(
-        @Field("mobile") mobile: String
-    ): Call<MessageItem>
-
-    @FormUrlEncoded
-    @POST("${AUTH}password/verify-otp")
-    fun verifyPasswordOtp(
-        @Field("mobile") mobile: String,
-        @Field("otp") otp: String
-    ): Call<MessageItem>
-
-    @FormUrlEncoded
-    @POST("${AUTH}password/reset")
-    fun resetPassword(
-        @Field("mobile") mobile: String,
-        @Field("new_password") newPassword: String,
-        @Field("new_password_confirmation") newPasswordConfirmation: String
-    ): Call<MessageItem>
-
-    // ── Forgot MPIN OTP flow ──────────────────────────────────────────────────
-
-    @FormUrlEncoded
-    @POST("${AUTH}mpin/send-otp")
-    fun sendMpinOtp(
-        @Field("mobile") mobile: String
-    ): Call<MessageItem>
-
-    @FormUrlEncoded
-    @POST("${AUTH}mpin/verify-otp")
-    fun verifyMpinOtp(
-        @Field("mobile") mobile: String,
-        @Field("otp") otp: String
-    ): Call<MessageItem>
-
-    @FormUrlEncoded
-    @POST("${AUTH}mpin/reset")
-    fun resetMpin(
-        @Field("mobile") mobile: String,
-        @Field("new_mpin") newMpin: String,
-        @Field("new_mpin_confirmation") newMpinConfirmation: String
-    ): Call<MessageItem>
-
-    @POST("${AUTH}mpin/create")
-    fun createMpin(
-        @Header("Authorization") token: String,
-        @Body body: CreateMpinRequest
-    ): Call<MpinItem>
 
     // ── Wallet ────────────────────────────────────────────────────────────────
 
@@ -575,6 +450,7 @@ interface ApiService {
         @Body request: MunicipalTaxProcessPaymentRequest
     ): Call<MunicipalTaxPaymentItem>
 
+    // Confirmed backend quirk: municipal tax transaction-status routes through mobile-recharge endpoint
     @POST("${AUTH}mobile-recharge/transaction-status")
     fun getMunicipalTaxTransactionStatus(
         @Header("Authorization") authorization: String,
@@ -700,51 +576,4 @@ interface ApiService {
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Call<General<List<UnifiedTransactionItem>>>
-
-    // ── B2C V2 Registration & Onboarding ─────────────────────────────────────
-
-    @Multipart
-    @POST("${AUTH}v2/register")
-    fun registerV2(
-        @Part("name") name: RequestBody,
-        @Part("mobile") mobile: RequestBody,
-        @Part("email") email: RequestBody,
-        @Part("password") password: RequestBody,
-        @Part("password_confirmation") passwordConfirmation: RequestBody,
-        @Part("aadhaar_number") aadhaarNumber: RequestBody,
-        @Part aadhaarPhoto: MultipartBody.Part,
-        @Part("state_id") stateId: RequestBody,
-        @Part("city_id") cityId: RequestBody,
-        @Part("referral_code") referralCode: RequestBody,
-        @Part("platform") platform: RequestBody
-    ): Call<RegisterItem>
-
-    // Re-upload after KYC rejection — triggered by `aadhaar_rejected` on /api/user
-    @Multipart
-    @POST("${AUTH}kyc/aadhaar")
-    fun reuploadAadhaar(
-        @Header("Authorization") authorization: String,
-        @Part("aadhaar_number") aadhaarNumber: RequestBody,
-        @Part aadhaarPhoto: MultipartBody.Part
-    ): Call<MessageItem>
-
-    @GET("${AUTH}v2/address/states")
-    fun getAddressStates(): Call<General<List<StateItem>>>
-
-    @GET("${AUTH}v2/address/states/{state_id}/cities")
-    fun getAddressCities(
-        @Path("state_id") stateId: String
-    ): Call<General<List<CityItem>>>
-
-    @POST("${AUTH}v2/bank-details")
-    fun addBankDetails(
-        @Header("Authorization") authorization: String,
-        @Body body: BankDetailsV2Request
-    ): Call<BankDetailsV2Item>
-
-    @POST("${AUTH}v2/pan")
-    fun addPan(
-        @Header("Authorization") authorization: String,
-        @Body body: PanV2Request
-    ): Call<PanV2Item>
 }

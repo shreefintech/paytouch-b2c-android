@@ -15,11 +15,11 @@ import androidx.databinding.ObservableBoolean
 import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
-import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.ResetMpinViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityResetMpinBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -38,11 +38,17 @@ class ResetMpinActivity : BaseActivity() {
     private val viewModel: ResetMpinViewModel by viewModels()
     private var showProgress = ObservableBoolean(false)
 
-    private val mobile by lazy { intent.getStringExtra(Constant.EXTRA_MOBILE) ?: "" }
+    private val resetToken by lazy { intent.getStringExtra(Constant.EXTRA_RESET_TOKEN) ?: "" }
     private val isCreateMode by lazy { intent.getBooleanExtra(EXTRA_IS_CREATE_MODE, false) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Reset mode is only reachable from OTP verification, which always passes the token
+        if (!isCreateMode && resetToken.isBlank()) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
+            finish()
+            return
+        }
         binding = ActivityResetMpinBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -181,22 +187,23 @@ class ResetMpinActivity : BaseActivity() {
             viewModel.createMpin(
                 mpin      = mpin,
                 onLoading = { showProgress.set(true) },
-                onSuccess = { showProgress.set(false); navigateToHome() },
+                onSuccess = { data -> showProgress.set(false); navigateAfterMpinSetup(data) },
                 onError   = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
             )
         } else {
             viewModel.changeMpin(
-                mobile    = mobile,
-                newMpin   = mpin,
-                onLoading = { showProgress.set(true) },
-                onSuccess = { showProgress.set(false); navigateToLogin() },
-                onError   = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
+                resetToken = resetToken,
+                newMpin    = mpin,
+                onLoading  = { showProgress.set(true) },
+                onSuccess  = { showProgress.set(false); navigateToLogin() },
+                onError    = { msg -> showProgress.set(false); ToastUtil.showDelete(mActivity, msg) }
             )
         }
     }
 
-    private fun navigateToHome() {
-        startActivity(Intent(mActivity, HomeActivity::class.java).apply {
+    // mpin_required is false in this response, so the router can't loop back here
+    private fun navigateAfterMpinSetup(data: MeDataItem?) {
+        startActivity(NextStepRouter.intentFor(mActivity, data?.nextStep, data?.mpinRequired).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
     }

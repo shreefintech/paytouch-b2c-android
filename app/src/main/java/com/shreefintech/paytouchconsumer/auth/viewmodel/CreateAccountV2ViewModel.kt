@@ -6,9 +6,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.RegisterItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.getString
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +52,7 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
                 return@launch
             }
 
-            ApiClient.apiService.registerV2(
+            ApiAuthClient.apiService.registerV2(
                 name.toTextBody(),
                 mobile.toTextBody(),
                 email.toTextBody(),
@@ -64,8 +64,8 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
                 cityId.toTextBody(),
                 referralCode.toTextBody(),
                 Constant.FCM_PLATFORM_ANDROID.toTextBody()
-            ).enqueue(object : Callback<RegisterItem> {
-                override fun onResponse(call: Call<RegisterItem>, response: Response<RegisterItem>) {
+            ).enqueue(object : Callback<MessageItem> {
+                override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     if (response.isSuccessful) {
                         onSuccess()
                     } else {
@@ -73,7 +73,7 @@ class CreateAccountV2ViewModel(application: Application) : AndroidViewModel(appl
                     }
                 }
 
-                override fun onFailure(call: Call<RegisterItem>, t: Throwable) {
+                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })

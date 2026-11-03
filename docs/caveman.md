@@ -72,7 +72,7 @@ Full screen list, per-module class/package tables, navigation tree and intent ex
 - **MPIN mode:** Enter mobile + 4-digit MPIN
 - Both modes call the same login API
 - On success, the Bearer token is saved in SharedPreferences
-- App checks response flags (`requires_kyc`, `requires_mpin`) to decide where to route next (`requires_virtual_account` is permanently retired — handled server-side)
+- App routes via `NextStepRouter` from the response's `next_step` + `mpin_required` (`requires_virtual_account` is permanently retired — handled server-side)
 
 **Session:**
 - Every API call sends the Bearer token in the `Authorization` header
@@ -91,9 +91,9 @@ Full screen list, per-module class/package tables, navigation tree and intent ex
 ```
 Register / Login
       ↓
-KYC (requires_kyc = true) → KycStatusActivity (pending/approved/rejected)
+KYC (next_step is a KYC step) → KycStatusActivity (pending/approved/rejected)
       ↓ approved
-MPIN creation (requires_mpin = true)
+MPIN creation (mpin_required = true)
       ↓
 HomeActivity (all steps complete)
 ```

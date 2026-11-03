@@ -44,7 +44,7 @@ import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
 import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
 import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
-import com.shreefintech.paytouchconsumer.rewards.LevelUpActivity
+// import com.shreefintech.paytouchconsumer.rewards.LevelUpActivity  // TODO(B2C-147): restore with checkLevelUp
 import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
 import com.shreefintech.paytouchconsumer.utill.BankDetailsDialogHelper
@@ -82,7 +82,7 @@ class HomeActivity : BaseActivity() {
     // True when the location flow ended while Home was not in front — asked again in onResume()
     private var isNotificationPermissionPending = false
 
-    // ── Aadhaar re-upload dialog (blocking — shown while /api/user says aadhaar_rejected) ──
+    // ── Aadhaar re-upload dialog (blocking — shown while auth/me returns kyc_rejection) ──
     private val showProgressAadhaar = ObservableBoolean(false)
     private var aadhaarDialog: Dialog? = null
     private var aadhaarBinding: DialogReuploadAadhaarBinding? = null
@@ -140,12 +140,14 @@ class HomeActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.checkLevelUp { levelData ->
-            // Skip if the user already left Home (e.g. opened a module) before the response arrived.
-            if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                LevelUpActivity.start(mActivity, levelData)
-            }
-        }
+        // TODO(B2C-147): re-enable once /level moves to the B2C backend — the old backend 401s the
+        //  B2C token and SessionInterceptor then logs the user out right after login
+        // viewModel.checkLevelUp { levelData ->
+        //     // Skip if the user already left Home (e.g. opened a module) before the response arrived.
+        //     if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+        //         LevelUpActivity.start(mActivity, levelData)
+        //     }
+        // }
         if (isNotificationPermissionPending) requestNotificationPermission()
     }
 

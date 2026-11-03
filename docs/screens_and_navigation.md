@@ -19,8 +19,8 @@
 - Any screen (explicit logout)
 
 **Exit points:**
-- Login success, `requires_kyc = true` → `KycActivity`
-- Login success, `requires_mpin = true` → `ResetMpinActivity` (create mode, via `buildCreateIntent()`)
+- Login success, `next_step` is a KYC step (`NextStep.isKycStep`) → `KycActivity`
+- Login success, `mpin_required = true` → `ResetMpinActivity` (create mode, via `buildCreateIntent()`)
 - Login success, all clear → `HomeActivity`
 - "Register" tap → `CreateAccountActivity`
 - "Forgot Password" tap → `OtpVerificationActivity` (password reset)
@@ -108,8 +108,8 @@
 **Purpose:** Entry point for KYC; shows a 0/2 document-progress card and launches the two required sections.
 
 **Entry points:**
-- `LoginActivity` (post-login routing, `requires_kyc = true`)
-- App launch (token exists, `requires_kyc = true`)
+- `LoginActivity` (post-login routing, KYC `next_step`)
+- App launch (token exists, `auth/me` returns a KYC `next_step`)
 
 **Exit points:**
 - "Identity Verification" tap → `IdentityVerificationActivity` (for result)
@@ -220,7 +220,7 @@
 - White card with "Categories" title
 - 3×3 grid of category tiles (Electricity, Gas, Prepaid, TV Cable, DTH, Fastag, Loan, My Account, Tax)
 - Load Wallet button at the bottom of the card
-- **Aadhaar re-upload dialog (blocking):** on every create, `GET /api/user` is checked; when `aadhaar_rejected == true` a non-cancelable dialog asks for the Aadhaar number + document and submits to `POST /api/kyc/aadhaar`. Only a successful submit dismisses it. If `/api/user` fails, Home stays usable and the check repeats on the next launch.
+- **Aadhaar re-upload dialog (blocking):** on every create, `GET mobile/auth/me` is checked; when `kyc_rejection.items` contains both `aadhaar_number` and `aadhaar_photo` a non-cancelable dialog asks for the Aadhaar number + document and submits to `POST mobile/kyc/individual/resubmit`. Only a successful submit dismisses it. If `auth/me` fails, Home stays usable and the check repeats on the next launch.
 
 ---
 
@@ -471,19 +471,19 @@ Session check (read SharedPreferences)
      │                                                               │
      └── Token exists ─────────────────────────────────────────────►┤
                                                                      │
-                                                     Check onboarding flags:
+                                                     NextStepRouter:
                                                                      │
-                                       requires_kyc ────────────► KycActivity ✅
+                                       KYC next_step ───────────► KycActivity ✅
                                                                      │
                                                                      └── Both sections done ──► KycStatusActivity ✅
                                                                                                         │
                                                                                           KYC_APPROVED ──► ResetMpinActivity ✅
                                                                      │
-                                       requires_mpin ───────────────────────────────────────────────────►┐
+                                       mpin_required ───────────────────────────────────────────────────►┐
                                                                      │                                   │
                                                                      │                   MPIN created ───►┤
                                                                      │
-                                       All flags false ───────────────────────────────────────────────────►┤
+                                       Otherwise ─────────────────────────────────────────────────────────►┤
                                                                                            ▼
                                                                                     HomeActivity ✅
                                                                                           │

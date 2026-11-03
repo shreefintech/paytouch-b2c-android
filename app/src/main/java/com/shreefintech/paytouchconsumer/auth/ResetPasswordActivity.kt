@@ -28,10 +28,16 @@ class ResetPasswordActivity : BaseActivity() {
     private var showProgress = ObservableBoolean(false)
     private var isNewPasswordVisible     = false
     private var isConfirmPasswordVisible = false
-    private val mobile by lazy { intent.getStringExtra(Constant.EXTRA_MOBILE) ?: "" }
+    private val resetToken by lazy { intent.getStringExtra(Constant.EXTRA_RESET_TOKEN) ?: "" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Only reachable from OTP verification, which always passes the token
+        if (resetToken.isBlank()) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
+            finish()
+            return
+        }
         binding = ActivityResetPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -119,7 +125,7 @@ class ResetPasswordActivity : BaseActivity() {
         val newPassword = binding.etNewPassword.text?.toString() ?: ""
         viewModel.changePassword(
             context     = mActivity,
-            mobile      = mobile,
+            resetToken  = resetToken,
             newPassword = newPassword,
             onLoading   = { showProgress.set(true) },
             onSuccess   = { showProgress.set(false); navigateToLogin() },

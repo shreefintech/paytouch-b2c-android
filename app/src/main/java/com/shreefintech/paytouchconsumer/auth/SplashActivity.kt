@@ -17,13 +17,11 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.BuildConfig
 import com.shreefintech.paytouchconsumer.Constant
-import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.SplashViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivitySplashBinding
 import com.shreefintech.paytouchconsumer.fcm.NotificationHelper
-import com.shreefintech.paytouchconsumer.kyc.KycActivity
-import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
 
@@ -34,7 +32,8 @@ class SplashActivity : BaseActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private var sessionData: UserProfileItem? = null
+    private var sessionValid = false
+    private var meData: MeDataItem? = null
     private var apiFinished = false
     private var timerFinished = false
 
@@ -133,7 +132,8 @@ class SplashActivity : BaseActivity() {
     private fun startFlow() {
         apiFinished = false
         timerFinished = false
-        sessionData = null
+        sessionValid = false
+        meData = null
         handler.removeCallbacks(timerRunnable)
         handler.postDelayed(timerRunnable, 5000L)
         fetchSession()
@@ -141,7 +141,7 @@ class SplashActivity : BaseActivity() {
 
     private fun fetchSession() {
         if (!SharedPreferenceHelper.isLoggedIn(mActivity)) {
-            onApiDone(null)
+            onApiDone(false, null)
             return
         }
         if (!Utility.isInternetAvailable(mActivity)) {
@@ -153,24 +153,24 @@ class SplashActivity : BaseActivity() {
         val tokenType = SharedPreferenceHelper.getSharedPreferenceString(mActivity, Constant.KEY_TOKEN_TYPE, "Bearer") ?: "Bearer"
         viewModel.validateSession(
             authorization = "$tokenType $token",
-            onSuccess = { data -> onApiDone(data) },
-            onError = { onApiDone(null) }
+            onSuccess = { data -> onApiDone(true, data) },
+            onError = { onApiDone(false, null) }
         )
     }
 
-    private fun onApiDone(data: UserProfileItem?) {
-        sessionData = data
+    private fun onApiDone(valid: Boolean, data: MeDataItem?) {
+        sessionValid = valid
+        meData = data
         apiFinished = true
         if (timerFinished) redirect()
     }
 
     private fun redirect() {
         NotificationHelper.syncToken(mActivity)
-        val intent = when {
-            sessionData?.requiresKyc == true  -> Intent(mActivity, KycActivity::class.java)
-            sessionData?.requiresMpin == true -> ResetMpinActivity.buildCreateIntent(mActivity)
-            sessionData != null               -> Intent(mActivity, HomeActivity::class.java)
-            else                              -> Intent(mActivity, LoginActivity::class.java)
+        val intent = if (sessionValid) {
+            NextStepRouter.intentFor(mActivity, meData?.nextStep, meData?.mpinRequired)
+        } else {
+            Intent(mActivity, LoginActivity::class.java)
         }
         navigate(intent)
     }

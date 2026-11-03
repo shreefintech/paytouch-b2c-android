@@ -7,7 +7,7 @@ import androidx.databinding.ObservableBoolean
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.DialogPanBinding
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Item
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
@@ -97,7 +97,7 @@ object PanCardDialogHelper {
         }
 
         showProgress.set(true)
-        ApiClient.apiService.addPan(authorization, PanV2Request(pan))
+        ApiAuthClient.apiService.addPan(authorization, PanV2Request(pan))
             .enqueue(object : Callback<PanV2Item> {
                 override fun onResponse(call: Call<PanV2Item>, response: Response<PanV2Item>) {
                     showProgress.set(false)

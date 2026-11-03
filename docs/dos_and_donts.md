@@ -16,7 +16,7 @@ Rules **not** already stated in `CLAUDE.md` (core architecture, naming, network,
 | MPIN | Exactly 4 digits; confirmation must match |
 | Email | Standard email format |
 
-**DO enforce the mandatory onboarding sequence: KYC → MPIN.** Server flags `requires_kyc`, `requires_mpin` drive routing after login; never allow skipping. `requires_virtual_account` is permanently retired — no client routing for it.
+**DO enforce the mandatory onboarding sequence: KYC → MPIN.** Server fields `next_step` + `mpin_required` drive routing after login, only via `NextStepRouter`; never allow skipping. `requires_virtual_account` is permanently retired — no client routing for it.
 
 **DO calculate the platform fee (tiers in `business_logic.md` §7) in a ViewModel and show it before the user confirms payment.**
 

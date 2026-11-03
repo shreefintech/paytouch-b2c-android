@@ -17,7 +17,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.SplashActivity
-import com.shreefintech.paytouchconsumer.retrofit.ApiClient
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.notification.DeviceTokenRequest
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
@@ -127,7 +127,7 @@ object NotificationHelper {
             deviceId = deviceId(context),
             language = Constant.FCM_LANGUAGE_DEFAULT
         )
-        ApiClient.apiService.registerDeviceToken(bearer, body)
+        ApiAuthClient.apiService.registerDeviceToken(bearer, body)
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     pendingToken = null

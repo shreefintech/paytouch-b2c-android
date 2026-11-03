@@ -19,14 +19,12 @@ import androidx.databinding.ObservableBoolean
 import com.bumptech.glide.Glide
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
-import com.shreefintech.paytouchconsumer.HomeActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.auth.viewmodel.LoginViewModel
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoginBinding
 import com.shreefintech.paytouchconsumer.enums.LoginMode
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.kyc.KycActivity
-import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.LoginDataItem
 import com.shreefintech.paytouchconsumer.utill.BannerSliderHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -245,10 +243,10 @@ class LoginActivity : BaseActivity() {
             credential = credential,
             mode = currentMode,
             onLoading = { showProgress.set(true) },
-            onSuccess = { data ->
+            onSuccess = { loginData ->
                 showProgress.set(false)
                 ToastUtil.showSuccess(mActivity, getString(R.string.msgLoginSuccess), inWindow = false)
-                navigateAfterLogin(data)
+                navigateAfterLogin(loginData)
             },
             onError = { msg ->
                 showProgress.set(false)
@@ -257,13 +255,8 @@ class LoginActivity : BaseActivity() {
         )
     }
 
-    private fun navigateAfterLogin(data: LoginItem?) {
-        val intent = when {
-            data?.requiresKyc == true            -> Intent(mActivity, KycActivity::class.java)
-            data?.requiresMpin == true           -> ResetMpinActivity.buildCreateIntent(mActivity)
-            else                                 -> Intent(mActivity, HomeActivity::class.java)
-        }
-        startActivity(intent)
+    private fun navigateAfterLogin(data: LoginDataItem?) {
+        startActivity(NextStepRouter.intentFor(mActivity, data?.nextStep, data?.mpinRequired))
         finishAffinity()
     }
 

@@ -32,7 +32,8 @@ object ApiClient {
         if (_apiService == null) _apiService = retrofit.create(ApiService::class.java)
     }
 
-    private fun buildRetrofit(): Retrofit {
+    // Shared by [ApiAuthClient] so both backends get the same headers, timeouts, session and logging interceptors
+    internal fun buildRetrofit(baseUrl: String = Constant.BASE_URL): Retrofit {
         val clientBuilder = OkHttpClient.Builder()
             .connectTimeout(DEFAULT_TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)
             .readTimeout(DEFAULT_TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)
@@ -54,12 +55,16 @@ object ApiClient {
 
         if (BuildConfig.DEBUG) {
             clientBuilder.addInterceptor(
-                HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                    redactHeader("Authorization")
+                }
             )
+            clientBuilder.addInterceptor(CurlInterceptor())
         }
 
         return Retrofit.Builder()
-            .baseUrl(Constant.BASE_URL)
+            .baseUrl(baseUrl)
             .client(clientBuilder.build())
             .addConverterFactory(
                 GsonConverterFactory.create(GsonBuilder().setLenient().create())

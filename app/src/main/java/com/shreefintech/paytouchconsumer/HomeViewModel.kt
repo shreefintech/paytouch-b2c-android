@@ -6,11 +6,12 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
+import com.shreefintech.paytouchconsumer.retrofit.ApiAuthClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.UserProfileItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.LogoutRequest
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
@@ -47,7 +48,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             longitude = location.longitude,
             accuracy = if (location.hasAccuracy()) location.accuracy.toDouble() else null
         )
-        ApiClient.apiService.sendLocation(bearerToken(), body)
+        ApiAuthClient.apiService.sendLocation(bearerToken(), body)
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     if (!response.isSuccessful) {
@@ -95,29 +96,32 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     // Survives Activity recreation — a recreated Home must not re-block while the previous upload is in flight
     private var isAadhaarUploading = false
-    private var aadhaarCheckCall: Call<UserProfileItem>? = null
+    private var aadhaarCheckCall: Call<General<MeDataItem>>? = null
 
     /**
-     * Silent — Home stays usable if /api/user fails; the flag is re-checked on the next Home launch.
+     * Silent — Home stays usable if mobile/auth/me fails; the flag is re-checked on the next Home launch.
      * Also the post-login source of the bank/PAN onboarding flags (see [saveOnboardingFlags]) — keep this call.
      */
     fun checkAadhaarRejected(onRejected: () -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) return
         aadhaarCheckCall?.cancel()
-        aadhaarCheckCall = ApiClient.apiService.getUser(bearerToken()).also {
-            it.enqueue(object : Callback<UserProfileItem> {
-                override fun onResponse(call: Call<UserProfileItem>, response: Response<UserProfileItem>) {
+        aadhaarCheckCall = ApiAuthClient.apiService.getMe(bearerToken()).also {
+            it.enqueue(object : Callback<General<MeDataItem>> {
+                override fun onResponse(call: Call<General<MeDataItem>>, response: Response<General<MeDataItem>>) {
                     if (aadhaarCheckCall === call) aadhaarCheckCall = null
-                    // Only /api/user drives the bank/PAN flags — login lands here without passing through Splash
-                    saveOnboardingFlags(response.body())
+                    val data = response.body()?.data
+                    // Refreshes the bank/PAN flags on every Home launch
+                    saveOnboardingFlags(data?.bankDetailsAdded, data?.panAdded, data?.nextStep)
                     // Checked at response time so the flags above still refresh while an upload is in flight.
                     // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
                     // switch the upload result to LiveData if Home ever stops being portrait-locked
                     if (isAadhaarUploading) return
-                    if (response.isSuccessful && response.body()?.aadhaarRejected == true) onRejected()
+                    // The dialog resubmits both Aadhaar fields; resubmit 422s on any field that wasn't rejected
+                    val rejected = data?.kycRejection?.items.orEmpty()
+                    if (response.isSuccessful && "aadhaar_number" in rejected && "aadhaar_photo" in rejected) onRejected()
                 }
 
-                override fun onFailure(call: Call<UserProfileItem>, t: Throwable) {
+                override fun onFailure(call: Call<General<MeDataItem>>, t: Throwable) {
                     if (aadhaarCheckCall === call) aadhaarCheckCall = null
                     t.printStackTrace()
                 }
@@ -155,7 +159,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 return@launch
             }
 
-            ApiClient.apiService.reuploadAadhaar(
+            ApiAuthClient.apiService.reuploadAadhaar(
                 bearerToken(),
                 aadhaarNumber.toRequestBody("text/plain".toMediaTypeOrNull()),
                 photoPart
@@ -185,7 +189,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val fcmToken = SharedPreferenceHelper.getSharedPreferenceString(
             getApplication(), Constant.KEY_FCM_TOKEN, ""
         )?.ifEmpty { null }
-        ApiClient.apiService.logout(bearerToken(), LogoutRequest(fcmToken))
+        ApiAuthClient.apiService.logout(bearerToken(), LogoutRequest(fcmToken))
             .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
                     // /logout response body only ever contains "message" (no "success" key),

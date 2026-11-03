@@ -19,6 +19,21 @@ If a task touches something no doc covers, **ask before proceeding**.
 
 ---
 
+## Ask, Don't Assume (Mandatory)
+
+If at any point during a session — while reading code, planning, or generating output — something is **missing, ambiguous, or unclear**, stop and ask before proceeding. This applies even when auto-permission is enabled.
+
+**Never assume an answer and move on.** Examples of when to stop and ask:
+
+- An API endpoint, request/response field, or contract detail is not documented and cannot be inferred from existing code.
+- A UI requirement (layout, behavior, copy) is unspecified and multiple valid interpretations exist.
+- A referenced file, class, drawable, or string resource does not exist and its intended form is unclear.
+- Business logic (fee, routing, validation rule) is not covered in `docs/` and cannot be derived from analogous modules.
+- The correct base class, pattern, or architecture decision is genuinely ambiguous for the new case.
+
+**One blocking question is better than one wrong assumption baked into generated code.** Ask the question in plain language, state what you were about to assume, and wait for the answer before writing any code that depends on it.
+
+---
 ## Final Verification (Mandatory)
 
 Before presenting code, self-review and confirm: no compile errors · no logic bugs/wrong assumptions · correct nullability (`?.`, `?:`, `!!`) · no lifecycle issues (Context leaks, callbacks after destroy) · UI on main thread, background work off it · no memory leaks (anonymous inner classes holding Activity) · edge cases (empty list, null response, out-of-bounds) · no perf regressions (full redraws, redundant API calls, main-thread work) · project naming · no unused imports/variables/dead code · integrates with existing patterns · all rules in this file satisfied · no deprecated APIs · works on API 24–37. Only present the solution after this passes.
@@ -56,7 +71,7 @@ Notes: package `utill/` spelling is intentional — never rename. FCM notificati
 7. Network errors parsed via **ApiHelper.parseErrorMessage()**.
 8. Adapters contain no business logic or network calls.
 9. ViewModels must not store Activity/Context references.
-10. All endpoints declared in **`ApiService`** (`paytouch.in`, via `ApiClient`) or **`ApiAdminService`** (`admin.paytouch.in`, via `ApiAdminClient`) — never construct `OkHttpClient`/`Retrofit` in a ViewModel or Activity. One client per backend URL.
+10. All endpoints declared in **`ApiService`** (`paytouch.in`, via `ApiClient`), **`ApiAuthService`** (auth + onboarding on `backend-b2c.paytouch.in`, via `ApiAuthClient`) or **`ApiAdminService`** (`admin.paytouch.in`, via `ApiAdminClient`) — never construct `OkHttpClient`/`Retrofit` in a ViewModel or Activity. One client per backend URL.
 11. `mapToTransactionItem()` uses `item.id?.toString() ?: "--"` for `userId` — never a loop index (duplicates on paginated appends, loses server identity).
 12. **Never generate `transaction_id` client-side** — no `Utility.generateTransactionId()`, no `transaction_id` in payment request DTOs. Read it from the server response.
 13. **ViewModel base class by role:** main payment `{Category}ViewModel` → `BaseBillViewModel` (balance checks). RecentTransaction / TransactionReport / TransactionStatus / SmsReceipt ViewModels → `AndroidViewModel` (use `bearerToken()` / `getString()` from `ViewModelExt.kt`). Do not flag these for extending `AndroidViewModel`.
@@ -75,6 +90,7 @@ Notes: package `utill/` spelling is intentional — never rename. FCM notificati
 
 19. Never use `getApplication()`/`applicationContext` for anything involving a View (no Material theme → `InflateException`), and never show a toast from a ViewModel — pass the message to the Activity via callback and show with `mActivity`.
 20. **Never throw or rethrow** — log and return a fallback (`null` / early `return`). Unexpected failures (image compression, PDF render, camera bind, receipt save/share) → `Utility.logError(e)` (Crashlytics non-fatal). Expected failures (`ActivityNotFoundException`, network `onFailure`, `CancellationException`) and `OutOfMemoryError` → plain `e.printStackTrace()`.
+21. **`CurlInterceptor` is local-only — intentional.** `retrofit/CurlInterceptor.kt` is gitignored (it uses `Log.d`, which the pre-commit hook blocks) and is referenced from `ApiClient` under `BuildConfig.DEBUG`. All builds are made locally, so this is not a blocker. Do not flag it as a missing/untracked class, do not commit it, do not move it to a debug source set, and do not remove it from `ApiClient` or `.gitignore`.
 
 ## Naming (hard rules)
 
@@ -108,7 +124,7 @@ ApiClient.apiService.someEndpoint(body).enqueue(object : Callback<SomeItem> {
 - Match the real API — **never guess `General<T>`**.
   - Envelope `{data, success, meta, message}` → `Call<General<YourItem?>>`, check `response.isSuccessful && body?.data != null`.
   - Flat → `Call<YourItem>`, check `isSuccessful && body?.success == true` if it has `success`, else `isSuccessful`.
-- Auth endpoints are always flat: `GET /api/user` → `UserProfileItem`; `POST /api/login` → `LoginItem`; `POST /api/register` → `RegisterItem` (all: `isSuccessful`); `POST /api/*/send-otp|verify-otp|reset` → `MessageItem` (`isSuccessful && success == true`).
+- Auth + onboarding endpoints are on **`ApiAuthService`** (`backend-b2c.paytouch.in/api/mobile/`, via `ApiAuthClient`) and use the envelope: `GET auth/me` → `General<MeDataItem>`; `POST auth/login` / `auth/register` → `General<LoginDataItem>`; `POST auth/mpin` → `General<MeDataItem>`; `POST auth/forgot-credential/verify-otp` → `General<ResetTokenDataItem>` (all: `isSuccessful && body?.data != null`). `POST auth/forgot-credential` / `auth/forgot-credential/reset` → `MessageItem` (`isSuccessful && success == true`). Route post-auth screens only via `NextStepRouter`.
 - **API response DTOs:** every field nullable (incl. `Int?`/`Double?`/`Long?`), every field `@field:SerializedName("key")`; apply `?:` fallbacks at call site.
 - **Local activity-to-activity DTOs:** nullable only if genuinely optional; no `@SerializedName` needed.
 
