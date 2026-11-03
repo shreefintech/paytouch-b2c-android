@@ -60,10 +60,10 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - `mpin_required` (Boolean)
 - `bank_details_added` (Boolean)
 - `pan_added` (Boolean)
-- `user` (`AuthUserItem`): `id`, `name`, `mobile`, `email`, `referral_code`, `wallet_balance`, `total_spent`, `kyc_completed`, `referred_by`, `referral_earnings`, `aadhaar_rejected`
+- `user` (`AuthUserItem`): `id`, `name`, `mobile`, `email`, `referral_code`, `wallet_balance`, `total_spent`, `kyc_completed`, `referred_by`, `referral_earnings`, `aadhaar_masked` (short-signup users only)
 
 ### Response Fields (`auth/me` and `auth/mpin` — `data`, `MeDataItem`)
-- `user` (`AuthUserItem`), `next_step`, `mpin_required`, `bank_details_added`, `aadhaar_added`, `pan_added`, `kyc_rejection` (non-null while a rejection is open → Home Aadhaar re-upload dialog)
+- `user` (`AuthUserItem`), `next_step`, `mpin_required`, `bank_details_added`, `aadhaar_added`, `pan_added`, `kyc_rejection` (`{ items: [String], reason }`, kept untyped as `Any?` and read via `MeDataItem.kycRejectedItems`; items are `aadhaar_number` / `aadhaar_photo` / `bank_details` → Home Aadhaar re-upload dialog when either Aadhaar item is rejected — `MeDataItem.isAadhaarRejected`)
 
 ### State Transitions
 ```
