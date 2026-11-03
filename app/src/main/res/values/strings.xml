@@ -672,6 +672,7 @@
     <string name="labelSubmitted">Submitted</string>
     <string name="titleEnterMpin">Enter MPIN</string>
     <string name="msgEnterMpinBankSubtitle">Enter your 4-digit MPIN to save this bank account</string>
+    <string name="msgEnterMpinProfileSubtitle">Enter your 4-digit MPIN to update your profile</string>
     <string name="msgBankAccountSaved">Bank account saved.</string>
     <string name="msgBankDetailsLoadFailed">Couldn\'t load bank details. Please try again later.</string>
     <string name="btnPreview">Preview</string>

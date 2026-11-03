@@ -12,7 +12,7 @@ User profile viewer and referral/earn screen. Two tabs: **Account Info** (KYC-de
 1. `MyAccountActivity.kt` — two-tab screen; both API calls triggered in `onCreate()` (no manual refresh)
 2. `viewmodel/MyAccountViewModel.kt` — extends `AndroidViewModel` (not `BaseBillViewModel`); two independent API calls
 3. `KycDetailsActivity.kt` — in this same package; opened from "View KYC Details" button; shows submitted KYC documents
-4. `retrofit/model/myaccount/` folder — `AccountInfoItem`, `ReferralInfoItem` and their data classes
+4. `retrofit/model/myaccount/` folder — `ReferralRewardsItem`, `ReferralDataItem`, `EditProfileRequest`; the profile itself is `AuthUserItem` (`retrofit/model/auth/`)
 
 **Launched from:** `HomeActivity` → `binding.llMyAccount` click handler
 
@@ -20,7 +20,7 @@ User profile viewer and referral/earn screen. Two tabs: **Account Info** (KYC-de
 
 **Key things to know:**
 - Both tabs load their data up-front in `onCreate()` — tab switching is purely visual (no re-fetch)
-- Balance (`wallet_balance`) is shown via `Utility.formatAmount()`; `"--"` when null
+- Balance (`main_wallet` from `GET api/mobile/wallet/balance`) is shown via `Utility.formatAmount()`; `"--"` when null
 - `KycDetailsActivity` is in this package but calls `GET /api/dashboard-kyc/my-account` (same endpoint family as the KYC module)
 - `DocPreviewActivity` is also in this package — handles full-screen image/PDF preview of KYC documents
 - Clipboard copy uses `ClipboardManager` directly; share uses `Intent.ACTION_SEND` — no third-party libraries needed
@@ -60,9 +60,8 @@ No data is passed on entry — all content is fetched from the API.
 
 | File | Purpose |
 |---|---|
-| `AccountInfoItem.kt` | Flat response for `GET /api/dashboard-kyc/account-overview`; also declares nested `AccountInfoContactItem` and `AccountInfoMembershipItem` |
-| `AccountInfoMemberItem.kt` | Nested `member` object (`memberCode`, `city`, `status`) |
-| `ReferralInfoItem.kt` | Response wrapper for `GET /api/referral-info` |
+| `ReferralRewardsItem.kt` | Response of `GET api/mobile/rewards/referral`; totals in `meta.summary` (`ReferralDataItem`) |
+| `EditProfileRequest.kt` | Body of `PUT api/mobile/auth/me` — name, email, state_id, city_id, mpin |
 | `ReferralDataItem.kt` | Referral code, link, total earnings, earning potential |
 
 ---
@@ -75,19 +74,19 @@ Displays KYC-verified profile data. Shows a shimmer placeholder while the API ca
 
 | Field | Source field |
 |---|---|
-| Member Name | `AccountInfoItem.name` |
-| Status | `AccountInfoItem.member?.status` |
-| Member Code | `AccountInfoItem.member?.memberCode` |
-| Mobile No | `AccountInfoItem.contact?.mobile` |
-| Email | `AccountInfoItem.contact?.email` |
-| Home Address | `AccountInfoItem.homeAddress` |
-| Registration Date | `AccountInfoItem.membership?.registeredOn` — `Utility.formatDate(…, "dd-MM-yyyy")` |
-| Activation Date | `AccountInfoItem.membership?.activatedOn` — `Utility.formatDate(…, "dd-MM-yyyy")` |
-| Balance | `AccountInfoItem.walletBalance` — `Utility.formatAmount(…)`, `"--"` when null |
+| Member Name | `AuthUserItem.name` (`GET api/mobile/auth/me` → `data.user`) |
+| Status | `AuthUserItem.status` (first letter capitalised) |
+| Member Code | Always `"--"` — not available in B2C |
+| Mobile No | `AuthUserItem.mobile` |
+| Email | `AuthUserItem.email` |
+| Home Address | `"city, state"` from `AuthUserItem.city` / `.state` — no street address in B2C |
+| Registration Date | `AuthUserItem.createdAt` — `Utility.formatDate(…, "dd-MM-yyyy")` |
+| Activation Date | `AuthUserItem.activatedAt` — `Utility.formatDate(…, "dd-MM-yyyy")` |
+| Balance | `WalletBalanceItem.mainWallet` — `Utility.formatAmount(…)`, `"--"` when null |
 
 Text fields fall back to `"--"` when null.
 
-**Edit profile (pencil next to Member Code):** Opens `dialog_edit_profile` — name, email, state, city prefilled from `AccountInfoItem` (`address.state` / `address.city`). States/cities load from `v2/address/states` / `v2/address/states/{state_id}/cities`. Submit calls `POST /api/profile`; on success the stored email is updated and account info is re-fetched (home address is derived server-side). Ignored until account info has loaded.
+**Edit profile (pencil next to Member Code):** Opens `dialog_edit_profile` — name, email, state, city prefilled from `AuthUserItem`. `auth/me` sends state/city as names only, so they are matched by name against the `api/mobile/address/states` / `address/states/{state_id}/cities` lists to get ids. Submit validates, then opens `dialog_mpin`; the MPIN submit calls `PUT api/mobile/auth/me`. On success both dialogs close, stored email is updated and `auth/me` is re-fetched. Ignored until account info has loaded.
 
 **"View KYC Details" button:** Navigates to `KycDetailsActivity` (in this package) — fetches `GET /api/dashboard-kyc/my-account` via `KycDetailsViewModel`. Document taps open `DocPreviewActivity` with `extra_file_url` + `extra_file_title`.
 
@@ -114,15 +113,16 @@ Displays referral code and link with copy and share actions. Shows a shimmer pla
 
 | Method | Endpoint | `ApiService` function | ViewModel method | Response model |
 |---|---|---|---|---|
-| GET | `api/dashboard-kyc/account-overview` | `getAccountOverview()` | `getAccountInfo()` | `AccountInfoItem` |
-| GET | `api/referral-info` | `getReferralInfo()` | `getReferralInfo()` | `ReferralInfoItem` |
-| POST | `api/profile` | `updateProfile()` | `updateProfile()` | `General<EditProfileDataItem>` |
+| GET | `api/mobile/auth/me` | `getMe()` | `getProfile()` | `General<MeDataItem>` |
+| GET | `api/mobile/wallet/balance` | `getWalletBalance()` | `getWalletBalance()` | `General<WalletBalanceItem>` |
+| GET | `api/mobile/rewards/referral` | `getReferralRewards()` | `getReferralRewards()` | `ReferralRewardsItem` |
+| PUT | `api/mobile/auth/me` | `updateMe()` | `updateProfile()` | `MessageItem` |
 
-**Success check (both endpoints):** `response.isSuccessful && response.body()?.success == true`
+**Success check:** `General<…>` calls — `isSuccessful && body?.data != null`; flat `MessageItem` (`updateMe`) and referral — `isSuccessful && success == true`
 
 **Parameters:**
-- `getAccountInfo` — `Authorization: Bearer <token>` header only
-- `getReferralInfo` — `Authorization: Bearer <token>` header only
+- `getProfile` / `getWalletBalance` — `Authorization: Bearer <token>` header only
+- `getReferralRewards` — `Authorization: Bearer <token>` header only
 
 **ViewModel base class:** `AndroidViewModel` — My Account has no bill-payment flow, so `BaseBillViewModel` is not used here.
 

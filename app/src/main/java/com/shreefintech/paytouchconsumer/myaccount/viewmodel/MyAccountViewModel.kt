@@ -6,11 +6,13 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.AccountInfoItem
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.AuthUserItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.EditProfileRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralInfoItem
+import com.shreefintech.paytouchconsumer.retrofit.model.myaccount.ReferralRewardsItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
 import com.shreefintech.paytouchconsumer.utill.getString
@@ -20,9 +22,9 @@ import retrofit2.Response
 
 class MyAccountViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun getAccountInfo(
+    fun getProfile(
         onLoading: () -> Unit,
-        onSuccess: (AccountInfoItem) -> Unit,
+        onSuccess: (AuthUserItem) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -30,19 +32,17 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
             return
         }
         onLoading()
-        ApiClient.apiService.getAccountOverview(bearerToken())
-            .enqueue(object : Callback<AccountInfoItem> {
+        ApiClient.apiService.getMe(bearerToken())
+            .enqueue(object : Callback<General<MeDataItem>> {
                 override fun onResponse(
-                    call: Call<AccountInfoItem>,
-                    response: Response<AccountInfoItem>
+                    call: Call<General<MeDataItem>>,
+                    response: Response<General<MeDataItem>>
                 ) {
-                    if (response.isSuccessful && response.body()?.success == true) {
-                        val data = response.body()
-                        if (data != null) {
-                            onSuccess(data)
-                        } else {
-                            onError(getString(R.string.errGeneric))
-                        }
+                    val user = response.body()?.data?.user
+                    if (response.isSuccessful && user != null) {
+                        onSuccess(user)
+                    } else if (response.isSuccessful) {
+                        onError(response.body()?.message ?: getString(R.string.errGeneric))
                     } else {
                         onError(
                             ApiHelper.parseErrorMessage(
@@ -52,13 +52,47 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
                     }
                 }
 
-                override fun onFailure(call: Call<AccountInfoItem>, t: Throwable) {
+                override fun onFailure(call: Call<General<MeDataItem>>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
     }
 
-    fun getReferralInfo(
+    fun getWalletBalance(
+        onSuccess: (WalletBalanceItem) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!Utility.isInternetAvailable(getApplication())) {
+            onError(getString(R.string.msgNoInternet))
+            return
+        }
+        ApiClient.apiService.getWalletBalance(bearerToken())
+            .enqueue(object : Callback<General<WalletBalanceItem>> {
+                override fun onResponse(
+                    call: Call<General<WalletBalanceItem>>,
+                    response: Response<General<WalletBalanceItem>>
+                ) {
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        onSuccess(data)
+                    } else if (response.isSuccessful) {
+                        onError(response.body()?.message ?: getString(R.string.errGeneric))
+                    } else {
+                        onError(
+                            ApiHelper.parseErrorMessage(
+                                getApplication(), response.code(), response.errorBody()?.string()
+                            )
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<General<WalletBalanceItem>>, t: Throwable) {
+                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
+                }
+            })
+    }
+
+    fun getReferralRewards(
         onLoading: () -> Unit,
         onSuccess: (ReferralDataItem) -> Unit,
         onError: (String) -> Unit
@@ -68,14 +102,14 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
             return
         }
         onLoading()
-        ApiClient.apiService.getReferralInfo(bearerToken())
-            .enqueue(object : Callback<ReferralInfoItem> {
+        ApiClient.apiService.getReferralRewards(bearerToken())
+            .enqueue(object : Callback<ReferralRewardsItem> {
                 override fun onResponse(
-                    call: Call<ReferralInfoItem>,
-                    response: Response<ReferralInfoItem>
+                    call: Call<ReferralRewardsItem>,
+                    response: Response<ReferralRewardsItem>
                 ) {
                     if (response.isSuccessful && response.body()?.success == true) {
-                        val data = response.body()?.data
+                        val data = response.body()?.meta?.summary
                         if (data != null) {
                             onSuccess(data)
                         } else {
@@ -90,7 +124,7 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
                     }
                 }
 
-                override fun onFailure(call: Call<ReferralInfoItem>, t: Throwable) {
+                override fun onFailure(call: Call<ReferralRewardsItem>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })
@@ -99,7 +133,7 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
     fun updateProfile(
         request: EditProfileRequest,
         onLoading: () -> Unit,
-        onSuccess: (EditProfileDataItem, String) -> Unit,
+        onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -107,16 +141,16 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
             return
         }
         onLoading()
-        ApiClient.apiService.updateProfile(bearerToken(), request)
-            .enqueue(object : Callback<General<EditProfileDataItem>> {
+        ApiClient.apiService.updateMe(bearerToken(), request)
+            .enqueue(object : Callback<MessageItem> {
                 override fun onResponse(
-                    call: Call<General<EditProfileDataItem>>,
-                    response: Response<General<EditProfileDataItem>>
+                    call: Call<MessageItem>,
+                    response: Response<MessageItem>
                 ) {
                     val body = response.body()
-                    val data = body?.data
-                    if (response.isSuccessful && body?.success == true && data != null) {
-                        onSuccess(data, body.message ?: getString(R.string.msgProfileUpdated))
+                    // Success flag decides — the screen refetches auth/me for the updated fields
+                    if (response.isSuccessful && body?.success == true) {
+                        onSuccess(body.message ?: getString(R.string.msgProfileUpdated))
                     } else if (response.isSuccessful) {
                         // HTTP 200 with success:false — errorBody() is null, the reason is in body.message
                         onError(body?.message ?: getString(R.string.errGeneric))
@@ -129,7 +163,7 @@ class MyAccountViewModel(application: Application) : AndroidViewModel(applicatio
                     }
                 }
 
-                override fun onFailure(call: Call<General<EditProfileDataItem>>, t: Throwable) {
+                override fun onFailure(call: Call<MessageItem>, t: Throwable) {
                     onError(t.localizedMessage ?: getString(R.string.errGeneric))
                 }
             })

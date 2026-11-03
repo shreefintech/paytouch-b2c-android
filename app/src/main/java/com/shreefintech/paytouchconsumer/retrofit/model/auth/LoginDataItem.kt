@@ -20,5 +20,11 @@ data class AuthUserItem(
     @field:SerializedName("referral_code")     val referralCode: String?,
     @field:SerializedName("wallet_balance")    val walletBalance: String?,
     // B2C-286 — short-signup users only
-    @field:SerializedName("aadhaar_masked")    val aadhaarMasked: String?
+    @field:SerializedName("aadhaar_masked")    val aadhaarMasked: String?,
+    // GET auth/me only — state/city are plain names, not {id, name}
+    @field:SerializedName("status")            val status: String?,
+    @field:SerializedName("created_at")        val createdAt: String?,
+    @field:SerializedName("activated_at")      val activatedAt: String?,
+    @field:SerializedName("state")             val state: String?,
+    @field:SerializedName("city")              val city: String?
 )

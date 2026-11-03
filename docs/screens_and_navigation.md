@@ -389,8 +389,9 @@ Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules â
 
 | Endpoint | Purpose |
 |---|---|
-| `GET api/dashboard-kyc/account-overview` | Fetch account profile data |
-| `GET api/referral-info` | Fetch referral code and link |
+| `GET api/mobile/auth/me` | Fetch account profile data |
+| `GET api/mobile/wallet/balance` | Fetch wallet balance (main wallet) |
+| `GET api/mobile/rewards/referral` | Fetch referral code, link and totals |
 
 **Pending:** `TODO(PAYTOUCH-523)` â€” expose `totalEarnings` and `earningPotential` on Refer & Earn tab.
 
