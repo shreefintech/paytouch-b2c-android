@@ -30,9 +30,9 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                     call: Call<General<MeDataItem>>,
                     response: Response<General<MeDataItem>>
                 ) {
-                    if (response.isSuccessful) {
-                        val data = response.body()?.data
-                        saveOnboardingFlags(data?.bankDetailsAdded, data?.panAdded, data?.nextStep)
+                    val data = response.body()?.data
+                    if (response.isSuccessful && data != null) {
+                        saveOnboardingFlags(data.bankDetailsAdded, data.panAdded, data.nextStep)
                         onSuccess(data)
                     } else {
                         onError(

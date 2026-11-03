@@ -19,11 +19,11 @@ class KycDetailsViewModel(application: Application) : AndroidViewModel(applicati
 
     /**
      * auth/me (identity + KYC state), then GET wallet/bank-account (withdrawal bank).
-     * Only an auth/me failure is an error — a bank failure still shows identity with a null bank.
+     * Only an auth/me failure is an error — a bank failure still shows identity with a null bank and `isBankFailed`.
      */
     fun fetchDetails(
         onLoading: () -> Unit,
-        onReady: (MeDataItem, WalletBankAccountItem?) -> Unit,
+        onReady: (me: MeDataItem, bank: WalletBankAccountItem?, isBankFailed: Boolean) -> Unit,
         onError: (String) -> Unit
     ) {
         if (!Utility.isInternetAvailable(getApplication())) {
@@ -36,7 +36,7 @@ class KycDetailsViewModel(application: Application) : AndroidViewModel(applicati
                 override fun onResponse(call: Call<General<MeDataItem>>, response: Response<General<MeDataItem>>) {
                     val me = response.body()?.data
                     if (response.isSuccessful && me != null) {
-                        fetchBank { bank -> onReady(me, bank) }
+                        fetchBank { bank, isFailed -> onReady(me, bank, isFailed) }
                     } else {
                         onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
                     }
@@ -48,19 +48,20 @@ class KycDetailsViewModel(application: Application) : AndroidViewModel(applicati
             })
     }
 
-    private fun fetchBank(onDone: (WalletBankAccountItem?) -> Unit) {
+    private fun fetchBank(onDone: (bank: WalletBankAccountItem?, isFailed: Boolean) -> Unit) {
         ApiClient.apiService.getWalletBankAccount(bearerToken())
             .enqueue(object : Callback<General<WalletBankAccountItem>> {
                 override fun onResponse(
                     call: Call<General<WalletBankAccountItem>>,
                     response: Response<General<WalletBankAccountItem>>
                 ) {
-                    onDone(if (response.isSuccessful) response.body()?.data else null)
+                    val bank = if (response.isSuccessful) response.body()?.data else null
+                    onDone(bank, bank == null)
                 }
 
                 override fun onFailure(call: Call<General<WalletBankAccountItem>>, t: Throwable) {
                     t.printStackTrace()
-                    onDone(null)
+                    onDone(null, true)
                 }
             })
     }

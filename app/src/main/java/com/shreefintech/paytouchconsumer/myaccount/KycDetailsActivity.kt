@@ -50,11 +50,6 @@ class KycDetailsActivity : BaseActivity() {
     }
 
     companion object {
-        // kyc_rejection.items values
-        private const val KYC_ITEM_AADHAAR_NUMBER = "aadhaar_number"
-        private const val KYC_ITEM_AADHAAR_PHOTO = "aadhaar_photo"
-        private const val KYC_ITEM_BANK_DETAILS = "bank_details"
-
         fun start(context: Context) {
             context.startActivity(Intent(context, KycDetailsActivity::class.java))
         }
@@ -105,11 +100,13 @@ class KycDetailsActivity : BaseActivity() {
                 binding.pbLoading.isVisible = true
                 binding.nsvContent.isVisible = false
             },
-            onReady = { me, bank ->
+            onReady = { me, bank, isBankFailed ->
                 if (isFinishing || isDestroyed) return@fetchDetails
                 binding.pbLoading.isVisible = false
                 binding.nsvContent.isVisible = true
                 populateData(me, bank)
+                // The empty card alone would read as "no bank on file"
+                if (isBankFailed) ToastUtil.showWarning(mActivity, getString(R.string.msgBankDetailsLoadFailed))
             },
             onError = { msg ->
                 binding.pbLoading.isVisible = false
@@ -120,19 +117,18 @@ class KycDetailsActivity : BaseActivity() {
     }
 
     private fun populateData(me: MeDataItem, bank: WalletBankAccountItem?) {
-        val rejected = me.kycRejectedItems
         val isComplete = NextStep.from(me.nextStep) == NextStep.COMPLETE
         populateIdentity(me, badge(
-            isRejected = rejected.any { it == KYC_ITEM_AADHAAR_NUMBER || it == KYC_ITEM_AADHAAR_PHOTO },
+            isRejected = me.isAadhaarRejected,
             isComplete = isComplete,
             isOnFile   = me.aadhaarAdded == true
         ))
         populateBank(bank, badge(
-            isRejected = KYC_ITEM_BANK_DETAILS in rejected,
+            isRejected = MeDataItem.KYC_ITEM_BANK_DETAILS in me.kycRejectedItems,
             isComplete = isComplete,
             isOnFile   = me.bankDetailsAdded == true
         ))
-        // No documents source in B2C yet — the section stays hidden until one exists
+        // TODO(B2C-287): no documents source in B2C yet — the section stays hidden until one exists
         populateDocuments(emptyList())
     }
 

@@ -77,9 +77,14 @@ class KycStatusActivity : BaseActivity() {
     }
 
     private fun renderStatus(nextStep: String?, mpinRequired: Boolean?) {
+        // Missing step = nothing known yet; an unrecognised one goes to the router (Home), never a stuck pending screen
+        if (nextStep == null) {
+            showPending()
+            return
+        }
         when (NextStep.from(nextStep)) {
-            NextStep.PENDING_APPROVAL, null -> showPending()
-            NextStep.REGISTRATION_REJECTED  -> showRejected()
+            NextStep.PENDING_APPROVAL      -> showPending()
+            NextStep.REGISTRATION_REJECTED -> showRejected()
             // Any other step has moved on (complete, MPIN, bank, Aadhaar) — the router decides where
             else -> navigateTo(NextStepRouter.intentFor(mActivity, nextStep, mpinRequired))
         }

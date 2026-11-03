@@ -71,7 +71,7 @@ Notes: package `utill/` spelling is intentional — never rename. FCM notificati
 7. Network errors parsed via **ApiHelper.parseErrorMessage()**.
 8. Adapters contain no business logic or network calls.
 9. ViewModels must not store Activity/Context references.
-10. All endpoints declared in **`ApiService`** (`www.paytouch.in`, via `ApiClient` — auth/onboarding under `api/mobile/`) or **`ApiAdminService`** (`admin.paytouch.in`, via `ApiAdminClient`) — never construct `OkHttpClient`/`Retrofit` in a ViewModel or Activity. One client per backend URL.
+10. All endpoints declared in **`ApiService`** (`backend-b2c.paytouch.in` = `Constant.BASE_URL`, via `ApiClient` — auth/onboarding under `api/mobile/`, legacy routes under `api/`) or **`ApiAdminService`** (`admin.paytouch.in`, via `ApiAdminClient`) — never construct `OkHttpClient`/`Retrofit` in a ViewModel or Activity. One client per backend URL.
 11. `mapToTransactionItem()` uses `item.id?.toString() ?: "--"` for `userId` — never a loop index (duplicates on paginated appends, loses server identity).
 12. **Never generate `transaction_id` client-side** — no `Utility.generateTransactionId()`, no `transaction_id` in payment request DTOs. Read it from the server response.
 13. **ViewModel base class by role:** main payment `{Category}ViewModel` → `BaseBillViewModel` (balance checks). RecentTransaction / TransactionReport / TransactionStatus / SmsReceipt ViewModels → `AndroidViewModel` (use `bearerToken()` / `getString()` from `ViewModelExt.kt`). Do not flag these for extending `AndroidViewModel`.
@@ -123,7 +123,7 @@ ApiClient.apiService.someEndpoint(body).enqueue(object : Callback<SomeItem> {
 - Match the real API — **never guess `General<T>`**.
   - Envelope `{data, success, meta, message}` → `Call<General<YourItem?>>`, check `response.isSuccessful && body?.data != null`.
   - Flat → `Call<YourItem>`, check `isSuccessful && body?.success == true` if it has `success`, else `isSuccessful`.
-- Auth + onboarding endpoints are in **`ApiService`** under `MOBILE` (`www.paytouch.in/api/mobile/`, via `ApiClient`) and use the envelope: `GET auth/me` → `General<MeDataItem>`; `POST auth/login` / `auth/register` → `General<LoginDataItem>`; `POST auth/mpin` → `General<MeDataItem>`; `POST auth/forgot-credential/verify-otp` → `General<ResetTokenDataItem>` (all: `isSuccessful && body?.data != null`). `POST auth/forgot-credential` / `auth/forgot-credential/reset` → `MessageItem` (`isSuccessful && success == true`). Route post-auth screens only via `NextStepRouter`.
+- Auth + onboarding endpoints are in **`ApiService`** under `MOBILE` (`backend-b2c.paytouch.in/api/mobile/`, via `ApiClient`) and use the envelope: `GET auth/me` → `General<MeDataItem>`; `POST auth/login` / `auth/register` → `General<LoginDataItem>`; `POST auth/mpin` → `General<MeDataItem>`; `POST auth/forgot-credential/verify-otp` → `General<ResetTokenDataItem>` (all: `isSuccessful && body?.data != null`). `POST auth/forgot-credential` / `auth/forgot-credential/reset` → `MessageItem` (`isSuccessful && success == true`). Route post-auth screens only via `NextStepRouter`.
 - **API response DTOs:** every field nullable (incl. `Int?`/`Double?`/`Long?`), every field `@field:SerializedName("key")`; apply `?:` fallbacks at call site.
 - **Local activity-to-activity DTOs:** nullable only if genuinely optional; no `@SerializedName` needed.
 

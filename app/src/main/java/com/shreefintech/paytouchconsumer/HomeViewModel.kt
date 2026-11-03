@@ -119,7 +119,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     if (!response.isSuccessful || data == null) return
                     val step = NextStep.from(data.nextStep)
                     when {
-                        data.kycRejection != null || step?.needsAadhaar == true -> onRejected()
+                        data.isAadhaarRejected || step?.needsAadhaar == true -> onRejected()
                         step == NextStep.PENDING_APPROVAL -> onPendingApproval(data.nextStep)
                     }
                 }

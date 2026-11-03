@@ -47,7 +47,8 @@ object ApiHelper {
 
     /**
      * The first 422 field error, else the backend `message`, else the HTTP status text.
-     * A 403 also hands its `error_code` to [onForbidden].
+     * Side effect: a 403 also hands its `error_code` to [onForbidden], which may log out or navigate.
+     * Only for [ApiClient] responses — `error_code` values are B2C-backend specific.
      */
     fun parseErrorMessage(mContext: Context, statusCode: Int, errorBody: String?): String {
         // Step 1 : Try to parse backend `message` field (same as iOS GeneralResponseModel decode)
@@ -87,9 +88,9 @@ object ApiHelper {
         // error_code is the upper-case form of the matching next_step value
         val nextStep = errorCode.lowercase()
         if (NextStep.from(nextStep)?.isKycStep == true) {
-            // CLEAR_TOP: reuses the Home/status screen already in the stack instead of stacking a second one
+            // CLEAR_TASK: the KYC step blocks the app, so the router's screen becomes the new root (same as other router launches)
             context.startActivity(NextStepRouter.intentFor(context, nextStep, null).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             })
         }
     }

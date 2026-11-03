@@ -23,7 +23,6 @@ data class AuthUserItem(
     @field:SerializedName("kyc_completed")     val kycCompleted: Boolean?,
     @field:SerializedName("referred_by")       val referredBy: String?,
     @field:SerializedName("referral_earnings") val referralEarnings: String?,
-    @field:SerializedName("aadhaar_rejected")  val aadhaarRejected: Boolean?,
     // B2C-286 — short-signup users only
     @field:SerializedName("aadhaar_masked")    val aadhaarMasked: String?
 )

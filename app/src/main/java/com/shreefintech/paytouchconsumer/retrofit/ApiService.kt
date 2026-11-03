@@ -131,7 +131,7 @@ interface ApiService {
 
     companion object {
         const val AUTH = "api/"
-        // Migrated routes (auth, onboarding, KYC) — https://www.paytouch.in/api/mobile/
+        // Migrated routes (auth, onboarding, KYC) — https://backend-b2c.paytouch.in/api/mobile/
         const val MOBILE = "api/mobile/"
     }
 
@@ -260,7 +260,7 @@ interface ApiService {
         @Body body: WalletBankAccountRequest
     ): Call<General<WalletBankAccountItem>>
 
-    // TODO: routes below (except Dashboard KYC, already migrated) still use old paths — replace with new routes in separate branches
+    // TODO(B2C-287): routes below (except Dashboard KYC, already migrated) still use old paths — replace with new routes in separate branches
 
     // ── Wallet ────────────────────────────────────────────────────────────────
 

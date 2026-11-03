@@ -15,10 +15,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="24dp"
+        android:paddingHorizontal="@dimen/dialog_padding_horizontal"
         android:background="@drawable/bg_transaction_item"
-        android:paddingTop="20dp"
-        android:paddingBottom="24dp">
+        android:paddingTop="@dimen/margin_extra_large"
+        android:paddingBottom="@dimen/dialog_padding_horizontal">
 
         <!-- Title -->
         <androidx.appcompat.widget.AppCompatTextView
@@ -50,9 +50,9 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="5dp"
+                android:padding="@dimen/margin_extra_small"
                 android:src="@drawable/ic_cross"
-                android:tint="@color/primary" />
+                app:tint="@color/primary" />
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Subtitle -->
@@ -60,7 +60,7 @@
             android:id="@+id/tvSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/margin_small_medium"
             android:fontFamily="@font/proza_libre_medium"
             android:text="@string/msgEnterMpinBankSubtitle"
             android:textColor="@color/sub_text_color"
@@ -74,7 +74,7 @@
             android:id="@+id/tvMpinLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/margin_extra_large"
             android:fontFamily="@font/proza_libre_semi_bold"
             android:text="@string/label_mpin"
             android:textColor="@color/primary"

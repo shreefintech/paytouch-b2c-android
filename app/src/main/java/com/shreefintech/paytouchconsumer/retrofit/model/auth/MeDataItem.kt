@@ -17,4 +17,15 @@ data class MeDataItem(
     // shape change can't fail the whole auth/me parse
     val kycRejectedItems: List<String>
         get() = ((kycRejection as? Map<*, *>)?.get("items") as? List<*>)?.filterIsInstance<String>().orEmpty()
+
+    // Only these can be fixed by the Aadhaar re-upload dialog — a bank-only rejection must not open it
+    val isAadhaarRejected: Boolean
+        get() = kycRejectedItems.any { it == KYC_ITEM_AADHAAR_NUMBER || it == KYC_ITEM_AADHAAR_PHOTO }
+
+    companion object {
+        // kyc_rejection.items values
+        const val KYC_ITEM_AADHAAR_NUMBER = "aadhaar_number"
+        const val KYC_ITEM_AADHAAR_PHOTO = "aadhaar_photo"
+        const val KYC_ITEM_BANK_DETAILS = "bank_details"
+    }
 }

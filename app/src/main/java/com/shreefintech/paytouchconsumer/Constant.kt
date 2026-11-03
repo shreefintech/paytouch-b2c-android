@@ -8,7 +8,9 @@ object Constant {
     const val LOCAL_URL = "https://tablet-frying-shy.ngrok-free.dev/"
 
     const val LIVE_URL = "https://www.paytouch.in/"
-    const val BASE_URL = "https://backend-b2c.paytouch.in/"
+    // B2C backend — serves both the migrated api/mobile/ routes and the legacy api/ routes
+    const val B2C_URL = "https://backend-b2c.paytouch.in/"
+    const val BASE_URL = B2C_URL
     const val BASE_URL_ADMIN = "https://admin.paytouch.in/"
 
     // AUTH store keys

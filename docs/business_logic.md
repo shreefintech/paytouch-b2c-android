@@ -13,7 +13,7 @@ Users register with phone/email/password, then log in via password or MPIN. A Be
 - Mobile number must be exactly 10 digits
 - Password must be at least 8 characters
 - Email must pass standard email format validation
-- Auth + onboarding endpoints are declared in `ApiService` with the `MOBILE` prefix (`https://www.paytouch.in/api/mobile/`) and called via `ApiClient.apiService`. Other modules still use the old `api/` prefix — pending migration to new routes.
+- Auth + onboarding endpoints are declared in `ApiService` with the `MOBILE` prefix (`https://backend-b2c.paytouch.in/api/mobile/`) and called via `ApiClient.apiService`. Other modules still use the old `api/` prefix — pending migration to new routes.
 - Both password and MPIN login share `mobile/auth/login`; `type` is `Constant.CREDENTIAL_TYPE_PASSWORD` or `Constant.CREDENTIAL_TYPE_MPIN`
 - All auth responses use the `General<T>` envelope (`{success, message, data}`) — check `isSuccessful && body?.data != null`
 - Routing after login / Splash / MPIN creation goes through **`NextStepRouter.intentFor(context, next_step, mpin_required)`** — never route inline:
