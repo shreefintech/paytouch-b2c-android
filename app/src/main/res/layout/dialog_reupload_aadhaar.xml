@@ -10,6 +10,10 @@
         <variable
             name="showProgress"
             type="androidx.databinding.ObservableBoolean" />
+        <!-- true = aadhaar_required (kyc/individual/aadhaar, needs state + city); false = rejection resubmit -->
+        <variable
+            name="isAddMode"
+            type="boolean" />
     </data>
 
     <!-- Blocking dialog — intentionally no close button -->
@@ -28,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/proza_libre_semi_bold"
-            android:text="@string/titleReuploadAadhaar"
+            android:text="@{isAddMode ? @string/titleAddAadhaar : @string/titleReuploadAadhaar}"
             android:textColor="@color/primary"
             android:textSize="@dimen/text_size_18" />
 
@@ -38,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:fontFamily="@font/proza_libre_medium"
-            android:text="@string/msgReuploadAadhaarSubtitle"
+            android:text="@{isAddMode ? @string/msgAddAadhaarSubtitle : @string/msgReuploadAadhaarSubtitle}"
             android:textColor="@color/sub_text_color"
             android:textSize="@dimen/text_size_12" />
 
@@ -73,6 +77,150 @@
             android:textColor="@color/black"
             android:textColorHint="?attr/colorTextHint"
             android:textSize="@dimen/text_size_13" />
+
+        <!-- State + City side by side — add mode only (same fields as registration) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:orientation="horizontal"
+            android:visibility="@{isAddMode ? View.VISIBLE : View.GONE}">
+
+            <!-- State column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelState"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_13" />
+
+                <FrameLayout
+                    android:id="@+id/flStateAnchor"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_height"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:background="@drawable/bg_input_field"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClickListener="@{onClickListener}">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvState"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center_vertical"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:paddingHorizontal="@dimen/margin_small"
+                        android:paddingEnd="24dp"
+                        android:text="@string/hintSelectState"
+                        android:textColor="?attr/colorTextHint"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <FrameLayout
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginEnd="@dimen/margin_small">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivStateArrow"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_down_arrow"
+                            android:tint="@color/primary" />
+
+                        <ProgressBar
+                            android:id="@+id/pbStateLoading"
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:indeterminateTint="@color/primary"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- City column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_small"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/proza_libre_semi_bold"
+                    android:includeFontPadding="false"
+                    android:text="@string/labelCity"
+                    android:textColor="@color/primary"
+                    android:textSize="@dimen/text_size_13" />
+
+                <FrameLayout
+                    android:id="@+id/flCityAnchor"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_height"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:background="@drawable/bg_input_field"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClickListener="@{onClickListener}">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvCity"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/proza_libre_medium"
+                        android:gravity="center_vertical"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:paddingHorizontal="@dimen/margin_small"
+                        android:paddingEnd="24dp"
+                        android:text="@string/hintSelectCity"
+                        android:textColor="?attr/colorTextHint"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <FrameLayout
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginEnd="@dimen/margin_small">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivCityArrow"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_down_arrow"
+                            android:tint="@color/primary" />
+
+                        <ProgressBar
+                            android:id="@+id/pbCityLoading"
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:indeterminateTint="@color/primary"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
 
         <!-- Aadhaar Photo label -->
         <androidx.appcompat.widget.AppCompatTextView

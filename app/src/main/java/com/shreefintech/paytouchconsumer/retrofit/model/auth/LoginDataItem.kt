@@ -19,10 +19,6 @@ data class AuthUserItem(
     @field:SerializedName("email")             val email: String?,
     @field:SerializedName("referral_code")     val referralCode: String?,
     @field:SerializedName("wallet_balance")    val walletBalance: String?,
-    @field:SerializedName("total_spent")       val totalSpent: String?,
-    @field:SerializedName("kyc_completed")     val kycCompleted: Boolean?,
-    @field:SerializedName("referred_by")       val referredBy: String?,
-    @field:SerializedName("referral_earnings") val referralEarnings: String?,
     // B2C-286 — short-signup users only
     @field:SerializedName("aadhaar_masked")    val aadhaarMasked: String?,
     // GET auth/me only — state/city are plain names, not {id, name}
