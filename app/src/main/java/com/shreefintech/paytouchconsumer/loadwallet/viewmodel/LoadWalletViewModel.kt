@@ -306,7 +306,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             onError(getString(R.string.msgNoInternet))
             return
         }
-        // ponytail: first page only — add paging when users hold more than REFERRAL_PER_PAGE referral rows
+        // TODO(B2C-298): first page only — add paging when users hold more than REFERRAL_PER_PAGE referral rows
         ApiClient.apiService.getReferralHistory(bearerToken(), page = 1, perPage = REFERRAL_PER_PAGE)
             .enqueue(object : Callback<General<List<BonusRewardItem>>> {
                 override fun onResponse(

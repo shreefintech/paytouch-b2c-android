@@ -122,7 +122,7 @@ class BillPaymentStatusActivity : BaseActivity() {
 
     private fun pollStatus() {
         if (isFinal || isNavigating) return
-        // ponytail: fixed cap (~60 s), then "Payment Processing" stays and the receipt/Status tab show the final state
+        // TODO(B2C-303): fixed cap (~60 s), then "Payment Processing" stays and the receipt/Status tab show the final state
         if (pollAttempts >= Constant.BILLPAY_POLL_MAX_ATTEMPTS) return
         pollAttempts++
         statusViewModel.loadStatus(

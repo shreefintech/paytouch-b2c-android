@@ -220,7 +220,7 @@ class TransactionReportActivity : BaseActivity() {
                     if (oldestDay != null && oldestDay < from) isPastFromDate = true
                 }
                 // Filtered in the app — keep paging while a page brought no matching rows, up to a cap
-                // ponytail: fixed cap; move date / account filters server-side when the API takes them
+                // TODO(B2C-303): fixed cap; move date / account filters server-side when the API takes them
                 if (page == 1) emptyAutoPages = 0
                 emptyAutoPages = if (list.isEmpty()) emptyAutoPages + 1 else 0
                 if (emptyAutoPages in 1 until BillPayTransactionsViewModel.MAX_AUTO_PAGES && canLoadNextPage()) {

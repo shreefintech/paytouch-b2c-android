@@ -10,13 +10,13 @@ User profile viewer and referral/earn screen. Two tabs: **Account Info** (KYC-de
 
 **First files to open:**
 1. `MyAccountActivity.kt` — two-tab screen; both API calls triggered in `onCreate()` (no manual refresh)
-2. `viewmodel/MyAccountViewModel.kt` — extends `AndroidViewModel` (not `BaseBillViewModel`); two independent API calls
+2. `viewmodel/MyAccountViewModel.kt` — extends `AndroidViewModel`; two independent API calls
 3. `KycDetailsActivity.kt` — in this same package; opened from "View KYC Details" button; shows submitted KYC documents
 4. `retrofit/model/myaccount/` folder — `ReferralRewardsItem`, `ReferralDataItem`, `EditProfileRequest`; the profile itself is `AuthUserItem` (`retrofit/model/auth/`)
 
 **Launched from:** `HomeActivity` → `binding.llMyAccount` click handler
 
-**ViewModel base class:** `AndroidViewModel` — this module has no bill-payment flow, so `BaseBillViewModel` is not used
+**ViewModel base class:** `AndroidViewModel`
 
 **Key things to know:**
 - Both tabs load their data up-front in `onCreate()` — tab switching is purely visual (no re-fetch)
@@ -124,7 +124,7 @@ Displays referral code and link with copy and share actions. Shows a shimmer pla
 - `getProfile` / `getWalletBalance` — `Authorization: Bearer <token>` header only
 - `getReferralRewards` — `Authorization: Bearer <token>` header only
 
-**ViewModel base class:** `AndroidViewModel` — My Account has no bill-payment flow, so `BaseBillViewModel` is not used here.
+**ViewModel base class:** `AndroidViewModel`
 
 ---
 

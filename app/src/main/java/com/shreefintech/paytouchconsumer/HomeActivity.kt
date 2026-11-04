@@ -652,7 +652,7 @@ class HomeActivity : BaseActivity() {
 
                 binding.llFastag -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-FASTAG): open BillPayActivity for CategoryType.FASTAG once the backend routes it — iOS shows "Coming soon" too
+                    // TODO(B2C-303): open BillPayActivity for CategoryType.FASTAG once the backend routes it — iOS shows "Coming soon" too
                     ToastUtil.showWarning(mActivity, getString(R.string.labelComingSoon))
                 }
 
