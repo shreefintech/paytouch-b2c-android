@@ -156,8 +156,11 @@ object Constant {
     // Required prefixes of upi_intent_url / payment_link before the app opens them
     const val TOPUP_UPI_URL_PREFIX = "upi://"
     const val TOPUP_PAYMENT_LINK_PREFIX = "https://"
-    // GET wallet/statement `wallet` filter (main, referral, bonus, earning) — My Wallet lists show main
+    // GET wallet/statement `wallet` filter — one per My Wallet → Wallet sub tab (WalletHistoryTab)
     const val WALLET_STATEMENT_MAIN = "main"
+    const val WALLET_STATEMENT_BONUS = "bonus"
+    const val WALLET_STATEMENT_REFERRAL = "referral"
+    const val WALLET_STATEMENT_EARNING = "earning"
     const val WALLET_DIRECTION_CREDIT = "credit"
 
     // Fee preview payment_method_type values — the user picks the method on HDFC's page

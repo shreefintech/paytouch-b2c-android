@@ -21,6 +21,7 @@ import com.shreefintech.paytouchconsumer.databinding.ItemDetailRowBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletHistoryDetailPassItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletHistoryDetailPassItem.Source
+import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.billpay.BillPayTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupItem
@@ -62,6 +63,12 @@ class TransactionHistoryDetailActivity : BaseActivity() {
                     putExtra(EXTRA_TRANSACTION_ID, transactionId)
                 }
             )
+        }
+
+        // My Wallet history row: its detail item when set, else the legacy transaction id
+        fun start(context: Context, row: WalletTransactionItem) {
+            val detail = row.detail
+            if (detail != null) start(context, detail) else start(context, row.transactionId)
         }
 
         fun start(context: Context, item: WalletHistoryDetailPassItem) {
@@ -219,7 +226,7 @@ class TransactionHistoryDetailActivity : BaseActivity() {
         // Platform Fee = charge + gst_amount
         val charge = data.charge
         val gst = data.gstAmount
-        val platformFee = if (charge == null && gst == null) null else ((charge ?: 0.0) + (gst ?: 0.0)).toString()
+        val platformFee = if (charge == null && gst == null) null else (charge ?: 0.0) + (gst ?: 0.0)
         showWalletDetail(
             amount        = data.amount?.toString() ?: item.amount,
             status        = data.status,
@@ -229,7 +236,7 @@ class TransactionHistoryDetailActivity : BaseActivity() {
                 R.string.labelBiller to data.billerName,
                 R.string.labelOperatorReference to data.providerRef,
                 R.string.labelPlatformFee to platformFee?.let { Utility.formatAmount(it) },
-                R.string.labelTotalAmount to data.totalAmount?.let { Utility.formatAmount(it.toString()) },
+                R.string.labelTotalAmount to data.totalAmount?.let { Utility.formatAmount(it) },
                 R.string.labelFailureReason to data.failureReason
             )
         )
@@ -238,8 +245,8 @@ class TransactionHistoryDetailActivity : BaseActivity() {
     private fun populateTopup(item: WalletHistoryDetailPassItem, data: WalletTopupItem) {
         showWalletDetail(
             amount        = data.amount ?: item.amount,
-            status        = data.status,
-            // Tone follows the top-up result rule: open → pending, final success set → success, on_hold → pending
+            // An open top-up reads "Pending" whatever its raw status; tone follows resultStatus()
+            status        = if (data.isFinal == true) data.status else Constant.TOPUP_STATUS_PENDING,
             toneStatus    = data.resultStatus(),
             transactionId = data.clientReference ?: item.clientReference,
             createdAt     = data.createdAt ?: item.createdAt,

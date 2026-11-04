@@ -4,22 +4,17 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
-import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.ApiClient
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusRewardItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletHistoryItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.VirtualAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupFeeItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalFeeItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletStatementItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupRequest
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalItem
@@ -46,7 +41,6 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
         private const val WITHDRAW_POLL_MAX_ATTEMPTS = 10
         // 503 = payouts unavailable, nothing debited — a plain failure, not an unknown outcome
         private const val HTTP_SERVICE_UNAVAILABLE = 503
-        private const val REFERRAL_PER_PAGE = 50
     }
 
     override fun onCleared() {
@@ -266,75 +260,6 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             maxAttempts = WITHDRAW_POLL_MAX_ATTEMPTS,
             onResult = onResult
         )
-    }
-
-    fun fetchRecentHistory(
-        onSuccess: (ArrayList<WalletTransactionItem>) -> Unit,
-        onError: (String) -> Unit
-    ) {
-        if (!Utility.isInternetAvailable(getApplication())) {
-            onError(getString(R.string.msgNoInternet))
-            return
-        }
-        // Recent list: first 2 rows of the main-wallet statement
-        ApiClient.apiService.getWalletStatement(bearerToken(), Constant.WALLET_STATEMENT_MAIN, perPage = 2, cursor = null)
-            .enqueue(object : Callback<WalletStatementItem> {
-                override fun onResponse(
-                    call: Call<WalletStatementItem>,
-                    response: Response<WalletStatementItem>
-                ) {
-                    val body = response.body()
-                    if (response.isSuccessful && body?.success == true) {
-                        val list = ArrayList<WalletTransactionItem>()
-                        body.data?.forEach { list.add(WalletTransactionItem.from(it)) }
-                        onSuccess(list)
-                    } else {
-                        onError(
-                            ApiHelper.parseErrorMessage(
-                                getApplication(), response.code(), response.errorBody()?.string()
-                            )
-                        )
-                    }
-                }
-
-                override fun onFailure(call: Call<WalletStatementItem>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
-                }
-            })
-    }
-
-    // GET rewards/referral rows, mapped to the row shape ReferralHistoryAdp renders
-    fun fetchReferralHistory(
-        onSuccess: (List<BonusWalletHistoryItem>) -> Unit,
-        onError: (String) -> Unit
-    ) {
-        if (!Utility.isInternetAvailable(getApplication())) {
-            onError(getString(R.string.msgNoInternet))
-            return
-        }
-        // TODO(B2C-298): first page only — add paging when users hold more than REFERRAL_PER_PAGE referral rows
-        ApiClient.apiService.getReferralHistory(bearerToken(), page = 1, perPage = REFERRAL_PER_PAGE)
-            .enqueue(object : Callback<General<List<BonusRewardItem>>> {
-                override fun onResponse(
-                    call: Call<General<List<BonusRewardItem>>>,
-                    response: Response<General<List<BonusRewardItem>>>
-                ) {
-                    val data = response.body()?.data
-                    if (response.isSuccessful && data != null) {
-                        onSuccess(data.map { it.toHistoryItem() })
-                    } else {
-                        onError(
-                            ApiHelper.parseErrorMessage(
-                                getApplication(), response.code(), response.errorBody()?.string()
-                            )
-                        )
-                    }
-                }
-
-                override fun onFailure(call: Call<General<List<BonusRewardItem>>>, t: Throwable) {
-                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
-                }
-            })
     }
 
     fun fetchEarningWallet(

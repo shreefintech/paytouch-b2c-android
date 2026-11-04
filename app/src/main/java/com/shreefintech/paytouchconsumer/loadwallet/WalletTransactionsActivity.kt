@@ -82,11 +82,7 @@ class WalletTransactionsActivity : BaseActivity() {
     private fun setupAdapter() {
         transactionAdp = WalletTransactionAdp(mActivity, transactionList)
         transactionAdp.onClickItem = { row ->
-            if (!Utility.stopClick()) {
-                val detail = row.detail
-                if (detail != null) TransactionHistoryDetailActivity.start(mActivity, detail)
-                else TransactionHistoryDetailActivity.start(mActivity, row.transactionId)
-            }
+            if (!Utility.stopClick()) TransactionHistoryDetailActivity.start(mActivity, row)
         }
 
         binding.rvTransactions.apply {

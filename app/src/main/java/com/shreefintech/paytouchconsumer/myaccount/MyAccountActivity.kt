@@ -155,7 +155,7 @@ class MyAccountActivity : BaseActivity() {
         viewModel.getWalletBalance(
             onSuccess = onSuccess@{ data ->
                 if (isDestroyed) return@onSuccess
-                binding.tvBalance.text = if (data.mainWallet != null) Utility.formatAmount(data.mainWallet) else "--"
+                binding.tvBalance.text = Utility.formatAmount(data.mainWallet ?: "0")
             },
             onError = onError@{ msg ->
                 if (isDestroyed) return@onError
@@ -222,7 +222,7 @@ class MyAccountActivity : BaseActivity() {
 
         binding.tvReferralCode.text = code
         binding.tvReferralLink.text = link
-        binding.tvTotalEarnings.text = Utility.formatAmount(data.totalEarnings)
+        binding.tvTotalEarnings.text = Utility.formatAmount(data.totalEarnings ?: "0")
 
         // Store referral code in SharedPreferences for sharing
         if (code != "--") {

@@ -139,7 +139,7 @@ Both live once in `BillPayTransactionsViewModel` and take the `CategoryType`:
 
 | Field | Value |
 |---|---|
-| `transactionId` | `item.clientReference ?: "--"` |
+| `transactionId` | `txn_reference`, else `client_reference` (`txnReferenceOf(item)`) — the Transaction ID on every Bill Pay screen |
 | `userId` | `item.clientReference ?: "--"` — the API has no numeric id; **never** a loop index |
 | `date` (`TransactionItem`) | `item.createdAt ?: "--"` — raw; `TransactionDetailActivity` formats it with `"dd/MM/yyyy"` |
 | `date` (`RecentTransactionItem`) | `Utility.formatDate(item.createdAt, "dd MMM yyyy")` — pre-formatted |
@@ -147,7 +147,8 @@ Both live once in `BillPayTransactionsViewModel` and take the `CategoryType`:
 | `platformFee` | `Utility.formatAmount(charge + gst_amount)` |
 | `totalPayable` | `Utility.formatAmount(amount + charge + gst_amount)` |
 | `mobileNumber` / `accountNumber` | First `input_params` value other than `circle_code` (`accountNumber(item)`) |
-| `referenceId` / `reference` | `provider_ref`, else `txn_reference`, else `client_reference` (`referenceOf(item)`) |
+| `referenceId` (`TransactionItem`) | `provider_ref`, else `txn_reference`, else `client_reference` (`referenceOf(item)`) |
+| `reference` (`RecentTransactionItem`) | `txnReferenceOf(item)` — same Transaction ID as above |
 | `categoryIconRes` | `category.iconRes` |
 | `isMobileCategory` / `isVehicleCategory` | From `CategoryType` — never hard-code in the adapter |
 | `categoryType` | The `CategoryType` — drives View Receipt in `TransactionDetailActivity` |

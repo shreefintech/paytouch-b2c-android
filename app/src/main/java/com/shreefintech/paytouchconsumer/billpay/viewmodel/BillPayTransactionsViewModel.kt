@@ -162,9 +162,9 @@ class BillPayTransactionsViewModel(application: Application) : AndroidViewModel(
             ?: "--"
     }
 
-    // Transaction ID shown on every Bill Pay screen
+    // Transaction ID shown on every Bill Pay screen: txn_reference, else client_reference (old/imported payments)
     fun txnReferenceOf(item: BillPayTransactionItem): String =
-        item.txnReference?.takeIf { it.isNotBlank() } ?: "--"
+        item.txnReference?.takeIf { it.isNotBlank() } ?: item.clientReference ?: "--"
 
     // Reference row: provider_ref, else txn_reference, else client_reference
     fun referenceOf(item: BillPayTransactionItem): String =

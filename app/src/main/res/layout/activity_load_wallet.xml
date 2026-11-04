@@ -1181,7 +1181,7 @@
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
 
-                    <!-- Sub tabs — labels set by selectRecentTab(): Main / Bonus / Referral / Earning or
+                    <!-- Sub tabs — labels set by updateHistoryTabVisuals(): Main / Bonus / Referral / Earning or
                          Withdrawals / Bonus / Cashback / Referral -->
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1309,7 +1309,7 @@
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
 
-                    <!-- Recent items list (wallet or referral based on tab) -->
+                    <!-- History preview: 2 rows of the selected sub tab -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvTransactions"
                         android:layout_width="match_parent"

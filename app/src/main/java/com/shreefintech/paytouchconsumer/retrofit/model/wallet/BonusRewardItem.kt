@@ -19,7 +19,7 @@ data class BonusRewardItem(
         private val DEBIT_KINDS = setOf("reversal", "cashback_reversal", "spend")
     }
 
-    // Maps onto the row shape ReferralHistoryAdp already renders
+    // Signed row shape read by WalletTransactionItem.from(BonusRewardItem)
     fun toHistoryItem() = BonusWalletHistoryItem(
         type        = if (kind?.lowercase() in DEBIT_KINDS) "debit" else "credit",
         amount      = amount?.let { kotlin.math.abs(it) },

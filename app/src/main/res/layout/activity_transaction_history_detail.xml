@@ -350,7 +350,7 @@
                                     android:textSize="@dimen/text_size_13"
                                     tools:text="₹2079.00" />
                             </LinearLayout>
-                            <!-- Wallet history detail rows (label + value), filled by populateWalletRows() -->
+                            <!-- Wallet history detail rows (label + value), filled by showWalletDetail() -->
                             <LinearLayout
                                 android:id="@+id/llWalletRows"
                                 android:layout_width="match_parent"

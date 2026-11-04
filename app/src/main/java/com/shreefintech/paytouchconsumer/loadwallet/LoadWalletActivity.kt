@@ -405,7 +405,7 @@ class LoadWalletActivity : BaseActivity() {
 
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvPaymentMode.text = mode
-        dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
+        dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance ?: "0")
         dialogBinding.tvFee.text = "--"
         dialogBinding.tvTotal.text = "--"
 
@@ -662,7 +662,7 @@ class LoadWalletActivity : BaseActivity() {
         viewModel.fetchEarningWallet(
             onSuccess = { data ->
                 showProgressEarning.set(false)
-                binding.tvEarningBalance.text = Utility.formatAmount(data.principal)
+                binding.tvEarningBalance.text = Utility.formatAmount(data.principal ?: "0")
             },
             onError = {
                 showProgressEarning.set(false)
@@ -749,7 +749,7 @@ class LoadWalletActivity : BaseActivity() {
         }
 
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
-        dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
+        dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance ?: "0")
 
         dialog.show()
         bindTopupFees(dialogBinding, amount)
@@ -904,11 +904,11 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun populateWalletBalance(data: WalletBalanceItem) {
-        // live_balance when sent, else main_wallet; every bucket is null until the user has a wallet → shown as 0
-        currentWalletBalance = if (data.hasWallet == false) "0" else data.liveBalance ?: data.mainWallet
+        // live_balance when sent, else main_wallet; a null bucket (e.g. no wallet yet) is shown as ₹0.00
+        currentWalletBalance = if (data.hasWallet == false) "0" else data.liveBalance ?: data.mainWallet ?: "0"
         binding.tvWalletBalance.text = Utility.formatAmount(currentWalletBalance)
         binding.tvVaWalletBalance.text = Utility.formatAmount(currentWalletBalance)
-        binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet)
+        binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet ?: "0")
     }
 
     // My Wallet preview — 2 rows of the selected sub tab. No toast on error: fetchVirtualAccount() already
@@ -987,19 +987,14 @@ class LoadWalletActivity : BaseActivity() {
 
     private fun setupRecyclerView() {
         transactionAdp = WalletTransactionAdp(mActivity, transactionList)
-        transactionAdp.onClickItem = { row -> openHistoryDetail(row) }
+        transactionAdp.onClickItem = { row ->
+            if (!Utility.stopClick()) TransactionHistoryDetailActivity.start(mActivity, row)
+        }
         binding.rvTransactions.layoutManager = LinearLayoutManager(mActivity)
         binding.rvTransactions.adapter = transactionAdp
         // Keep both views hidden until fetchHistoryPreview() resolves — avoids flashing "No transactions" while loading
         binding.tvNoTransactions.visibility = View.GONE
         binding.rvTransactions.visibility = View.GONE
-    }
-
-    private fun openHistoryDetail(row: WalletTransactionItem) {
-        if (Utility.stopClick()) return
-        val detail = row.detail
-        if (detail != null) TransactionHistoryDetailActivity.start(mActivity, detail)
-        else TransactionHistoryDetailActivity.start(mActivity, row.transactionId)
     }
 
     private fun updateEmptyState() {
