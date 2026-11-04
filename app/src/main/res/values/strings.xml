@@ -998,4 +998,18 @@
     <string name="titleAddAadhaar">Add Aadhaar</string>
     <string name="msgAddAadhaarSubtitle">Your account has no Aadhaar on file. Please enter your Aadhaar number, select your state and city, and upload a clear photo to continue.</string>
 
+    <!-- Bill Pay (shared screen for every category) -->
+    <string name="labelSelectCircle">Select Circle</string>
+    <string name="msgSelectCircle">Please select your circle</string>
+    <string name="msgLoadingCircles">Loading circles, please wait…</string>
+    <string name="msgNoBillFound">No bill found</string>
+    <string name="msgBillerDetailsUnavailable">This company\'s details couldn\'t be loaded</string>
+    <string name="msgFieldRequired">Please enter a valid %1$s</string>
+    <string name="msgFeePreviewLoading">Fetching the platform fee, please wait…</string>
+    <string name="msgBillPayNotConfirmed">Your payment isn\'t confirmed yet. Check Recent Transactions before paying again.</string>
+    <string name="labelDetailIdentifierFmt">%1$s - %2$s</string>
+    <string name="labelIdentifierFmt">%1$s %2$s</string>
+    <string name="hintEnterField">Enter %1$s</string>
+    <string name="msgCategoriesLoadFailed">Couldn\'t load bill categories</string>
+
 </resources>

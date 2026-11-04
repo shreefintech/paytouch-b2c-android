@@ -24,7 +24,7 @@
             android:id="@+id/clRoot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:context=".electricity.transactions.SmsReceiptActivity">
+            tools:context=".billpay.transactions.SmsReceiptActivity">
 
         <!-- Toolbar -->
         <include
@@ -603,6 +603,7 @@
                                     android:tint="@color/primary" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvConfirmationTitle"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="@dimen/margin_extra_small"

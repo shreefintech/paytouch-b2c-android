@@ -4,9 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
+        <import type="android.view.View" />
+
         <variable
             name="onClickListener"
             type="android.view.View.OnClickListener" />
+
+        <variable
+            name="showProgressCategories"
+            type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -92,6 +99,7 @@
 
                         <!-- Row 1: Electricity | Gas | Prepaid -->
                         <LinearLayout
+                            android:id="@+id/llCategoryRow1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/margin_large"
@@ -238,6 +246,7 @@
 
                         <!-- Row 2: TV Cable | DTH | Fastag -->
                         <LinearLayout
+                            android:id="@+id/llCategoryRow2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/margin_extra_large"
@@ -382,6 +391,7 @@
 
                         <!-- Row 3: Loan | My Account | Tax -->
                         <LinearLayout
+                            android:id="@+id/llCategoryRow3"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/margin_extra_large"
@@ -521,6 +531,66 @@
 
                         </LinearLayout>
 
+
+                        <!-- Shown instead of the bill tiles when billpay/categories failed and nothing loaded yet -->
+                        <LinearLayout
+                            android:id="@+id/llCategoriesRetryRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:includeFontPadding="false"
+                                android:text="@string/msgCategoriesLoadFailed"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/text_size_12" />
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_small"
+                                app:cardBackgroundColor="?attr/colorPrimary"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <LinearLayout
+                                    android:id="@+id/llCategoriesRetry"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="?selectableItemBackground"
+                                    android:gravity="center"
+                                    android:onClickListener="@{onClickListener}"
+                                    android:orientation="horizontal"
+                                    android:paddingHorizontal="@dimen/margin_medium"
+                                    android:paddingVertical="@dimen/margin_small_medium">
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/proza_libre_medium"
+                                        android:includeFontPadding="false"
+                                        android:text="@string/btnRetry"
+                                        android:textColor="@color/white"
+                                        android:textSize="@dimen/text_size_12"
+                                        android:visibility="@{showProgressCategories ? View.GONE : View.VISIBLE}" />
+
+                                    <ProgressBar
+                                        style="?android:attr/progressBarStyleSmall"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:indeterminateTint="@color/white"
+                                        android:visibility="@{showProgressCategories ? View.VISIBLE : View.GONE}"
+                                        tools:visibility="gone" />
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
                     </LinearLayout>
 
                     <!-- Load Wallet — scrolls with content, last item in NestedScrollView -->

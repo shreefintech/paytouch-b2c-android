@@ -32,7 +32,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-// NOTE: extends AndroidViewModel — wallet screen IS the balance source; BaseBillViewModel's balance-check methods do not apply here
+// NOTE: extends AndroidViewModel — wallet screen IS the balance source
 class LoadWalletViewModel(application: Application) : AndroidViewModel(application) {
 
     private val pollHandler = Handler(Looper.getMainLooper())

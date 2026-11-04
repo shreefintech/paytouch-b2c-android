@@ -17,7 +17,7 @@ Handles wallet top-up via the HDFC payment gateway (WebView-based), displays wal
 
 **Launched from:** `HomeActivity` → `binding.llLoadWallet` / wallet balance area click handler
 
-**ViewModel base class:** `AndroidViewModel` — no bill-payment flow; `BaseBillViewModel` is not used
+**ViewModel base class:** `AndroidViewModel`
 
 **The Activity lifecycle dance (critical to understand):**
 1. User taps "Proceed" → `createHdfcOrder()` → HDFC returns a `payUrl`

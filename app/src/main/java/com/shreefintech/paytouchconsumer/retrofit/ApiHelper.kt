@@ -74,7 +74,8 @@ object ApiHelper {
     /**
      * Money-call 403s. Codes that name a KYC step (`AADHAAR_REQUIRED`, `KYC_RESUBMIT_REQUIRED`) open it via
      * [NextStepRouter]; `USER_BLOCKED` logs out like a 401. Others (`BANK_DETAILS_REQUIRED`, `LOCATION_REQUIRED`)
-     * only show the message. NEW_TASK because most callers pass the Application context.
+     * only show the message here — BillPayActivity reads them via [parseErrorCode] to open the bank popup / resend
+     * location. NEW_TASK because most callers pass the Application context.
      */
     private fun onForbidden(context: Context, errorCode: String?) {
         if (errorCode.isNullOrEmpty() || !SharedPreferenceHelper.isLoggedIn(context)) return
@@ -92,6 +93,17 @@ object ApiHelper {
             context.startActivity(NextStepRouter.intentFor(context, nextStep, null).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             })
+        }
+    }
+
+    /** Top-level `error_code` of an error body (403 money calls), or null. Pass the same string given to [parseErrorMessage]. */
+    fun parseErrorCode(errorBody: String?): String? {
+        if (errorBody.isNullOrEmpty()) return null
+        return try {
+            Gson().fromJson(errorBody, ErrorBodyItem::class.java)?.errorCode
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 

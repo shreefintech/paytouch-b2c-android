@@ -10,6 +10,8 @@ import android.text.InputFilter
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.Space
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -33,22 +35,18 @@ import com.shreefintech.paytouchconsumer.databinding.DialogConfirmLogoutBinding
 import com.shreefintech.paytouchconsumer.databinding.DialogReuploadAadhaarBinding
 import com.shreefintech.paytouchconsumer.auth.LoginActivity
 import com.shreefintech.paytouchconsumer.auth.NextStepRouter
+import com.shreefintech.paytouchconsumer.billpay.BillPayActivity
+import com.shreefintech.paytouchconsumer.enums.CategoryType
 import com.shreefintech.paytouchconsumer.databinding.ActivityHomeBinding
-import com.shreefintech.paytouchconsumer.dth.DthActivity
-import com.shreefintech.paytouchconsumer.electricity.ElectricityActivity
-import com.shreefintech.paytouchconsumer.gas.GasActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.LoadWalletActivity
 import com.shreefintech.paytouchconsumer.location.LocationPermissionHelper
-import com.shreefintech.paytouchconsumer.loan.LoanActivity
-import com.shreefintech.paytouchconsumer.municipaltax.MunicipalTaxActivity
 import com.shreefintech.paytouchconsumer.myaccount.MyAccountActivity
-import com.shreefintech.paytouchconsumer.postpaid.PostpaidActivity
-import com.shreefintech.paytouchconsumer.prepaid.PrepaidActivity
 import com.shreefintech.paytouchconsumer.retrofit.model.CityItem
 import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
 import com.shreefintech.paytouchconsumer.utill.loadAddressCities
 import com.shreefintech.paytouchconsumer.utill.loadAddressStates
+import com.shreefintech.paytouchconsumer.utill.sendLocation
 import com.shreefintech.paytouchconsumer.widget.CustomDropdown
 // import com.shreefintech.paytouchconsumer.rewards.LevelUpActivity  // TODO(B2C-147): restore with checkLevelUp
 import androidx.databinding.ObservableBoolean
@@ -87,6 +85,11 @@ class HomeActivity : BaseActivity() {
 
     // True when the location flow ended while Home was not in front — asked again in onResume()
     private var isNotificationPermissionPending = false
+
+    // ── Bill Pay tiles (billpay/categories) ──
+    private val showProgressCategories = ObservableBoolean(false)
+    private var hasLoadedCategories = false
+    private var hasRequestedCategories = false
 
     // ── Aadhaar dialog (blocking — resubmit when both Aadhaar items are rejected, add when next_step is aadhaar_required) ──
     private val showProgressAadhaar = ObservableBoolean(false)
@@ -136,8 +139,12 @@ class HomeActivity : BaseActivity() {
         val listener = onClickListener()
         binding.onClickListener = listener
         binding.lytToolbar.onClickListener = listener
+        binding.showProgressCategories = showProgressCategories
         onBack()
         setupAadhaarPicker()
+        // Bill tiles stay hidden until billpay/categories says which ones have billers
+        layoutCategoryTiles(emptySet())
+        loadBillPayCategories(showError = true)
 
         // Skip on config change / process restore — once per Home launch is enough
         if (savedInstanceState == null) {
@@ -170,6 +177,70 @@ class HomeActivity : BaseActivity() {
         //     }
         // }
         if (isNotificationPermissionPending) requestNotificationPermission()
+        // Refresh on every return to the Dashboard — silent; the first load (onCreate) and Retry show errors
+        if (hasRequestedCategories && !showProgressCategories.get()) loadBillPayCategories(showError = false)
+    }
+
+    // ── Bill Pay tiles ────────────────────────────────────────
+
+    private fun loadBillPayCategories(showError: Boolean) {
+        hasRequestedCategories = true
+        viewModel.loadBillPayCategories(
+            onLoading = { showProgressCategories.set(true) },
+            onSuccess = onSuccess@{ categories ->
+                showProgressCategories.set(false)
+                if (isDestroyed) return@onSuccess
+                hasLoadedCategories = true
+                binding.llCategoriesRetryRow.gone()
+                // Listed categories with no tile (broadband_postpaid, water, insurance, …) are ignored
+                layoutCategoryTiles(categories.map { CategoryType.from(it.category) }.toSet())
+            },
+            onError = onError@{ msg ->
+                showProgressCategories.set(false)
+                if (isDestroyed) return@onError
+                // Keep the last good tiles; only a never-loaded Dashboard swaps them for the Retry row
+                if (!hasLoadedCategories) binding.llCategoriesRetryRow.visible()
+                if (showError) ToastUtil.showDelete(mActivity, msg)
+            }
+        )
+    }
+
+    /** Shows the tiles of [categories] (plus My Account, always) in rows of three, in the layout's order. */
+    private fun layoutCategoryTiles(categories: Set<CategoryType>) {
+        val tiles = listOf(
+            CategoryType.ELECTRICITY to binding.llElectricity,
+            CategoryType.GAS to binding.llGas,
+            CategoryType.PREPAID to binding.llPrepaid,
+            CategoryType.POSTPAID to binding.llPostpaid,
+            CategoryType.DTH to binding.llDth,
+            CategoryType.FASTAG to binding.llFastag,
+            CategoryType.LOAN to binding.llLoan,
+            CategoryType.MUNICIPAL_TAX to binding.llTax,
+            null to binding.llMyAccount
+        ).mapNotNull { (category, tile) ->
+            // The card wraps the clickable LinearLayout
+            val card = tile.parent as? View ?: return@mapNotNull null
+            card to (category == null || category in categories)
+        }
+        val rows = listOf(binding.llCategoryRow1, binding.llCategoryRow2, binding.llCategoryRow3)
+        rows.forEach { it.removeAllViews() }
+        val shown = tiles.filter { it.second }.map { it.first }
+        tiles.filterNot { it.second }.forEach { (card, _) -> card.gone() }
+        val gap = resources.getDimensionPixelSize(R.dimen.margin_small)
+        shown.chunked(TILES_PER_ROW).forEachIndexed { rowIndex, rowTiles ->
+            val row = rows.getOrNull(rowIndex) ?: return@forEachIndexed
+            (0 until TILES_PER_ROW).forEach { column ->
+                // Empty slots keep the remaining tiles at a third of the width
+                val view = rowTiles.getOrNull(column)?.also { it.visible() } ?: Space(mActivity)
+                val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                params.marginStart = if (column > 0) gap else 0
+                params.marginEnd = if (column < TILES_PER_ROW - 1) gap else 0
+                row.addView(view, params)
+            }
+        }
+        rows.forEachIndexed { index, row ->
+            row.visibility = if (index < (shown.size + TILES_PER_ROW - 1) / TILES_PER_ROW) View.VISIBLE else View.GONE
+        }
     }
 
     // Never pop the system dialog over another screen (e.g. a category opened mid location fix)
@@ -555,43 +626,50 @@ class HomeActivity : BaseActivity() {
 
                 binding.llElectricity -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, ElectricityActivity::class.java))
+                    BillPayActivity.start(mActivity, CategoryType.ELECTRICITY)
                 }
 
                 binding.llGas -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, GasActivity::class.java))
+                    BillPayActivity.start(mActivity, CategoryType.GAS)
                 }
 
                 binding.llPrepaid -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, PrepaidActivity::class.java))
+                    BillPayActivity.start(mActivity, CategoryType.PREPAID)
                 }
 
                 binding.llPostpaid -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, PostpaidActivity::class.java))
+                    BillPayActivity.start(mActivity, CategoryType.POSTPAID)
                 }
 
                 binding.llDth -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, DthActivity::class.java))
+                    BillPayActivity.start(mActivity, CategoryType.DTH)
 
                 }
 
                 binding.llFastag -> {
                     if (Utility.stopClick()) return@OnClickListener
+                    // TODO(B2C-303): open BillPayActivity for CategoryType.FASTAG once the backend routes it — iOS shows "Coming soon" too
                     ToastUtil.showWarning(mActivity, getString(R.string.labelComingSoon))
                 }
 
                 binding.llLoan -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, LoanActivity::class.java))
+                    BillPayActivity.start(mActivity, CategoryType.LOAN)
                 }
 
                 binding.llTax -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    startActivity(Intent(mActivity, MunicipalTaxActivity::class.java))
+                    BillPayActivity.start(mActivity, CategoryType.MUNICIPAL_TAX)
+                }
+
+                binding.llCategoriesRetry -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressCategories.get()) return@OnClickListener
+                    loadBillPayCategories(showError = true)
                 }
 
                 binding.llMyAccount -> {
@@ -635,5 +713,9 @@ class HomeActivity : BaseActivity() {
 
             }
         }
+    }
+
+    companion object {
+        private const val TILES_PER_ROW = 3
     }
 }

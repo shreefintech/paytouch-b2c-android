@@ -57,6 +57,27 @@ object Constant {
     // Bill payment receipt — success status (compared case-insensitively)
     const val PAYMENT_STATUS_SUCCESS = "success"
 
+    // Bill Pay (api/mobile/billpay) — default account param keys when a biller sends input_params: []
+    const val BILLPAY_PARAM_CONSUMER_NUMBER = "consumer_number"
+    const val BILLPAY_PARAM_MOBILE_NUMBER = "mobile_number"
+    const val BILLPAY_PARAM_CIRCLE_CODE = "circle_code"
+    // Imported old payments (transactions rows): input_params = {source: "old_b2c", identifier: "<account>"}
+    const val BILLPAY_PARAM_IDENTIFIER = "identifier"
+    const val BILLPAY_PARAM_SOURCE = "source"
+    // Bill Pay status values — final: success / failed / expired; open: pending / processing / unconfirmed
+    const val BILLPAY_STATUS_SUCCESS = "success"
+    const val BILLPAY_STATUS_FAILED = "failed"
+    const val BILLPAY_STATUS_EXPIRED = "expired"
+    const val BILLPAY_STATUS_PENDING = "pending"
+    const val BILLPAY_STATUS_PROCESSING = "processing"
+    const val BILLPAY_STATUS_UNCONFIRMED = "unconfirmed"
+    // 403 error_code values handled by the Bill Pay screen (others are handled in ApiHelper)
+    const val ERROR_CODE_BANK_DETAILS_REQUIRED = "BANK_DETAILS_REQUIRED"
+    const val ERROR_CODE_LOCATION_REQUIRED = "LOCATION_REQUIRED"
+    // Status polling after pay
+    const val BILLPAY_POLL_INTERVAL_MS = 2500L
+    const val BILLPAY_POLL_MAX_ATTEMPTS = 24
+
     // KYC local files (under filesDir, exposed via file_provider_paths.xml) — each owning
     // Activity deletes its own directory when it finishes so ID documents are not retained.
     const val KYC_SELFIE_DIR = "kyc"

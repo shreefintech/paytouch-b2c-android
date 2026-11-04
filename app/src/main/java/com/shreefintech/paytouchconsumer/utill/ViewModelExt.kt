@@ -1,6 +1,7 @@
 package com.shreefintech.paytouchconsumer.utill
 
 import android.app.Application
+import android.location.Location
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import com.shreefintech.paytouchconsumer.Constant
@@ -11,6 +12,8 @@ import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.CityItem
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.StateItem
+import com.shreefintech.paytouchconsumer.retrofit.model.auth.MessageItem
+import com.shreefintech.paytouchconsumer.retrofit.model.location.UserLocationRequest
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,6 +34,31 @@ fun AndroidViewModel.saveOnboardingFlags(bankDetailsAdded: Boolean?, panAdded: B
     panAdded?.let {
         SharedPreferenceHelper.setSharedPreferenceBoolean(getApplication(), Constant.KEY_PAN_ADDED, it)
     }
+}
+
+/**
+ * POST location — required once per app open before billpay/pay (403 LOCATION_REQUIRED otherwise).
+ * Sent from Home and resent by Bill Pay after that 403. Failures are not shown to the user.
+ */
+fun AndroidViewModel.sendLocation(location: Location) {
+    if (!Utility.isInternetAvailable(getApplication())) return
+    val body = UserLocationRequest(
+        latitude = location.latitude,
+        longitude = location.longitude,
+        accuracy = if (location.hasAccuracy()) location.accuracy.toDouble() else null
+    )
+    ApiClient.apiService.sendLocation(bearerToken(), body)
+        .enqueue(object : Callback<MessageItem> {
+            override fun onResponse(call: Call<MessageItem>, response: Response<MessageItem>) {
+                if (!response.isSuccessful) {
+                    IllegalStateException("sendLocation failed: HTTP ${response.code()}").printStackTrace()
+                }
+            }
+
+            override fun onFailure(call: Call<MessageItem>, t: Throwable) {
+                t.printStackTrace()
+            }
+        })
 }
 
 fun AndroidViewModel.loadAddressStates(
