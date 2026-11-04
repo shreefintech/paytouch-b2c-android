@@ -22,6 +22,7 @@ data class BillPayTransactionItem(
     @field:SerializedName("failure_reason")   val failureReason: String? = null,
     @field:SerializedName("charge")           val charge: Double? = null,
     @field:SerializedName("gst_amount")       val gstAmount: Double? = null,
+    @field:SerializedName("total_amount")     val totalAmount: Double? = null,
     @field:SerializedName("created_at")       val createdAt: String? = null,
     @field:SerializedName("updated_at")       val updatedAt: String? = null
 )

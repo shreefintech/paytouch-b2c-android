@@ -21,8 +21,8 @@ import com.shreefintech.paytouchconsumer.databinding.ItemDetailRowBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletHistoryDetailPassItem
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletHistoryDetailPassItem.Source
+import com.shreefintech.paytouchconsumer.retrofit.model.billpay.BillPayTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BillPayStatusItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalItem
 import com.shreefintech.paytouchconsumer.transactions.viewmodel.TransactionHistoryDetailViewModel
@@ -215,13 +215,13 @@ class TransactionHistoryDetailActivity : BaseActivity() {
         )
     }
 
-    private fun populateBillPay(item: WalletHistoryDetailPassItem, data: BillPayStatusItem) {
+    private fun populateBillPay(item: WalletHistoryDetailPassItem, data: BillPayTransactionItem) {
         // Platform Fee = charge + gst_amount
-        val charge = data.charge?.toDoubleOrNull()
-        val gst = data.gstAmount?.toDoubleOrNull()
+        val charge = data.charge
+        val gst = data.gstAmount
         val platformFee = if (charge == null && gst == null) null else ((charge ?: 0.0) + (gst ?: 0.0)).toString()
         showWalletDetail(
-            amount        = data.amount ?: item.amount,
+            amount        = data.amount?.toString() ?: item.amount,
             status        = data.status,
             transactionId = data.clientReference ?: item.clientReference,
             createdAt     = data.createdAt ?: item.createdAt,
@@ -229,7 +229,7 @@ class TransactionHistoryDetailActivity : BaseActivity() {
                 R.string.labelBiller to data.billerName,
                 R.string.labelOperatorReference to data.providerRef,
                 R.string.labelPlatformFee to platformFee?.let { Utility.formatAmount(it) },
-                R.string.labelTotalAmount to data.totalAmount?.let { Utility.formatAmount(it) },
+                R.string.labelTotalAmount to data.totalAmount?.let { Utility.formatAmount(it.toString()) },
                 R.string.labelFailureReason to data.failureReason
             )
         )

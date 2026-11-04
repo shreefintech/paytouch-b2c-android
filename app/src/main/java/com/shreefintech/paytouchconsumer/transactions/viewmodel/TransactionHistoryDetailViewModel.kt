@@ -8,7 +8,7 @@ import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.retrofit.ApiHelper
 import com.shreefintech.paytouchconsumer.retrofit.model.General
 import com.shreefintech.paytouchconsumer.retrofit.model.transactions.TransactionHistoryDetailItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BillPayStatusItem
+import com.shreefintech.paytouchconsumer.retrofit.model.billpay.BillPayTransactionItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletTopupItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalItem
 import com.shreefintech.paytouchconsumer.utill.bearerToken
@@ -59,7 +59,7 @@ class TransactionHistoryDetailViewModel(application: Application) : AndroidViewM
     fun loadBillPayStatus(
         clientReference: String,
         onLoading: () -> Unit,
-        onSuccess: (BillPayStatusItem) -> Unit,
+        onSuccess: (BillPayTransactionItem) -> Unit,
         onNotFound: () -> Unit,
         onError: (String) -> Unit
     ) = loadWalletDetail(
