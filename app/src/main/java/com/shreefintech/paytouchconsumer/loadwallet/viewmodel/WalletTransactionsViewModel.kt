@@ -151,7 +151,7 @@ class WalletTransactionsViewModel(application: Application) : AndroidViewModel(a
             })
     }
 
-    // rewards/bonus and rewards/referral — first page only (doc); lastPage is always true
+    // TODO(B2C-309): rewards/bonus and rewards/referral load the first page only (doc); paginate once the doc confirms meta — lastPage is always true
     private fun loadRewards(
         isReferral: Boolean,
         perPage: Int,

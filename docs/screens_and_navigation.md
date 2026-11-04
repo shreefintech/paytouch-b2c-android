@@ -259,7 +259,7 @@ View Receipt → `SmsReceiptActivity` with the row's `client_reference`.
 
 ### ✅ Load Wallet Module
 
-Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules — no bill-fetch, no operator selection, no `BaseBillViewModel`. See `loadwallet/README.md` for the full payment flow and return-URL interception detail.
+Wallet top-up via HDFC payment gateway. Distinct from all bill-payment modules — no bill-fetch, no operator selection. See `loadwallet/README.md` for the full payment flow and return-URL interception detail.
 
 | Screen | Class | Package |
 |---|---|---|

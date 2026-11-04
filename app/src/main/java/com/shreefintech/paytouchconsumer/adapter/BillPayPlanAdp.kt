@@ -101,6 +101,7 @@ class BillPayPlanAdp(
         }
 
         holder.binding.root.setOnClickListener {
+            if (Utility.stopClick()) return@setOnClickListener
             val pos = holder.bindingAdapterPosition
             if (pos != RecyclerView.NO_POSITION) {
                 onClickItem?.invoke(mArrayList[pos])

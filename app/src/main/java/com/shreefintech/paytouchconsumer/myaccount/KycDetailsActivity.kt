@@ -119,7 +119,8 @@ class KycDetailsActivity : BaseActivity() {
                 populateVirtualAccount(va)
                 if (vaError != null && !isErrorShown) {
                     isErrorShown = true
-                    if (vaError.isNotEmpty()) ToastUtil.showDelete(mActivity, vaError)
+                    // Only the VA card is affected (it stays hidden) — a soft warning, like the bank card
+                    if (vaError.isNotEmpty()) ToastUtil.showWarning(mActivity, vaError)
                 }
             },
             onError = { msg ->
@@ -198,6 +199,7 @@ class KycDetailsActivity : BaseActivity() {
         item.tvBankName.text = va.bankName?.ifBlank { null } ?: "--"
         item.tvIfsc.text = va.ifsc?.ifBlank { null } ?: "--"
         item.tvBranchLabel.setText(R.string.labelUpiId)
+        item.ivBranchIcon.setImageResource(R.drawable.ic_upi)
         item.tvBranchName.text = va.vpa?.ifBlank { null } ?: "--"
         item.ivEditBank.visibility = View.GONE
         binding.llVirtualAccount.addView(item.root)

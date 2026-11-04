@@ -16,6 +16,7 @@ import com.shreefintech.paytouchconsumer.retrofit.model.billpay.BillPayTransacti
 import com.shreefintech.paytouchconsumer.utill.MoneyRequestId
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.bearerToken
+import com.shreefintech.paytouchconsumer.utill.envelopeCallback
 import com.shreefintech.paytouchconsumer.utill.getString
 import retrofit2.Call
 import retrofit2.Callback
@@ -37,7 +38,7 @@ class BillPayViewModel(application: Application) : AndroidViewModel(application)
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         onLoading()
-        ApiClient.apiService.getBillPayBillers(bearerToken(), category).enqueue(dataCallback(onSuccess, onError))
+        ApiClient.apiService.getBillPayBillers(bearerToken(), category).enqueue(envelopeCallback(onSuccess, onError))
     }
 
     fun loadCircles(
@@ -47,7 +48,7 @@ class BillPayViewModel(application: Application) : AndroidViewModel(application)
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         onLoading()
-        ApiClient.apiService.getBillPayCircles(bearerToken()).enqueue(dataCallback(onSuccess, onError))
+        ApiClient.apiService.getBillPayCircles(bearerToken()).enqueue(envelopeCallback(onSuccess, onError))
     }
 
     fun fetchBill(
@@ -60,7 +61,7 @@ class BillPayViewModel(application: Application) : AndroidViewModel(application)
         if (!Utility.isInternetAvailable(getApplication())) { onError(getString(R.string.msgNoInternet)); return }
         onLoading()
         ApiClient.apiService.fetchBillPayBill(bearerToken(), BillPayFetchBillRequest(billerId, inputParams))
-            .enqueue(dataCallback(onSuccess, onError))
+            .enqueue(envelopeCallback(onSuccess, onError))
     }
 
     fun loadFeePreview(
@@ -73,7 +74,7 @@ class BillPayViewModel(application: Application) : AndroidViewModel(application)
         feePreviewCall?.cancel()
         onLoading()
         feePreviewCall = ApiClient.apiService.getBillPayFeePreview(bearerToken(), amount).also { call ->
-            call.enqueue(dataCallback<BillPayFeePreviewItem>(onSuccess) { msg ->
+            call.enqueue(envelopeCallback<BillPayFeePreviewItem>(onSuccess) { msg ->
                 // Cancelled because a newer amount was asked for — that call reports instead
                 if (!call.isCanceled) onError(msg)
             })
@@ -133,21 +134,4 @@ class BillPayViewModel(application: Application) : AndroidViewModel(application)
                 }
             })
     }
-
-    // Envelope {data, success, meta, message} — success when HTTP 2xx and data is present
-    private fun <T> dataCallback(onSuccess: (T) -> Unit, onError: (String) -> Unit) =
-        object : Callback<General<T>> {
-            override fun onResponse(call: Call<General<T>>, response: Response<General<T>>) {
-                val data = response.body()?.data
-                if (response.isSuccessful && data != null) {
-                    onSuccess(data)
-                } else {
-                    onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
-                }
-            }
-
-            override fun onFailure(call: Call<General<T>>, t: Throwable) {
-                onError(t.localizedMessage ?: getString(R.string.errGeneric))
-            }
-        }
 }

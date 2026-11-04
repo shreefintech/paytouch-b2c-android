@@ -19,12 +19,7 @@ data class BonusRewardItem(
         private val DEBIT_KINDS = setOf("reversal", "cashback_reversal", "spend")
     }
 
-    // Signed row shape read by WalletTransactionItem.from(BonusRewardItem)
-    fun toHistoryItem() = BonusWalletHistoryItem(
-        type        = if (kind?.lowercase() in DEBIT_KINDS) "debit" else "credit",
-        amount      = amount?.let { kotlin.math.abs(it) },
-        reason      = kind,
-        description = details?.takeIf { it.isNotBlank() } ?: kind,
-        createdAt   = createdAt
-    )
+    // Read by WalletTransactionItem.from(BonusRewardItem) — the sign comes from isCredit, not amount
+    val isCredit: Boolean get() = kind?.lowercase() !in DEBIT_KINDS
+    val absAmount: Double? get() = amount?.let { kotlin.math.abs(it) }
 }

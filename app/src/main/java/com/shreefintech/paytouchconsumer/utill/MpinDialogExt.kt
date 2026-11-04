@@ -11,7 +11,7 @@ import android.widget.EditText
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.DialogMpinBinding
 
-// 4-box MPIN entry in dialog_mpin.xml — shared by Edit Profile, Edit Bank Details, Load Wallet and Earning Wallet
+// 4-box MPIN entry in dialog_mpin.xml — shared by Bill Pay, Edit Profile, Edit Bank Details, Load Wallet and Earning Wallet
 
 private val DialogMpinBinding.mpinBoxes
     get() = listOf(etMpin1, etMpin2, etMpin3, etMpin4)

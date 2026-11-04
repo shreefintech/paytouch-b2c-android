@@ -17,7 +17,7 @@ Handles wallet top-up via the HDFC payment gateway (WebView-based), displays wal
 
 **Launched from:** `HomeActivity` → `binding.llLoadWallet` / wallet balance area click handler
 
-**ViewModel base class:** `AndroidViewModel` — no bill-payment flow; `BaseBillViewModel` is not used
+**ViewModel base class:** `AndroidViewModel` (helpers from `utill/ViewModelExt.kt`)
 
 **The Activity lifecycle dance (critical to understand):**
 1. User taps "Proceed" → `createHdfcOrder()` → HDFC returns a `payUrl`
@@ -51,8 +51,8 @@ Handles wallet top-up via the HDFC payment gateway (WebView-based), displays wal
 
 ```
 LoadWalletActivity.onCreate()
-    ├── GET /api/wallet/user-data       → populateWalletData()
-    └── GET /api/wallet/combined-wallet-history (page=1, perPage=2)
+    ├── GET wallet/balance + virtual-account → balance card, VA card
+    └── GET wallet/statement (current history tab, 2 rows) via WalletTransactionsViewModel
                                         → shows last 2 transactions
 
 "Make Payment" button
@@ -157,9 +157,9 @@ Scroll listener fires `loadPage(nextPage())` when the last visible item is withi
 | `HdfcOrderResponseItem` | — | Wrapper: `success: Boolean?`, `message: String?`, `data: HdfcOrderItem?` |
 | `HdfcOrderItem` | — | `orderId`, `amount`, `status`, `paymentLinks`, `returnUrl`, `walletCreditedAt` |
 | `HdfcPaymentLinksItem` | — | `web`, `mobile`, `expiry` |
-| `WalletDataItem` | GET `api/wallet/user-data` | Wallet balance, virtual account number, IFSC, live bank balance, embedded `WalletInfoItem` |
-| `WalletInfoItem` | — | Nested inside `WalletDataItem`; `balance`, `status`, KYC flag, limits |
-| `WalletHistoryPageItem` | GET `api/wallet/combined-wallet-history` | Paginated wrapper: `data: List<WalletHistoryItem>`, `lastPage`, `currentPage` |
+| `WalletBalanceItem` | GET `api/mobile/wallet/balance` | Main / bonus / referral / earning balances |
+| `VirtualAccountItem` | GET `api/mobile/virtual-account` | `hasVirtualAccount`, `bankAcc`, `ifsc`, `vpa`, `isActive` |
+| `WalletStatementItem` | GET `api/mobile/wallet/statement` | Cursor-paginated ledger rows (`wallet` = main / bonus / referral / earning) |
 | `WalletHistoryItem` | — | `transactionId`, `amount`, `type` (`CREDIT`/`DEBIT`), `serviceName`, `createdAt`, `status` |
 
 ### Local Display DTOs — `loadwallet/model/`
@@ -179,8 +179,8 @@ All declared in `ApiService.kt` under `// ── Wallet ──` and `// ── H
 
 | Method | Path | Used by |
 |---|---|---|
-| `GET` | `api/wallet/user-data` | `LoadWalletViewModel.fetchUserWalletData()` |
-| `GET` | `api/wallet/combined-wallet-history` | `LoadWalletViewModel.fetchRecentHistory()`, `WalletTransactionsViewModel.loadHistory()` |
+| `GET` | `api/mobile/wallet/balance`, `api/mobile/virtual-account` | `LoadWalletViewModel.fetchWalletBalance()`, `fetchVirtualAccount()` |
+| `GET` | `api/mobile/wallet/statement` | `WalletTransactionsViewModel.loadHistory()` (Load Wallet preview + View All) |
 | `POST` | `api/hdfc/orders` | `LoadWalletViewModel.createHdfcOrder()` |
 | `GET` | `api/hdfc/orders/{order_id}/status` | `LoadWalletViewModel.checkOrderStatus()` |
 

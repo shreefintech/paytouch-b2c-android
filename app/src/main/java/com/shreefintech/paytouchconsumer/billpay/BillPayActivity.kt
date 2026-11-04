@@ -278,14 +278,18 @@ class BillPayActivity : BaseActivity() {
     }
 
     private fun fetchBill() {
+        if (showProgressFetch.get()) return
         val billerId = selectedBiller?.id?.toString() ?: return
+        val inputParams = collectInputParams()
         viewModel.fetchBill(
             billerId = billerId,
-            inputParams = collectInputParams(),
+            inputParams = inputParams,
             onLoading = { showProgressFetch.set(true) },
             onSuccess = { bill ->
                 showProgressFetch.set(false)
                 if (isDestroyed) return@fetchBill
+                // Company or account changed while fetching — this bill belongs to the old one
+                if (selectedBiller?.id?.toString() != billerId || collectInputParams() != inputParams) return@fetchBill
                 // has_bill false → "No bill found", no bill card, nothing to pay
                 if (bill.hasBill != true) {
                     ToastUtil.showWarning(mActivity, getString(R.string.msgNoBillFound))
@@ -307,7 +311,10 @@ class BillPayActivity : BaseActivity() {
         if ((amount.toDoubleOrNull() ?: 0.0) <= 0) return
         viewModel.loadFeePreview(
             amount = amount,
-            onLoading = {},
+            onLoading = {
+                binding.tvPlatformFee.text = getString(R.string.msgLoading)
+                binding.tvTotalPayable.text = getString(R.string.msgLoading)
+            },
             onSuccess = { preview ->
                 if (isDestroyed || amount != currentAmountText()) return@loadFeePreview
                 feePreview = preview
@@ -320,6 +327,7 @@ class BillPayActivity : BaseActivity() {
             },
             onError = { msg ->
                 if (isDestroyed) return@loadFeePreview
+                resetFeeDisplay()
                 ToastUtil.showDelete(mActivity, msg)
             }
         )

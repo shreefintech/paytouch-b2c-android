@@ -24,6 +24,9 @@ data class WalletTransactionItem(
     // Wallet history rows open TransactionHistoryDetailActivity with this; null = legacy transactionId
     val detail: WalletHistoryDetailPassItem? = null
 ) {
+    // Opens TransactionHistoryDetailActivity only when there is something to load or show
+    val isClickable: Boolean get() = detail != null || transactionId.isNotEmpty()
+
     companion object {
         // Ledger types → detail call (Wallet History API doc, 2026-11-04); every other type is row-only
         private val BILLPAY_TYPES    = setOf("billpay", "recharge", "platform_fee", "refund")
@@ -90,13 +93,12 @@ data class WalletTransactionItem(
 
         // GET rewards/bonus or rewards/referral row — no status call, always row-only detail
         fun from(item: BonusRewardItem): WalletTransactionItem {
-            val history = item.toHistoryItem()
             val title = item.details?.takeIf { it.isNotBlank() } ?: kindLabel(item.kind)
             return WalletTransactionItem(
                 title           = title,
                 date            = Utility.formatDate(item.createdAt, "dd MMM yyyy"),
-                amount          = Utility.formatAmount(history.amount?.toString()),
-                isCredit        = history.isCredit,
+                amount          = Utility.formatAmount(item.absAmount?.toString()),
+                isCredit        = item.isCredit,
                 transactionId   = "",
                 categoryIconRes = R.drawable.img_load_wallet,
                 detail          = WalletHistoryDetailPassItem(
@@ -104,7 +106,7 @@ data class WalletTransactionItem(
                     clientReference = item.clientReference,
                     txnReference    = item.txnReference,
                     description     = title,
-                    amount          = history.amount?.toString(),
+                    amount          = item.absAmount?.toString(),
                     balanceAfter    = item.walletAfter?.toString(),
                     createdAt       = item.createdAt
                 )

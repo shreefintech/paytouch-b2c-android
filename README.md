@@ -343,7 +343,6 @@ Never use `Toast.makeText()`. Always use `ToastUtil`:
 | `Utility.isInternetAvailable(context)` | Active network check — call before every API call |
 | `Utility.stopClick()` | 800ms debounce guard — call at the top of every click handler |
 | `Utility.hideKeyboard(activity)` | Dismisses soft keyboard |
-| `Utility.calculatePlatformFee(amount)` | Returns platform fee for the amount (see Business Rules) |
 | `Utility.maskNumber(number)` | Masks account/mobile number for display in list rows: `9876*****0` |
 | `Utility.formatAmount(raw)` | Formats currency (`₹1,234.50`) — `String?` and `Double?` overloads; `trimZeros = true` (plan cards only) drops `.00` |
 | `Utility.formatDate(raw, pattern)` | Formats date string — always use instead of `SimpleDateFormat` |
@@ -391,14 +390,7 @@ binding.flFetchBill.attach(binding.clRoot as ViewGroup)
 
 ### Platform Fee
 
-Applied before every payment. Use `Utility.calculatePlatformFee(amount: Double)` — never inline.
-
-| Bill amount | Fee |
-|---|---|
-| < Rs.1,000 | Rs.4 |
-| Rs.1,000 – Rs.5,000 | Rs.8 |
-| Rs.5,001 – Rs.40,000 | Rs.20 |
-| > Rs.40,000 | Rs.30 |
+Server-side only — Bill Pay shows the fee from `GET billpay/fee-preview` (Platform Fee = `fee + gst_amount`), wallet top-up / withdrawal from their own `fee-preview` calls. No client fee table (`docs/business_logic.md` §7).
 
 ### Field Validation
 

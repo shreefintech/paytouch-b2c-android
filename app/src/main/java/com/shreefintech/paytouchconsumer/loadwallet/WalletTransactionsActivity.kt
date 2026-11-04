@@ -31,6 +31,7 @@ class WalletTransactionsActivity : BaseActivity() {
 
     private val transactionList = ArrayList<WalletTransactionItem>()
     private lateinit var transactionAdp: WalletTransactionAdp
+    private var isOfflineToastShown = false
 
     private val tab by lazy {
         WalletHistoryTab.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_TAB) } ?: WalletHistoryTab.MAIN
@@ -107,9 +108,16 @@ class WalletTransactionsActivity : BaseActivity() {
 
     private fun loadPage(page: Int) {
         if (!Utility.isInternetAvailable(mActivity)) {
-            if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            if (page == 1) {
+                showNoInternet()
+            } else if (!isOfflineToastShown) {
+                // Every scroll past the threshold lands here — one toast per offline stretch
+                isOfflineToastShown = true
+                ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
+            }
             return
         }
+        isOfflineToastShown = false
         if (page == 1) hideNoInternet()
         walletTxVm.loadHistory(
             tab       = tab,

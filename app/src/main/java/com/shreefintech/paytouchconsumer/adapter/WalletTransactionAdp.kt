@@ -36,7 +36,7 @@ class WalletTransactionAdp(
             val pos = holder.bindingAdapterPosition
             if (pos != RecyclerView.NO_POSITION) {
                 val row = mArrayList[pos]
-                if (row.detail != null || row.transactionId.isNotEmpty()) onClickItem?.invoke(row)
+                if (row.isClickable) onClickItem?.invoke(row)
             }
         }
         holder.binding.apply {
@@ -52,12 +52,12 @@ class WalletTransactionAdp(
                 }
                 item.isCredit -> {
                     cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_success)
-                    tvAmount.text = root.context.getString(R.string.textCreditSign, item.amount)
+                    tvAmount.text = mContext.getString(R.string.textCreditSign, item.amount)
                     tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_success))
                 }
                 else -> {
                     cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_reject)
-                    tvAmount.text = root.context.getString(R.string.textDebitSign, item.amount)
+                    tvAmount.text = mContext.getString(R.string.textDebitSign, item.amount)
                     tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_reject))
                 }
             }

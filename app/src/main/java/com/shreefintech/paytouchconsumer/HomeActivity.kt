@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.InputFilter
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
@@ -90,6 +92,7 @@ class HomeActivity : BaseActivity() {
     private val showProgressCategories = ObservableBoolean(false)
     private var hasLoadedCategories = false
     private var hasRequestedCategories = false
+    private var lastCategoriesLoadAt = 0L
 
     // ── Aadhaar dialog (blocking — resubmit when both Aadhaar items are rejected, add when next_step is aadhaar_required) ──
     private val showProgressAadhaar = ObservableBoolean(false)
@@ -177,8 +180,11 @@ class HomeActivity : BaseActivity() {
         //     }
         // }
         if (isNotificationPermissionPending) requestNotificationPermission()
-        // Refresh on every return to the Dashboard — silent; the first load (onCreate) and Retry show errors
-        if (hasRequestedCategories && !showProgressCategories.get()) loadBillPayCategories(showError = false)
+        // Silent refresh on return to the Dashboard once the tiles are stale (or never loaded); onCreate and Retry show errors
+        val isStale = SystemClock.elapsedRealtime() - lastCategoriesLoadAt >= CATEGORIES_REFRESH_MS
+        if (hasRequestedCategories && !showProgressCategories.get() && (!hasLoadedCategories || isStale)) {
+            loadBillPayCategories(showError = false)
+        }
     }
 
     // ── Bill Pay tiles ────────────────────────────────────────
@@ -186,11 +192,17 @@ class HomeActivity : BaseActivity() {
     private fun loadBillPayCategories(showError: Boolean) {
         hasRequestedCategories = true
         viewModel.loadBillPayCategories(
-            onLoading = { showProgressCategories.set(true) },
+            onLoading = {
+                showProgressCategories.set(true)
+                // Never-loaded Dashboard: a spinner in the tile area (Retry has its own in-button one)
+                if (!hasLoadedCategories && !binding.llCategoriesRetryRow.isVisible) binding.pbCategories.visible()
+            },
             onSuccess = onSuccess@{ categories ->
                 showProgressCategories.set(false)
                 if (isDestroyed) return@onSuccess
+                binding.pbCategories.gone()
                 hasLoadedCategories = true
+                lastCategoriesLoadAt = SystemClock.elapsedRealtime()
                 binding.llCategoriesRetryRow.gone()
                 // Listed categories with no tile (broadband_postpaid, water, insurance, …) are ignored
                 layoutCategoryTiles(categories.map { CategoryType.from(it.category) }.toSet())
@@ -198,6 +210,7 @@ class HomeActivity : BaseActivity() {
             onError = onError@{ msg ->
                 showProgressCategories.set(false)
                 if (isDestroyed) return@onError
+                binding.pbCategories.gone()
                 // Keep the last good tiles; only a never-loaded Dashboard swaps them for the Retry row
                 if (!hasLoadedCategories) binding.llCategoriesRetryRow.visible()
                 if (showError) ToastUtil.showDelete(mActivity, msg)
@@ -652,7 +665,7 @@ class HomeActivity : BaseActivity() {
 
                 binding.llFastag -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    // TODO(PAYTOUCH-FASTAG): open BillPayActivity for CategoryType.FASTAG once the backend routes it — iOS shows "Coming soon" too
+                    // TODO(B2C-309): open BillPayActivity for CategoryType.FASTAG once the backend routes it — iOS shows "Coming soon" too
                     ToastUtil.showWarning(mActivity, getString(R.string.labelComingSoon))
                 }
 
@@ -717,5 +730,6 @@ class HomeActivity : BaseActivity() {
 
     companion object {
         private const val TILES_PER_ROW = 3
+        private const val CATEGORIES_REFRESH_MS = 5 * 60 * 1000L
     }
 }

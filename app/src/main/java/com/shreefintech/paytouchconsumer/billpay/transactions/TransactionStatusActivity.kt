@@ -162,7 +162,7 @@ class TransactionStatusActivity : BaseActivity() {
                 }
                 binding.tvEmpty.visibility = if (mArrayList.isEmpty()) View.VISIBLE else View.GONE
                 // Pending is filtered here — keep paging while a page brought no visible rows, up to a cap
-                // ponytail: fixed cap; older pending rows need a server `status=pending` filter to reach
+                // TODO(B2C-309): fixed cap; older pending rows need a server `status=pending` filter to reach
                 if (page == 1) emptyAutoPages = 0
                 emptyAutoPages = if (list.isEmpty()) emptyAutoPages + 1 else 0
                 if (emptyAutoPages in 1 until BillPayTransactionsViewModel.MAX_AUTO_PAGES &&

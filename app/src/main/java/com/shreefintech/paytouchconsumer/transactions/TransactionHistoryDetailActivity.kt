@@ -125,10 +125,11 @@ class TransactionHistoryDetailActivity : BaseActivity() {
             transactionId = transactionId,
             onLoading     = { showLoading(true) },
             onSuccess     = { item ->
+                if (isFinishing || isDestroyed) return@loadDetail
                 showLoading(false)
                 populateData(item)
             },
-            onError       = { msg -> showError(msg) }
+            onError       = { msg -> if (!isFinishing && !isDestroyed) showError(msg) }
         )
     }
 
@@ -186,20 +187,24 @@ class TransactionHistoryDetailActivity : BaseActivity() {
         }
         hideNoInternet()
         val onLoading = { showLoading(true) }
-        val onNotFound = { showNotFound() }
-        val onError = { msg: String -> showError(msg) }
+        // Replies after the screen closed must not touch its views
+        val onNotFound = { if (!isFinishing && !isDestroyed) showNotFound() }
+        val onError = { msg: String -> if (!isFinishing && !isDestroyed) showError(msg) }
         when (item.source) {
             Source.BILLPAY -> viewModel.loadBillPayStatus(reference, onLoading, { data ->
+                if (isFinishing || isDestroyed) return@loadBillPayStatus
                 showLoading(false)
                 populateBillPay(item, data)
             }, onNotFound, onError)
 
             Source.TOPUP -> viewModel.loadTopup(reference, onLoading, { data ->
+                if (isFinishing || isDestroyed) return@loadTopup
                 showLoading(false)
                 populateTopup(item, data)
             }, onNotFound, onError)
 
             Source.WITHDRAWAL -> viewModel.loadWithdrawal(reference, onLoading, { data ->
+                if (isFinishing || isDestroyed) return@loadWithdrawal
                 showLoading(false)
                 populateWithdrawal(item, data)
             }, onNotFound, onError)
@@ -318,12 +323,14 @@ class TransactionHistoryDetailActivity : BaseActivity() {
         row.tvValue.text = value
     }
 
+    // Shared by Bill Pay, top-up and withdrawal statuses (compared upper-case); anything not final reads Pending
     private fun toneOf(status: String?): StatusTone {
         val raw = status?.uppercase().orEmpty()
-        return when (raw) {
-            in Constant.TOPUP_SUCCESS_STATUSES   -> StatusTone.SUCCESS
-            in Constant.WITHDRAW_FAILED_STATUSES -> StatusTone.FAILED
-            else                                 -> StatusTone.PENDING
+        return when {
+            raw in Constant.TOPUP_SUCCESS_STATUSES -> StatusTone.SUCCESS
+            raw in Constant.WITHDRAW_FAILED_STATUSES ||
+                raw == Constant.BILLPAY_STATUS_EXPIRED.uppercase() -> StatusTone.FAILED
+            else -> StatusTone.PENDING
         }
     }
 
@@ -343,11 +350,15 @@ class TransactionHistoryDetailActivity : BaseActivity() {
 
     private fun showLoading(loading: Boolean) {
         binding.pbLoading.visibility = if (loading) View.VISIBLE else View.GONE
-        if (loading) binding.svContent.visibility = View.GONE
+        if (loading) {
+            binding.svContent.visibility = View.GONE
+            binding.tvEmpty.visibility = View.GONE
+        }
     }
 
     private fun showError(msg: String) {
         showLoading(false)
+        binding.tvEmpty.setText(R.string.msgTransactionDetailsNotFound)
         binding.tvEmpty.visibility = View.VISIBLE
         if (msg.isNotEmpty()) ToastUtil.showDelete(mActivity, msg)
     }

@@ -174,7 +174,8 @@ object Constant {
     // Paid at HDFC, held for manual review — final but shown as pending
     const val TOPUP_STATUS_ON_HOLD = "ON_HOLD"
     // Final top-up statuses that count as success (Wallet History / Load Wallet API doc, 2026-11-04)
-    val TOPUP_SUCCESS_STATUSES = setOf("SUCCESS", "SUCCESSFUL", "COMPLETED", "CHARGED", "CREDITED")
+    const val TOPUP_STATUS_CREDITED = "CREDITED"
+    val TOPUP_SUCCESS_STATUSES = WITHDRAW_SUCCESS_STATUSES + TOPUP_STATUS_CREDITED
 
     // Transaction type values returned by /api/transactions/{id}
     const val TRANSACTION_TYPE_HDFC = "hdfc_smartgateway"
