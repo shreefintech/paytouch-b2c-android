@@ -153,6 +153,116 @@
 
         </LinearLayout>
 
+        <!-- Pay Using — POST wallet/topups `flow`: Net Banking = payment_page, UPI = upi_intent -->
+        <LinearLayout
+            android:id="@+id/llPayUsing"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="@id/dummyView"
+            app:layout_constraintStart_toStartOf="@id/dummyView"
+            app:layout_constraintTop_toBottomOf="@id/llDescription">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/proza_libre_semi_bold"
+                android:includeFontPadding="false"
+                android:text="@string/labelPayUsing"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_13" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvFlowNetBanking"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/input_height"
+                    android:layout_marginEnd="@dimen/margin_small"
+                    android:layout_weight="1"
+                    android:onClickListener="@{onClickListener}"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/primary"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/icon_small"
+                            android:layout_height="@dimen/icon_small"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_bank" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvFlowNetBanking"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_small"
+                            android:fontFamily="@font/proza_libre_regular"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelPaymentMethodNetBanking"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvFlowUpi"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/input_height"
+                    android:layout_marginStart="@dimen/margin_small"
+                    android:layout_weight="1"
+                    android:onClickListener="@{onClickListener}"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/primary"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/icon_small"
+                            android:layout_height="@dimen/icon_small"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_upi" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvFlowUpi"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_small"
+                            android:fontFamily="@font/proza_libre_regular"
+                            android:includeFontPadding="false"
+                            android:text="@string/labelPaymentMethodUpi"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
         <!-- Proceed Payment button -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnProceedPayment"
@@ -168,7 +278,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/dummyView"
             app:layout_constraintStart_toStartOf="@id/dummyView"
-            app:layout_constraintTop_toBottomOf="@id/llDescription">
+            app:layout_constraintTop_toBottomOf="@id/llPayUsing">
 
             <LinearLayout
                 android:layout_width="match_parent"

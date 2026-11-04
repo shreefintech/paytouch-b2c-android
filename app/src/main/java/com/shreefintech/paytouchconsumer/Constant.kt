@@ -141,8 +141,9 @@ object Constant {
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
-    // Wallet top-up (POST wallet/topups) `flow` value
+    // Wallet top-up (POST wallet/topups) `flow` values — Net Banking opens HDFC's payment page, UPI opens a UPI app
     const val TOPUP_FLOW_PAYMENT_PAGE = "payment_page"
+    const val TOPUP_FLOW_UPI_INTENT = "upi_intent"
     // GET wallet/statement `wallet` filter (main, referral, bonus, earning) — My Wallet lists show main
     const val WALLET_STATEMENT_MAIN = "main"
     const val WALLET_DIRECTION_CREDIT = "credit"

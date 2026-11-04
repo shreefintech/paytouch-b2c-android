@@ -22,6 +22,9 @@ import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityHdfcWebViewBinding
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
+import org.json.JSONException
+import org.json.JSONObject
+import org.json.JSONTokener
 import java.io.ByteArrayInputStream
 
 class HdfcWebViewActivity : BaseActivity() {
@@ -43,6 +46,7 @@ class HdfcWebViewActivity : BaseActivity() {
     companion object {
         private const val EXTRA_URL = "hdfc_payment_url"
         private const val EXTRA_RETURN_URL = "hdfc_return_url"
+        private const val RETURN_PAGE_TEXT_JS = "(function(){return document.body ? document.body.innerText : '';})()"
 
         fun newIntent(
             context: Context,
@@ -214,6 +218,7 @@ class HdfcWebViewActivity : BaseActivity() {
                 url: String
             ) {
                 binding.pbPageLoad.visibility = View.GONE
+                checkReturnPage(view)
             }
 
             override fun onReceivedError(
@@ -275,6 +280,34 @@ class HdfcWebViewActivity : BaseActivity() {
         }
 
         return false
+    }
+
+    // The backend's return page is plain JSON — {"success":true,"message":"Payment page closed...",
+    // "data":{"client_reference":"…","order_id":"…"}} — and no return_url is sent, so detect it by content.
+    // Closing hands back to LoadWalletActivity.onResume, which polls the pending top-up's status.
+    private fun checkReturnPage(view: WebView) {
+        if (hasReturned) return
+        view.evaluateJavascript(RETURN_PAGE_TEXT_JS) { raw ->
+            if (hasReturned || isFinishing || isDestroyed) return@evaluateJavascript
+            // evaluateJavascript hands back a JSON-encoded string ("\"{...}\"") or "null"
+            val text = (try {
+                JSONTokener(raw ?: return@evaluateJavascript).nextValue() as? String
+            } catch (e: JSONException) {
+                e.printStackTrace()
+                null
+            })?.trim() ?: return@evaluateJavascript
+            if (!text.startsWith("{")) return@evaluateJavascript
+            val clientReference = try {
+                JSONObject(text).optJSONObject("data")?.optString("client_reference")
+            } catch (e: JSONException) {
+                e.printStackTrace()
+                null
+            }
+            if (!clientReference.isNullOrEmpty()) {
+                hasReturned = true
+                finish()
+            }
+        }
     }
 
     private fun onBack() {

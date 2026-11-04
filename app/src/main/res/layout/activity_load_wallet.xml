@@ -1232,6 +1232,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/btm_sheet_bg"
+            android:clickable="true"
             android:visibility="gone" />
 
         <!-- Make Payment bottom sheet -->
