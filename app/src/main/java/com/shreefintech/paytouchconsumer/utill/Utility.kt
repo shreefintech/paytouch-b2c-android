@@ -52,11 +52,23 @@ object Utility {
         }
     }
 
+    // Fractional seconds (".000000") — stripped before the offset-aware parse in formatDate()
+    private val FRACTIONAL_SECONDS = Regex("\\.\\d+")
+
     fun formatDate(createdAt: String?, format: String = "dd/MM/yyyy hh:mm a"): String {
         if (createdAt.isNullOrBlank()) return "--"
-        val cleaned = createdAt.substringBefore(".").substringBefore("+")
         val utc = TimeZone.getTimeZone("UTC")
         val ist = TimeZone.getTimeZone("Asia/Kolkata")
+        val output = SimpleDateFormat(format, Locale.getDefault()).apply { timeZone = ist }
+        // Explicit offset (e.g. "2026-10-31T12:00:00+05:30") — honour it; the fallback below strips it and assumes UTC
+        try {
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
+                .parse(createdAt.replace(FRACTIONAL_SECONDS, ""))
+                ?.let { return output.format(it) }
+        } catch (_: Exception) {
+            // Expected for timestamps without an offset — fall through to the legacy parsers below
+        }
+        val cleaned = createdAt.substringBefore(".").substringBefore("+")
         val inputFormats = listOf(
             "yyyy-MM-dd'T'HH:mm:ss",
             "dd/MM/yyyy hh:mm a",
@@ -64,7 +76,6 @@ object Utility {
             "dd/MM/yyyy",
             "yyyy-MM-dd"
         )
-        val output = SimpleDateFormat(format, Locale.getDefault()).apply { timeZone = ist }
         for (pattern in inputFormats) {
             try {
                 val parser = SimpleDateFormat(pattern, Locale.getDefault()).apply {

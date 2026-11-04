@@ -1,5 +1,6 @@
 package com.shreefintech.paytouchconsumer.earningwallet
 
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -18,18 +19,23 @@ import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityEarningWalletBinding
+import com.shreefintech.paytouchconsumer.databinding.DialogMpinBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetEarningLockBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetEarningOptInBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetEarningWithdrawBinding
 import com.shreefintech.paytouchconsumer.earningwallet.viewmodel.EarningWalletViewModel
-import com.shreefintech.paytouchconsumer.retrofit.model.WalletDataItem
-import com.shreefintech.paytouchconsumer.retrofit.model.rewards.EarningWalletItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletEarningItem
 import com.shreefintech.paytouchconsumer.utill.PanCardDialogHelper
 import com.shreefintech.paytouchconsumer.utill.SharedPreferenceHelper
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
 import com.shreefintech.paytouchconsumer.utill.Utility.gone
 import com.shreefintech.paytouchconsumer.utill.Utility.visible
+import com.shreefintech.paytouchconsumer.utill.clearMpin
+import com.shreefintech.paytouchconsumer.utill.createDialog
+import com.shreefintech.paytouchconsumer.utill.getMpin
+import com.shreefintech.paytouchconsumer.utill.setupMpinBoxes
 
 class EarningWalletActivity : BaseActivity() {
 
@@ -58,6 +64,14 @@ class EarningWalletActivity : BaseActivity() {
     private var resultCode = 0
     private var isDataLoaded = false
 
+    // Lock and withdraw need the MPIN — the API call runs from the MPIN dialog's submit button
+    private enum class MpinAction { LOCK, WITHDRAW }
+    private var pendingAction = MpinAction.LOCK
+    private var pendingAmount = 0.0
+    private var mpinDialog: Dialog? = null
+    private var mpinDialogBinding: DialogMpinBinding? = null
+    private val showProgressMpin = ObservableBoolean(false)
+
     companion object {
         fun start(context: Context) {
             context.startActivity(Intent(context, EarningWalletActivity::class.java))
@@ -75,6 +89,11 @@ class EarningWalletActivity : BaseActivity() {
         onBack()
         retryCallback = { loadData() }
         loadData()
+    }
+
+    override fun onDestroy() {
+        mpinDialog?.dismiss()
+        super.onDestroy()
     }
 
     // region Setup
@@ -179,7 +198,7 @@ class EarningWalletActivity : BaseActivity() {
             onSuccess = { populateEarningWallet(it) },
             onError = { ToastUtil.showDelete(mActivity, it) }
         )
-        viewModel.fetchWalletData(
+        viewModel.fetchWalletBalance(
             onSuccess = { populateWalletBalance(it) },
             onError = { ToastUtil.showDelete(mActivity, it) }
         )
@@ -195,7 +214,7 @@ class EarningWalletActivity : BaseActivity() {
             onSuccess = { populateEarningWallet(it) },
             onError = { ToastUtil.showDelete(mActivity, it) }
         )
-        viewModel.fetchWalletData(
+        viewModel.fetchWalletBalance(
             onSuccess = { populateWalletBalance(it) },
             onError = { ToastUtil.showDelete(mActivity, it) }
         )
@@ -205,12 +224,16 @@ class EarningWalletActivity : BaseActivity() {
 
     // region Populate UI
 
-    private fun populateEarningWallet(item: EarningWalletItem) {
+    private fun populateEarningWallet(item: WalletEarningItem) {
         isDataLoaded = true
         isOptedIn = item.optedIn == true
-        lockedBalance = item.principal ?: 0.0
-        interestAccrued = item.interestAccrued ?: 0.0
-        val pendingAmt = item.pendingWithdrawalAmount ?: 0.0
+        lockedBalance = item.principal?.toDoubleOrNull() ?: 0.0
+        interestAccrued = item.interestAccrued?.toDoubleOrNull() ?: 0.0
+        val pendingAmt = item.pendingWithdrawalAmount?.toDoubleOrNull() ?: 0.0
+        // Server is the source of truth for PAN — keeps the cached flag in step for the lock gate
+        if (item.panAdded == true) {
+            SharedPreferenceHelper.setSharedPreferenceBoolean(mActivity, Constant.KEY_PAN_ADDED, true)
+        }
 
         binding.tvLockedBalance.text = Utility.formatAmount(lockedBalance.toString())
 
@@ -281,8 +304,8 @@ class EarningWalletActivity : BaseActivity() {
         }
     }
 
-    private fun populateWalletBalance(item: WalletDataItem) {
-        walletBalance = item.walletBalance?.toDoubleOrNull() ?: 0.0
+    private fun populateWalletBalance(item: WalletBalanceItem) {
+        walletBalance = item.mainWallet?.toDoubleOrNull() ?: 0.0
     }
 
     private fun updateWithdrawState(entered: Double) {
@@ -399,21 +422,8 @@ class EarningWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errExceedsWalletBalance))
             return
         }
-        viewModel.postLock(
-            amount = amount,
-            onLoading = { showProgressLock.set(true) },
-            onSuccess = { msg ->
-                showProgressLock.set(false)
-                resultCode = 1
-                lockBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                if (msg.isNotEmpty()) ToastUtil.showSuccess(mActivity, msg)
-                refreshData()
-            },
-            onError = { msg ->
-                showProgressLock.set(false)
-                ToastUtil.showDelete(mActivity, msg)
-            }
-        )
+        Utility.hideKeyboard(mActivity)
+        showMpinDialog(MpinAction.LOCK, amount)
     }
 
     private fun onWithdraw() {
@@ -423,25 +433,83 @@ class EarningWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errMinAmount))
             return
         }
+        // TODO(B2C-298): the API doc gives no earning-withdraw minimum — lock's ₹100 assumed
+        if (amount < Constant.EARNING_MIN_LOCK_AMOUNT) {
+            ToastUtil.showDelete(mActivity, getString(R.string.errMinEarningWithdrawAmount, Constant.EARNING_MIN_LOCK_AMOUNT))
+            return
+        }
         if (amount > lockedBalance) {
             ToastUtil.showDelete(mActivity, getString(R.string.errExceedsLockedBalance))
             return
         }
-        viewModel.postWithdraw(
-            amount = amount,
-            onLoading = { showProgressWithdraw.set(true) },
-            onSuccess = { msg ->
-                showProgressWithdraw.set(false)
-                resultCode = 1
-                withdrawBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                if (msg.isNotEmpty()) ToastUtil.showSuccess(mActivity, msg)
-                refreshData()
-            },
-            onError = { msg ->
-                showProgressWithdraw.set(false)
-                ToastUtil.showDelete(mActivity, msg)
-            }
+        Utility.hideKeyboard(mActivity)
+        showMpinDialog(MpinAction.WITHDRAW, amount)
+    }
+
+    // Same MPIN popup as LoadWalletActivity — opens over the sheet, which closes once the call succeeds
+    private fun showMpinDialog(action: MpinAction, amount: Double) {
+        if (mpinDialog?.isShowing == true) return
+        pendingAction = action
+        pendingAmount = amount
+        val dialogBinding = DialogMpinBinding.inflate(layoutInflater)
+        mpinDialogBinding = dialogBinding
+        showProgressMpin.set(false)
+        dialogBinding.showProgress = showProgressMpin
+        dialogBinding.setupMpinBoxes()
+        dialogBinding.onClickListener = onClickListener()
+        dialogBinding.tvSubtitle.setText(
+            if (action == MpinAction.LOCK) R.string.msgEnterMpinLockSubtitle else R.string.msgEnterMpinWithdrawSubtitle
         )
+
+        val dialog = dialogBinding.createDialog(mActivity)
+        dialog.setOnDismissListener {
+            mpinDialog = null
+            mpinDialogBinding = null
+        }
+        mpinDialog = dialog
+        dialog.show()
+    }
+
+    private fun submitMpin(dialogBinding: DialogMpinBinding) {
+        Utility.hideKeyboard(dialogBinding.root)
+        val mpin = dialogBinding.getMpin()
+        val msg = when {
+            mpin.isEmpty() -> getString(R.string.msgMpinEmpty)
+            mpin.length != 4 -> getString(R.string.msgMpinInvalid)
+            else -> null
+        }
+        if (msg != null) {
+            ToastUtil.showDelete(mActivity, msg, inWindow = false)
+            return
+        }
+        val sheet = if (pendingAction == MpinAction.LOCK) lockBehavior else withdrawBehavior
+        val onSuccess: (String) -> Unit = onSuccess@{ successMsg ->
+            showProgressMpin.set(false)
+            if (isFinishing || isDestroyed) return@onSuccess
+            resultCode = 1
+            mpinDialog?.dismiss()
+            sheet.state = BottomSheetBehavior.STATE_HIDDEN
+            if (successMsg.isNotEmpty()) ToastUtil.showSuccess(mActivity, successMsg)
+            refreshData()
+        }
+        val onError: (String) -> Unit = onError@{ errorMsg ->
+            showProgressMpin.set(false)
+            if (isFinishing || isDestroyed) return@onError
+            mpinDialogBinding?.clearMpin()
+            ToastUtil.showDelete(mActivity, errorMsg, inWindow = false)
+        }
+        // Outcome unknown — dialog stays so a retry goes out with the same request_id
+        val onPending: (String) -> Unit = onPending@{ pendingMsg ->
+            showProgressMpin.set(false)
+            if (isFinishing || isDestroyed) return@onPending
+            mpinDialogBinding?.clearMpin()
+            ToastUtil.showWarning(mActivity, pendingMsg, inWindow = false)
+        }
+        if (pendingAction == MpinAction.LOCK) {
+            viewModel.postLock(pendingAmount, mpin, { showProgressMpin.set(true) }, onSuccess, onError, onPending)
+        } else {
+            viewModel.postWithdraw(pendingAmount, mpin, { showProgressMpin.set(true) }, onSuccess, onError, onPending)
+        }
     }
 
     // endregion
@@ -528,6 +596,16 @@ class EarningWalletActivity : BaseActivity() {
                 withdrawSheet.btnWithdrawSheet -> {
                     if (Utility.stopClick()) return@OnClickListener
                     onWithdraw()
+                }
+                mpinDialogBinding?.cardClose -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressMpin.get()) return@OnClickListener
+                    mpinDialog?.dismiss()
+                }
+                mpinDialogBinding?.cardSubmit -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    if (showProgressMpin.get()) return@OnClickListener
+                    mpinDialogBinding?.let { submitMpin(it) }
                 }
             }
         }

@@ -120,6 +120,21 @@ object Constant {
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
 
+    // Wallet top-up (POST wallet/topups) `flow` values — Net Banking opens HDFC's payment page, UPI opens a UPI app
+    const val TOPUP_FLOW_PAYMENT_PAGE = "payment_page"
+    const val TOPUP_FLOW_UPI_INTENT = "upi_intent"
+    // GET wallet/statement `wallet` filter (main, referral, bonus, earning) — My Wallet lists show main
+    const val WALLET_STATEMENT_MAIN = "main"
+    const val WALLET_DIRECTION_CREDIT = "credit"
+
+    // Fee preview payment_method_type values — the user picks the method on HDFC's page
+    const val TOPUP_FEE_METHOD_UPI = "UPI"
+    const val TOPUP_FEE_METHOD_CARD = "CARD"
+    const val TOPUP_FEE_METHOD_NB = "NB"
+    // Top-up final status values (compared case-insensitively); initiated / pending / crediting / on_hold show as processing
+    const val TOPUP_STATUS_SUCCESS = "SUCCESS"
+    const val TOPUP_STATUS_FAILED = "FAILED"
+
     // Transaction type values returned by /api/transactions/{id}
     const val TRANSACTION_TYPE_HDFC = "hdfc_smartgateway"
 

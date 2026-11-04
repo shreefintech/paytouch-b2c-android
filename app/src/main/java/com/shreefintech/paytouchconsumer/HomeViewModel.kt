@@ -63,14 +63,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Silently checks /api/level on every Dashboard appear.
+     * Silently checks /api/mobile/rewards/level on every Dashboard appear.
      * Saves the level first so each level shows exactly once. With no saved level
      * (fresh install / re-login) the current level is celebrated once.
      * No toast on failure — matches iOS "the level check is silent" spec.
      */
     fun checkLevelUp(onLevelUp: (RewardsLevelItem) -> Unit) {
         if (!Utility.isInternetAvailable(getApplication())) return
-        ApiClient.apiService.getRewardsLevel(bearerToken())
+        ApiClient.apiService.getCustomerLevel(bearerToken())
             .enqueue(object : Callback<General<RewardsLevelItem?>> {
                 override fun onResponse(
                     call: Call<General<RewardsLevelItem?>>,
@@ -113,8 +113,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     // Refreshes the bank/PAN flags on every Home launch
                     saveOnboardingFlags(data?.bankDetailsAdded, data?.panAdded, data?.nextStep)
                     // Checked at response time so the flags above still refresh while an upload is in flight.
-                    // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
-                    // switch the upload result to LiveData if Home ever stops being portrait-locked
+                    // TODO(B2C-238): if that in-flight upload then fails, the block returns only on the next Home launch;
+                    //  switch the upload result to LiveData if Home ever stops being portrait-locked
                     if (isAadhaarUploading) return
                     if (!response.isSuccessful || data == null) return
                     val step = NextStep.from(data.nextStep)

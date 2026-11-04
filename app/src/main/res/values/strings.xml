@@ -499,6 +499,20 @@
     <string name="labelTransactionsZero">Transactions: 0</string>
     <string name="labelVirtualAccountNumber">Virtual Account Number</string>
     <string name="labelActiveStatus">Active</string>
+    <string name="labelInactiveStatus">Inactive</string>
+    <string name="labelFee">Fee</string>
+    <string name="labelTotalDebit">Total Debit</string>
+    <string name="labelConfirmedAtPayout">Confirmed at payout</string>
+    <string name="labelChargesByPaymentMethod">Charges by payment method</string>
+    <string name="labelPayUsing">Pay Using</string>
+    <string name="labelPaymentMethodUpi">UPI</string>
+    <string name="labelPaymentMethodCard">Card</string>
+    <string name="labelPaymentMethodNetBanking">Net Banking</string>
+    <string name="labelConfirmedAtPayment">Confirmed at payment</string>
+    <string name="msgFeeDependsOnPaymentMethod">The fee depends on the payment method you choose on the next page.</string>
+    <string name="errFeePreviewFailed">Couldn\'t load charges. You\'ll see them on the payment page.</string>
+    <string name="msgMoneyRequestPending">Your request is still processing. Check your wallet before trying again — retrying won\'t charge you twice.</string>
+    <string name="labelUpiId">UPI ID</string>
     <string name="labelAccountHolder">Account Holder</string>
     <string name="labelPoweredByPartners">Powered by • Bharat Connect • Indusind • PayTouch • ICICI</string>
     <string name="btnMakePayment">Make Payment</string>
@@ -673,6 +687,8 @@
     <string name="titleEnterMpin">Enter MPIN</string>
     <string name="msgEnterMpinBankSubtitle">Enter your 4-digit MPIN to save this bank account</string>
     <string name="msgEnterMpinProfileSubtitle">Enter your 4-digit MPIN to update your profile</string>
+    <string name="msgEnterMpinLockSubtitle">Enter your 4-digit MPIN to lock this amount</string>
+    <string name="msgEnterMpinWithdrawSubtitle">Enter your 4-digit MPIN to withdraw this amount</string>
     <string name="msgBankAccountSaved">Bank account saved.</string>
     <string name="msgBankDetailsLoadFailed">Couldn\'t load bank details. Please try again later.</string>
     <string name="btnPreview">Preview</string>
@@ -778,6 +794,7 @@
     <string name="errNotEnoughBalance">Not enough Wallet Balance</string>
     <string name="errExceedsWalletBalance">Amount exceeds your wallet balance</string>
     <string name="errMinLockAmount">Minimum lock amount is ₹%1$d</string>
+    <string name="errMinEarningWithdrawAmount">Minimum withdrawal amount is ₹%1$d</string>
 
     <!-- Earning Wallet — Withdraw sheet -->
     <string name="titleWithdrawToWallet">Withdraw to Wallet</string>
