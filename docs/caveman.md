@@ -151,27 +151,19 @@ com.shreefintech.paytouchconsumer/
 ├── applock/        # AppLockHelper (lifecycle-based lock rules) + AppLockActivity (phone screen lock prompt)
 ├── kyc/            # KYC hub (KycActivity), kyc/identity/IdentityVerificationActivity, kyc/bank/BankDetailsActivity, KycStatusActivity; virtual account is server-side — no client Activity
 ├── home/           # Home/Dashboard (HomeActivity — currently at root level, will move here)
-├── electricity/    # Electricity bill payment + transaction history (canonical module template)
-├── gas/            # Gas bill payment + transaction history
-├── prepaid/        # Mobile prepaid recharge — operator + circle + plan selection
-├── postpaid/       # Mobile postpaid bill payment
-├── dth/            # DTH recharge — operator + plan selection
-├── fastag/         # FASTag recharge — vehicle number + amount, real-time fee, no bill-fetch
-├── loan/           # Loan repayment — bill-fetch pattern; circleId = "0"
-├── municipaltax/   # Municipal tax payment — bill-fetch pattern
+├── billpay/        # Bill Pay — ONE flow for every bill category: BillPayActivity (form), BillPayPlanSelectionActivity, transactions/ (Recent, Report, Status, SmsReceipt), viewmodel/
 ├── loadwallet/     # Wallet top-up via HDFC gateway (LoadWallet, HdfcWebView, PaymentStatus, WalletTransactions)
 ├── myaccount/      # My Account — two-tab profile viewer (Account Info + Refer & Earn), KycDetails, DocPreview
-├── transactions/   # Shared TransactionDetailActivity + TransactionItem model (never duplicated per module)
-├── adapter/        # Shared adapters: TransactionAdp, RecentTransactionAdp, PrepaidPlanAdp, DthPlanAdp
+├── transactions/   # Shared TransactionDetailActivity, BillPaymentStatusActivity (polls billpay/status) + TransactionItem model
+├── adapter/        # Shared adapters: TransactionAdp, RecentTransactionAdp, BillPayPlanAdp
 ├── fcm/            # Push notifications — MyFirebaseMessagingService + NotificationHelper (channel, token register)
 ├── location/       # LocationPermissionHelper — disclosure dialog → permission → one foreground fix for payment risk checks
-├── enums/          # Project-wide enums (LoginMode, etc.)
+├── enums/          # Project-wide enums (CategoryType = bill categories, LoginMode, etc.)
 ├── glass/          # LiquidGlassEffect custom blur UI components
 ├── retrofit/       # All networking (ApiService, ApiClient, ApiHelper, models)
 ├── utill/          # Shared utilities — spelling "utill" is intentional, never rename
 ├── widget/         # Reusable custom views (LiquidGlassButton, CustomDropdown, etc.)
 ├── BaseActivity.kt
-├── BaseBillViewModel.kt
 ├── HomeActivity.kt
 └── Constant.kt
 ```

@@ -19,5 +19,7 @@ data class TransactionItem(
     val companyName: String,
     val isMobileCategory: Boolean = false,
     val isVehicleCategory: Boolean = false,
+    // Server identifier_label (e.g. "Consumer Number"); null → label from the category flags
+    val identifierLabel: String? = null,
     val categoryType: CategoryType = CategoryType.UNKNOWN
 )

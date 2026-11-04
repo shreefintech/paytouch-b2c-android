@@ -2,7 +2,7 @@
 
 Fintech Android app (Kotlin, MVVM hybrid) by Shreefintech for Indian consumers: utility bill payments (electricity, gas, mobile, DTH, cable, broadband, FASTag, loans, taxes) + digital wallet. Single user role.
 
-> **Current state:** API wiring is **in progress**. Core modules (Auth, Electricity, Gas, Prepaid, Postpaid, DTH, FASTag, Loan, Municipal Tax, My Account) have live API integration. Newly added modules may begin with UI stubs marked `TODO(PAYTOUCH-xxx):` — do not treat pending stubs or relaxed validations as bugs.
+> **Current state:** API wiring is **in progress**. Core modules (Auth, KYC, Bill Pay — one shared flow for Electricity, Gas, Prepaid, Postpaid, DTH, Loan, Municipal Tax —, Load Wallet, My Account) have live API integration. Bill Pay follows the iOS "Bill Pay Module — Dashboard to Receipt" doc (`docs/business_logic.md` §7); `billpay/pay` is not completable on staging yet. Newly added modules may begin with UI stubs marked `TODO(PAYTOUCH-xxx):` — do not treat pending stubs or relaxed validations as bugs.
 
 ## Docs — read only when the task touches that area
 
@@ -10,7 +10,7 @@ Fintech Android app (Kotlin, MVVM hybrid) by Shreefintech for Indian consumers: 
 |---|---|
 | `docs/caveman.md` | Need app overview, tech stack, package structure, external systems |
 | `docs/business_logic.md` | Feature/data work: fees, onboarding, auth/session, endpoints, request/response fields, validation |
-| `docs/dos_and_donts.md` | Creating a bill-payment module or transaction screens (per-module files, mapping rules, list loading) |
+| `docs/dos_and_donts.md` | Bill Pay work: adding a category, transaction screens, mapping rules, list loading |
 | `docs/code_patterns.md` | Need full reference code: click handling, button/list loading, LiquidGlass, keyboard, back/result, intent passing, bottom sheet |
 | `docs/screens_and_navigation.md` | New screen, navigation flow, back-stack, intent extras |
 | `docs/no_internet_handling.md` | Offline/connectivity handling |
@@ -72,19 +72,17 @@ Notes: package `utill/` spelling is intentional — never rename. FCM notificati
 8. Adapters contain no business logic or network calls.
 9. ViewModels must not store Activity/Context references.
 10. All endpoints declared in **`ApiService`** (`backend-b2c.paytouch.in` = `Constant.BASE_URL`, via `ApiClient` — auth/onboarding under `api/mobile/`, legacy routes under `api/`) or **`ApiAdminService`** (`admin.paytouch.in`, via `ApiAdminClient`) — never construct `OkHttpClient`/`Retrofit` in a ViewModel or Activity. One client per backend URL.
-11. `mapToTransactionItem()` uses `item.id?.toString() ?: "--"` for `userId` — never a loop index (duplicates on paginated appends, loses server identity).
-12. **Never generate `transaction_id` client-side** — no `Utility.generateTransactionId()`, no `transaction_id` in payment request DTOs. Read it from the server response.
-13. **ViewModel base class by role:** main payment `{Category}ViewModel` → `BaseBillViewModel` (balance checks). RecentTransaction / TransactionReport / TransactionStatus / SmsReceipt ViewModels → `AndroidViewModel` (use `bearerToken()` / `getString()` from `ViewModelExt.kt`). Do not flag these for extending `AndroidViewModel`.
-14. Set `isMobileCategory` (true: Prepaid, Postpaid, DTH) and `isVehicleCategory` (true: FASTag) in every `mapToTransactionItem()` / `mapToDisplayItem()` — never hard-code in the adapter. SMS Receipt: set `binding.tvConsumerNoLabel.text` in `populateReceiptFromApi()` → `labelConsumerNo` / `labelMobileNo` / `labelVehicleNumber`.
+11. `mapToTransactionItem()` uses `item.clientReference ?: "--"` for `userId` (Bill Pay rows have no numeric id; other lists keep `item.id?.toString() ?: "--"`) — never a loop index (duplicates on paginated appends, loses server identity).
+12. **Never generate `transaction_id` / `client_reference` client-side** — no `Utility.generateTransactionId()`, no transaction id in payment request DTOs. Read `client_reference` from the `billpay/pay` response. The only client-made id is `request_id` — an idempotency key from `MoneyRequestId` (new per attempt, reused on retry of the same attempt), never a transaction id.
+13. **ViewModel base class:** every ViewModel extends `AndroidViewModel` (use `bearerToken()` / `getString()` / `sendLocation()` from `ViewModelExt.kt`). `BaseBillViewModel` was removed with the per-module flows — Bill Pay has no client wallet/VPS balance check (the server decides on `billpay/pay`). Bill Pay ViewModels live in `billpay/viewmodel/` and are shared by every category — never add a per-category ViewModel.
+14. `isMobileCategory` (Prepaid, Postpaid, DTH) and `isVehicleCategory` (FASTag) come from `CategoryType` in `mapToTransactionItem()` / `mapToDisplayItem()` (`BillPayTransactionsViewModel`) — never hard-code in the adapter. SMS Receipt: `binding.tvConsumerNoLabel.text` set in `SmsReceiptActivity.populateReceipt()` from `identifier_label`, else `labelConsumerNo` / `labelMobileNo` / `labelVehicleNumber`.
 15. List rows show `Utility.maskNumber(item.mobileNumber)` (`9876*****0`); raw number only in `TransactionDetailActivity`.
-16. Currency always via `Utility.formatAmount()` — `(String?)` overload for all modules, `(Double?)` only for Electricity DTOs. Never `"₹%.2f".format()` or string templates.
+16. Currency always via `Utility.formatAmount()` — `(Double?)` overload for Bill Pay DTOs (`retrofit/model/billpay/`), `(String?)` overload elsewhere. Never `"₹%.2f".format()` or string templates.
 17. Dates only via `Utility.formatDate()` — never `SimpleDateFormat` in a ViewModel. `"dd MMM yyyy"` in `mapToDisplayItem()`; `"dd/MM/yyyy"` in `TransactionDetailActivity`; default (`"dd/MM/yyyy hh:mm a"`) for full datetime. `mapToTransactionItem()` passes `item.createdAt ?: "--"` raw.
 18. **Confirmed backend quirks — do NOT "fix":**
 
     | Location | Apparent anomaly | Confirmed behaviour |
     |---|---|---|
-    | `ApiService.kt` — `getMunicipalTaxTransactionStatus` | Uses `@POST("${AUTH}mobile-recharge/transaction-status")` | **Intentional backend routing.** Do not change the URL. |
-    | `MunicipalTaxLatestPaymentDataItem.subService` | `@field:SerializedName("subservice")` (no underscore) | **API contract.** Backend sends `subservice`. Do not rename. |
     | `KycViewModel.callInitiate()` — HTTP 422 | Treated as success (proceeds to `submitSectionAPlaceholder`) | **Intentional.** 422 = KYC already initiated. Do not treat as error. |
     | `KycViewModel.agreeKyc()` — any error/failure | Both `onResponse` (any code) and `onFailure` proceed to `fetchFinalStatus()` | **Intentional.** `GET /kyc/status` is source of truth. Do not add error handling. |
 
@@ -140,7 +138,7 @@ Must work on API 24–37. Any API > 24 needs `if (Build.VERSION.SDK_INT >= ...)`
 
 - **Clicks:** single centralized `onClickListener()` with `when (it)`; prefer DataBinding `android:onClickListener="@{onClickListener}"`; every branch starts with `if (Utility.stopClick()) return@OnClickListener`.
 - **Hub/dashboard taps:** implemented module → navigate; pending → empty handler with `// TODO(PAYTOUCH-xxx): navigate to XxxActivity when implemented`. A silent empty handler without TODO is a review blocker.
-- **No cross-module Activity navigation — ever** (never open `ElectricityActivity` from the Gas tile).
+- **A bill tile opens only its own category** — `BillPayActivity.start(mActivity, CategoryType.X)` with the tile's own `CategoryType` (never Electricity from the Gas tile). Non-bill modules never open each other's Activities.
 - **Loading state (hard rule):** every button that triggers an API call shows a `ProgressBar` *inside the button*, driven by one `ObservableBoolean` per button (layout `<data>` variable), set `true` before the call and `false` in both `onResponse` and `onFailure`; click guard `if (showProgressX.get()) return@OnClickListener`. Dropdown/list fields: small spinner replaces the arrow icon in the field slot. Never full-screen loaders, never alpha-only dimming, never one shared `isLoading` for multiple buttons.
 - **LiquidGlassButton:** call `.attach(binding.clRoot as ViewGroup)` on each one in `onCreate()` after `setContentView()` — never `LiquidGlassEffect.attach()`.
 - **Keyboard (screens with EditText):** manifest `adjustResize`; `ViewCompat.setOnApplyWindowInsetsListener` padding with `maxOf(ime.bottom, systemBars.bottom)`; `Utility.hideKeyboard(mActivity)` before button actions.
@@ -152,11 +150,16 @@ Must work on API 24–37. Any API > 24 needs `if (Build.VERSION.SDK_INT >= ...)`
 - **Assets:** search for existing drawables/colors/styles/dimens first; if missing, use a placeholder name (`ic_edit_placeholder`) and list under **Missing Assets**.
 - **RecyclerView:** single change → update `mArrayList` + `notifyItemChanged(pos)`; delete → `removeAt` + `notifyItemRemoved`; full reload (filter/search/page 1) → `clear()` + `notifyDataSetChanged()`; pagination → `notifyItemRangeInserted`. Never reload the API to reflect a single-item change.
 
-## Bill Payment Modules
+## Bill Pay (all bill categories — one shared flow, follows the iOS doc)
 
-- Electricity is the canonical template. Each module has its **own Activity + `activity_*.xml`**; `item_*.xml` layouts are **shared** — reuse, never copy.
-- Shared, never duplicated per module: `TransactionAdp`, `RecentTransactionAdp`, `TransactionItem`, `RecentTransactionItem`, `TransactionDetailActivity`, `TransactionFilterHelper`, `ReceiptHelper`, `item_transaction.xml`, `lyt_shimmer_transaction_item.xml`, `sheet_filter.xml`. Per-module file list: `docs/dos_and_donts.md`.
+- **One flow for every bill category** (iOS "Bill Pay Module — Dashboard to Receipt"; contract in `docs/business_logic.md` §7). Screens: `billpay/BillPayActivity` (form), `BillPayPlanSelectionActivity` (Prepaid/DTH), `transactions/BillPaymentStatusActivity` (polls `billpay/status`), `billpay/transactions/` Recent / Report / Status / SmsReceipt. Each takes a `CategoryType` (`enums/CategoryType.kt`).
+- **Never add a per-category Activity, ViewModel, layout, DTO set or endpoint.** A new category = a new `CategoryType` entry + its Home tile (`docs/dos_and_donts.md` → Adding a Category). The old per-module packages (`electricity/`, `gas/`, `prepaid/`, …) and their `api/<module>/…` endpoints were removed with approval — do not recreate them.
+- Endpoints: only the `// ── Bill Pay ──` block in `ApiService` (`api/mobile/billpay/…`, `api/mobile/transactions`). Home tiles come from `billpay/categories` (only categories with billers).
+- Amount: bill categories → `fetch-bill` (`has_bill: false` = "No bill found"); Prepaid/DTH → plans (Prepaid needs a circle). Fee from `fee-preview` only — no client fee table. Pay = MPIN popup → one `billpay/pay` with a `MoneyRequestId` `request_id`; timeout/5xx = "not confirmed" (never shown as failed), form resets.
+- Pay 403s: `BANK_DETAILS_REQUIRED` → bank popup then retry, `LOCATION_REQUIRED` → resend location (`ApiHelper.parseErrorCode()`); `AADHAAR_REQUIRED` / `KYC_RESUBMIT_REQUIRED` / `USER_BLOCKED` handled in `ApiHelper`.
+- Shared, never duplicated: `TransactionAdp`, `RecentTransactionAdp`, `BillPayPlanAdp`, `TransactionItem`, `RecentTransactionItem`, `TransactionDetailActivity`, `TransactionFilterHelper`, `ReceiptHelper`, `item_transaction.xml`, `item_bill_pay_field.xml`, `item_prepaid_plan.xml`, `lyt_shimmer_transaction_item.xml`, `sheet_filter.xml`, `dialog_mpin.xml`.
 - `TransactionDetailActivity` has no SMS Receipt button — do not add it back.
-- Category icon set in `mapToTransactionItem()` as `R.drawable.img_{category}`.
+- Category icon = `CategoryType.iconRes` (`R.drawable.img_{category}`).
 - `TransactionHistoryDetailActivity` (wallet history) and `TransactionReportDetailActivity` (bill reports) are **intentionally separate** — do not merge or flag as duplication.
-- Add `{module}/README.md` only when the module is fully complete; root `README.md` module table may be updated once `HomeActivity` wires it.
+- FASTag tile shows "Coming soon" (iOS has no route yet) — `CategoryType.FASTAG` exists for when the backend routes it.
+- Add `{module}/README.md` only when a non-bill module is fully complete (Bill Pay is documented in `docs/`); root `README.md` module table may be updated once `HomeActivity` wires it.

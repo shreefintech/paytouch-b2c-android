@@ -13,16 +13,9 @@ import com.google.gson.Gson
 import com.shreefintech.paytouchconsumer.BaseActivity
 import com.shreefintech.paytouchconsumer.R
 import com.shreefintech.paytouchconsumer.databinding.ActivityTransactionDetailBinding
-import com.shreefintech.paytouchconsumer.dth.transactions.DthSmsReceiptActivity
-import com.shreefintech.paytouchconsumer.electricity.transactions.SmsReceiptActivity
+import com.shreefintech.paytouchconsumer.billpay.transactions.SmsReceiptActivity
 import com.shreefintech.paytouchconsumer.enums.CategoryType
-import com.shreefintech.paytouchconsumer.fastag.transactions.FastagSmsReceiptActivity
-import com.shreefintech.paytouchconsumer.gas.transactions.GasSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
-import com.shreefintech.paytouchconsumer.loan.transactions.LoanSmsReceiptActivity
-import com.shreefintech.paytouchconsumer.municipaltax.transactions.MunicipalTaxSmsReceiptActivity
-import com.shreefintech.paytouchconsumer.postpaid.transactions.PostpaidSmsReceiptActivity
-import com.shreefintech.paytouchconsumer.prepaid.transactions.PrepaidSmsReceiptActivity
 import com.shreefintech.paytouchconsumer.transactions.model.TransactionItem
 import com.shreefintech.paytouchconsumer.utill.AnimationHelper
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -82,7 +75,9 @@ class TransactionDetailActivity : BaseActivity() {
             item.isMobileCategory  -> R.string.labelMobileNoFmt
             else                   -> R.string.labelConsumerNoFmt
         }
-        binding.tvMobileNumber.text  = getString(numberLabelFmt, item.mobileNumber)
+        binding.tvMobileNumber.text  = item.identifierLabel
+            ?.let { getString(R.string.labelIdentifierFmt, it, item.mobileNumber) }
+            ?: getString(numberLabelFmt, item.mobileNumber)
         binding.tvUsername.text      = getString(R.string.labelUsernameFmt, item.username)
         binding.tvStatus.text        = item.status
         binding.tvDate.text          = Utility.formatDate(item.date, "dd/MM/yyyy")
@@ -121,17 +116,7 @@ class TransactionDetailActivity : BaseActivity() {
                     if (Utility.stopClick()) return@OnClickListener
                     val item = transactionItem ?: return@OnClickListener
                     val txnId = item.transactionId.takeIf { it != "--" } ?: return@OnClickListener
-                    when (item.categoryType) {
-                        CategoryType.ELECTRICITY  -> SmsReceiptActivity.start(mActivity, txnId)
-                        CategoryType.GAS          -> GasSmsReceiptActivity.start(mActivity, txnId)
-                        CategoryType.PREPAID      -> PrepaidSmsReceiptActivity.start(mActivity, txnId)
-                        CategoryType.POSTPAID     -> PostpaidSmsReceiptActivity.start(mActivity, txnId)
-                        CategoryType.DTH          -> DthSmsReceiptActivity.start(mActivity, txnId)
-                        CategoryType.FASTAG       -> FastagSmsReceiptActivity.start(mActivity, txnId)
-                        CategoryType.LOAN         -> LoanSmsReceiptActivity.start(mActivity, txnId)
-                        CategoryType.MUNICIPAL_TAX -> MunicipalTaxSmsReceiptActivity.start(mActivity, txnId)
-                        CategoryType.UNKNOWN      -> {}
-                    }
+                    SmsReceiptActivity.start(mActivity, item.categoryType, txnId)
                 }
             }
         }

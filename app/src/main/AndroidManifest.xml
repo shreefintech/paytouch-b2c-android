@@ -102,7 +102,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".electricity.ElectricityActivity"
+            android:name=".billpay.BillPayActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
@@ -112,34 +112,11 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".gas.GasActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".gas.transactions.GasTransactionStatusActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".gas.transactions.GasTransactionReportActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".gas.transactions.GasRecentTransactionActivity"
+            android:name=".billpay.transactions.RecentTransactionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".gas.transactions.GasSmsReceiptActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".electricity.transactions.RecentTransactionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".electricity.transactions.SmsReceiptActivity"
+            android:name=".billpay.transactions.SmsReceiptActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -151,159 +128,17 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".electricity.transactions.TransactionReportActivity"
+            android:name=".billpay.transactions.TransactionReportActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".electricity.transactions.ElectricityTransactionStatusActivity"
+            android:name=".billpay.transactions.TransactionStatusActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".prepaid.PrepaidActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".postpaid.PostpaidActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".prepaid.PrepaidPlanSelectionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".prepaid.transactions.PrepaidTransactionStatusActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".prepaid.transactions.PrepaidTransactionReportActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".dth.transactions.DthTransactionStatusActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".dth.transactions.DthTransactionReportActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".postpaid.transactions.PostpaidTransactionStatusActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".postpaid.transactions.PostpaidTransactionReportActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".fastag.transactions.FastagTransactionStatusActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".fastag.transactions.FastagTransactionReportActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".fastag.transactions.FastagRecentTransactionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".fastag.transactions.FastagSmsReceiptActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".prepaid.transactions.PrepaidRecentTransactionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".prepaid.transactions.PrepaidSmsReceiptActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".postpaid.transactions.PostpaidRecentTransactionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".postpaid.transactions.PostpaidSmsReceiptActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".dth.transactions.DthRecentTransactionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".dth.transactions.DthSmsReceiptActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".dth.DthActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".dth.DthPlanSelectionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".fastag.FastagActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".loan.LoanActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".loan.transactions.LoanTransactionStatusActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".loan.transactions.LoanTransactionReportActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".loan.transactions.LoanRecentTransactionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".loan.transactions.LoanSmsReceiptActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".municipaltax.MunicipalTaxActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".municipaltax.transactions.MunicipalTaxRecentTransactionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".municipaltax.transactions.MunicipalTaxTransactionStatusActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".municipaltax.transactions.MunicipalTaxTransactionReportActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".municipaltax.transactions.MunicipalTaxSmsReceiptActivity"
+            android:name=".billpay.BillPayPlanSelectionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

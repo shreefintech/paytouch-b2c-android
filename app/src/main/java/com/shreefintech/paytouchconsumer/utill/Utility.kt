@@ -356,15 +356,6 @@ object Utility {
         }.start()
     }
 
-    fun calculatePlatformFee(amount: Double): Double {
-        return when {
-            amount < 1000 -> 4.0
-            amount <= 5000 -> 8.0
-            amount <= 40000 -> 20.0
-            else -> 30.0
-        }
-    }
-
 
     class EmojiExcludeFilter : InputFilter {
 

@@ -15,7 +15,7 @@ private fun onClickListener(): View.OnClickListener {
             // Pending module — explicit TODO, never a silent no-op
             binding.cardGas -> {
                 if (Utility.stopClick()) return@OnClickListener
-                // TODO(PAYTOUCH-585): navigate to GasActivity when implemented
+                // TODO(PAYTOUCH-585): open BillPayActivity for CategoryType.WATER when implemented
             }
         }
     }

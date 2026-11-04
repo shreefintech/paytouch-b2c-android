@@ -1,6 +1,6 @@
 # PayTouch Consumer — DOs and DON'Ts
 
-Rules **not** already stated in `CLAUDE.md` (core architecture, naming, network, loading-state, click, RecyclerView rules live there — not repeated here), plus the full Category Module rules. UI code snippets: `docs/code_patterns.md`.
+Rules **not** already stated in `CLAUDE.md` (core architecture, naming, network, loading-state, click, RecyclerView rules live there — not repeated here), plus the full Bill Pay rules. UI code snippets: `docs/code_patterns.md`.
 
 ---
 
@@ -18,7 +18,7 @@ Rules **not** already stated in `CLAUDE.md` (core architecture, naming, network,
 
 **DO enforce the mandatory onboarding sequence: KYC → MPIN.** Server fields `next_step` + `mpin_required` drive routing after login, only via `NextStepRouter`; never allow skipping. `requires_virtual_account` is permanently retired — no client routing for it.
 
-**DO calculate the platform fee (tiers in `business_logic.md` §7) in a ViewModel and show it before the user confirms payment.**
+**DO show the platform fee from `GET billpay/fee-preview` before the user confirms a bill payment** (`business_logic.md` §7) — never a client-side fee table.
 
 **DO handle 401 globally via an OkHttp interceptor** (`SessionInterceptor` or equivalent): clear all SharedPreferences, launch LoginActivity with cleared back stack. Never per-ViewModel.
 
@@ -26,7 +26,7 @@ Rules **not** already stated in `CLAUDE.md` (core architecture, naming, network,
 
 **DO play audio feedback after every payment** — `payment_success.mp3` / `payment_failed.mp3`; release the MediaPlayer in `onDestroy()`.
 
-**DO rely on API endpoints for transaction history** — `api/{category}/payment-history` (recent) and `api/{category}/payment-reports` (filtered).
+**DO rely on the API for transaction history** — `GET api/mobile/transactions?category=` for every bill category (Recent, Status, Report, Receipt).
 
 ---
 
@@ -58,51 +58,42 @@ Rules **not** already stated in `CLAUDE.md` (core architecture, naming, network,
 
 ---
 
-## Category Module Output Rules
+## Bill Pay Rules (every bill category)
 
-**All bill payment modules share the same design. When generating code for any new module (Water, Broadband, DTH, Cable, FASTag, Loans, Taxes, etc.) apply every rule in this section without exception.**
-
----
-
-### Files to Generate Per Module
-
-Create exactly these files — no more, no less:
-
-| File | Copy From |
-|---|---|
-| `{Category}Activity` + `activity_{category}.xml` | `ElectricityActivity` / `activity_electricity.xml` |
-| `{Category}ViewModel` | `ElectricityViewModel` (extends `BaseBillViewModel`) |
-| `{Category}RecentTransactionActivity` + `activity_{category}_recent_transaction.xml` | Electricity equivalent |
-| `{Category}RecentTransactionViewModel` | Electricity equivalent |
-| `{Category}TransactionReportActivity` + `activity_{category}_transaction_report.xml` | Electricity equivalent |
-| `{Category}TransactionReportViewModel` | Electricity equivalent |
-| `{Category}TransactionStatusActivity` + `activity_{category}_transaction_status.xml` | Electricity equivalent |
-| `{Category}TransactionStatusViewModel` | Electricity equivalent |
-| `{Category}SmsReceiptActivity` + `activity_{category}_sms_receipt.xml` | Electricity equivalent |
-| `{Category}SmsReceiptViewModel` | Electricity equivalent (standalone `AndroidViewModel`) |
-| `retrofit/model/{category}/` DTOs | Match actual API contract — never guess field names |
-| `ApiService.kt` entries under `// ── {Category} ──` block | One declaration per endpoint |
-
-Electricity is the canonical template. Copy it; swap names and endpoints only. Do not redesign.
+**All bill categories share ONE flow (iOS "Bill Pay Module" doc): one screen, one set of APIs, one set of transaction
+screens. A new category is a new `CategoryType` entry — never a new Activity / ViewModel / layout / endpoint set.**
+API contract: `docs/business_logic.md` §7.
 
 ---
 
-### What Is Shared — Never Duplicate Per Module
+### Adding a Category
+
+1. Add an entry to `enums/CategoryType.kt`: backend `value`, `titleRes`, `fieldLabelRes`, `iconRes` (`R.drawable.img_{category}`),
+   `smsBodyRes`, `receiptTitleRes`, `defaultParamName` (only if the iOS/backend doc names one), and the
+   `isPlanBased` / `needsCircle` / `isMobileCategory` / `isVehicleCategory` flags.
+2. Add its tile to `activity_home.xml` and to the `tiles` list in `HomeActivity.layoutCategoryTiles()`; tap →
+   `BillPayActivity.start(mActivity, CategoryType.X)` (or a `TODO(PAYTOUCH-xxx)` + "Coming soon" if the backend has no route).
+3. Nothing else. If the category needs something `BillPayActivity` can't do, ask first.
+
+---
+
+### Files — all shared, never duplicate per category
 
 | Component | Location |
 |---|---|
-| `TransactionDetailActivity` | `transactions/TransactionDetailActivity.kt` |
-| `TransactionAdp` | `adapter/TransactionAdp.kt` |
-| `RecentTransactionAdp` | `adapter/RecentTransactionAdp.kt` |
-| `TransactionItem` | `transactions/model/TransactionItem.kt` |
-| `RecentTransactionItem` | `transactions/model/RecentTransactionItem.kt` |
-| `TransactionFilterHelper` | `utill/TransactionFilterHelper.kt` |
-| `ReceiptHelper` | `utill/ReceiptHelper.kt` |
-| `item_transaction.xml` | `res/layout/item_transaction.xml` |
-| `lyt_shimmer_transaction_item.xml` | `res/layout/lyt_shimmer_transaction_item.xml` |
-| `sheet_filter.xml` | `res/layout/sheet_filter.xml` |
+| `BillPayActivity` + `activity_bill_pay.xml` + `item_bill_pay_field.xml` | `billpay/` — form for every category |
+| `BillPayViewModel` | `billpay/viewmodel/` — billers, circles, fetch bill, fee preview, pay |
+| `BillPayPlanSelectionActivity` + `BillPayPlanSelectionViewModel` + `BillPayPlanAdp` | Prepaid / DTH plans (`item_prepaid_plan.xml`) |
+| `BillPaymentStatusActivity` + `BillPayStatusViewModel` | `transactions/` + `billpay/viewmodel/` — result screen, polls `billpay/status` |
+| `RecentTransactionActivity`, `TransactionStatusActivity`, `TransactionReportActivity`, `SmsReceiptActivity` | `billpay/transactions/` — each takes the category (`start(context, CategoryType)`) |
+| `BillPayTransactionsViewModel` | `billpay/viewmodel/` — `GET transactions` paging + `mapToTransactionItem()` / `mapToDisplayItem()` |
+| `retrofit/model/billpay/*Item` | DTOs — match the API contract, never guess |
+| `TransactionDetailActivity`, `TransactionAdp`, `RecentTransactionAdp`, `TransactionItem`, `RecentTransactionItem` | `transactions/`, `adapter/` |
+| `TransactionFilterHelper`, `ReceiptHelper`, `MpinDialogExt`, `MoneyRequestId`, `BankDetailsDialogHelper` | `utill/` |
+| `item_transaction.xml`, `lyt_shimmer_transaction_item.xml`, `sheet_filter.xml`, `dialog_mpin.xml` | `res/layout/` |
 
-If one of these is missing a field required by a new module, add it to the existing shared class (nullable, with a sensible default at the call site). Never fork a separate copy.
+If a shared class is missing a field a category needs, add it to the shared class (nullable, default at the call
+site). Never fork a copy.
 
 ---
 
@@ -116,7 +107,7 @@ If one of these is missing a field required by a new module, add it to the exist
 | `bearerToken()` | `utill/ViewModelExt.kt` | Any local `"Bearer $token"` construction |
 | `getString(@StringRes id)` | `utill/ViewModelExt.kt` | Any local string-resource lookup |
 | `Utility.formatAmount(value)` | `utill/Utility.kt` | Any local `NumberFormat` / currency formatting — never use raw string template `"₹${item.amount}"` |
-| `Utility.formatAmount(raw: Double?)` | `utill/Utility.kt` | Electricity DTOs use `Double?` for amount fields — use this overload; all other modules use `String?` and the standard overload |
+| `Utility.formatAmount(raw: Double?)` | `utill/Utility.kt` | Bill Pay DTOs (`retrofit/model/billpay/`) use `Double?` for amounts — use this overload; other modules use `String?` and the standard overload |
 | `Utility.formatDate(raw, "dd MMM yyyy")` | `utill/Utility.kt` | Recent transaction list date display |
 | `Utility.formatDate(raw, "dd/MM/yyyy")` | `utill/Utility.kt` | Transaction detail date-only display |
 | `Utility.formatDate(raw)` | `utill/Utility.kt` | Full datetime display (default `"dd/MM/yyyy hh:mm a"`) |
@@ -142,183 +133,79 @@ amount = "₹${item.billAmount ?: "0.00"}"
 
 ---
 
-### `mapToTransactionItem()` Rules
+### `mapToTransactionItem()` / `mapToDisplayItem()` Rules
 
-Apply to every `mapToTransactionItem()` in every module's report/status ViewModel:
-
-| Field | Value |
-|---|---|
-| `userId` | `item.id?.toString() ?: "--"` — **never** use loop index or `(index + 1).toString()` |
-| `date` | `item.createdAt ?: "--"` — **raw ISO string, do not pre-format here**; `TransactionDetailActivity` formats it with `"dd/MM/yyyy"` at display time |
-| `amount` | `Utility.formatAmount(item.amount)` — never a string template |
-| `platformFee` | `Utility.formatAmount(item.platformFee)` — or `"₹0.00"` if the DTO has no fee field |
-| `totalPayable` | `Utility.formatAmount(item.totalPayable)` |
-| `categoryIconRes` | `R.drawable.img_{category}` — the only visual difference between modules |
-| `isMobileCategory` | `true` for Mobile Prepaid, Postpaid, DTH; `false` for all others — **never omit this field** |
-| `isVehicleCategory` | `true` for FASTag only; `false` for all others — drives "Vehicle No" label in adapters |
-
-Apply to every `mapToDisplayItem()` in every module's recent transaction ViewModel:
+Both live once in `BillPayTransactionsViewModel` and take the `CategoryType`:
 
 | Field | Value |
 |---|---|
-| `date` | `Utility.formatDate(item.createdAt, "dd MMM yyyy")` — **pre-format here**; the list card displays it directly, there is no detail formatter for recent items |
-| `amount` | `Utility.formatAmount(item.totalPayable ?: item.amount)` — prefer `totalPayable`; fall back to `amount` only if `totalPayable` is absent |
-| `isMobileCategory` | Same rule as `mapToTransactionItem()` above |
-| `isVehicleCategory` | Same rule as `mapToTransactionItem()` above |
+| `transactionId` | `item.clientReference ?: "--"` |
+| `userId` | `item.clientReference ?: "--"` — the API has no numeric id; **never** a loop index |
+| `date` (`TransactionItem`) | `item.createdAt ?: "--"` — raw; `TransactionDetailActivity` formats it with `"dd/MM/yyyy"` |
+| `date` (`RecentTransactionItem`) | `Utility.formatDate(item.createdAt, "dd MMM yyyy")` — pre-formatted |
+| `amount` | `Utility.formatAmount(item.amount)` (`Double?` overload) — never a string template |
+| `platformFee` | `Utility.formatAmount(charge + gst_amount)` |
+| `totalPayable` | `Utility.formatAmount(amount + charge + gst_amount)` |
+| `mobileNumber` / `accountNumber` | First `input_params` value other than `circle_code` (`accountNumber(item)`) |
+| `referenceId` / `reference` | `provider_ref`, else `txn_reference`, else `client_reference` (`referenceOf(item)`) |
+| `categoryIconRes` | `category.iconRes` |
+| `isMobileCategory` / `isVehicleCategory` | From `CategoryType` — never hard-code in the adapter |
+| `categoryType` | The `CategoryType` — drives View Receipt in `TransactionDetailActivity` |
 
-**`isMobileCategory` and `isVehicleCategory` drive adapter label behaviour:**
-- `isMobileCategory = true` → "Mobile No - %s"
-- `isVehicleCategory = true` → "Vehicle No - %s"
-- Both `false` → "Consumer No - %s"
-- **Masked display** (`TransactionAdp.tvMobile`): shows `Utility.maskNumber(item.mobileNumber)` — the `mobileNumber` field holds whichever identifier applies (mobile number, consumer number, or vehicle number)
+**Labels:** `isMobileCategory` → "Mobile No - %s", `isVehicleCategory` → "Vehicle No - %s", else "Consumer No - %s".
+List rows mask with `Utility.maskNumber()`; the raw number only in `TransactionDetailActivity`.
 
-**SMS Receipt label** — set `tvConsumerNoLabel` dynamically in `populateReceiptFromApi()`, never rely on the static XML default alone:
-
-| Module | Label string |
-|---|---|
-| Electricity, Gas, Loan, Municipal Tax | `R.string.labelConsumerNo` — "Consumer No" |
-| Mobile Prepaid, Mobile Postpaid, DTH | `R.string.labelMobileNo` — "Mobile No." |
-| FASTag | `R.string.labelVehicleNumber` — "Vehicle Number" |
-
-```kotlin
-// In populateReceiptFromApi() — consumer-number category (Electricity, Gas, Loan, Municipal Tax)
-binding.tvConsumerNoLabel.text = getString(R.string.labelConsumerNo)
-
-// In populateReceiptFromApi() — mobile-number category (Prepaid, Postpaid, DTH)
-binding.tvConsumerNoLabel.text = getString(R.string.labelMobileNo)
-
-// In populateReceiptFromApi() — vehicle-number category (FASTag)
-binding.tvConsumerNoLabel.text = getString(R.string.labelVehicleNumber)
-```
-
-The XML default (`android:text="@string/labelConsumerNo"`) is a layout-editor placeholder only; every Activity must set the label explicitly at runtime so the correct string is guaranteed regardless of the XML default.
+**SMS Receipt label** — `SmsReceiptActivity.populateReceipt()` sets `tvConsumerNoLabel` from `identifier_label`, falling
+back to `labelVehicleNumber` / `labelMobileNo` / `labelConsumerNo` by category flags. Title = `category.receiptTitleRes`,
+SMS body = `category.smsBodyRes`.
 
 ---
 
 ### Progress State Pattern
 
-Every module must follow the project-wide `ObservableBoolean` + DataBinding pattern. Per-module checklist:
-
-- Main payment screen: one `ObservableBoolean` per button (`showProgressFetch`, `showProgressPay`)
-- Operator/field loading: spinner inside the field slot (`pbCompanyLoading` + `ivCompanyArrow` swap)
-- SMS receipt download/share: `ObservableBoolean showProgressReceipt`, wired to both `pbReceiptLoading` and `pbDisplayLoading` via DataBinding
-- All `ObservableBoolean` variables set `false` in **both** `onResponse` and `onFailure` — no exceptions
-- Click guard: `if (showProgressXxx.get()) return@OnClickListener` before every API call
-
-#### Transaction Status Screen — Search Loading
-
-Every `{Category}TransactionStatusActivity` uses a single `ObservableBoolean showProgressSearch` for the search button:
-
-```kotlin
-private val showProgressSearch = ObservableBoolean(false)
-
-// in onCreate():
-binding.showProgressSearch = showProgressSearch
-
-// showShimmer() drives it — true on page-1 load, false when done:
-private fun showShimmer(show: Boolean) {
-    showProgressSearch.set(show)
-    // ... shimmer visibility toggle
-}
-
-// Click guard — always use showProgressSearch, never viewModel.isLoading:
-binding.llSearch -> {
-    if (Utility.stopClick()) return@OnClickListener
-    if (showProgressSearch.get()) return@OnClickListener
-    onSearch()
-}
-```
-
-**Do not guard the search button with `viewModel.isLoading` directly** — the `ObservableBoolean` is already kept in sync via `showShimmer()` and is the canonical guard.
+- Bill Pay form: `showProgressFetch` (Fetch Bill), `showProgressPay` (shared by Proceed and the MPIN popup's Submit — one
+  pay call). Company / circle fields: spinner in the field slot (`pbCompanyLoading` / `pbCircleLoading`).
+- SMS receipt: `showProgressReceipt`.
+- Home: `showProgressCategories` (Retry button).
+- Every `ObservableBoolean` is set `false` in **both** success and failure. Click guard
+  `if (showProgressXxx.get()) return@OnClickListener` before every API call.
+- Transaction Status has no search button any more — status filter tabs (All / Success / Failed / Pending) reload page 1.
 
 #### List Loading Pattern — Shimmer vs Footer
 
 | Situation | What to show |
 |---|---|
-| Page 1 initial load (or filter/search reset) | Hide `rvTransactions`, show `shimmerLayout` + `startShimmer()` |
+| Page 1 initial load (or filter / tab change) | Hide `rvTransactions`, show `shimmerLayout` + `startShimmer()` |
 | Page 2+ pagination load | Keep `rvTransactions` visible, show `pbLoadMore` footer spinner |
 | Load complete (any page) | Stop/hide shimmer or `pbLoadMore`; show `tvEmpty` if list is empty |
 
-```kotlin
-// Page 1
-if (page == 1) showShimmer(true) else showFooterLoader(true)
-
-// onSuccess
-if (page == 1) {
-    showShimmer(false)
-    mArrayList.clear(); mArrayList.addAll(list)
-    adapter.notifyDataSetChanged()
-} else {
-    showFooterLoader(false)
-    val start = mArrayList.size
-    mArrayList.addAll(list)
-    adapter.notifyItemRangeInserted(start, list.size)
-}
-
-// onError — always hide the loader that was shown
-if (page == 1) showShimmer(false) else showFooterLoader(false)
-```
-
-Pagination trigger — attach once in `setupRecyclerView()`:
-
-```kotlin
-recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-        if (dy <= 0) return
-        val lm = recyclerView.layoutManager as LinearLayoutManager
-        if (lm.findLastVisibleItemPosition() >= lm.itemCount - 3 && viewModel.canLoadMore()) {
-            loadPage(viewModel.nextPage())
-        }
-    }
-})
-```
-
-**Never call `showShimmer(true)` for pagination pages** — it blanks the existing list. Footer spinner only.
-
----
-
-### Layout Rules
-
-- Transaction status/report/recent layouts: copy the electricity equivalent XML, change only the `<string>` title and the toolbar title string resource. Do not alter the view hierarchy.
-- SMS receipt layout: copy `activity_electricity_sms_receipt.xml` or `activity_gas_sms_receipt.xml`, change only the title. Do not add or remove views.
-- All transaction list layouts must include `lyt_shimmer_transaction_item.xml` as the loading placeholder.
-- Operator dropdown field must include the `pbCompanyLoading` + `ivCompanyArrow` inside a `FrameLayout` slot — matching `activity_electricity.xml` exactly.
+Paging: `BillPayTransactionsViewModel.canLoadMore()` (`meta.current_page < meta.last_page`) + `nextPage()`, triggered
+when the last visible row is within 3 of the end. Screens that filter in the app (Status → Pending, Report) keep paging
+while a page brings no visible rows. **Never call `showShimmer(true)` for pagination pages.**
 
 ---
 
 ### ApiService Declaration
 
-- Add all endpoints for a module under a single comment block: `// ── {Category} ──`
-- Never scatter a module's endpoints across other modules' sections
-- Never add an endpoint inside a ViewModel, Activity, or anywhere other than `ApiService.kt` (or `ApiAdminService.kt` for `admin.paytouch.in` endpoints)
+- Bill Pay endpoints live in one block: `// ── Bill Pay (all categories share these) ──` in `ApiService.kt`.
+- Never add per-category endpoints. Never add an endpoint outside `ApiService.kt` / `ApiAdminService.kt`.
 
 ---
 
-### Transaction Type Parameter
+### `category` Parameter
 
-The `type` query parameter for `GET /api/transactions` must match the server contract:
-
-| Module | `type` value |
-|---|---|
-| Electricity | `"electricity"` |
-| Gas | `"gas"` |
-| Mobile Prepaid | `"mobile_recharge"` |
-| Mobile Postpaid | `"mobile_postpaid"` |
-| DTH | `"dth"` |
-| FASTag | `"fastag"` |
-| Loan Repayment | `"loan_repayment"` |
-| Municipal Tax | `"municipal_tax"` |
-| Any new module | Check the API contract — never guess |
+`GET billpay/utility-billers` and `GET transactions` take `category = CategoryType.value`:
+`electricity`, `gas`, `prepaid`, `mobile_postpaid`, `dth`, `fastag`, `loan_repayment`, `municipal_taxes`.
+Any new category: check the API contract (`billpay/categories` lists the 16 backend values) — never guess.
 
 ---
 
 ### SMS Receipt Entry Modes
 
-Every `{Category}SmsReceiptActivity` has two modes, controlled by `EXTRA_FROM_PAYMENT: Boolean`:
+`SmsReceiptActivity.start(context, category, clientReference?, fromPayment)`:
 
-| Mode | `fromPayment` | Title row | Data |
-|---|---|---|---|
-| After payment | `true` | Hidden | `GET /api/{category}/latest-payment` |
-| From recent transactions | `false` | Visible (tab bar) | Same `GET /api/{category}/latest-payment` |
-
-Both modes call `getLatestPayments()` unconditionally in `onCreate()`. There is no separate per-transaction receipt endpoint — the latest-payment endpoint always returns the most recent record for the authenticated user.
+| Opened from | `client_reference` | Data |
+|---|---|---|
+| Result screen (`fromPayment = true`, title row hidden) | Yes | `GET billpay/status/{ref}` |
+| Transaction Detail → View Receipt | Yes | `GET billpay/status/{ref}` |
+| SMS Receipt tab on the form | No | `GET transactions?category=X&per_page=1` → first row's ref → `GET billpay/status/{ref}` |

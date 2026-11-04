@@ -13,5 +13,7 @@ data class RecentTransactionItem(
     @DrawableRes val categoryIconRes: Int,
     val isMobileCategory: Boolean = false,
     val isVehicleCategory: Boolean = false,
+    // Server identifier_label (e.g. "Consumer Number"); null → label from the category flags
+    val identifierLabel: String? = null,
     var isExpanded: Boolean = false
 )
