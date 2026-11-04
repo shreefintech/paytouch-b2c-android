@@ -306,7 +306,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             onError(getString(R.string.msgNoInternet))
             return
         }
-        // ponytail: first page only — add paging when users hold more than REFERRAL_PER_PAGE referral rows
+        // TODO(B2C-298): first page only — add paging when users hold more than REFERRAL_PER_PAGE referral rows
         ApiClient.apiService.getReferralHistory(bearerToken(), page = 1, perPage = REFERRAL_PER_PAGE)
             .enqueue(object : Callback<General<List<BonusRewardItem>>> {
                 override fun onResponse(
@@ -395,10 +395,12 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             })
     }
 
-    // onPending: timeout / 5xx — outcome unknown, so a retry of the same amount reuses the request_id
+    // onPending: timeout / 5xx — outcome unknown, so a retry of the same amount + mode + narration reuses the request_id
     fun withdraw(
         amount: Double,
         mpin: String,
+        transferMode: String,
+        narration: String?,
         onLoading: () -> Unit,
         onSuccess: (WalletWithdrawalItem) -> Unit,
         onError: (String) -> Unit,
@@ -414,7 +416,9 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
             request = WalletWithdrawalRequest(
                 amount = amount,
                 mpin = mpin,
-                requestId = withdrawIdempotencyKey.forAttempt(amount.toString())
+                requestId = withdrawIdempotencyKey.forAttempt("$amount|$transferMode|$narration"),
+                transferMode = transferMode,
+                remark = narration
             )
         ).enqueue(object : Callback<General<WalletWithdrawalItem>> {
             override fun onResponse(

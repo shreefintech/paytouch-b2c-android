@@ -100,6 +100,7 @@ class LoadWalletActivity : BaseActivity() {
     private var withdrawConfirmDialogBinding: DialogConfirmWithdrawBinding? = null
     private var pendingWithdrawAmount: Double = 0.0
     private var pendingWithdrawMode: String = MODE_IMPS
+    private var pendingWithdrawNarration: String? = null
     // amount + fee from the fee preview; null until it loads (or when the fee isn't synced) — the server still checks
     private var pendingWithdrawTotal: Double? = null
 
@@ -372,8 +373,7 @@ class LoadWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errInsufficientBalance))
             return
         }
-        // TODO(B2C-298): G28 — POST wallet/withdrawals takes no payment mode or narration; UI kept,
-        //  values not sent until the API accepts them
+        pendingWithdrawNarration = withdrawSheetBinding.etNarration.text?.toString()?.trim()?.takeIf { it.isNotEmpty() }
         hideWithdrawSheet()
         showWithdrawConfirmDialog(amount, selectedPaymentMode)
     }
@@ -463,6 +463,8 @@ class LoadWalletActivity : BaseActivity() {
         viewModel.withdraw(
             amount = pendingWithdrawAmount,
             mpin = mpin,
+            transferMode = pendingWithdrawMode,
+            narration = pendingWithdrawNarration,
             onLoading = { showProgressMpin.set(true) },
             onSuccess = onSuccess@{ data ->
                 showProgressMpin.set(false)

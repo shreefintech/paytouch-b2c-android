@@ -113,8 +113,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     // Refreshes the bank/PAN flags on every Home launch
                     saveOnboardingFlags(data?.bankDetailsAdded, data?.panAdded, data?.nextStep)
                     // Checked at response time so the flags above still refresh while an upload is in flight.
-                    // ponytail: if that in-flight upload then fails, the block returns only on the next Home launch;
-                    // switch the upload result to LiveData if Home ever stops being portrait-locked
+                    // TODO(B2C-238): if that in-flight upload then fails, the block returns only on the next Home launch;
+                    //  switch the upload result to LiveData if Home ever stops being portrait-locked
                     if (isAadhaarUploading) return
                     if (!response.isSuccessful || data == null) return
                     val step = NextStep.from(data.nextStep)
