@@ -18,9 +18,9 @@ data class MeDataItem(
     val kycRejectedItems: List<String>
         get() = ((kycRejection as? Map<*, *>)?.get("items") as? List<*>)?.filterIsInstance<String>().orEmpty()
 
-    // Either Aadhaar item rejected — drives the Aadhaar badge on KYC Details
+    // Any Aadhaar item rejected (entry starts with "aadhaar", iOS parity) — drives the Aadhaar badge on KYC Details
     val isAadhaarRejected: Boolean
-        get() = kycRejectedItems.any { it == KYC_ITEM_AADHAAR_NUMBER || it == KYC_ITEM_AADHAAR_PHOTO }
+        get() = kycRejectedItems.any { it.startsWith(KYC_ITEM_AADHAAR_PREFIX) }
 
     // The Home re-upload dialog posts both Aadhaar fields — resubmit 422s on any field that wasn't rejected
     val canResubmitAadhaar: Boolean
@@ -31,5 +31,6 @@ data class MeDataItem(
         const val KYC_ITEM_AADHAAR_NUMBER = "aadhaar_number"
         const val KYC_ITEM_AADHAAR_PHOTO = "aadhaar_photo"
         const val KYC_ITEM_BANK_DETAILS = "bank_details"
+        private const val KYC_ITEM_AADHAAR_PREFIX = "aadhaar"
     }
 }

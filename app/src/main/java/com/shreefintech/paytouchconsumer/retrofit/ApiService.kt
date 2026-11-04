@@ -21,6 +21,8 @@ import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Item
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.BankDetailsV2Request
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Item
 import com.shreefintech.paytouchconsumer.retrofit.model.v2.PanV2Request
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BillPayStatusItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalPageItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusRewardItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.VirtualAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
@@ -700,6 +702,21 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Path("client_reference") clientReference: String
     ): Call<General<WalletWithdrawalItem>>
+
+    // Rewards & Withdrawals → Withdrawals tab; page-numbered, more while meta.current_page < meta.last_page
+    @GET("${MOBILE}wallet/withdrawals")
+    fun getWalletWithdrawals(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): Call<WalletWithdrawalPageItem>
+
+    // History detail for billpay / recharge / platform_fee / refund / cashback rows
+    @GET("${MOBILE}billpay/status/{client_reference}")
+    fun getBillPayStatus(
+        @Header("Authorization") authorization: String,
+        @Path("client_reference") clientReference: String
+    ): Call<General<BillPayStatusItem>>
 
     // Wallet ledger — replaces combined-wallet-history; cursor omitted on the first page
     @GET("${MOBILE}wallet/statement")

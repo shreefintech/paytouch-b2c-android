@@ -26,6 +26,7 @@ import com.shreefintech.paytouchconsumer.enums.NextStep
 import com.shreefintech.paytouchconsumer.kyc.bank.model.EditBankPassItem
 import com.shreefintech.paytouchconsumer.retrofit.model.auth.MeDataItem
 import com.shreefintech.paytouchconsumer.retrofit.model.kyc.KycDocumentDetailItem
+import com.shreefintech.paytouchconsumer.retrofit.model.wallet.VirtualAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBankAccountItem
 import com.shreefintech.paytouchconsumer.utill.ToastUtil
 import com.shreefintech.paytouchconsumer.utill.Utility
@@ -95,6 +96,8 @@ class KycDetailsActivity : BaseActivity() {
             return
         }
         hideNoInternet()
+        // Bank and VA calls can both fail — only the first error toast is shown
+        var isErrorShown = false
         viewModel.fetchDetails(
             onLoading = {
                 binding.pbLoading.isVisible = true
@@ -106,7 +109,18 @@ class KycDetailsActivity : BaseActivity() {
                 binding.nsvContent.isVisible = true
                 populateData(me, bank)
                 // The empty card alone would read as "no bank on file"
-                if (isBankFailed) ToastUtil.showWarning(mActivity, getString(R.string.msgBankDetailsLoadFailed))
+                if (isBankFailed && !isErrorShown) {
+                    isErrorShown = true
+                    ToastUtil.showWarning(mActivity, getString(R.string.msgBankDetailsLoadFailed))
+                }
+            },
+            onVirtualAccount = { va, vaError ->
+                if (isFinishing || isDestroyed) return@fetchDetails
+                populateVirtualAccount(va)
+                if (vaError != null && !isErrorShown) {
+                    isErrorShown = true
+                    if (vaError.isNotEmpty()) ToastUtil.showDelete(mActivity, vaError)
+                }
             },
             onError = { msg ->
                 binding.pbLoading.isVisible = false
@@ -153,14 +167,40 @@ class KycDetailsActivity : BaseActivity() {
         item.tvAccountNumber.text = bank?.accountMasked?.takeIf { hasBank } ?: "--"
         item.tvBankName.text = bank?.bankName?.takeIf { hasBank } ?: "--"
         item.tvIfsc.text = bank?.ifsc?.takeIf { hasBank } ?: "--"
-        // Branch is not returned by wallet/bank-account
-        item.llBranchName.isVisible = false
+        // wallet/bank-account has no branch — that row shows the holder name instead
+        item.ivBranchIcon.setImageResource(R.drawable.ic_user_1)
+        item.tvBranchLabel.setText(R.string.labelAccountHolderName)
+        item.tvBranchName.text = bank?.holderName?.takeIf { hasBank && it.isNotBlank() } ?: "--"
         item.ivEditBank.visibility = View.VISIBLE
         item.ivEditBank.setOnClickListener {
             if (Utility.stopClick()) return@setOnClickListener
             onEditBank(bank?.takeIf { hasBank })
         }
         binding.llBankAccounts.addView(item.root)
+    }
+
+    // VA card from GET virtual-account — hidden when the user has none or the call failed
+    private fun populateVirtualAccount(va: VirtualAccountItem?) {
+        binding.llVirtualAccount.removeAllViews()
+        val hasVa = va?.hasVirtualAccount == true
+        binding.llVirtualAccountSection.isVisible = hasVa
+        if (va == null || !hasVa) return
+
+        val isActive = va.isActive == true
+        binding.tvVirtualAccountStatus.setText(if (isActive) R.string.labelActiveStatus else R.string.labelInactiveStatus)
+        binding.tvVirtualAccountStatus.setTextColor(
+            ContextCompat.getColor(this, if (isActive) R.color.colorStatusSuccess else R.color.colorStatusPending)
+        )
+
+        val item = ItemKycBankAccountBinding.inflate(layoutInflater, binding.llVirtualAccount, false)
+        item.tvAccountNumberLabel.setText(R.string.labelVirtualAccountNumber)
+        item.tvAccountNumber.text = va.bankAcc?.ifBlank { null } ?: "--"
+        item.tvBankName.text = va.bankName?.ifBlank { null } ?: "--"
+        item.tvIfsc.text = va.ifsc?.ifBlank { null } ?: "--"
+        item.tvBranchLabel.setText(R.string.labelUpiId)
+        item.tvBranchName.text = va.vpa?.ifBlank { null } ?: "--"
+        item.ivEditBank.visibility = View.GONE
+        binding.llVirtualAccount.addView(item.root)
     }
 
     private fun onEditBank(bank: WalletBankAccountItem?) {
@@ -194,12 +234,13 @@ class KycDetailsActivity : BaseActivity() {
         }
     }
 
-    // iOS parity: rejected when kyc_rejection.items names it, verified once complete, submitted while on file
+    // iOS parity: rejected when kyc_rejection.items names it, verified when on file and complete,
+    // submitted while only on file, else pending
     private fun badge(isRejected: Boolean, isComplete: Boolean, isOnFile: Boolean): KycBadge = when {
-        isRejected -> KycBadge.REJECTED
-        isComplete -> KycBadge.VERIFIED
-        isOnFile   -> KycBadge.SUBMITTED
-        else       -> KycBadge.PENDING
+        isRejected             -> KycBadge.REJECTED
+        isOnFile && isComplete -> KycBadge.VERIFIED
+        isOnFile               -> KycBadge.SUBMITTED
+        else                   -> KycBadge.PENDING
     }
 
     private fun applyBadge(view: TextView, badge: KycBadge) {

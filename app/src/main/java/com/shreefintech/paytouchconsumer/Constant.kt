@@ -116,6 +116,15 @@ object Constant {
     const val WITHDRAW_STATUS_FAILED = "FAILED"
     const val WITHDRAW_STATUS_REJECTED = "REJECTED"
     const val WITHDRAW_STATUS_REVERSED = "REVERSED"
+    const val WITHDRAW_STATUS_SUCCESSFUL = "SUCCESSFUL"
+    const val WITHDRAW_STATUS_CHARGED = "CHARGED"
+    const val WITHDRAW_STATUS_FAILURE = "FAILURE"
+    const val WITHDRAW_STATUS_DECLINED = "DECLINED"
+    // Withdrawals history rows: success = plain debit, failed = grey "Failed" (money back in wallet), else "Pending"
+    val WITHDRAW_SUCCESS_STATUSES = setOf(WITHDRAW_STATUS_SUCCESS, WITHDRAW_STATUS_SUCCESSFUL, WITHDRAW_STATUS_COMPLETED, WITHDRAW_STATUS_CHARGED)
+    val WITHDRAW_FAILED_STATUSES = setOf(
+        WITHDRAW_STATUS_FAILED, WITHDRAW_STATUS_FAILURE, WITHDRAW_STATUS_REJECTED, WITHDRAW_STATUS_DECLINED, WITHDRAW_STATUS_REVERSED
+    )
 
     // HDFC order creation
     const val HDFC_ORDER_PURPOSE_WALLET_TOPUP = "wallet_topup"
@@ -123,6 +132,9 @@ object Constant {
     // Wallet top-up (POST wallet/topups) `flow` values — Net Banking opens HDFC's payment page, UPI opens a UPI app
     const val TOPUP_FLOW_PAYMENT_PAGE = "payment_page"
     const val TOPUP_FLOW_UPI_INTENT = "upi_intent"
+    // Required prefixes of upi_intent_url / payment_link before the app opens them
+    const val TOPUP_UPI_URL_PREFIX = "upi://"
+    const val TOPUP_PAYMENT_LINK_PREFIX = "https://"
     // GET wallet/statement `wallet` filter (main, referral, bonus, earning) — My Wallet lists show main
     const val WALLET_STATEMENT_MAIN = "main"
     const val WALLET_DIRECTION_CREDIT = "credit"
@@ -134,6 +146,11 @@ object Constant {
     // Top-up final status values (compared case-insensitively); initiated / pending / crediting / on_hold show as processing
     const val TOPUP_STATUS_SUCCESS = "SUCCESS"
     const val TOPUP_STATUS_FAILED = "FAILED"
+    const val TOPUP_STATUS_PENDING = "PENDING"
+    // Paid at HDFC, held for manual review — final but shown as pending
+    const val TOPUP_STATUS_ON_HOLD = "ON_HOLD"
+    // Final top-up statuses that count as success (Wallet History / Load Wallet API doc, 2026-11-04)
+    val TOPUP_SUCCESS_STATUSES = setOf("SUCCESS", "SUCCESSFUL", "COMPLETED", "CHARGED", "CREDITED")
 
     // Transaction type values returned by /api/transactions/{id}
     const val TRANSACTION_TYPE_HDFC = "hdfc_smartgateway"

@@ -39,10 +39,13 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
     private val withdrawIdempotencyKey = MoneyRequestId()
 
     companion object {
-        // TODO(B2C-298): G6 — backend gave no polling interval/timeout for top-ups or withdrawals; ~12 s total,
-        //  then the status shows pending
+        // Polling per the API docs: top-ups every 3 s up to 5 times, withdrawals every 3 s up to 10 times (~30 s);
+        // after that the status shows pending
         private const val STATUS_POLL_INTERVAL_MS = 3000L
-        private const val STATUS_POLL_MAX_ATTEMPTS = 5
+        private const val TOPUP_POLL_MAX_ATTEMPTS = 5
+        private const val WITHDRAW_POLL_MAX_ATTEMPTS = 10
+        // 503 = payouts unavailable, nothing debited — a plain failure, not an unknown outcome
+        private const val HTTP_SERVICE_UNAVAILABLE = 503
         private const val REFERRAL_PER_PAGE = 50
     }
 
@@ -183,6 +186,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
         pollStatus(
             request = { ApiClient.apiService.getWalletTopup(bearerToken(), clientReference) },
             isFinal = { it.isFinal == true },
+            maxAttempts = TOPUP_POLL_MAX_ATTEMPTS,
             onResult = onResult
         )
     }
@@ -192,15 +196,16 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
         request: () -> Call<General<T>>,
         isFinal: (T) -> Boolean,
         onResult: (T?) -> Unit,
+        maxAttempts: Int,
         attempt: Int = 1
     ) {
         if (!Utility.isInternetAvailable(getApplication())) { onResult(null); return }
         request().enqueue(object : Callback<General<T>> {
             override fun onResponse(call: Call<General<T>>, response: Response<General<T>>) {
                 val data = if (response.isSuccessful) response.body()?.data else null
-                if (data != null && !isFinal(data) && attempt < STATUS_POLL_MAX_ATTEMPTS) {
+                if (data != null && !isFinal(data) && attempt < maxAttempts) {
                     pollHandler.postDelayed(
-                        { pollStatus(request, isFinal, onResult, attempt + 1) },
+                        { pollStatus(request, isFinal, onResult, maxAttempts, attempt + 1) },
                         STATUS_POLL_INTERVAL_MS
                     )
                 } else {
@@ -258,6 +263,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
         pollStatus(
             request = { ApiClient.apiService.getWalletWithdrawal(bearerToken(), clientReference) },
             isFinal = { it.isFinal == true },
+            maxAttempts = WITHDRAW_POLL_MAX_ATTEMPTS,
             onResult = onResult
         )
     }
@@ -425,7 +431,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
                 call: Call<General<WalletWithdrawalItem>>,
                 response: Response<General<WalletWithdrawalItem>>
             ) {
-                if (response.code() >= 500) {
+                if (response.code() >= 500 && response.code() != HTTP_SERVICE_UNAVAILABLE) {
                     onPending(getString(R.string.msgMoneyRequestPending))
                     return
                 }

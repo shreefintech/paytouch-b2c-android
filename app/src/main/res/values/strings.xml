@@ -498,6 +498,7 @@
     <string name="labelPendingTransactions">Pending</string>
     <string name="labelTransactionsZero">Transactions: 0</string>
     <string name="labelVirtualAccountNumber">Virtual Account Number</string>
+    <string name="labelVirtualAccount">Virtual Account</string>
     <string name="labelActiveStatus">Active</string>
     <string name="labelInactiveStatus">Inactive</string>
     <string name="labelFee">Fee</string>
@@ -682,6 +683,26 @@
     <string name="labelUploadedDocuments">Uploaded Documents</string>
     <string name="labelVerified">Verified</string>
     <string name="labelPending">Pending</string>
+
+    <!-- My Wallet history tabs + history detail rows -->
+    <string name="labelTabMain">Main</string>
+    <string name="labelTabBonus">Bonus</string>
+    <string name="labelTabReferral">Referral</string>
+    <string name="labelTabEarning">Earning</string>
+    <string name="labelTabWithdrawals">Withdrawals</string>
+    <string name="labelTabRewardsWithdrawals">Rewards &amp; Withdrawals</string>
+    <string name="titleWalletHistory">%1$s History</string>
+    <string name="labelWithdrawalTo">Withdrawal to %1$s</string>
+    <string name="labelFailed">Failed</string>
+    <string name="labelBiller">Biller</string>
+    <string name="labelOperatorReference">Operator Reference</string>
+    <string name="labelTotalAmount">Total Amount</string>
+    <string name="labelFailureReason">Failure Reason</string>
+    <string name="labelCreditAmount">Credit Amount</string>
+    <string name="labelTotalDebited">Total Debited</string>
+    <string name="labelBank">Bank</string>
+    <string name="labelUtr">UTR</string>
+    <string name="labelBalanceAfter">Balance After</string>
     <string name="labelRejected">Rejected</string>
     <string name="labelSubmitted">Submitted</string>
     <string name="titleEnterMpin">Enter MPIN</string>

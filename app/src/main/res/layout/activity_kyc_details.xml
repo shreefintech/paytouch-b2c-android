@@ -416,6 +416,58 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical" />
 
+                        <!-- Virtual Account (GET virtual-account) — hidden until the user has one -->
+                        <LinearLayout
+                            android:id="@+id/llVirtualAccountSection"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_extra_large"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/proza_libre_bold"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/labelVirtualAccount"
+                                    android:textColor="@color/primary"
+                                    android:textSize="@dimen/text_size_16" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tvVirtualAccountStatus"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/proza_libre_semi_bold"
+                                    android:includeFontPadding="false"
+                                    android:paddingHorizontal="@dimen/margin_small_medium"
+                                    android:paddingVertical="@dimen/margin_extra_small"
+                                    android:textColor="@color/colorStatusSuccess"
+                                    android:textSize="@dimen/text_size_12"
+                                    tools:text="@string/labelActiveStatus" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="@dimen/kyc_gradiant_line_width"
+                                android:layout_height="2dp"
+                                android:layout_marginTop="@dimen/margin_tiny"
+                                android:background="@drawable/kyc_gradiant_line" />
+
+                            <!-- item_kyc_bank_account inflated in populateVirtualAccount() -->
+                            <LinearLayout
+                                android:id="@+id/llVirtualAccount"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical" />
+                        </LinearLayout>
+
                         <!-- Header: title LEFT | Verified RIGHT -->
                         <LinearLayout
                             android:id="@+id/llDocumentsHeader"
