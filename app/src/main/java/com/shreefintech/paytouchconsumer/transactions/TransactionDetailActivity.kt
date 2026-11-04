@@ -85,7 +85,7 @@ class TransactionDetailActivity : BaseActivity() {
         binding.tvPlatformFee.text   = item.platformFee
         binding.tvTotalPayable.text  = item.totalPayable
         binding.tvTransactionId.text = item.transactionId
-        binding.llViewReceipt.visibility = if (item.categoryType != CategoryType.UNKNOWN && item.transactionId != "--") View.VISIBLE else View.GONE
+        binding.llViewReceipt.visibility = if (item.categoryType != CategoryType.UNKNOWN && item.userId != "--") View.VISIBLE else View.GONE
 
         val (bgColor, textColor) = when (item.status.lowercase()) {
             "success" -> Pair(R.color.toast_bg_success, R.color.toast_text_success)
@@ -115,8 +115,9 @@ class TransactionDetailActivity : BaseActivity() {
                 binding.llViewReceipt -> {
                     if (Utility.stopClick()) return@OnClickListener
                     val item = transactionItem ?: return@OnClickListener
-                    val txnId = item.transactionId.takeIf { it != "--" } ?: return@OnClickListener
-                    SmsReceiptActivity.start(mActivity, item.categoryType, txnId)
+                    // userId holds client_reference — the receipt's billpay/status key
+                    val clientReference = item.userId.takeIf { it != "--" } ?: return@OnClickListener
+                    SmsReceiptActivity.start(mActivity, item.categoryType, clientReference)
                 }
             }
         }

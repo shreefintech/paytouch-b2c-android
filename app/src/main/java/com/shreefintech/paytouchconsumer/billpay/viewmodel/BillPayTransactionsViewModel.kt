@@ -116,7 +116,7 @@ class BillPayTransactionsViewModel(application: Application) : AndroidViewModel(
             status            = item.status ?: "-",
             amount            = Utility.formatAmount(item.amount),
             accountNumber     = accountNumber(item),
-            reference         = referenceOf(item),
+            reference         = txnReferenceOf(item),
             categoryIconRes   = category.iconRes,
             isMobileCategory  = category.isMobileCategory,
             isVehicleCategory = category.isVehicleCategory,
@@ -127,7 +127,7 @@ class BillPayTransactionsViewModel(application: Application) : AndroidViewModel(
         val fee = (item.charge ?: 0.0) + (item.gstAmount ?: 0.0)
         return TransactionItem(
             mobileNumber      = accountNumber(item),
-            transactionId     = item.clientReference ?: "--",
+            transactionId     = txnReferenceOf(item),
             amount            = Utility.formatAmount(item.amount),
             status            = item.status ?: "--",
             categoryIconRes   = category.iconRes,
@@ -161,6 +161,10 @@ class BillPayTransactionsViewModel(application: Application) : AndroidViewModel(
                 .values.firstOrNull { it.isNotBlank() }
             ?: "--"
     }
+
+    // Transaction ID shown on every Bill Pay screen
+    fun txnReferenceOf(item: BillPayTransactionItem): String =
+        item.txnReference?.takeIf { it.isNotBlank() } ?: "--"
 
     // Reference row: provider_ref, else txn_reference, else client_reference
     fun referenceOf(item: BillPayTransactionItem): String =

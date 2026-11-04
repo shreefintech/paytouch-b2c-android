@@ -342,6 +342,7 @@ class BillPayActivity : BaseActivity() {
                     mActivity,
                     BillPaymentStatusItem(
                         clientReference = item.clientReference ?: "--",
+                        txnReference = item.txnReference?.takeIf { it.isNotBlank() } ?: "--",
                         amount = (item.amount ?: currentAmountText().toDoubleOrNull())?.toString() ?: "",
                         status = item.status ?: "",
                         isFinal = item.isFinal == true,

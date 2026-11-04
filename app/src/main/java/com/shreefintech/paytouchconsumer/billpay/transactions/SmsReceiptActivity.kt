@@ -214,7 +214,7 @@ class SmsReceiptActivity : BaseActivity() {
         binding.tvCompanyName.text     = item.billerName ?: "--"
         binding.tvReceiptDate.text     = date
         binding.tvAmountPaid.text      = amount
-        binding.tvPaytouchTxnId.text   = ref
+        binding.tvPaytouchTxnId.text   = transactionsViewModel.txnReferenceOf(item)
         // Reference row: provider_ref, else client_reference
         binding.tvBConnectTxnId.text   = item.providerRef?.takeIf { it.isNotBlank() } ?: ref
         binding.tvCcf.text             = Utility.formatAmount(fee)

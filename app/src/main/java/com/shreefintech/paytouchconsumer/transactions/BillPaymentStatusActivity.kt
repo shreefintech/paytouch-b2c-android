@@ -63,6 +63,8 @@ class BillPaymentStatusActivity : BaseActivity() {
     private var isFinal = false
     private var currentStatus = ""
     private var amount = ""
+    // Shown as Transaction ID; often only set once billpay/status reports it
+    private var txnReference = "--"
     private var isNavigating = false
     private val soundPlayer = StatusSoundPlayer()
     private var isSoundPlayed = false
@@ -94,6 +96,7 @@ class BillPaymentStatusActivity : BaseActivity() {
         binding.onClickListener = onClickListener()
         binding.lytToolbar.ivBack.gone()
         amount = passItem?.amount ?: ""
+        txnReference = passItem?.txnReference ?: "--"
         isFinal = passItem?.isFinal == true
         populateStatus(passItem?.status ?: "", null)
         onBack()
@@ -131,9 +134,12 @@ class BillPaymentStatusActivity : BaseActivity() {
             onSuccess = { item ->
                 if (isFinishing || isDestroyed) return@loadStatus
                 item.amount?.let { amount = it.toString() }
+                val newTxnReference = item.txnReference?.takeIf { it.isNotBlank() } ?: txnReference
+                val txnChanged = newTxnReference != txnReference
+                txnReference = newTxnReference
                 val status = item.status ?: currentStatus
                 isFinal = item.isFinal == true
-                if (!status.equals(currentStatus, ignoreCase = true) || isFinal) populateStatus(status, item.failureReason)
+                if (!status.equals(currentStatus, ignoreCase = true) || isFinal || txnChanged) populateStatus(status, item.failureReason)
                 if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@loadStatus
                 if (isFinal) scheduleReceipt() else handler.postDelayed(pollRunnable, Constant.BILLPAY_POLL_INTERVAL_MS)
             },
@@ -169,8 +175,8 @@ class BillPaymentStatusActivity : BaseActivity() {
         binding.tvStatusLabel.setTextColor(statusColor)
         binding.tvStatusDescription.text = failureReason?.takeIf { display.isFailed && it.isNotBlank() } ?: display.description
         binding.tvAmountLabel.text = display.amountLabel
-        binding.tvTransactionId.text = clientReference
-        binding.ivCopyId.visibility = if (clientReference == "--") View.GONE else View.VISIBLE
+        binding.tvTransactionId.text = txnReference
+        binding.ivCopyId.visibility = if (txnReference == "--") View.GONE else View.VISIBLE
         binding.tvAmount.text = Utility.formatAmount(amount)
         binding.tvAmount.setTextColor(statusColor)
         if (changed) {
@@ -251,7 +257,7 @@ class BillPaymentStatusActivity : BaseActivity() {
 
     private fun copyTransactionId() {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("client_reference", clientReference))
+        clipboard.setPrimaryClip(ClipData.newPlainText("txn_reference", txnReference))
         ToastUtil.showSuccess(mActivity, getString(R.string.msgCopiedToClipboard))
         binding.ivCopyId.setImageResource(R.drawable.ic_toast_tick)
         handler.postDelayed({ binding.ivCopyId.setImageResource(R.drawable.ic_copy) }, 1500L)
