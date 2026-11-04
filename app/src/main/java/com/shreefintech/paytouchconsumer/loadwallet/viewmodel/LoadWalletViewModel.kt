@@ -139,6 +139,8 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
 
     fun createTopup(
         amount: Double,
+        flow: String,
+        remark: String?,
         onLoading: () -> Unit,
         onSuccess: (WalletTopupItem) -> Unit,
         onError: (String) -> Unit
@@ -150,7 +152,7 @@ class LoadWalletViewModel(application: Application) : AndroidViewModel(applicati
         onLoading()
         ApiClient.apiService.createWalletTopup(
             authorization = bearerToken(),
-            request = WalletTopupRequest(amount = amount, flow = Constant.TOPUP_FLOW_PAYMENT_PAGE)
+            request = WalletTopupRequest(amount = amount, flow = flow, remark = remark)
         ).enqueue(object : Callback<General<WalletTopupItem>> {
             override fun onResponse(
                 call: Call<General<WalletTopupItem>>,

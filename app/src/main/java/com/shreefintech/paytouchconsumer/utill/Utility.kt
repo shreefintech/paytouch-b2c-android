@@ -66,6 +66,7 @@ object Utility {
                 .parse(createdAt.replace(FRACTIONAL_SECONDS, ""))
                 ?.let { return output.format(it) }
         } catch (_: Exception) {
+            // Expected for timestamps without an offset — fall through to the legacy parsers below
         }
         val cleaned = createdAt.substringBefore(".").substringBefore("+")
         val inputFormats = listOf(

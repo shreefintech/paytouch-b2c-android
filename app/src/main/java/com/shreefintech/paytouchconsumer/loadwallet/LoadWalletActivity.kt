@@ -91,6 +91,10 @@ class LoadWalletActivity : BaseActivity() {
     private var confirmDialogBinding: DialogConfirmPaymentBinding? = null
     private var pendingPayAmount: Double = 0.0
     private val showProgressPay = ObservableBoolean(false)
+    // POST wallet/topups `flow` picked on the sheet; flow + remark are captured when the confirm dialog opens
+    private var selectedTopupFlow = Constant.TOPUP_FLOW_PAYMENT_PAGE
+    private var pendingPayFlow = Constant.TOPUP_FLOW_PAYMENT_PAGE
+    private var pendingPayRemark: String? = null
 
     private var withdrawConfirmDialog: Dialog? = null
     private var withdrawConfirmDialogBinding: DialogConfirmWithdrawBinding? = null
@@ -270,6 +274,25 @@ class LoadWalletActivity : BaseActivity() {
                 binding.viewBg.alpha = slideOffset.coerceIn(0f, 1f)
             }
         })
+        selectTopupFlow(Constant.TOPUP_FLOW_PAYMENT_PAGE)
+    }
+
+    private fun selectTopupFlow(flow: String) {
+        selectedTopupFlow = flow
+        val primary = ContextCompat.getColor(mActivity, R.color.primary)
+        val primaryLight = ContextCompat.getColor(mActivity, R.color.primary_light)
+        val black = ContextCompat.getColor(mActivity, R.color.black)
+        val transparent = ContextCompat.getColor(mActivity, android.R.color.transparent)
+        val density = resources.displayMetrics.density
+        listOf(
+            Triple(Constant.TOPUP_FLOW_PAYMENT_PAGE, sheetBinding.cvFlowNetBanking, sheetBinding.tvFlowNetBanking),
+            Triple(Constant.TOPUP_FLOW_UPI_INTENT, sheetBinding.cvFlowUpi, sheetBinding.tvFlowUpi)
+        ).forEach { (rowFlow, card, label) ->
+            val isSelected = rowFlow == flow
+            card.setCardBackgroundColor(if (isSelected) primaryLight else transparent)
+            card.strokeWidth = ((if (isSelected) 2 else 1) * density).toInt()
+            label.setTextColor(if (isSelected) primary else black)
+        }
     }
 
     private fun setupWithdrawSheet() {
@@ -349,8 +372,8 @@ class LoadWalletActivity : BaseActivity() {
             ToastUtil.showDelete(mActivity, getString(R.string.errInsufficientBalance))
             return
         }
-        // TODO(B2C-298): G28 — POST wallet/withdrawals takes no payment mode or narration; both are hidden in
-        //  sheet_withdraw.xml and the mode stays IMPS — show them again once the API accepts them
+        // TODO(B2C-298): G28 — POST wallet/withdrawals takes no payment mode or narration; UI kept,
+        //  values not sent until the API accepts them
         hideWithdrawSheet()
         showWithdrawConfirmDialog(amount, selectedPaymentMode)
     }
@@ -628,10 +651,13 @@ class LoadWalletActivity : BaseActivity() {
         viewModel.fetchRewardsLevel(
             onSuccess = { data ->
                 showProgressRewards.set(false)
+                binding.cardRewardsLevel.visible()
                 populateLevel(data)
             },
             onError = {
                 showProgressRewards.set(false)
+                // No level to show — hide the strip; a later successful refresh shows it again
+                binding.cardRewardsLevel.gone()
                 binding.tvTierName.text = "--"
                 binding.ivTierBadge.setImageDrawable(null)
                 binding.tvCashbackPct.text = "--"
@@ -690,7 +716,6 @@ class LoadWalletActivity : BaseActivity() {
             return
         }
 
-        // TODO(B2C-298): G28 — POST wallet/topups takes no description — field stays visible but is not sent
         val amountStr = sheetBinding.etAmount.text?.toString()?.trim() ?: ""
         if (amountStr.isEmpty()) {
             ToastUtil.showDelete(mActivity, getString(R.string.errEnterAmount))
@@ -702,6 +727,8 @@ class LoadWalletActivity : BaseActivity() {
             return
         }
         // TODO(B2C-298): G2 — HDFC min/max not shared; server's 422 message covers out-of-range amounts
+        pendingPayFlow = selectedTopupFlow
+        pendingPayRemark = sheetBinding.etDescription.text?.toString()?.trim()?.takeIf { it.isNotEmpty() }
         hidePaymentSheet()
         showConfirmDialog(amount)
     }
@@ -738,13 +765,19 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     // "Charges by payment method" — one fee-preview call per method; a method that fails is left out,
-    // the error toasts only when all of them fail
+    // the error toasts only when all of them fail. UPI flow pays by UPI only, so only that row shows.
     private fun bindTopupFees(dialogBinding: DialogConfirmPaymentBinding, amount: Double) {
-        val rows = listOf(
+        val allRows = listOf(
             Triple(Constant.TOPUP_FEE_METHOD_UPI, dialogBinding.tvFeeUpi, dialogBinding.groupFeeUpi),
             Triple(Constant.TOPUP_FEE_METHOD_CARD, dialogBinding.tvFeeCard, dialogBinding.groupFeeCard),
             Triple(Constant.TOPUP_FEE_METHOD_NB, dialogBinding.tvFeeNb, dialogBinding.groupFeeNb)
         )
+        val (rows, skipped) = allRows.partition {
+            pendingPayFlow != Constant.TOPUP_FLOW_UPI_INTENT || it.first == Constant.TOPUP_FEE_METHOD_UPI
+        }
+        skipped.forEach { it.third.gone() }
+        // UPI flow has no method choice on the next page
+        if (skipped.isNotEmpty()) dialogBinding.tvFeeNote.gone()
         var remaining = rows.size
         var failed = 0
         rows.forEach { (method, tvFee, group) ->
@@ -759,7 +792,7 @@ class LoadWalletActivity : BaseActivity() {
                 }
                 remaining--
                 if (remaining == 0 && failed == rows.size) {
-                    dialogBinding.tvFeeTitle.gone()
+                    dialogBinding.cardFees.gone()
                     ToastUtil.showDelete(mActivity, getString(R.string.errFeePreviewFailed), inWindow = false)
                 }
             }
@@ -769,6 +802,8 @@ class LoadWalletActivity : BaseActivity() {
     private fun startTopup() {
         viewModel.createTopup(
             amount = pendingPayAmount,
+            flow = pendingPayFlow,
+            remark = pendingPayRemark,
             onLoading = { showProgressPay.set(true) },
             onSuccess = onSuccess@{ data ->
                 showProgressPay.set(false)
@@ -789,13 +824,21 @@ class LoadWalletActivity : BaseActivity() {
                     return@onSuccess
                 }
                 // Without a reference or link the payment can't be opened or tracked
-                val payUrl = data.paymentLink.orEmpty()
+                val isUpiFlow = pendingPayFlow == Constant.TOPUP_FLOW_UPI_INTENT
+                val payUrl = (if (isUpiFlow) data.upiIntentUrl else data.paymentLink).orEmpty()
                 if (clientReference.isEmpty() || payUrl.isEmpty()) {
                     ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
                     return@onSuccess
                 }
                 Utility.hideKeyboard(mActivity)
                 confirmDialog?.dismiss()
+                if (isUpiFlow) {
+                    // Status is polled from onResume when the user comes back from the UPI app
+                    if (!HdfcPaymentHelper.launchUpiIntent(mActivity, clientReference, amount, payUrl)) {
+                        ToastUtil.showDelete(mActivity, getString(R.string.errAppNotInstalled), inWindow = false)
+                    }
+                    return@onSuccess
+                }
                 HdfcPaymentHelper.launchPayment(
                     context   = mActivity,
                     orderId   = clientReference,
@@ -814,6 +857,7 @@ class LoadWalletActivity : BaseActivity() {
     private fun showPaymentSheet() {
         sheetBinding.etAmount.setText("")
         sheetBinding.etDescription.setText("")
+        selectTopupFlow(Constant.TOPUP_FLOW_PAYMENT_PAGE)
         binding.viewBg.visible()
         sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
@@ -1060,6 +1104,16 @@ class LoadWalletActivity : BaseActivity() {
                 sheetBinding.ivClose -> {
                     if (Utility.stopClick()) return@OnClickListener
                     hidePaymentSheet()
+                }
+
+                sheetBinding.cvFlowNetBanking -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    selectTopupFlow(Constant.TOPUP_FLOW_PAYMENT_PAGE)
+                }
+
+                sheetBinding.cvFlowUpi -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    selectTopupFlow(Constant.TOPUP_FLOW_UPI_INTENT)
                 }
 
                 sheetBinding.btnProceedPayment -> {
