@@ -593,7 +593,7 @@
                                     android:layout_height="1dp"
                                     android:layout_marginTop="@dimen/margin_small"
                                     android:layout_marginBottom="@dimen/margin_small"
-                                    android:background="#1A000000" />
+                                    android:background="@color/bill_card_divider" />
 
                                 <!-- Customer Name -->
                                 <LinearLayout
@@ -853,7 +853,7 @@
                                     android:layout_height="1dp"
                                     android:layout_marginTop="@dimen/margin_small"
                                     android:layout_marginBottom="@dimen/margin_small"
-                                    android:background="#1A000000" />
+                                    android:background="@color/bill_card_divider" />
 
                                 <!-- Truncated description -->
                                 <androidx.appcompat.widget.AppCompatTextView

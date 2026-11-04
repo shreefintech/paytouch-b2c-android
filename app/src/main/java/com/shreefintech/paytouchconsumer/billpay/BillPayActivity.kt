@@ -286,10 +286,13 @@ class BillPayActivity : BaseActivity() {
             onSuccess = { bill ->
                 showProgressFetch.set(false)
                 if (isDestroyed) return@fetchBill
-                // has_bill false still shows the bill card (amount ₹0) so the user sees what came back
+                // has_bill false → "No bill found", no bill card, nothing to pay
+                if (bill.hasBill != true) {
+                    ToastUtil.showWarning(mActivity, getString(R.string.msgNoBillFound))
+                    return@fetchBill
+                }
                 fetchedBill = bill
                 showBillDetails(bill)
-                if (bill.hasBill != true) ToastUtil.showWarning(mActivity, getString(R.string.msgNoBillFound))
             },
             onError = { msg ->
                 showProgressFetch.set(false)
@@ -459,7 +462,8 @@ class BillPayActivity : BaseActivity() {
                     if (fetchedBill != null) clearFetchedBill()
                 }
             })
-            typed[key]?.let { field.etField.setText(it) }
+            // The placeholder field (key "") hands its value to a single-field biller
+            (typed[key] ?: typed[""]?.takeIf { fields.size == 1 })?.let { field.etField.setText(it) }
             fieldBindings.add(key to field)
         }
     }
@@ -643,7 +647,7 @@ class BillPayActivity : BaseActivity() {
         val mpin = dialogBinding.getMpin()
         val msg = when {
             mpin.isEmpty() -> getString(R.string.msgMpinEmpty)
-            mpin.length != 4 -> getString(R.string.msgMpinInvalid)
+            mpin.length != MPIN_LENGTH -> getString(R.string.msgMpinInvalid)
             else -> null
         }
         if (msg != null) {
@@ -761,6 +765,7 @@ class BillPayActivity : BaseActivity() {
         private const val EXTRA_CATEGORY = "extra_category"
         private const val FEE_PREVIEW_DEBOUNCE_MS = 400L
         private const val MOBILE_NUMBER_LENGTH = 10
+        private const val MPIN_LENGTH = 4
 
         fun start(context: Context, category: CategoryType) {
             context.startActivity(

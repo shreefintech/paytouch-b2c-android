@@ -56,6 +56,9 @@ class BillPaymentStatusActivity : BaseActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
     private val pollRunnable = Runnable { pollStatus() }
+    private val receiptRunnable = Runnable {
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) openReceipt()
+    }
     private var pollAttempts = 0
     private var isFinal = false
     private var currentStatus = ""
@@ -99,14 +102,14 @@ class BillPaymentStatusActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         if (isNavigating) return
-        handler.removeCallbacksAndMessages(null)
+        stopPollAndReceipt()
         // Final → receipt after a short pause; open → keep polling while in front
         if (isFinal || clientReference == "--") scheduleReceipt() else handler.postDelayed(pollRunnable, Constant.BILLPAY_POLL_INTERVAL_MS)
     }
 
     override fun onPause() {
         super.onPause()
-        handler.removeCallbacksAndMessages(null)
+        stopPollAndReceipt()
     }
 
     override fun onDestroy() {
@@ -145,10 +148,14 @@ class BillPaymentStatusActivity : BaseActivity() {
     }
 
     private fun scheduleReceipt() {
-        handler.removeCallbacksAndMessages(null)
-        handler.postDelayed({
-            if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) openReceipt()
-        }, AUTO_RECEIPT_DELAY_MS)
+        stopPollAndReceipt()
+        handler.postDelayed(receiptRunnable, AUTO_RECEIPT_DELAY_MS)
+    }
+
+    // Leaves the copy-icon reset queued
+    private fun stopPollAndReceipt() {
+        handler.removeCallbacks(pollRunnable)
+        handler.removeCallbacks(receiptRunnable)
     }
 
     // ── UI ────────────────────────────────────────────────────────────────────

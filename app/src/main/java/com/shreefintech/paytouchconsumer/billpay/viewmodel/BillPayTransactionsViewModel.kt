@@ -26,10 +26,15 @@ class BillPayTransactionsViewModel(application: Application) : AndroidViewModel(
 
     companion object {
         const val PER_PAGE = 20
+        // Screens that filter rows in the app stop auto-loading empty pages after this many in a row
+        const val MAX_AUTO_PAGES = 5
     }
 
     private var currentPage = 0
     private var lastPage = 1
+
+    // Only this call may update paging or reach the screen — a page-1 reload (tab / filter change) cancels the older one
+    private var activeCall: Call<BillPayTransactionPageItem>? = null
 
     var isLoading = false
         private set
@@ -49,6 +54,8 @@ class BillPayTransactionsViewModel(application: Application) : AndroidViewModel(
         perPage: Int = PER_PAGE
     ) {
         if (page == 1) {
+            activeCall?.cancel()
+            activeCall = null
             currentPage = 0
             lastPage = 1
             isLoading = false
@@ -60,32 +67,43 @@ class BillPayTransactionsViewModel(application: Application) : AndroidViewModel(
         }
         isLoading = true
         onLoading()
-        ApiClient.apiService.getBillPayTransactions(bearerToken(), category.value, page, perPage, status)
-            .enqueue(object : Callback<BillPayTransactionPageItem> {
-                override fun onResponse(
-                    call: Call<BillPayTransactionPageItem>,
-                    response: Response<BillPayTransactionPageItem>
-                ) {
-                    isLoading = false
-                    val body = response.body()
-                    if (response.isSuccessful && body?.success == true) {
-                        currentPage = body.meta?.currentPage ?: page
-                        lastPage = body.meta?.lastPage ?: currentPage
-                        onSuccess(body.data.orEmpty())
-                    } else {
-                        onError(
-                            ApiHelper.parseErrorMessage(
-                                getApplication(), response.code(), response.errorBody()?.string()
-                            )
+        val newCall = ApiClient.apiService.getBillPayTransactions(bearerToken(), category.value, page, perPage, status)
+        activeCall = newCall
+        newCall.enqueue(object : Callback<BillPayTransactionPageItem> {
+            override fun onResponse(
+                call: Call<BillPayTransactionPageItem>,
+                response: Response<BillPayTransactionPageItem>
+            ) {
+                if (call != activeCall) return
+                activeCall = null
+                isLoading = false
+                val body = response.body()
+                if (response.isSuccessful && body?.success == true) {
+                    currentPage = body.meta?.currentPage ?: page
+                    lastPage = body.meta?.lastPage ?: currentPage
+                    onSuccess(body.data.orEmpty())
+                } else {
+                    onError(
+                        ApiHelper.parseErrorMessage(
+                            getApplication(), response.code(), response.errorBody()?.string()
                         )
-                    }
+                    )
                 }
+            }
 
-                override fun onFailure(call: Call<BillPayTransactionPageItem>, t: Throwable) {
-                    isLoading = false
-                    onError(t.localizedMessage ?: getString(R.string.errGeneric))
-                }
-            })
+            override fun onFailure(call: Call<BillPayTransactionPageItem>, t: Throwable) {
+                // Cancelled by a newer page-1 load — that call reports instead
+                if (call != activeCall) return
+                activeCall = null
+                isLoading = false
+                onError(t.localizedMessage ?: getString(R.string.errGeneric))
+            }
+        })
+    }
+
+    override fun onCleared() {
+        activeCall?.cancel()
+        activeCall = null
     }
 
     // ── Mapping (shared by every Bill Pay list) ───────────────────────────────

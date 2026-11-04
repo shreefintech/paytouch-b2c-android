@@ -51,6 +51,11 @@ class TransactionReportActivity : BaseActivity() {
     private var filterStatus:     String? = null
     private var filterConsumerNo: String? = null
 
+    // Pages in a row that brought no matching rows (the next one is auto-loaded)
+    private var emptyAutoPages = 0
+    // A loaded page already reached rows older than filterFromDate — no later page can match
+    private var isPastFromDate = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTransactionReportBinding.inflate(layoutInflater)
@@ -114,7 +119,7 @@ class TransactionReportActivity : BaseActivity() {
                 val lm          = recyclerView.layoutManager as LinearLayoutManager
                 val lastVisible = lm.findLastVisibleItemPosition()
                 val totalItems  = lm.itemCount
-                if (lastVisible >= totalItems - 3 && viewModel.canLoadMore()) {
+                if (lastVisible >= totalItems - 3 && canLoadNextPage()) {
                     loadPage(viewModel.nextPage())
                 }
             }
@@ -180,6 +185,8 @@ class TransactionReportActivity : BaseActivity() {
         return true
     }
 
+    private fun canLoadNextPage() = !isPastFromDate && viewModel.canLoadMore()
+
     private fun loadPage(page: Int) {
         if (!Utility.isInternetAvailable(mActivity)) {
             if (page == 1) showNoInternet() else ToastUtil.showDelete(mActivity, getString(R.string.msgNoInternet))
@@ -206,8 +213,19 @@ class TransactionReportActivity : BaseActivity() {
                     mAllList.addAll(list)
                     appendToDisplayList(list)
                 }
-                // Filtered in the app — keep paging while a page brought no matching rows
-                if (list.isEmpty() && viewModel.canLoadMore()) loadPage(viewModel.nextPage())
+                // Rows are newest first — once a page reaches past the From date, older pages can't match
+                if (page == 1) isPastFromDate = false
+                filterFromDate?.let { from ->
+                    val oldestDay = rows.lastOrNull()?.createdAt?.take(10)
+                    if (oldestDay != null && oldestDay < from) isPastFromDate = true
+                }
+                // Filtered in the app — keep paging while a page brought no matching rows, up to a cap
+                // ponytail: fixed cap; move date / account filters server-side when the API takes them
+                if (page == 1) emptyAutoPages = 0
+                emptyAutoPages = if (list.isEmpty()) emptyAutoPages + 1 else 0
+                if (emptyAutoPages in 1 until BillPayTransactionsViewModel.MAX_AUTO_PAGES && canLoadNextPage()) {
+                    loadPage(viewModel.nextPage())
+                }
             },
             onError    = { msg ->
                 if (isDestroyed) return@loadPage

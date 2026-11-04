@@ -85,6 +85,7 @@ class BillPayPlanSelectionActivity : BaseActivity() {
                 binding.tvEmpty.visibility = View.GONE
             },
             onSuccess = { plans ->
+                if (isDestroyed) return@loadPlans
                 binding.shimmerLayout.stopShimmer()
                 binding.shimmerLayout.visibility = View.GONE
                 if (plans.isEmpty()) {
@@ -95,6 +96,7 @@ class BillPayPlanSelectionActivity : BaseActivity() {
                 }
             },
             onError = { msg ->
+                if (isDestroyed) return@loadPlans
                 binding.shimmerLayout.stopShimmer()
                 binding.shimmerLayout.visibility = View.GONE
                 binding.tvEmpty.visibility = View.VISIBLE

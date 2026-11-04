@@ -42,6 +42,8 @@ class TransactionStatusActivity : BaseActivity() {
 
     private val mArrayList = ArrayList<TransactionItem>()
     private var selectedTab = Tab.ALL
+    // Pages in a row that brought no visible rows (Pending tab auto-loads the next one)
+    private var emptyAutoPages = 0
 
     private enum class Tab(val serverStatus: String?) {
         ALL(null),
@@ -159,8 +161,13 @@ class TransactionStatusActivity : BaseActivity() {
                     transactionAdp.notifyItemRangeInserted(insertStart, list.size)
                 }
                 binding.tvEmpty.visibility = if (mArrayList.isEmpty()) View.VISIBLE else View.GONE
-                // Pending is filtered here — keep paging while a page brought no visible rows
-                if (list.isEmpty() && tab == Tab.PENDING && viewModel.canLoadMore()) loadPage(viewModel.nextPage())
+                // Pending is filtered here — keep paging while a page brought no visible rows, up to a cap
+                // ponytail: fixed cap; older pending rows need a server `status=pending` filter to reach
+                if (page == 1) emptyAutoPages = 0
+                emptyAutoPages = if (list.isEmpty()) emptyAutoPages + 1 else 0
+                if (emptyAutoPages in 1 until BillPayTransactionsViewModel.MAX_AUTO_PAGES &&
+                    tab == Tab.PENDING && viewModel.canLoadMore()
+                ) loadPage(viewModel.nextPage())
             },
             onError   = { msg ->
                 if (isDestroyed) return@loadPage
