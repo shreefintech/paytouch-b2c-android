@@ -84,7 +84,7 @@ class WalletTransactionsViewModel(application: Application) : AndroidViewModel(a
         when {
             statementWallet != null -> loadStatement(statementWallet, perPage, deliver, fail)
             tab == WalletHistoryTab.WITHDRAWALS -> loadWithdrawals(page, perPage, deliver, fail)
-            else -> loadRewards(tab == WalletHistoryTab.REWARD_REFERRAL, perPage, deliver, fail)
+            else -> loadRewards(tab == WalletHistoryTab.REWARD_REFERRAL, page, perPage, deliver, fail)
         }
     }
 
@@ -151,17 +151,18 @@ class WalletTransactionsViewModel(application: Application) : AndroidViewModel(a
             })
     }
 
-    // TODO(B2C-309): rewards/bonus and rewards/referral load the first page only (doc); paginate once the doc confirms meta — lastPage is always true
+    // Page-numbered; the doc gives no paging meta, so a short page is the last one
     private fun loadRewards(
         isReferral: Boolean,
+        page: Int,
         perPage: Int,
         deliver: (ArrayList<WalletTransactionItem>, Boolean) -> Unit,
         fail: (String) -> Unit
     ) {
         val call = if (isReferral) {
-            ApiClient.apiService.getReferralHistory(bearerToken(), page = 1, perPage = perPage)
+            ApiClient.apiService.getReferralHistory(bearerToken(), page = page, perPage = perPage)
         } else {
-            ApiClient.apiService.getBonusRewards(bearerToken(), page = 1, perPage = perPage)
+            ApiClient.apiService.getBonusRewards(bearerToken(), page = page, perPage = perPage)
         }
         call.enqueue(object : Callback<General<List<BonusRewardItem>>> {
             override fun onResponse(
@@ -170,7 +171,7 @@ class WalletTransactionsViewModel(application: Application) : AndroidViewModel(a
             ) {
                 val data = response.body()?.data
                 if (response.isSuccessful && data != null) {
-                    deliver(ArrayList(data.map { WalletTransactionItem.from(it) }), true)
+                    deliver(ArrayList(data.map { WalletTransactionItem.from(it) }), data.size < perPage)
                 } else {
                     fail(errorMessage(response.code(), response.errorBody()))
                 }

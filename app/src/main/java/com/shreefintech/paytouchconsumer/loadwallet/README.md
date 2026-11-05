@@ -181,6 +181,9 @@ All declared in `ApiService.kt` under `// ── Wallet ──` and `// ── H
 |---|---|---|
 | `GET` | `api/mobile/wallet/balance`, `api/mobile/virtual-account` | `LoadWalletViewModel.fetchWalletBalance()`, `fetchVirtualAccount()` |
 | `GET` | `api/mobile/wallet/statement` | `WalletTransactionsViewModel.loadHistory()` (Load Wallet preview + View All) |
+| `GET` | `api/mobile/wallet/withdrawals` | `WalletTransactionsViewModel.loadHistory()` — Rewards & Withdrawals → Withdrawals (page-numbered, `meta.current_page` / `last_page`) |
+| `GET` | `api/mobile/rewards/bonus` | `WalletTransactionsViewModel.loadHistory()` — Rewards & Withdrawals → Bonus (page-numbered, a short page is the last) |
+| `GET` | `api/mobile/rewards/referral` | `WalletTransactionsViewModel.loadHistory()` — Rewards & Withdrawals → Referral (`getReferralHistory()`, page-numbered, a short page is the last) |
 | `POST` | `api/hdfc/orders` | `LoadWalletViewModel.createHdfcOrder()` |
 | `GET` | `api/hdfc/orders/{order_id}/status` | `LoadWalletViewModel.checkOrderStatus()` |
 

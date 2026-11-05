@@ -20,8 +20,8 @@ User profile viewer and referral/earn screen. Two tabs: **Account Info** (KYC-de
 
 **Key things to know:**
 - Both tabs load their data up-front in `onCreate()` — tab switching is purely visual (no re-fetch)
-- Balance (`main_wallet` from `GET api/mobile/wallet/balance`) is shown via `Utility.formatAmount()`; `"--"` when null
-- `KycDetailsActivity` is in this package but calls `GET /api/dashboard-kyc/my-account` (same endpoint family as the KYC module)
+- Balance (`main_wallet` from `GET api/mobile/wallet/balance`) is shown via `Utility.formatAmount()`; `₹0.00` when null
+- `KycDetailsActivity` is in this package — `GET api/mobile/auth/me`, then `GET api/mobile/wallet/bank-account` (bank card) and `GET api/mobile/virtual-account` (VA card, hidden when none or failed)
 - `DocPreviewActivity` is also in this package — handles full-screen image/PDF preview of KYC documents
 - Clipboard copy uses `ClipboardManager` directly; share uses `Intent.ACTION_SEND` — no third-party libraries needed
 
@@ -88,7 +88,7 @@ Text fields fall back to `"--"` when null.
 
 **Edit profile (pencil next to Member Code):** Opens `dialog_edit_profile` — name, email, state, city prefilled from `AuthUserItem`. `auth/me` sends state/city as names only, so they are matched by name against the `api/mobile/address/states` / `address/states/{state_id}/cities` lists to get ids. Submit validates, then opens `dialog_mpin`; the MPIN submit calls `PUT api/mobile/auth/me`. On success both dialogs close, stored email is updated and `auth/me` is re-fetched. Ignored until account info has loaded.
 
-**"View KYC Details" button:** Navigates to `KycDetailsActivity` (in this package) — fetches `GET /api/dashboard-kyc/my-account` via `KycDetailsViewModel`. Document taps open `DocPreviewActivity` with `extra_file_url` + `extra_file_title`.
+**"View KYC Details" button:** Navigates to `KycDetailsActivity` (in this package) — `KycDetailsViewModel.fetchDetails()` loads `auth/me`, then `wallet/bank-account` and `virtual-account` alongside (only an `auth/me` failure is an error). Document taps open `DocPreviewActivity` with `extra_file_url` + `extra_file_title`.
 
 ---
 
@@ -117,6 +117,8 @@ Displays referral code and link with copy and share actions. Shows a shimmer pla
 | GET | `api/mobile/wallet/balance` | `getWalletBalance()` | `getWalletBalance()` | `General<WalletBalanceItem>` |
 | GET | `api/mobile/rewards/referral` | `getReferralRewards()` | `getReferralRewards()` | `ReferralRewardsItem` |
 | PUT | `api/mobile/auth/me` | `updateMe()` | `updateProfile()` | `MessageItem` |
+| GET | `api/mobile/wallet/bank-account` | `getWalletBankAccount()` | `KycDetailsViewModel.fetchDetails()` | `General<WalletBankAccountItem>` |
+| GET | `api/mobile/virtual-account` | `getVirtualAccount()` | `KycDetailsViewModel.fetchDetails()` | `General<VirtualAccountItem>` |
 
 **Success check:** `General<…>` calls — `isSuccessful && body?.data != null`; flat `MessageItem` (`updateMe`) and referral — `isSuccessful && success == true`
 

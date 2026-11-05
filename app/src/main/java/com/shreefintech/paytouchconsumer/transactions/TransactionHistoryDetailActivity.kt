@@ -235,7 +235,10 @@ class TransactionHistoryDetailActivity : BaseActivity() {
         showWalletDetail(
             amount        = data.amount?.toString() ?: item.amount,
             status        = data.status,
-            transactionId = data.clientReference ?: item.clientReference,
+            // Same Transaction ID as every Bill Pay screen: txn_reference, else client_reference
+            transactionId = data.txnReference?.takeIf { it.isNotBlank() }
+                ?: item.txnReference?.takeIf { it.isNotBlank() }
+                ?: data.clientReference ?: item.clientReference,
             createdAt     = data.createdAt ?: item.createdAt,
             rows          = listOf(
                 R.string.labelBiller to data.billerName,
