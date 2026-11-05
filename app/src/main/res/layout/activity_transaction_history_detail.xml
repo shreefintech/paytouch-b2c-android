@@ -188,6 +188,7 @@
 
                             <!-- Identifier row (Connection Number / Purpose) -->
                             <LinearLayout
+                                android:id="@+id/llIdentifier"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="@dimen/margin_small"
@@ -349,6 +350,13 @@
                                     android:textSize="@dimen/text_size_13"
                                     tools:text="₹2079.00" />
                             </LinearLayout>
+                            <!-- Wallet history detail rows (label + value), filled by showWalletDetail() -->
+                            <LinearLayout
+                                android:id="@+id/llWalletRows"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:visibility="gone" />
 
                             <!-- Date row -->
                             <LinearLayout

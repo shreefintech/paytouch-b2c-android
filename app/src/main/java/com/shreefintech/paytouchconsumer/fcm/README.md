@@ -19,7 +19,7 @@ meta-data in `AndroidManifest.xml`.
 
 | Method   | Endpoint            | Body                                                        | Response      |
 |----------|---------------------|-------------------------------------------------------------|---------------|
-| `POST`   | `/api/device-token` | `DeviceTokenRequest` (`fcm_token`, `platform`, `device_id`, `language`) | `MessageItem` |
+| `POST`   | `/api/mobile/device-token` | `DeviceTokenRequest` (`token`, `platform`, `device_id`, `language`) — `fcm_token` is rejected with 422 | `MessageItem` |
 
 Bearer token is optional — `null` registers the device without linking to a user. After login,
 `syncToken()` is called again with a bearer token so the server links the device to the account.

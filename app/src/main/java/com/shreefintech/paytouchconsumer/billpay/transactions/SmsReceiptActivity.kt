@@ -209,12 +209,10 @@ class SmsReceiptActivity : BaseActivity() {
         // identifier_label is null for imported old payments
         binding.tvConsumerNoLabel.text = item.identifierLabel?.takeIf { it.isNotBlank() } ?: getString(labelRes)
         binding.tvConsumerNo.text      = account
-        // No customer name in billpay/status
-        (binding.tvCustomerName.parent as? View)?.visibility = View.GONE
         binding.tvCompanyName.text     = item.billerName ?: "--"
         binding.tvReceiptDate.text     = date
         binding.tvAmountPaid.text      = amount
-        binding.tvPaytouchTxnId.text   = ref
+        binding.tvPaytouchTxnId.text   = transactionsViewModel.txnReferenceOf(item)
         // Reference row: provider_ref, else client_reference
         binding.tvBConnectTxnId.text   = item.providerRef?.takeIf { it.isNotBlank() } ?: ref
         binding.tvCcf.text             = Utility.formatAmount(fee)

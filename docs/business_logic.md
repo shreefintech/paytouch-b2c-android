@@ -288,7 +288,8 @@ Envelope `{success, message, meta, data}` → `General<T>`, success = `isSuccess
 ### Status / transaction row fields (`BillPayTransactionItem`)
 Read: `client_reference`, `status`, `is_final`, `amount`, `charge + gst_amount` (platform fee), `biller_name`,
 `input_params` (account = first value other than `circle_code`), `identifier_label` (account label; `null` for imported
-old payments), `provider_ref`, `txn_reference` (reference fallback), `failure_reason`, `created_at`.
+old payments), `provider_ref`, `txn_reference` (the Transaction ID shown on Status / Recent / Report / Detail / SMS Receipt, else
+`client_reference`; `client_reference` stays the key for `billpay/status` and receipts), `failure_reason`, `created_at`.
 Not read yet: `payment_breakdown`, `level`, `tds`. No customer name and no numeric id in this shape.
 
 ### Receipt, Recent, Transaction Status, Report — `GET transactions`

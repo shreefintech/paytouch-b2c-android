@@ -591,6 +591,16 @@
                                 </LinearLayout>
                             </com.google.android.material.card.MaterialCardView>
                         </LinearLayout>
+
+                        <!-- First billpay/categories load — stands in for the hidden bill tiles -->
+                        <ProgressBar
+                            android:id="@+id/pbCategories"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:indeterminateTint="?attr/colorPrimary"
+                            android:visibility="gone" />
                     </LinearLayout>
 
                     <!-- Load Wallet — scrolls with content, last item in NestedScrollView -->

@@ -122,7 +122,7 @@ object NotificationHelper {
         pendingToken = token
         val bearer = if (isLoggedIn) bearerToken(context) else null
         val body = DeviceTokenRequest(
-            fcmToken = token,
+            token = token,
             platform = Constant.FCM_PLATFORM_ANDROID,
             deviceId = deviceId(context),
             language = Constant.FCM_LANGUAGE_DEFAULT

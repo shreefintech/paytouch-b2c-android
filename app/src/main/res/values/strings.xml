@@ -202,10 +202,6 @@
     <string name="titleMobilePostpaid">Postpaid Recharge</string>
     <string name="labelMobileNumber">Mobile Number</string>
     <string name="hintMobileNumber">Enter Mobile Number</string>
-    <string name="msgMobileNumberEmpty">Please enter mobile number</string>
-    <string name="msgMobileNumberInvalid">Please enter a valid 10-digit mobile number</string>
-    <string name="titlePostpaidBillDetailsFetched">Postpaid Bill Details Fetched</string>
-    <string name="labelSelectState">Select State</string>
     <string name="btnBrowsePlan">Browse Plan</string>
     <string name="btnChangePlan">Change Plan</string>
     <string name="titleSelectPlan">Select a Plan</string>
@@ -213,7 +209,6 @@
     <string name="titlePrepaidPlanSelected">Plan Selected</string>
     <string name="labelValidity">Validity</string>
     <string name="labelDataBenefit">Data</string>
-    <string name="labelTalktime">Talktime</string>
     <string name="labelViewMore">… View more</string>
 
     <!-- Electricity screen -->
@@ -228,21 +223,17 @@
     <string name="hintSelectCompany">Select Company</string>
     <string name="labelConsumerNumber">Consumer Number</string>
     <string name="labelLoanAccountNumber">Loan Account Number</string>
-    <string name="hintLoanAccountNumber">Enter Loan Account Number</string>
     <string name="hintConsumerNumber">Enter Consumer Number</string>
-    <string name="hintPropertyNumber">Enter Property Number</string>
     <string name="labelAmount">Amount</string>
     <string name="hintAmount">Enter Amount</string>
     <string name="labelPlatformFee">Platform Fee</string>
     <string name="hintPlatformFee">Platform Fee</string>
     <string name="labelTotalPayable">Total Payable</string>
     <string name="hintTotalPayable">Payable Amount</string>
-    <string name="fmtCurrencyAmount">₹%.2f</string>
     <string name="msgTermsAgreement">I agree to the platform fee terms &amp; conditions.</string>
     <string name="btnProceedToPay">Proceed to pay</string>
     <string name="btnReset">Reset</string>
     <string name="titleRecentTransactions">Recent Transactions</string>
-    <string name="msgConsumerNumberEmpty">Please enter consumer number</string>
     <string name="msgSelectCompany">Please select a company</string>
     <string name="msgAmountEmpty">Please enter amount</string>
     <string name="msgDthRechargeSuccess">DTH recharge successful</string>
@@ -260,7 +251,6 @@
     <string name="categoryMunicipalTax">Municipal Tax</string>
 
     <!-- Referral History -->
-    <string name="titleReferralHistory">Referral History</string>
     <string name="tabWallet">Wallet</string>
 
     <!-- Transaction Report screen -->
@@ -399,34 +389,25 @@
     <string name="errNoEmailApp">No email app found</string>
     <string name="apiErr422">Unprocessable Content</string>
     <string name="btnFetchBill">Fetch Bill</string>
-    <string name="btnSearch">Search</string>
-    <string name="msgEnterSearchQuery">Please enter consumer no. or transaction ID</string>
     <string name="btnClear">Clear</string>
     <string name="msgLoadingOperators">Loading operators, please wait…</string>
-    <string name="msgLoadingStates">Loading states, please wait…</string>
     <string name="hintSearchOperator">Search</string>
     <string name="msgNoOperatorsFound">No operators found</string>
 
     <!-- Bill Details card -->
     <string name="titleBillDetailsFetched">Electricity Bill Details Fetched</string>
-    <string name="titleGasBillDetailsFetched">Gas Bill Details Fetched</string>
     <string name="labelDueDate">Due Date</string>
     <string name="labelBillDate">Bill Date</string>
     <string name="labelBillAmount">Bill Amount</string>
     <string name="labelConnectionNumber">Connection Number</string>
-    <string name="labelAgreementNumber">Agreement Number</string>
-    <string name="labelBillNumber">Bill Number</string>
     <string name="labelOperator">Operator</string>
     <string name="btnClearAndEnterManually">Clear &amp; Enter Manually</string>
     <string name="textFilter">Filter</string>
 
-    <string name="msgInsufficientBalance">Insufficient balance. Please add funds to your wallet.</string>
     <string name="categoryPostpaid">Postpaid</string>
-    <string name="hintSearchPrepaidTransaction">Search mobile number or Transaction ID</string>
 
     <!-- Loan screen -->
     <string name="titleLoanRepayment">Loan Repayment</string>
-    <string name="titleLoanBillDetailsFetched">Loan Bill Details Fetched</string>
     <string name="titleLoanPaymentConfirmation">Loan Payment Confirmation</string>
     <string name="msgPaymentSuccess">Payment successful!</string>
 
@@ -435,15 +416,12 @@
     <string name="labelVehicleNumber">Vehicle Number</string>
     <string name="labelVehicleNumberFmt">Vehicle Number %s</string>
     <string name="hintVehicleNumber">Enter Vehicle Number (e.g. MH12AB1234)</string>
-    <string name="msgVehicleNumberEmpty">Please enter vehicle number</string>
     <string name="labelCurrentFastagBalance">Current FASTag Balance</string>
     <string name="titleFastagDetailsFetched">FASTag Details Fetched</string>
     <string name="msgLoanSmsBody">Dear Customer, Your loan repayment of %1$s for Loan Account %2$s has been successfully processed.</string>
 
     <string name="titleMunicipalTax">Municipal Tax</string>
-    <string name="titleMunicipalTaxBillDetailsFetched">Municipal Tax Bill Details Fetched</string>
     <string name="titleMunicipalTaxPaymentConfirmation">Municipal Tax Payment Confirmation</string>
-    <string name="labelPropertyNo">Property Number</string>
     <string name="msgMunicipalTaxSmsBody">Dear Customer, Your municipal tax payment of %1$s for Property No %2$s has been successfully processed.</string>
 
     <!-- My Account screen -->
@@ -498,6 +476,7 @@
     <string name="labelPendingTransactions">Pending</string>
     <string name="labelTransactionsZero">Transactions: 0</string>
     <string name="labelVirtualAccountNumber">Virtual Account Number</string>
+    <string name="labelVirtualAccount">Virtual Account</string>
     <string name="labelActiveStatus">Active</string>
     <string name="labelInactiveStatus">Inactive</string>
     <string name="labelFee">Fee</string>
@@ -682,6 +661,26 @@
     <string name="labelUploadedDocuments">Uploaded Documents</string>
     <string name="labelVerified">Verified</string>
     <string name="labelPending">Pending</string>
+
+    <!-- My Wallet history tabs + history detail rows -->
+    <string name="labelTabMain">Main</string>
+    <string name="labelTabBonus">Bonus</string>
+    <string name="labelTabReferral">Referral</string>
+    <string name="labelTabEarning">Earning</string>
+    <string name="labelTabWithdrawals">Withdrawals</string>
+    <string name="labelTabRewardsWithdrawals">Rewards &amp; Withdrawals</string>
+    <string name="titleWalletHistory">%1$s History</string>
+    <string name="labelWithdrawalTo">Withdrawal to %1$s</string>
+    <string name="labelFailed">Failed</string>
+    <string name="labelBiller">Biller</string>
+    <string name="labelOperatorReference">Operator Reference</string>
+    <string name="labelTotalAmount">Total Amount</string>
+    <string name="labelFailureReason">Failure Reason</string>
+    <string name="labelCreditAmount">Credit Amount</string>
+    <string name="labelTotalDebited">Total Debited</string>
+    <string name="labelBank">Bank</string>
+    <string name="labelUtr">UTR</string>
+    <string name="labelBalanceAfter">Balance After</string>
     <string name="labelRejected">Rejected</string>
     <string name="labelSubmitted">Submitted</string>
     <string name="titleEnterMpin">Enter MPIN</string>
@@ -747,8 +746,6 @@
     <string name="btnDone">Done</string>
     <string name="labelBankAccountMasked">%1$s ••••%2$s</string>
     <string name="msgRequestIdCopied">Request ID copied</string>
-    <string name="labelCorporation">Corporation</string>
-    <string name="hintSelectCorporation">Select Corporation</string>
     <string name="titleLogout">Logout</string>
     <string name="msgConfirmLogout">Are you sure you want to logout?</string>
     <string name="btnLogout">Logout</string>

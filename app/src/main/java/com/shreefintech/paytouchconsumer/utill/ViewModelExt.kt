@@ -24,6 +24,23 @@ fun AndroidViewModel.bearerToken(): String =
 fun AndroidViewModel.getString(@StringRes resId: Int): String =
     getApplication<Application>().getString(resId)
 
+/** Envelope {data, success, meta, message} — success when HTTP 2xx and data is present. */
+fun <T> AndroidViewModel.envelopeCallback(onSuccess: (T) -> Unit, onError: (String) -> Unit) =
+    object : Callback<General<T>> {
+        override fun onResponse(call: Call<General<T>>, response: Response<General<T>>) {
+            val data = response.body()?.data
+            if (response.isSuccessful && data != null) {
+                onSuccess(data)
+            } else {
+                onError(ApiHelper.parseErrorMessage(getApplication(), response.code(), response.errorBody()?.string()))
+            }
+        }
+
+        override fun onFailure(call: Call<General<T>>, t: Throwable) {
+            onError(t.localizedMessage ?: getString(R.string.errGeneric))
+        }
+    }
+
 /** Sources: auth/login, auth/me, auth/mpin. Absent keys leave the saved value. */
 fun AndroidViewModel.saveOnboardingFlags(bankDetailsAdded: Boolean?, panAdded: Boolean?, nextStep: String?) {
     // bank_details_required forces the Add Bank Details popup before the first money action

@@ -1106,7 +1106,7 @@
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- Wallet / Referral History tab row -->
+                    <!-- Wallet / Rewards &amp; Withdrawals tab row -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -1153,7 +1153,7 @@
                                 </com.google.android.material.card.MaterialCardView>
 
                                 <com.google.android.material.card.MaterialCardView
-                                    android:id="@+id/cvTabReferralHistory"
+                                    android:id="@+id/cvTabRewards"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="2dp"
@@ -1163,7 +1163,7 @@
                                     app:strokeWidth="0dp">
 
                                     <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tvTabReferralHistory"
+                                        android:id="@+id/tvTabRewards"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:background="?selectableItemBackground"
@@ -1173,7 +1173,7 @@
                                         android:paddingTop="6dp"
                                         android:paddingEnd="14dp"
                                         android:paddingBottom="6dp"
-                                        android:text="@string/titleReferralHistory"
+                                        android:text="@string/labelTabRewardsWithdrawals"
                                         android:textSize="@dimen/text_size_13" />
                                 </com.google.android.material.card.MaterialCardView>
 
@@ -1181,7 +1181,135 @@
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
 
-                    <!-- Recent items list (wallet or referral based on tab) -->
+                    <!-- Sub tabs — labels set by updateHistoryTabVisuals(): Main / Bonus / Referral / Earning or
+                         Withdrawals / Bonus / Cashback / Referral -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvSubTab1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:onClickListener="@{onClickListener}"
+                            app:cardBackgroundColor="@android:color/transparent"
+                            app:cardCornerRadius="@dimen/card_corner_radius"
+                            app:cardElevation="0dp"
+                            app:strokeColor="?attr/colorPrimary"
+                            app:strokeWidth="1dp">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvSubTab1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?selectableItemBackground"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:paddingHorizontal="4dp"
+                                android:paddingVertical="5dp"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_size_11"
+                                tools:text="Main" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvSubTab2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="4dp"
+                            android:onClickListener="@{onClickListener}"
+                            app:cardBackgroundColor="@android:color/transparent"
+                            app:cardCornerRadius="@dimen/card_corner_radius"
+                            app:cardElevation="0dp"
+                            app:strokeColor="?attr/colorPrimary"
+                            app:strokeWidth="1dp">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvSubTab2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?selectableItemBackground"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:paddingHorizontal="4dp"
+                                android:paddingVertical="5dp"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_size_11"
+                                tools:text="Main" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvSubTab3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="4dp"
+                            android:onClickListener="@{onClickListener}"
+                            app:cardBackgroundColor="@android:color/transparent"
+                            app:cardCornerRadius="@dimen/card_corner_radius"
+                            app:cardElevation="0dp"
+                            app:strokeColor="?attr/colorPrimary"
+                            app:strokeWidth="1dp">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvSubTab3"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?selectableItemBackground"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:paddingHorizontal="4dp"
+                                android:paddingVertical="5dp"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_size_11"
+                                tools:text="Main" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cvSubTab4"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="4dp"
+                            android:onClickListener="@{onClickListener}"
+                            app:cardBackgroundColor="@android:color/transparent"
+                            app:cardCornerRadius="@dimen/card_corner_radius"
+                            app:cardElevation="0dp"
+                            app:strokeColor="?attr/colorPrimary"
+                            app:strokeWidth="1dp">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/tvSubTab4"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="?selectableItemBackground"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/proza_libre_medium"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:paddingHorizontal="4dp"
+                                android:paddingVertical="5dp"
+                                android:textColor="@color/primary"
+                                android:textSize="@dimen/text_size_11"
+                                tools:text="Main" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <!-- History preview: 2 rows of the selected sub tab -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvTransactions"
                         android:layout_width="match_parent"

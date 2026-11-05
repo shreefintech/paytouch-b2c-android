@@ -33,20 +33,20 @@ import com.shreefintech.paytouchconsumer.databinding.DialogMpinBinding
 import com.shreefintech.paytouchconsumer.databinding.DialogWithdrawSuccessBinding
 import com.shreefintech.paytouchconsumer.Constant
 import com.shreefintech.paytouchconsumer.R
-import com.shreefintech.paytouchconsumer.adapter.ReferralHistoryAdp
 import com.shreefintech.paytouchconsumer.adapter.WalletTransactionAdp
 import com.shreefintech.paytouchconsumer.databinding.ActivityLoadWalletBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetMakePaymentBinding
 import com.shreefintech.paytouchconsumer.databinding.SheetWithdrawBinding
 import com.shreefintech.paytouchconsumer.glass.LiquidGlassEffect
 import com.shreefintech.paytouchconsumer.loadwallet.model.PaymentStatusItem
+import com.shreefintech.paytouchconsumer.loadwallet.model.WalletHistoryTab
 import com.shreefintech.paytouchconsumer.loadwallet.model.WalletTransactionItem
 import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.LoadWalletViewModel
+import com.shreefintech.paytouchconsumer.loadwallet.viewmodel.WalletTransactionsViewModel
 import com.shreefintech.paytouchconsumer.earningwallet.EarningWalletActivity
 import com.shreefintech.paytouchconsumer.rewards.RewardsExplainerActivity
 import com.shreefintech.paytouchconsumer.enums.RewardsTier
 import com.shreefintech.paytouchconsumer.retrofit.model.rewards.RewardsLevelItem
-import com.shreefintech.paytouchconsumer.retrofit.model.wallet.BonusWalletHistoryItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.VirtualAccountItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletBalanceItem
 import com.shreefintech.paytouchconsumer.retrofit.model.wallet.WalletWithdrawalItem
@@ -71,11 +71,11 @@ class LoadWalletActivity : BaseActivity() {
     private var currentTab = TAB_TOTAL_BALANCE
     private val transactionList = ArrayList<WalletTransactionItem>()
     private lateinit var transactionAdp: WalletTransactionAdp
-    private val referralList = ArrayList<BonusWalletHistoryItem>()
-    private lateinit var referralAdp: ReferralHistoryAdp
-
-    private enum class RecentTab { WALLET, REFERRAL }
-    private var currentRecentTab = RecentTab.WALLET
+    // My Wallet history preview (2 rows) for the selected Wallet or Rewards & Withdrawals sub tab
+    private val historyVm: WalletTransactionsViewModel by viewModels()
+    private var currentHistoryTab = WalletHistoryTab.MAIN
+    private val subTabCards by lazy { listOf(binding.cvSubTab1, binding.cvSubTab2, binding.cvSubTab3, binding.cvSubTab4) }
+    private val subTabTexts by lazy { listOf(binding.tvSubTab1, binding.tvSubTab2, binding.tvSubTab3, binding.tvSubTab4) }
 
     private lateinit var sheetBinding: SheetMakePaymentBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<View>
@@ -131,6 +131,7 @@ class LoadWalletActivity : BaseActivity() {
         private const val MODE_IMPS = "IMPS"
         private const val MODE_NEFT = "NEFT"
         private const val MODE_RTGS = "RTGS"
+        private const val HISTORY_PREVIEW_ROWS = 2
 
         fun start(context: Context) {
             context.startActivity(Intent(context, LoadWalletActivity::class.java))
@@ -196,7 +197,7 @@ class LoadWalletActivity : BaseActivity() {
         setupPaymentSheet()
         setupWithdrawSheet()
         selectTab(TAB_TOTAL_BALANCE)
-        selectRecentTab(RecentTab.WALLET)
+        updateHistoryTabVisuals()
         onBack()
         retryCallback = { loadData() }
         loadData()
@@ -222,7 +223,7 @@ class LoadWalletActivity : BaseActivity() {
                     PaymentStatusItem(
                         orderId = data?.clientReference ?: clientReference,
                         amount  = data?.amount ?: amount,
-                        status  = data?.status ?: Constant.HDFC_STATUS_NEW,
+                        status  = data?.resultStatus() ?: Constant.HDFC_STATUS_NEW,
                         failureReason = data?.failureReason
                     )
                 )
@@ -251,7 +252,7 @@ class LoadWalletActivity : BaseActivity() {
             sheetBinding.etAmount.setText("")
             sheetBinding.etDescription.setText("")
             fetchWalletData()
-            fetchRecentHistory()
+            fetchHistoryPreview()
         }
     }
 
@@ -404,7 +405,7 @@ class LoadWalletActivity : BaseActivity() {
 
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
         dialogBinding.tvPaymentMode.text = mode
-        dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
+        dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance ?: "0")
         dialogBinding.tvFee.text = "--"
         dialogBinding.tvTotal.text = "--"
 
@@ -535,8 +536,10 @@ class LoadWalletActivity : BaseActivity() {
 
     @RawRes
     private fun withdrawSoundRes(status: String?): Int = when (status?.uppercase()) {
-        Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED -> R.raw.success_sound
-        Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> R.raw.failed_sound
+        Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED,
+        Constant.WITHDRAW_STATUS_SUCCESSFUL, Constant.WITHDRAW_STATUS_CHARGED -> R.raw.success_sound
+        Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED,
+        Constant.WITHDRAW_STATUS_FAILURE, Constant.WITHDRAW_STATUS_DECLINED -> R.raw.failed_sound
         else -> R.raw.pending_sound
     }
 
@@ -587,7 +590,8 @@ class LoadWalletActivity : BaseActivity() {
 
     private fun resolveWithdrawStatus(status: String?): WithdrawStatusDisplay {
         return when (status?.uppercase()) {
-            Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED -> WithdrawStatusDisplay(
+            Constant.WITHDRAW_STATUS_SUCCESS, Constant.WITHDRAW_STATUS_COMPLETED,
+            Constant.WITHDRAW_STATUS_SUCCESSFUL, Constant.WITHDRAW_STATUS_CHARGED -> WithdrawStatusDisplay(
                 titleRes = R.string.titleWithdrawalSuccessful,
                 subtitleRes = R.string.msgWithdrawalCredited,
                 gifRes = R.drawable.gif_success,
@@ -595,7 +599,8 @@ class LoadWalletActivity : BaseActivity() {
                 chipTextColorRes = R.color.toast_text_success
             )
 
-            Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED -> WithdrawStatusDisplay(
+            Constant.WITHDRAW_STATUS_FAILED, Constant.WITHDRAW_STATUS_REJECTED, Constant.WITHDRAW_STATUS_REVERSED,
+            Constant.WITHDRAW_STATUS_FAILURE, Constant.WITHDRAW_STATUS_DECLINED -> WithdrawStatusDisplay(
                 titleRes = R.string.titleWithdrawalFailed,
                 subtitleRes = R.string.msgWithdrawalFailed,
                 gifRes = R.drawable.gif_rejected,
@@ -627,25 +632,9 @@ class LoadWalletActivity : BaseActivity() {
         }
         hideNoInternet()
         fetchWalletData()
-        fetchRecentHistory()
-        fetchReferralHistory()
+        fetchHistoryPreview()
         fetchEarningWallet()
         fetchRewardsLevel()
-    }
-
-    // Bonus balance comes from wallet/balance (populateWalletBalance); this loads the referral rows only.
-    // No toast on error — fetchVirtualAccount() already reports a failing load; the list shows its empty state
-    private fun fetchReferralHistory() {
-        viewModel.fetchReferralHistory(
-            onSuccess = { rows ->
-                referralAdp.updateList(rows.take(2))
-                if (currentRecentTab == RecentTab.REFERRAL) updateEmptyState()
-            },
-            onError = {
-                referralAdp.updateList(emptyList())
-                if (currentRecentTab == RecentTab.REFERRAL) updateEmptyState()
-            }
-        )
     }
 
     private fun fetchRewardsLevel() {
@@ -673,7 +662,7 @@ class LoadWalletActivity : BaseActivity() {
         viewModel.fetchEarningWallet(
             onSuccess = { data ->
                 showProgressEarning.set(false)
-                binding.tvEarningBalance.text = Utility.formatAmount(data.principal)
+                binding.tvEarningBalance.text = Utility.formatAmount(data.principal ?: "0")
             },
             onError = {
                 showProgressEarning.set(false)
@@ -760,7 +749,7 @@ class LoadWalletActivity : BaseActivity() {
         }
 
         dialogBinding.tvAmount.text = Utility.formatAmount(amount.toString())
-        dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance)
+        dialogBinding.tvAvailableBalance.text = Utility.formatAmount(currentWalletBalance ?: "0")
 
         dialog.show()
         bindTopupFees(dialogBinding, amount)
@@ -812,23 +801,27 @@ class LoadWalletActivity : BaseActivity() {
                 if (isFinishing || isDestroyed) return@onSuccess
                 val clientReference = data.clientReference.orEmpty()
                 val amount = data.amount ?: pendingPayAmount.toString()
-                if (HdfcPaymentHelper.isFailedStatus(data.status.orEmpty())) {
+                if (data.resultStatus() == Constant.TOPUP_STATUS_FAILED) {
                     confirmDialog?.dismiss()
                     PaymentStatusActivity.start(
                         mActivity,
                         PaymentStatusItem(
                             orderId = clientReference,
                             amount  = amount,
-                            status  = data.status ?: Constant.HDFC_STATUS_NEW,
+                            status  = Constant.TOPUP_STATUS_FAILED,
                             failureReason = data.failureReason
                         )
                     )
                     return@onSuccess
                 }
-                // Without a reference or link the payment can't be opened or tracked
+                // Without a reference or link the payment can't be opened or tracked; payment_link must be https,
+                // upi_intent_url a upi:// link
                 val isUpiFlow = pendingPayFlow == Constant.TOPUP_FLOW_UPI_INTENT
                 val payUrl = (if (isUpiFlow) data.upiIntentUrl else data.paymentLink).orEmpty()
-                if (clientReference.isEmpty() || payUrl.isEmpty()) {
+                val schemeOk = payUrl.startsWith(
+                    if (isUpiFlow) Constant.TOPUP_UPI_URL_PREFIX else Constant.TOPUP_PAYMENT_LINK_PREFIX, ignoreCase = true
+                )
+                if (clientReference.isEmpty() || !schemeOk) {
                     ToastUtil.showDelete(mActivity, getString(R.string.errGeneric), inWindow = false)
                     return@onSuccess
                 }
@@ -911,22 +904,33 @@ class LoadWalletActivity : BaseActivity() {
     }
 
     private fun populateWalletBalance(data: WalletBalanceItem) {
-        // live_balance when sent, else main_wallet; every bucket is null until the user has a wallet → shown as 0
-        currentWalletBalance = if (data.hasWallet == false) "0" else data.liveBalance ?: data.mainWallet
+        // live_balance when sent, else main_wallet; a null bucket (e.g. no wallet yet) is shown as ₹0.00
+        currentWalletBalance = if (data.hasWallet == false) "0" else data.liveBalance ?: data.mainWallet ?: "0"
         binding.tvWalletBalance.text = Utility.formatAmount(currentWalletBalance)
         binding.tvVaWalletBalance.text = Utility.formatAmount(currentWalletBalance)
-        binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet)
+        binding.tvBonusBalance.text = Utility.formatAmount(data.bonusWallet ?: "0")
     }
 
-    // No toast on error — fetchVirtualAccount() already reports a failing load; the list shows its empty state
-    private fun fetchRecentHistory() {
-        viewModel.fetchRecentHistory(
+    // My Wallet preview — 2 rows of the selected sub tab. No toast on error: fetchVirtualAccount() already
+    // reports a failing load; the list shows its empty state
+    private fun fetchHistoryPreview() {
+        historyVm.loadHistory(
+            tab       = currentHistoryTab,
+            page      = 1,
+            perPage   = HISTORY_PREVIEW_ROWS,
+            onLoading = {
+                binding.tvNoTransactions.visibility = View.GONE
+                binding.rvTransactions.visibility = View.GONE
+            },
             onSuccess = { list ->
-                transactionAdp.updateList(list)
-                if (currentRecentTab == RecentTab.WALLET) updateEmptyState()
+                if (isFinishing || isDestroyed) return@loadHistory
+                transactionAdp.updateList(list.take(HISTORY_PREVIEW_ROWS))
+                updateEmptyState()
             },
             onError = {
-                if (currentRecentTab == RecentTab.WALLET) updateEmptyState()
+                if (isFinishing || isDestroyed) return@loadHistory
+                transactionAdp.updateList(emptyList())
+                updateEmptyState()
             }
         )
     }
@@ -983,45 +987,51 @@ class LoadWalletActivity : BaseActivity() {
 
     private fun setupRecyclerView() {
         transactionAdp = WalletTransactionAdp(mActivity, transactionList)
-        transactionAdp.onClickItem = { transactionId ->
-            if (!Utility.stopClick()) TransactionHistoryDetailActivity.start(mActivity, transactionId)
+        transactionAdp.onClickItem = { row ->
+            if (!Utility.stopClick()) TransactionHistoryDetailActivity.start(mActivity, row)
         }
-        referralAdp = ReferralHistoryAdp(mActivity, referralList)
-        // Adapter is attached by selectRecentTab() so the list follows the selected tab
         binding.rvTransactions.layoutManager = LinearLayoutManager(mActivity)
-        // Keep both views hidden until fetchRecentHistory() resolves — avoids flashing "No transactions" while loading
+        binding.rvTransactions.adapter = transactionAdp
+        // Keep both views hidden until fetchHistoryPreview() resolves — avoids flashing "No transactions" while loading
         binding.tvNoTransactions.visibility = View.GONE
         binding.rvTransactions.visibility = View.GONE
     }
 
     private fun updateEmptyState() {
-        val isEmpty = if (currentRecentTab == RecentTab.WALLET) transactionList.isEmpty() else referralList.isEmpty()
+        val isEmpty = transactionList.isEmpty()
         binding.tvNoTransactions.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.rvTransactions.visibility = if (isEmpty) View.GONE else View.VISIBLE
     }
 
-    private fun selectRecentTab(tab: RecentTab) {
-        currentRecentTab = tab
-        updateRecentTabVisuals()
-        binding.rvTransactions.adapter = if (tab == RecentTab.WALLET) transactionAdp else referralAdp
-        updateEmptyState()
+    // Picks the sub tab, re-labels the 4 chips for its group and reloads the preview
+    private fun selectHistoryTab(tab: WalletHistoryTab) {
+        currentHistoryTab = tab
+        updateHistoryTabVisuals()
+        transactionAdp.updateList(emptyList())
+        fetchHistoryPreview()
     }
 
-    private fun updateRecentTabVisuals() {
+    private fun updateHistoryTabVisuals() {
         val primary = ContextCompat.getColor(mActivity, R.color.primary)
         val white = ContextCompat.getColor(mActivity, R.color.white)
         val transparent = ContextCompat.getColor(mActivity, android.R.color.transparent)
-        if (currentRecentTab == RecentTab.WALLET) {
-            binding.cvTabWallet.setCardBackgroundColor(primary)
-            binding.tvTabWallet.setTextColor(white)
-            binding.cvTabReferralHistory.setCardBackgroundColor(transparent)
-            binding.tvTabReferralHistory.setTextColor(primary)
-        } else {
-            binding.cvTabWallet.setCardBackgroundColor(transparent)
-            binding.tvTabWallet.setTextColor(primary)
-            binding.cvTabReferralHistory.setCardBackgroundColor(primary)
-            binding.tvTabReferralHistory.setTextColor(white)
+        val isWallet = currentHistoryTab.group == WalletHistoryTab.Group.WALLET
+        binding.cvTabWallet.setCardBackgroundColor(if (isWallet) primary else transparent)
+        binding.tvTabWallet.setTextColor(if (isWallet) white else primary)
+        binding.cvTabRewards.setCardBackgroundColor(if (isWallet) transparent else primary)
+        binding.tvTabRewards.setTextColor(if (isWallet) primary else white)
+
+        WalletHistoryTab.of(currentHistoryTab.group).forEachIndexed { i, tab ->
+            val selected = tab == currentHistoryTab
+            subTabTexts[i].setText(tab.labelRes)
+            subTabTexts[i].setTextColor(if (selected) white else primary)
+            subTabCards[i].setCardBackgroundColor(if (selected) primary else transparent)
         }
+    }
+
+    private fun onSubTabClick(index: Int) {
+        val tab = WalletHistoryTab.of(currentHistoryTab.group).getOrNull(index) ?: return
+        if (tab != currentHistoryTab) selectHistoryTab(tab)
     }
 
     private fun selectTab(tab: Int) {
@@ -1086,21 +1096,22 @@ class LoadWalletActivity : BaseActivity() {
 
                 binding.llViewAll -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    val tab = if (currentRecentTab == RecentTab.WALLET)
-                        WalletTransactionsActivity.TAB_WALLET
-                    else
-                        WalletTransactionsActivity.TAB_REFERRAL
-                    WalletTransactionsActivity.start(mActivity, tab)
+                    WalletTransactionsActivity.start(mActivity, currentHistoryTab)
                 }
 
                 binding.cvTabWallet -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (currentRecentTab != RecentTab.WALLET) selectRecentTab(RecentTab.WALLET)
+                    if (currentHistoryTab.group != WalletHistoryTab.Group.WALLET) selectHistoryTab(WalletHistoryTab.MAIN)
                 }
 
-                binding.cvTabReferralHistory -> {
+                binding.cvTabRewards -> {
                     if (Utility.stopClick()) return@OnClickListener
-                    if (currentRecentTab != RecentTab.REFERRAL) selectRecentTab(RecentTab.REFERRAL)
+                    if (currentHistoryTab.group != WalletHistoryTab.Group.REWARDS) selectHistoryTab(WalletHistoryTab.WITHDRAWALS)
+                }
+
+                binding.cvSubTab1, binding.cvSubTab2, binding.cvSubTab3, binding.cvSubTab4 -> {
+                    if (Utility.stopClick()) return@OnClickListener
+                    onSubTabClick(subTabCards.indexOfFirst { it === view })
                 }
 
                 sheetBinding.ivClose -> {

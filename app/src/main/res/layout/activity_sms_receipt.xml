@@ -267,8 +267,10 @@
                                             tools:text="30723111936" />
                                     </LinearLayout>
 
-                                    <!-- Customer Name -->
+                                    <!-- Customer Name — hidden: billpay/status has no customer name -->
                                     <LinearLayout
+                                        android:id="@+id/llCustomerNameRow"
+                                        android:visibility="gone"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="@dimen/margin_medium"

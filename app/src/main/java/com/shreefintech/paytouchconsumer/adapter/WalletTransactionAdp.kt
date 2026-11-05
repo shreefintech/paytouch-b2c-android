@@ -2,6 +2,7 @@ package com.shreefintech.paytouchconsumer.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +17,7 @@ class WalletTransactionAdp(
     private val mArrayList: ArrayList<WalletTransactionItem>
 ) : RecyclerView.Adapter<WalletTransactionAdp.ViewHolder>() {
 
-    var onClickItem: ((transactionId: String) -> Unit)? = null
+    var onClickItem: ((WalletTransactionItem) -> Unit)? = null
     private val animatedPositions = mutableSetOf<Int>()
 
     class ViewHolder(val binding: ItemWalletTransactionBinding) :
@@ -34,22 +35,38 @@ class WalletTransactionAdp(
         holder.binding.root.setOnClickListener {
             val pos = holder.bindingAdapterPosition
             if (pos != RecyclerView.NO_POSITION) {
-                val id = mArrayList[pos].transactionId
-                if (id.isNotEmpty()) onClickItem?.invoke(id)
+                val row = mArrayList[pos]
+                if (row.isClickable) onClickItem?.invoke(row)
             }
         }
         holder.binding.apply {
             tvTitle.text = item.title
             tvDate.text = item.date
             Glide.with(mContext).load(item.categoryIconRes).placeholder(R.drawable.ic_file_not_found).into(ivIcon)
-            if (item.isCredit) {
-                cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_success)
-                tvAmount.text = root.context.getString(R.string.textCreditSign, item.amount)
-                tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_success))
+            when {
+                // Failed withdrawal — money went back to the wallet: grey, unsigned
+                item.isFailed -> {
+                    cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.hint_color)
+                    tvAmount.text = item.amount
+                    tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.hint_color))
+                }
+                item.isCredit -> {
+                    cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_success)
+                    tvAmount.text = mContext.getString(R.string.textCreditSign, item.amount)
+                    tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_success))
+                }
+                else -> {
+                    cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_reject)
+                    tvAmount.text = mContext.getString(R.string.textDebitSign, item.amount)
+                    tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_reject))
+                }
+            }
+            val statusRes = item.statusLabelRes
+            if (statusRes != null) {
+                tvRowStatus.setText(statusRes)
+                tvRowStatus.visibility = View.VISIBLE
             } else {
-                cvMain.strokeColor = ContextCompat.getColor(mContext, R.color.form_wizard_reject)
-                tvAmount.text = root.context.getString(R.string.textDebitSign, item.amount)
-                tvAmount.setTextColor(ContextCompat.getColor(mContext, R.color.form_wizard_reject))
+                tvRowStatus.visibility = View.GONE
             }
         }
         // Only first-screen rows animate, so only they need tracking.

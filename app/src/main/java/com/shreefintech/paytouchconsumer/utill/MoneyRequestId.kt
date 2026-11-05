@@ -3,7 +3,7 @@ package com.shreefintech.paytouchconsumer.utill
 import java.util.UUID
 
 /**
- * `request_id` (idempotency key) for money calls — wallet withdrawal, earning lock / withdraw.
+ * `request_id` (idempotency key) for money calls — Bill Pay, wallet withdrawal, earning lock / withdraw.
  * The same id is returned while one attempt's outcome is unknown (timeout / 5xx), so a retry can't pay twice;
  * [clear] once the server gave a definite answer. Not a transaction_id — the server still issues that.
  */
